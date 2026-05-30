@@ -11,6 +11,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import SidebarTree from "@/components/SidebarTree";
 import RuleViewer from "@/components/RuleViewer";
+import Link from "next/link";
 
 export default function Home() {
   const [activeRuleId, setActiveRuleId] = useState<string | null>(null);
@@ -212,6 +213,27 @@ export default function Home() {
           >
             홈으로
           </Button>
+
+          {/* 관리자 로그인 버튼 추가 */}
+          <Button
+            component={Link}
+            href="/admin"
+            variant="contained"
+            sx={{
+              bgcolor: "#0c3161",
+              "&:hover": { bgcolor: "#092244" },
+              borderRadius: "8px",
+              fontWeight: "bold",
+              fontSize: "0.775rem",
+              px: 2,
+              py: 0.5,
+              minHeight: "32px",
+            }}
+            className="font-bold text-xs active:scale-95 transition-all text-white font-sans"
+          >
+            관리자 로그인
+          </Button>
+
           <span className="text-xs text-slate-400 font-medium hidden sm:inline">
             Yewon Arts University Rule Management
           </span>
