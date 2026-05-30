@@ -1,6 +1,7 @@
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -82,7 +83,7 @@ model Revision {
   effectiveDate      DateTime           // 시행일자
   announcementNumber String             // 공포번호 (예: 제123호)
   
-  description        String?            
+  description        String?            @db.Text
 
   // 이 버전에 해당하는 규정의 상세 조항 리스트
   articles           Article[]
@@ -112,7 +113,7 @@ model Article {
   contentJson   Json        
   
   // 검색 효율성을 위해 파싱된 텍스트 전문을 별도로 저장 (전문 검색용)
-  contentText   String      
+  contentText   String      @db.Text
   
   sortOrder     Int         @default(1) // 렌더링 정렬 순서
 
@@ -142,7 +143,7 @@ model ArticleComparison {
   afterArticle    Article? @relation("AfterArticle", fields: [afterArticleId], references: [id], onDelete: SetNull)
   
   // 대비 설명 / 특이사항
-  note            String?  
+  note            String?  @db.Text
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -157,7 +158,7 @@ model Attachment {
   rule      Rule     @relation(fields: [ruleId], references: [id], onDelete: Cascade)
   
   title     String   // 서식명 (예: [별지 제1호 서식] 휴학원)
-  fileUrl   String   // 파일 다운로드 경로
+  fileUrl   String   @db.Text // 파일 다운로드 경로
   fileSize  Int?     // 파일 크기 (Bytes)
   fileType  String?    
 
