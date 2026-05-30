@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import { CircularProgress } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import EditIcon from "@mui/icons-material/Edit";
@@ -15,6 +16,40 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // 로그인 페이지는 인증 검사 생략
+    if (pathname === "/admin/login") {
+      setAuthorized(true);
+      return;
+    }
+
+    // 클라이언트 사이드 인증 체크
+    const session = localStorage.getItem("yewon_admin_session");
+    if (session === "authorized") {
+      setAuthorized(true);
+    } else {
+      setAuthorized(false);
+      router.push("/admin/login");
+    }
+  }, [pathname, router]);
+
+  // 인증 검사 대기 상태 (화면 깜빡임 방지용 프리미엄 스피너)
+  if (authorized === null) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center gap-4 bg-slate-950 text-slate-100 font-sans">
+        <CircularProgress size={30} sx={{ color: "#009b9e" }} />
+        <span className="text-slate-400 text-xs font-semibold select-none">관리자 세션 검증 중...</span>
+      </div>
+    );
+  }
+
+  // 로그인 페이지는 사이드바 레이아웃 없이 본문만 전면 노출
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
 
   const menuItems = [
     {
@@ -79,8 +114,18 @@ export default function AdminLayout({
           </nav>
         </div>
 
-        {/* 하단 푸터 - 사용자 서비스로 돌아가기 */}
-        <div className="p-4 border-t border-slate-800">
+        {/* 하단 푸터 - 사용자 서비스로 돌아가기 및 로그아웃 */}
+        <div className="p-4 border-t border-slate-800 space-y-2">
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.removeItem("yewon_admin_session");
+              router.push("/admin/login");
+            }}
+            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-red-500/30 text-xs font-black text-red-400 hover:bg-red-500/10 transition-all active:scale-95 cursor-pointer"
+          >
+            로그아웃
+          </button>
           <Link
             href="/"
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-slate-700 text-xs font-black text-slate-300 hover:bg-slate-900 hover:text-white transition-all active:scale-95 cursor-pointer"
