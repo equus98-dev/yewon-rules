@@ -38,7 +38,9 @@ export default function AdminDashboard() {
     );
   }
 
-  const { counts, deptStats, revisionFeed } = stats || {
+  const isDbError = stats && stats.error;
+
+  const { counts, deptStats, revisionFeed } = stats && stats.counts ? stats : {
     counts: { rules: 0, categories: 0, departments: 0, attachments: 0 },
     deptStats: [],
     revisionFeed: [],
@@ -75,6 +77,15 @@ export default function AdminDashboard() {
     <div className="h-full overflow-y-auto p-8 bg-slate-900 scrollbar">
       <div className="max-w-6xl mx-auto space-y-8 pb-10">
         
+        {/* 데이터베이스 오류 배너 */}
+        {isDbError && (
+          <div className="bg-red-500/10 border border-red-500/30 p-5 rounded-2xl text-xs text-red-400 font-bold select-none leading-relaxed">
+            ⚠️ 데이터베이스 연결 오류: Cloudflare Pages에서 데이터베이스를 로드할 수 없습니다.<br />
+            원인: {stats.error}<br />
+            해결 방안: Cloudflare Pages 설정에서 <strong>DATABASE_URL</strong> 환경 변수(Secret)가 세션 풀러 주소(aws-1-ap-northeast-1.pooler.supabase.com:6543)로 바르게 추가되고 <strong>nodejs_compat</strong> 호환성 플래그가 활성화되었는지 확인한 다음 배포를 재시도해 주십시오.
+          </div>
+        )}
+
         {/* 상단 웰컴 배너 */}
         <div className="bg-gradient-to-br from-[#0c3161]/50 to-[#071c38]/50 p-6 md:p-8 rounded-2xl border border-slate-700 shadow-md">
           <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
