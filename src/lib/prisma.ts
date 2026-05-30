@@ -4,12 +4,35 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Prisma 6에서는 추가 드라이버 어댑터나 복잡한 생성자 인수 없이 
-// 빈 인스턴스로 즉시 DATABASE_URL 환경 변수를 바인딩하여 작동합니다.
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
+// Edge/Serverless 환경을 위한 Driver Adapter 기반 Prisma Client 생성
+const createPrismaClient = () => {
+  const connectionString = process.env.DATABASE_URL;
+  
+  if (connectionString) {
+    try {
+      // Turbopack Edge 컴파일러의 eval 차단을 우회하기 위해 globalThis["require"] 사용
+      const req = (globalThis as any)["require"];
+      if (typeof req === "function") {
+        const { Pool } = req("pg");
+        const { PrismaPg } = req("@prisma/adapter-pg");
+        
+        const pool = new Pool({ connectionString });
+        const adapter = new PrismaPg(pool);
+        return new PrismaClient({
+          adapter,
+          log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to initialize edge adapter, falling back to standard client:", e);
+    }
+  }
+
+  return new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   });
+};
+
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
