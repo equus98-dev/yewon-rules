@@ -1,0 +1,168 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 1. 카테고리 (분야별 트리 구조)
+model Category {
+  id        String     @id @default(uuid())
+  name      String     
+  depth     Int        @default(1) // 1: 대분류, 2: 중분류, 3: 소분류 등
+  sortOrder Int        @default(1)
+  
+  // Self-referencing relationship for hierarchical tree
+  parentId  String?
+  parent    Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Category[] @relation("CategoryToCategory")
+  
+  // Relation to Rules
+  rules     Rule[]
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([parentId])
+}
+
+// 2. 소관 부서
+model Department {
+  id        String   @id @default(uuid())
+  name      String   @unique // 예: 교무처, 기획처, 총무처 등
+  code      String?  @unique  // 부서 코드 (예: DEPT001)
+  sortOrder Int      @default(1)
+  
+  rules     Rule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 3. 규정 기본 마스터 정보
+model Rule {
+  id           String      @id @default(uuid())
+  title        String      // 규정명 (예: 학칙)
+  ruleNumber   String      @unique // 규정번호 (예: 제1호)
+  initialSound String      // 가나다순 필터링용 초성 (예: ㅎ)
+  status       String      @default("EFFECTIVE") // 현행(EFFECTIVE), 폐지(ABOLISHED) 등
+  
+  // Relations
+  categoryId   String
+  category     Category    @relation(fields: [categoryId], references: [id])
+  
+  departmentId String
+  department   Department  @relation(fields: [departmentId], references: [id])
+
+  revisions    Revision[]
+  attachments  Attachment[]
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([categoryId])
+  @@index([departmentId])
+  @@index([initialSound])
+}
+
+// 4. 제·개정 연혁 (규정의 버전을 관리)
+model Revision {
+  id                 String             @id @default(uuid())
+  ruleId             String
+  rule               Rule               @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  
+  version            Int                @default(1) // 개정 차수 (예: 1 -> 제정, 2 -> 제1차 개정...)
+  versionName        String             // 표시용 이름 (예: "제15차 일부개정")
+  
+  revisionType       String             @default("AMENDMENT") // 제정(ENACTMENT), 개정(AMENDMENT), 전부개정(TOTAL_AMENDMENT), 폐지(ABOLITION)
+  
+  enactmentDate      DateTime           // 공포일자 / 제정일자
+  effectiveDate      DateTime           // 시행일자
+  announcementNumber String             // 공포번호 (예: 제123호)
+  
+  description        String?            
+
+  // 이 버전에 해당하는 규정의 상세 조항 리스트
+  articles           Article[]
+  // 신구조문대비표 정보
+  comparisons        ArticleComparison[]
+
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([ruleId])
+  @@unique([ruleId, version]) // 한 규정당 버전 차수는 유니크
+}
+
+// 5. 규정의 조항 구조 (들여쓰기 및 조-항-호 구조화)
+model Article {
+  id            String      @id @default(uuid())
+  revisionId    String
+  revision      Revision    @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  
+  chapter       String?       // 장 (예: 제1장 총칙)
+  section       String?       // 절 (예: 제1절 목적 및 정의)
+  
+  articleNumber Int         // 조 번호 (예: 1 -> 제1조)
+  title         String      // 조 제목 (예: 목적)
+  
+  // 상세 내용 - 조 본문 혹은 "항/호/목" 구조를 가지는 정형화된 JSON 데이터
+  contentJson   Json        
+  
+  // 검색 효율성을 위해 파싱된 텍스트 전문을 별도로 저장 (전문 검색용)
+  contentText   String      
+  
+  sortOrder     Int         @default(1) // 렌더링 정렬 순서
+
+  // 신구조문대비표 관계
+  comparisonsBefore ArticleComparison[] @relation("BeforeArticle")
+  comparisonsAfter  ArticleComparison[] @relation("AfterArticle")
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([revisionId])
+  @@index([chapter])
+}
+
+// 6. 신구조문 대비표
+model ArticleComparison {
+  id              String   @id @default(uuid())
+  revisionId      String
+  revision        Revision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  
+  // 개정 전 조항 (신설된 경우 Null)
+  beforeArticleId String?
+  beforeArticle   Article? @relation("BeforeArticle", fields: [beforeArticleId], references: [id], onDelete: SetNull)
+  
+  // 개정 후 조항 (폐지된 경우 Null)
+  afterArticleId  String?
+  afterArticle    Article? @relation("AfterArticle", fields: [afterArticleId], references: [id], onDelete: SetNull)
+  
+  // 대비 설명 / 특이사항
+  note            String?  
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([revisionId])
+}
+
+// 7. 관련 서식 / 첨부파일 (서식 hwp, pdf 등)
+model Attachment {
+  id        String   @id @default(uuid())
+  ruleId    String
+  rule      Rule     @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  
+  title     String   // 서식명 (예: [별지 제1호 서식] 휴학원)
+  fileUrl   String   // 파일 다운로드 경로
+  fileSize  Int?     // 파일 크기 (Bytes)
+  fileType  String?    
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ruleId])
+}
