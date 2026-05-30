@@ -4,7 +4,7 @@ import ThemeProvider from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "예원예술대학교 규정관리시스템",
-  description: "남서울대학교 시스템 기반으로 고도화된 예원예술대학교 규정관리시스템입니다. 분야별, 부서별, 가나다순 규정을 한눈에 편리하게 탐색하십시오.",
+  description: "예원예술대학교 규정관리시스템입니다. 분야별, 부서별, 가나다순 규정을 한눈에 편리하게 탐색하십시오.",
 };
 
 export default function RootLayout({

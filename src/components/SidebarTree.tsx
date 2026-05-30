@@ -202,7 +202,7 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
     { id: 2, title: "[공고] 학칙 및 학사행정규정 일부 개정 안 예고 수렴", date: "2026.05.14", dept: "교무처" },
     { id: 3, title: "예원예술대학교 요람 및 규정집 편찬위원회 발족식 개최", date: "2026.05.02", dept: "총무처" },
     { id: 4, title: "정부 재정지원 제한 평가 대비 정관 개정 완료 공지", date: "2026.04.28", dept: "기획처" },
-    { id: 5, title: "규정관리시스템 리뉴얼(남서울대 벤치마킹) 오픈 안내", date: "2026.04.15", dept: "전산정보원" },
+    { id: 5, title: "규정관리시스템 리뉴얼 오픈 안내", date: "2026.04.15", dept: "전산정보원" },
   ];
 
   // 서식 검색 필터링
