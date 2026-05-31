@@ -6,7 +6,7 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// 1. Cloudflare Edge 및 Node.js 하이브리드 환경에서 환경 변수를 가장 확실하게 읽어오는 지능형 헬퍼
+// 1. Cloudflare Pages 및 Node.js 하이브리드 환경에서 환경 변수를 가장 확실하게 읽어오는 지능형 헬퍼
 const getConnectionString = (): string | undefined => {
   // A. 일반 환경 변수 확인
   if (process.env.DATABASE_URL) {
@@ -59,11 +59,13 @@ const createPrismaClient = (connectionString: string | undefined): PrismaClient 
     }
   }
 
-  // 오직 실서버 프로덕션 에지 런타임 환경에서만 Neon Serverless 어댑터를 기동합니다.
-  const isProdEdge = process.env.NODE_ENV === "production" && process.env.NEXT_RUNTIME === "edge";
+  // 오직 실서버 프로덕션 환경(production)에서만 Neon Serverless 어댑터를 기동합니다.
+  // (Cloudflare Pages 환경의 NEXT_RUNTIME 판정 유실로 인한 우회를 원천 차단하기 위해 묻지도 따지지도 않고 Neon 어댑터를 강제 기동합니다.)
+  const isProduction = process.env.NODE_ENV === "production";
   
-  if (isProdEdge && connectionString) {
+  if (isProduction && connectionString) {
     try {
+      console.log("[Prisma] Production environment detected. Enabling Neon Serverless adapter...");
       const pool = new Pool({ connectionString });
       const adapter = new PrismaNeon(pool as any);
       return new PrismaClient({
@@ -111,10 +113,10 @@ const getPrisma = (): PrismaClient => {
   } else {
     // 혹시 모를 이전의 불완전 캐시 갱신 (Neon 어댑터 누락 방지)
     const client = globalForPrisma.prisma as any;
-    const isProdEdge = process.env.NODE_ENV === "production" && process.env.NEXT_RUNTIME === "edge";
+    const isProduction = process.env.NODE_ENV === "production";
     const hasNeonAdapter = client._engineConfig?.activeProvider === "postgres" && !!client._engineConfig?.adapter;
     
-    if (isProdEdge && !hasNeonAdapter) {
+    if (isProduction && !hasNeonAdapter) {
       globalForPrisma.prisma = createPrismaClient(connectionString);
     }
   }
@@ -134,5 +136,6 @@ export const prisma = new Proxy({} as PrismaClient, {
     return value;
   }
 });
+
 
 
