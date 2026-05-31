@@ -2,11 +2,12 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 
 export async function GET(request: Request) {
   try {
+    const prisma = await getPrisma();
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("query") || "";
     const initialSound = searchParams.get("initialSound") || "";
