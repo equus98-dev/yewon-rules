@@ -100,18 +100,21 @@ const getPrisma = (): PrismaClient => {
 
   // 프로덕션 에지 런타임의 경우:
   // 최초 앱 탑레벨 모듈 로드 시점에는 환경변수 바인딩이 아직 완성되지 않아 undefined 상태로 캐싱될 위험이 있습니다.
-  // 따라서 매 요청(Request) 런타임 시점에 환경변수가 채워진 것이 감지되면 인스턴스를 동적으로 온전하게 재구성합니다.
+  // 따라서 connectionString이 주입되기 전까지는 전역 싱글톤 캐시에 저장하지 않고, 
+  // 매 요청 시점에 완전한 환경변수가 수립되었을 때에만 딱 1회 올바르게 인스턴스를 캐싱합니다.
+  if (!connectionString) {
+    return createPrismaClient(undefined);
+  }
+
   if (!globalForPrisma.prisma) {
     globalForPrisma.prisma = createPrismaClient(connectionString);
-  } else if (connectionString) {
-    // 이미 생성되어 있으나 이전에 환경변수 누락 상태로 생성되어 Supabase 접속에 실패하는 것을 방지하기 위한 자가 갱신 로직
+  } else {
+    // 혹시 모를 이전의 불완전 캐시 갱신 (Neon 어댑터 누락 방지)
     const client = globalForPrisma.prisma as any;
-    // Neon 어댑터가 기동되어야 하는 에지 런타임임에도 어댑터가 안 붙은 깡통 PrismaClient가 들어있는 경우 자동 리빌딩
     const isProdEdge = process.env.NODE_ENV === "production" && process.env.NEXT_RUNTIME === "edge";
     const hasNeonAdapter = client._engineConfig?.activeProvider === "postgres" && !!client._engineConfig?.adapter;
     
     if (isProdEdge && !hasNeonAdapter) {
-      console.log("[Prisma] Production Edge runtime detected. Dynamically rebuilding Prisma Client with Neon Serverless adapter...");
       globalForPrisma.prisma = createPrismaClient(connectionString);
     }
   }
