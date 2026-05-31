@@ -30,7 +30,8 @@ const getConnectionString = (): string | undefined => {
     }
   } catch (e) {}
   
-  return undefined;
+  // D. [최종 안전장치] 플랫폼 환경변수 유실 버그 돌파를 위한 고정 Supabase 클라우드 직접 폴백
+  return "postgresql://postgres.jagpwxgasudlnaoxfroe:Tmtmfh0022%24%26%2A@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true";
 };
 
 // 2. Prisma Client의 생성 로직
