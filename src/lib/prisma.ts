@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { Pool } from "@neondatabase/serverless";
+import { PrismaNeon } from "@prisma/adapter-neon";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -10,18 +12,14 @@ const createPrismaClient = () => {
   
   if (connectionString) {
     try {
-      // 정적 import를 배제하고 동적 require를 적용하여 빌드타임 node:util/types 에러를 원천 회피합니다.
-      const { Pool } = require("pg");
-      const { PrismaPg } = require("@prisma/adapter-pg");
-      
       const pool = new Pool({ connectionString });
-      const adapter = new PrismaPg(pool);
+      const adapter = new PrismaNeon(pool as any);
       return new PrismaClient({
         adapter,
         log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
       });
     } catch (e) {
-      console.error("Failed to initialize Prisma Edge Client with PG adapter:", e);
+      console.error("Failed to initialize Prisma Client with Neon adapter:", e);
     }
   }
 
