@@ -162,18 +162,18 @@ export default function AdminRulesManagement() {
 
   if (loading) {
     return (
-      <div className="h-full w-full flex flex-col items-center justify-center gap-4 bg-slate-900">
-        <CircularProgress size={30} sx={{ color: "#009b9e" }} />
-        <span className="text-slate-400 text-xs font-semibold">대학 규정 색인 목록 로드 중...</span>
+      <div className="h-full w-full flex flex-col items-center justify-center gap-4 bg-slate-50">
+        <CircularProgress size={30} sx={{ color: "#0c3161" }} />
+        <span className="text-slate-550 text-xs font-semibold">대학 규정 색인 목록 로드 중...</span>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col bg-slate-900">
+    <div className="h-full flex flex-col bg-slate-50 text-slate-800">
       
       {/* 1. 상단 액션 툴바 */}
-      <div className="bg-slate-950/40 border-b border-slate-800 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 select-none">
+      <div className="bg-white border-b border-slate-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 select-none shadow-sm">
         
         {/* 검색 영역 */}
         <div className="relative w-full sm:w-80">
@@ -182,16 +182,16 @@ export default function AdminRulesManagement() {
             placeholder="규정명, 번호, 소관부서 검색..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-10 py-2 text-xs text-white placeholder-slate-500 font-bold focus:outline-none focus:ring-1 focus:ring-[#009b9e] focus:border-[#009b9e]"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-10 py-2.5 text-xs text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
           />
-          <SearchIcon className="absolute left-3 top-2.5 text-slate-500 text-sm" />
+          <SearchIcon className="absolute left-3.5 top-3 text-slate-400 text-sm" sx={{ fontSize: 16 }} />
         </div>
 
         {/* 신규 등록 버튼 */}
         <button
           type="button"
           onClick={() => setOpenCreate(true)}
-          className="bg-[#009b9e] hover:bg-[#008082] text-white text-xs font-black px-4.5 py-2.5 rounded-xl shadow-lg shadow-[#009b9e]/10 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+          className="bg-[#0c3161] hover:bg-[#092244] text-white text-xs font-black px-4.5 py-2.5 rounded-xl shadow-lg shadow-[#0c3161]/10 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
         >
           <AddIcon sx={{ fontSize: 16 }} />
           신규 규정 제정 등록
@@ -200,10 +200,10 @@ export default function AdminRulesManagement() {
 
       {/* 2. 메인 규정 테이블 영역 */}
       <div className="flex-1 overflow-auto p-8 scrollbar">
-        <div className="max-w-6xl mx-auto bg-slate-950/20 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="max-w-6xl mx-auto bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
           <table className="w-full text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-950/50 border-b border-slate-800 text-slate-400 select-none text-[11px]">
+              <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 select-none text-[11px]">
                 <th className="py-4 px-4 font-black w-14 text-center">번호</th>
                 <th className="py-4 px-4 font-black">규정명 / 분류</th>
                 <th className="py-4 px-4 font-black w-24 text-center">규정번호</th>
@@ -216,7 +216,7 @@ export default function AdminRulesManagement() {
             <tbody>
               {filteredRules.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-24 text-center text-slate-500 font-bold bg-slate-950/10">
+                  <td colSpan={7} className="py-24 text-center text-slate-450 font-bold bg-white">
                     검색 결과에 부합하는 대학 규정이 존재하지 않습니다.
                   </td>
                 </tr>
@@ -226,33 +226,33 @@ export default function AdminRulesManagement() {
                   return (
                     <tr
                       key={rule.id}
-                      className="border-b border-slate-800/50 hover:bg-slate-950/30 transition-colors"
+                      className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors"
                     >
-                      <td className="py-3 px-4 text-center text-slate-500 font-bold select-none">{idx + 1}</td>
+                      <td className="py-3 px-4 text-center text-slate-400 font-bold select-none">{idx + 1}</td>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
-                          <span className="bg-[#009b9e]/10 text-[#009b9e] px-1.5 py-0.5 rounded text-[9px] font-black border border-[#009b9e]/20 select-none shrink-0">
+                          <span className="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-[9px] font-black border border-blue-100 select-none shrink-0">
                             {rule.categoryName}
                           </span>
-                          <span className={`text-slate-100 font-bold hover:text-[#009b9e] cursor-pointer transition-colors ${isAbolished ? "line-through text-slate-600" : ""}`}>
+                          <span className={`text-slate-800 font-bold hover:text-blue-900 cursor-pointer transition-colors ${isAbolished ? "line-through text-slate-400" : ""}`}>
                             {rule.title}
                           </span>
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-center text-slate-300 font-bold">{rule.ruleNumber}</td>
+                      <td className="py-3 px-4 text-center text-slate-700 font-bold">{rule.ruleNumber}</td>
                       <td className="py-3 px-4 text-center select-none">
-                        <span className="bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-[10px] font-black border border-slate-700/50">
+                        <span className="bg-slate-100 text-slate-650 px-2 py-0.5 rounded text-[10px] font-black border border-slate-200">
                           {rule.departmentName}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-center text-slate-400 font-bold select-none">{rule.enactmentDate}</td>
+                      <td className="py-3 px-4 text-center text-slate-500 font-bold select-none">{rule.enactmentDate}</td>
                       <td className="py-3 px-4 text-center select-none">
                         {isAbolished ? (
-                          <span className="text-red-500 font-black bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded text-[9px]">
+                          <span className="text-red-650 font-black bg-red-50 border border-red-100 px-2 py-0.5 rounded text-[9px]">
                             폐지
                           </span>
                         ) : (
-                          <span className="text-[#009b9e] font-black bg-[#009b9e]/10 border border-[#009b9e]/20 px-2 py-0.5 rounded text-[9px]">
+                          <span className="text-emerald-700 font-black bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded text-[9px]">
                             현행
                           </span>
                         )}
@@ -263,18 +263,18 @@ export default function AdminRulesManagement() {
                         <button
                           type="button"
                           onClick={() => router.push(`/admin/editor?ruleId=${rule.id}`)}
-                          className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 text-[10px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm"
+                          className="bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 px-3 py-1.5 rounded-lg border border-slate-200 text-[10px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm"
                         >
                           <EditIcon sx={{ fontSize: 11 }} />
                           조문 개정
                         </button>
-
+ 
                         {/* 2) 폐지 / 복구 토글 */}
                         {isAbolished ? (
                           <button
                             type="button"
                             onClick={() => handleToggleStatus(rule.id, rule.status)}
-                            className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-500/20 text-[10px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm"
+                            className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-200 text-[10px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm"
                           >
                             <CheckCircleIcon sx={{ fontSize: 11 }} />
                             현행 복구
@@ -283,7 +283,7 @@ export default function AdminRulesManagement() {
                           <button
                             type="button"
                             onClick={() => handleToggleStatus(rule.id, rule.status)}
-                            className="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg border border-red-500/20 text-[10px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm"
+                            className="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-1.5 rounded-lg border border-red-200 text-[10px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm"
                           >
                             <BlockIcon sx={{ fontSize: 11 }} />
                             규정 폐지
@@ -298,7 +298,7 @@ export default function AdminRulesManagement() {
           </table>
         </div>
       </div>
-
+ 
       {/* 3. 신규 제정 등록 모달 */}
       <Dialog
         open={openCreate}
@@ -307,15 +307,16 @@ export default function AdminRulesManagement() {
         fullWidth
         sx={{
           "& .MuiPaper-root": {
-            bgcolor: "#0f172a", // slate-900
-            color: "white",
-            border: "1px solid #334155", // slate-700
+            bgcolor: "#ffffff", 
+            color: "#1e293b",
+            border: "1px solid #e2e8f0", 
             borderRadius: "16px",
+            boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
           },
         }}
       >
-        <DialogTitle className="text-sm font-black border-b border-slate-800 text-slate-100 flex items-center gap-2">
-          <AddIcon sx={{ fontSize: 18, color: "#009b9e" }} />
+        <DialogTitle className="text-sm font-black border-b border-slate-100 text-slate-800 flex items-center gap-2">
+          <AddIcon sx={{ fontSize: 18, color: "#0c3161" }} />
           신규 규정 제정 등록 (입안 기초 마스터)
         </DialogTitle>
         <form onSubmit={handleCreateRule}>
@@ -323,122 +324,122 @@ export default function AdminRulesManagement() {
             
             {/* 규정명 */}
             <div className="space-y-1">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">규정명 (필수)</label>
+              <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider pl-1">규정명 (필수)</label>
               <input
                 type="text"
                 required
                 placeholder="예: 대학평의원회 운영 규정"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 font-bold focus:outline-none focus:ring-1 focus:ring-[#009b9e]"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
               />
             </div>
-
+ 
             {/* 규정 분류 코드 & 규정번호 */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">규정번호 (필수)</label>
+                <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider pl-1">규정번호 (필수)</label>
                 <input
                   type="text"
                   required
                   placeholder="예: 제2-0-5호"
                   value={newRuleNum}
                   onChange={(e) => setNewRuleNum(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 font-bold focus:outline-none focus:ring-1 focus:ring-[#009b9e]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
                 />
               </div>
-
+ 
               {/* 제정 공포일 */}
               <div className="space-y-1">
-                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">제정일자 (필수)</label>
+                <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider pl-1">제정일자 (필수)</label>
                 <input
                   type="date"
                   required
                   value={newEnactmentDate}
                   onChange={(e) => setNewEnactmentDate(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white font-bold focus:outline-none focus:ring-1 focus:ring-[#009b9e]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
                 />
               </div>
             </div>
-
+ 
             {/* 분류 카테고리 & 소관 부서 */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1 flex flex-col">
-                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">분류 카테고리 (필수)</label>
+                <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 pl-1">분류 카테고리 (필수)</label>
                 <select
                   required
                   value={newCatId}
                   onChange={(e) => setNewCatId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-bold focus:outline-none focus:ring-1 focus:ring-[#009b9e]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] cursor-pointer"
                 >
                   <option value="" disabled>카테고리 선택</option>
                   {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    <option key={cat.id} value={cat.id} className="text-slate-850">{cat.name}</option>
                   ))}
                 </select>
               </div>
-
+ 
               <div className="space-y-1 flex flex-col">
-                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">소관 부서 (필수)</label>
+                <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 pl-1">소관 부서 (필수)</label>
                 <select
                   required
                   value={newDeptId}
                   onChange={(e) => setNewDeptId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-bold focus:outline-none focus:ring-1 focus:ring-[#009b9e]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] cursor-pointer"
                 >
                   <option value="" disabled>부서 선택</option>
                   {departments.map((d) => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
+                    <option key={d.id} value={d.id} className="text-slate-850">{d.name}</option>
                   ))}
                 </select>
               </div>
             </div>
-
+ 
             {/* 공포번호 & 원본 다운로드 한글/PDF URL */}
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-1">
-                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">공포 기호/번호</label>
+                <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider pl-1">공포 기호/번호</label>
                 <input
                   type="text"
                   placeholder="예: 예원 제2026-1호"
                   value={newAnnounceNum}
                   onChange={(e) => setNewAnnounceNum(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 font-bold focus:outline-none focus:ring-1 focus:ring-[#009b9e]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
                 />
               </div>
-
+ 
               <div className="space-y-1">
-                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">관련 서식 다운로드 링크 (한글/PDF URL)</label>
+                <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider pl-1">관련 서식 다운로드 링크 (한글/PDF URL)</label>
                 <input
                   type="url"
                   placeholder="예: https://yewon.ac.kr/main/filedown.php?no=46558"
                   value={newFileUrl}
                   onChange={(e) => setNewFileUrl(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 font-bold focus:outline-none focus:ring-1 focus:ring-[#009b9e]"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
                 />
               </div>
             </div>
-
+ 
           </DialogContent>
-          <DialogActions className="border-t border-slate-800/80 px-6 py-4 flex gap-2 justify-end">
+          <DialogActions className="border-t border-slate-100 px-6 py-4 flex gap-2 justify-end">
             <button
               type="button"
               onClick={() => setOpenCreate(false)}
-              className="px-4 py-2 border border-slate-700 text-slate-300 rounded-xl text-xs font-black hover:bg-slate-800 cursor-pointer transition-all active:scale-95"
+              className="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-black hover:bg-slate-50 cursor-pointer transition-all active:scale-95"
             >
               취소
             </button>
             <button
               type="submit"
               disabled={creating}
-              className="bg-[#009b9e] hover:bg-[#008082] text-white px-5 py-2 rounded-xl text-xs font-black cursor-pointer transition-all active:scale-95 shadow-md shadow-[#009b9e]/10 disabled:opacity-50"
+              className="bg-[#0c3161] hover:bg-[#092244] text-white px-5 py-2 rounded-xl text-xs font-black cursor-pointer transition-all active:scale-95 shadow-md shadow-[#0c3161]/10 disabled:opacity-50"
             >
               {creating ? "제정 등록 중..." : "제정 등록 승인"}
             </button>
           </DialogActions>
         </form>
       </Dialog>
-
+ 
     </div>
   );
 }

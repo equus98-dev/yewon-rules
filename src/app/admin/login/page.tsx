@@ -34,15 +34,15 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-slate-950 relative overflow-hidden text-slate-100">
+    <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 relative overflow-hidden text-slate-800">
       
       {/* 1. 배경 그래디언트 글로우 데코레이션 */}
-      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-[#009b9e]/10 blur-[120px] select-none pointer-events-none z-0"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-blue-500/10 blur-[120px] select-none pointer-events-none z-0"></div>
-      <div className="absolute inset-0 opacity-5 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:24px_24px] z-0"></div>
-
-      {/* 2. 로그인 글래스모피즘 카드 박스 */}
-      <div className="relative z-10 w-full max-w-md mx-4 p-8 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl flex flex-col items-center">
+      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-[#0c3161]/5 blur-[120px] select-none pointer-events-none z-0"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-blue-500/5 blur-[120px] select-none pointer-events-none z-0"></div>
+      <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:24px_24px] z-0"></div>
+ 
+      {/* 2. 로그인 화이트 카드 박스 */}
+      <div className="relative z-10 w-full max-w-md mx-4 p-8 bg-white border border-slate-200 rounded-3xl shadow-xl flex flex-col items-center">
         
         {/* 대학 로고 */}
         <div className="mb-6 flex flex-col items-center gap-1.5 select-none">
@@ -51,25 +51,25 @@ export default function AdminLoginPage() {
             alt="예원예술대학교 로고"
             width={160}
             height={36}
-            className="brightness-0 invert object-contain"
+            className="object-contain"
           />
-          <span className="text-[10px] text-[#009b9e] font-black tracking-widest uppercase mt-2">
+          <span className="text-[10px] text-[#0c3161] font-black tracking-widest uppercase mt-3">
             최고 관리자 인증 포털
           </span>
         </div>
-
+ 
         {/* 안내 문구 */}
-        <p className="text-center text-[11px] text-slate-400 font-bold mb-6 leading-relaxed select-none">
+        <p className="text-center text-[11px] text-slate-500 font-bold mb-6 leading-relaxed select-none">
           본 페이지는 대학규정관리시스템의 최고 관리자 통제 구역입니다.<br />
           보안을 위해 인증 키를 입력해 주십시오.
         </p>
-
+ 
         {/* 로그인 폼 */}
         <form onSubmit={handleLogin} className="w-full space-y-4">
           
           {/* 아이디 */}
           <div className="space-y-1.5 relative">
-            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider pl-1 select-none">Admin ID</label>
+            <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider pl-1 select-none">Admin ID</label>
             <div className="relative">
               <input
                 type="text"
@@ -77,15 +77,15 @@ export default function AdminLoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="아이디를 입력하세요..."
-                className="w-full bg-slate-950 border border-slate-800/80 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-600 font-bold focus:outline-none focus:ring-1 focus:ring-[#009b9e] focus:border-[#009b9e] transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] transition-all"
               />
-              <PersonIcon className="absolute left-3.5 top-3 text-slate-600 text-xs" sx={{ fontSize: 16 }} />
+              <PersonIcon className="absolute left-3.5 top-3 text-slate-400 text-xs" sx={{ fontSize: 16 }} />
             </div>
           </div>
-
+ 
           {/* 비밀번호 */}
           <div className="space-y-1.5 relative">
-            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider pl-1 select-none">Password</label>
+            <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider pl-1 select-none">Password</label>
             <div className="relative">
               <input
                 type="password"
@@ -93,24 +93,24 @@ export default function AdminLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="비밀번호를 입력하세요..."
-                className="w-full bg-slate-950 border border-slate-800/80 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-600 font-bold focus:outline-none focus:ring-1 focus:ring-[#009b9e] focus:border-[#009b9e] transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] transition-all"
               />
-              <LockIcon className="absolute left-3.5 top-3 text-slate-600 text-xs" sx={{ fontSize: 16 }} />
+              <LockIcon className="absolute left-3.5 top-3 text-slate-400 text-xs" sx={{ fontSize: 16 }} />
             </div>
           </div>
-
+ 
           {/* 에러 메시지 */}
           {error && (
-            <div className="text-red-400 text-[10px] font-bold text-center bg-red-500/10 border border-red-500/20 py-2 rounded-lg select-none">
+            <div className="text-red-600 text-[10px] font-bold text-center bg-red-50 border border-red-100 py-2 rounded-lg select-none">
               {error}
             </div>
           )}
-
+ 
           {/* 로그인 단추 */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#009b9e] hover:bg-[#008082] text-white text-xs font-black py-3 rounded-xl shadow-lg shadow-[#009b9e]/10 active:scale-97 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 select-none"
+            className="w-full bg-[#0c3161] hover:bg-[#092244] text-white text-xs font-black py-3 rounded-xl shadow-lg shadow-[#0c3161]/10 active:scale-97 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 select-none"
           >
             {loading ? (
               <CircularProgress size={14} sx={{ color: "white" }} />
@@ -118,19 +118,19 @@ export default function AdminLoginPage() {
               "로그인 및 세션 승인"
             )}
           </button>
-
+ 
         </form>
-
+ 
         {/* 풋터 */}
-        <div className="mt-8 border-t border-slate-800/50 pt-4 w-full text-center select-none">
+        <div className="mt-8 border-t border-slate-100 pt-4 w-full text-center select-none">
           <Link
             href="/"
-            className="text-[10px] text-slate-500 hover:text-slate-300 font-bold transition-colors"
+            className="text-[10px] text-slate-450 hover:text-blue-900 font-bold transition-colors"
           >
             ← 사용자 규정검색 화면으로
           </Link>
         </div>
-
+ 
       </div>
     </div>
   );
