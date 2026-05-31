@@ -83,18 +83,15 @@ export default function AdminLayout({
         
         {/* 상단 헤더 */}
         <div>
-          <div className="p-6 border-b border-slate-200 flex flex-col gap-2 select-none">
-            <div className="flex items-center gap-2">
+          <div className="p-6 border-b border-slate-200 flex flex-col items-center justify-center gap-2 select-none">
+            <div className="flex items-center justify-center w-full">
               <Image
                 src="/UI.png"
                 alt="로고"
-                width={120}
-                height={28}
-                className="object-contain"
+                width={183}
+                height={40}
+                className="h-10 w-auto object-contain"
               />
-            </div>
-            <div className="text-[13px] text-[#0c3161] font-black tracking-widest uppercase">
-              관리자 시스템 포털
             </div>
           </div>
  
@@ -148,7 +145,7 @@ export default function AdminLayout({
         {/* 헤더 바 */}
         <header className="h-16 border-b border-slate-250 bg-white px-8 flex items-center justify-between shrink-0 select-none">
           <div className="text-sm text-slate-500 font-bold">
-            예원예술대학교 대학규정 디지털 정비 사업
+            규정관리시스템 관리자 모드
           </div>
           
           <div className="flex items-center gap-4 text-sm font-bold text-slate-700">
