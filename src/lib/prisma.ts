@@ -75,8 +75,11 @@ const createPrismaClient = (connectionString: string): PrismaClient => {
       adapter,
       log: ["error"],
     });
-  } catch (e) {
+  } catch (e: any) {
     console.error("Failed to initialize Prisma Client with Neon adapter, falling back to standard client:", e);
+    // 에러 상세 원인을 텔레메트리로 전송하기 위해 글로벌 영역에 박제
+    (globalThis as any).neonInitError = e.message || String(e);
+    
     // Neon 어댑터 예외 시 즉각 표준 클라이언트로 리턴 폴백
     return new PrismaClient({
       datasources: {

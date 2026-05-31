@@ -11,6 +11,7 @@ export async function GET(request: Request) {
     DATABASE_URL_EXISTS: !!process.env.DATABASE_URL,
     DATABASE_URL_LENGTH: process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 0,
     DATABASE_URL_VAL: process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 25) + "..." : "NONE",
+    NEON_INIT_ERROR: (globalThis as any).neonInitError || "NONE"
   };
 
   try {
