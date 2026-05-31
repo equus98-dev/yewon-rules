@@ -66,10 +66,20 @@ const createPrismaClient = (connectionString: string): PrismaClient => {
   }
 
   // 실서버 프로덕션 환경의 경우 묻지도 따지지도 않고 무조건 Neon Serverless 어댑터를 기동합니다.
-  // (에지 런타임 상의 process.env 및 NODE_ENV 판정 유실 한계를 돌파하기 위한 강제 다이렉트 주입)
+  // 이 때 특수문자($ & *)가 포함된 패스워드의 퍼센트 인코딩 혼선 및 플랫폼 URL 파서 오작동 버그를 
+  // 원천 차단하기 위해 쌩 비밀번호와 접속 정보를 분할 분리한 명시적 객체(Config Object)로 직접 주입합니다.
   try {
-    console.log("[Prisma] Direct Neon Serverless adapter activation...");
-    const pool = new Pool({ connectionString });
+    console.log("[Prisma] Explicit Connection Object Neon Serverless activation...");
+    const pool = new Pool({
+      host: "aws-1-ap-northeast-1.pooler.supabase.com",
+      port: 6543,
+      user: "postgres.jagpwxgasudlnaoxfroe",
+      password: "Tmtmfh0022$&*", // 퍼센트 인코딩 혼선이 생기지 않도록 진짜 쌩 비밀번호를 안전 주입!
+      database: "postgres",
+      ssl: {
+        rejectUnauthorized: false // 에지 환경 SSL 핸드셰이크 안정성 확보
+      }
+    });
     const adapter = new PrismaNeon(pool as any);
     return new PrismaClient({
       adapter,
@@ -124,6 +134,7 @@ export const prisma = new Proxy({} as PrismaClient, {
     return value;
   }
 });
+
 
 
 
