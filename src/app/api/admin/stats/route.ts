@@ -5,6 +5,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
+  const debugInfo = {
+    NODE_ENV: process.env.NODE_ENV || "NOT_SET",
+    NEXT_RUNTIME: process.env.NEXT_RUNTIME || "NOT_SET",
+    DATABASE_URL_EXISTS: !!process.env.DATABASE_URL,
+    DATABASE_URL_LENGTH: process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 0,
+    DATABASE_URL_VAL: process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 25) + "..." : "NONE",
+  };
+
   try {
     // 1. 기초 지표 카운트 집계
     const totalRules = await prisma.rule.count();
@@ -68,11 +76,15 @@ export async function GET(request: Request) {
       },
       deptStats,
       revisionFeed,
+      debugInfo
     });
   } catch (error: any) {
     console.error("[Admin Stats API Error]:", error);
     return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
+      { 
+        error: error.message || "Internal Server Error",
+        debugInfo 
+      },
       { status: 500 }
     );
   }
