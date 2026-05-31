@@ -156,9 +156,9 @@ export default function AdminNotices() {
             </IconButton>
             <button
               onClick={handleOpenAddModal}
-              className="bg-[#0c3161] hover:bg-[#092244] text-[14px] font-black px-5.5 py-3 rounded-xl shadow-lg shadow-[#0c3161]/10 hover:shadow-[#0c3161]/25 transition-all flex items-center gap-1.5 active:scale-95 select-none cursor-pointer"
+              className="bg-[#0c3161] hover:bg-[#092244] text-white text-[14px] font-black px-5.5 py-3 rounded-xl shadow-lg shadow-[#0c3161]/10 hover:shadow-[#0c3161]/25 transition-all flex items-center gap-1.5 active:scale-95 select-none cursor-pointer"
             >
-              <AddIcon sx={{ fontSize: 18 }} />
+              <AddIcon sx={{ fontSize: 18, color: "white" }} />
               신규 공지 등록
             </button>
           </div>
