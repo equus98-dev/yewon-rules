@@ -36,19 +36,19 @@ export default function AdminLayout({
     }
   }, [pathname, router]);
 
-  // 인증 검사 대기 상태 (화면 깜빡임 방지용 프리미엄 스피너)
-  if (authorized === null) {
+  // 1. 로그인 페이지는 인증 검증 없이 즉시 전면 노출 (마운트 깜빡임 제로)
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
+  // 2. 인증 완료(true) 상태가 아닐 때는 대시보드 및 사이드바를 절대로 노출하지 않고 대기 화면 표시
+  if (authorized !== true) {
     return (
       <div className="min-h-screen w-full flex flex-col items-center justify-center gap-4 bg-slate-950 text-slate-100 font-sans">
         <CircularProgress size={30} sx={{ color: "#009b9e" }} />
         <span className="text-slate-400 text-xs font-semibold select-none">관리자 세션 검증 중...</span>
       </div>
     );
-  }
-
-  // 로그인 페이지는 사이드바 레이아웃 없이 본문만 전면 노출
-  if (pathname === "/admin/login") {
-    return <>{children}</>;
   }
 
   const menuItems = [
