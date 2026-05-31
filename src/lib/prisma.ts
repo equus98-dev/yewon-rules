@@ -22,10 +22,11 @@ const getConnectionString = (): string | undefined => {
     return g.env.DATABASE_URL;
   }
   
-  // C. 전역 식별자 최종 확인
+  // C. 전역 식별자 최종 확인 (TypeScript 컴파일 에러 'Cannot find name DATABASE_URL' 방지를 위한 동적 프로퍼티 안전 참조)
   try {
-    if (typeof DATABASE_URL !== "undefined") {
-      return DATABASE_URL;
+    const gRef = globalThis as any;
+    if (gRef.DATABASE_URL) {
+      return gRef.DATABASE_URL;
     }
   } catch (e) {}
   
