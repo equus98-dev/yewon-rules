@@ -281,23 +281,22 @@ export default function Home() {
         {/* 우측 메인 영역 */}
         <main className="flex-1 h-full overflow-hidden bg-slate-100 flex flex-col relative">
           
-          {/* 사이드바 접기/펴기 고급 세로 결합식 핸들 버튼 (프리미엄 윈도우 UI) */}
+          {/* 사이드바 접기/펴기 고급 세로 결합식 핸들 버튼 (프리미엄 윈도우 UI - 남색 테마 상단 배치) */}
           <div 
-            className="absolute top-1/2 -translate-y-1/2 z-30 transition-all duration-300 ease-in-out hidden lg:block"
+            className="absolute top-[84px] z-30 transition-all duration-300 ease-in-out hidden lg:block"
             style={{
               left: 0,
-              transform: "translateY(-50%)",
             }}
           >
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="bg-white hover:bg-slate-50 text-[#0c3161] hover:text-[#092244] w-5.5 h-20 rounded-r-2xl shadow-md border-y border-r border-slate-200 active:scale-95 transition-all select-none cursor-pointer flex items-center justify-center"
+              className="bg-[#0c3161] hover:bg-[#092244] text-white w-5.5 h-20 rounded-r-2xl shadow-lg border-y border-r border-[#092244] active:scale-95 transition-all select-none cursor-pointer flex items-center justify-center"
               title={isSidebarOpen ? "규정구조도 접기" : "규정구조도 펼치기"}
             >
               {isSidebarOpen ? (
-                <ArrowBackIosIcon sx={{ fontSize: 11, ml: 0.5 }} />
+                <ArrowBackIosIcon sx={{ fontSize: 11, ml: 0.5, color: "white" }} />
               ) : (
-                <ArrowForwardIosIcon sx={{ fontSize: 11 }} />
+                <ArrowForwardIosIcon sx={{ fontSize: 11, color: "white" }} />
               )}
             </button>
           </div>
