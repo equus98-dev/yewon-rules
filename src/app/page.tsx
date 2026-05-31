@@ -9,12 +9,14 @@ import GavelIcon from "@mui/icons-material/Gavel";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import SidebarTree from "@/components/SidebarTree";
 import RuleViewer from "@/components/RuleViewer";
 import Link from "next/link";
 
 export default function Home() {
   const [activeRuleId, setActiveRuleId] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any>([]);
@@ -257,23 +259,48 @@ export default function Home() {
       {/* ==================== 2. 메인 컨텐츠 영역 ==================== */}
       <div className="flex-1 flex overflow-hidden bg-slate-50">
         
-        {/* 좌측 사이드바 트리 (언제나 고정 노출 - 사용자 경험 고도화) */}
-        <aside className="w-[375px] shrink-0 h-full hidden lg:block border-r border-slate-200 z-10">
-          <SidebarTree
-            key={sidebarKey}
-            activeRuleId={activeRuleId}
-            onSelectRule={(ruleId) => {
-              // SidebarTree에서는 ruleId에 prefix(cat- 등)가 붙어 있을 수 있으므로 처리
-              // 하지만 SidebarTree가 rule.id(순수 UUID)를 바로 주기 때문에 그대로 연동 가능
-              const cleanId = ruleId.replace("cat-", "").replace("dept-", "").replace("abc-", "");
-              setActiveRuleId(cleanId);
-              setIsSearching(false); // 상세 보기 시 검색 결과 모드 해제
-            }}
-          />
+        {/* 좌측 사이드바 트리 (열기/닫기 가능한 슬라이딩 구조로 고도화) */}
+        <aside 
+          className={`shrink-0 h-full hidden lg:block border-slate-200 z-10 transition-all duration-300 ease-in-out overflow-hidden ${
+            isSidebarOpen ? "w-[375px] border-r" : "w-0 border-r-0"
+          }`}
+        >
+          <div className="w-[375px] h-full">
+            <SidebarTree
+              key={sidebarKey}
+              activeRuleId={activeRuleId}
+              onSelectRule={(ruleId) => {
+                const cleanId = ruleId.replace("cat-", "").replace("dept-", "").replace("abc-", "");
+                setActiveRuleId(cleanId);
+                setIsSearching(false); // 상세 보기 시 검색 결과 모드 해제
+              }}
+            />
+          </div>
         </aside>
 
         {/* 우측 메인 영역 */}
-        <main className="flex-1 h-full overflow-hidden bg-slate-100 flex flex-col">
+        <main className="flex-1 h-full overflow-hidden bg-slate-100 flex flex-col relative">
+          
+          {/* 사이드바 접기/펴기 고급 세로 결합식 핸들 버튼 (프리미엄 윈도우 UI) */}
+          <div 
+            className="absolute top-1/2 -translate-y-1/2 z-30 transition-all duration-300 ease-in-out hidden lg:block"
+            style={{
+              left: 0,
+              transform: "translateY(-50%)",
+            }}
+          >
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="bg-white hover:bg-slate-50 text-[#0c3161] hover:text-[#092244] w-5.5 h-20 rounded-r-2xl shadow-md border-y border-r border-slate-200 active:scale-95 transition-all select-none cursor-pointer flex items-center justify-center"
+              title={isSidebarOpen ? "규정구조도 접기" : "규정구조도 펼치기"}
+            >
+              {isSidebarOpen ? (
+                <ArrowBackIosIcon sx={{ fontSize: 11, ml: 0.5 }} />
+              ) : (
+                <ArrowForwardIosIcon sx={{ fontSize: 11 }} />
+              )}
+            </button>
+          </div>
           {activeRuleId ? (
             /* 규정 뷰어 표시 */
             <div className="flex-1 overflow-hidden">
