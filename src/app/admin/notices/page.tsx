@@ -1,0 +1,355 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { CircularProgress, IconButton } from "@mui/material";
+import CampaignIcon from "@mui/icons-material/Campaign";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import RefreshIcon from "@mui/icons-material/Refresh";
+
+export default function AdminNotices() {
+  const [notices, setNotices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // 모달 제어를 위한 상태
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingNotice, setEditingNotice] = useState<any | null>(null);
+
+  // 폼 필드 상태
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [dept, setDept] = useState("기획처");
+  const [date, setDate] = useState("");
+
+  const deptOptions = ["기획처", "교무처", "총무처", "교학지원처", "기획조정처", "행정지원처", "전산정보원"];
+
+  // 1. 공지사항 로드
+  const loadNotices = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/notices");
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setNotices(data);
+      }
+    } catch (e) {
+      console.error("Failed to load notices:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadNotices();
+  }, []);
+
+  // 오늘 날짜 문자열 획득 ("YYYY.MM.DD")
+  const getTodayDateString = () => {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, "0");
+    const d = String(today.getDate()).padStart(2, "0");
+    return `${y}.${m}.${d}`;
+  };
+
+  // 2. 신규 공지 작성 모달 켜기
+  const handleOpenAddModal = () => {
+    setEditingNotice(null);
+    setTitle("");
+    setContent("");
+    setDept("기획처");
+    setDate(getTodayDateString());
+    setModalOpen(true);
+  };
+
+  // 3. 기존 공지 수정 모달 켜기
+  const handleOpenEditModal = (notice: any) => {
+    setEditingNotice(notice);
+    setTitle(notice.title);
+    setContent(notice.content);
+    setDept(notice.dept);
+    setDate(notice.date);
+    setModalOpen(true);
+  };
+
+  // 4. 공지 저장 (생성 또는 수정)
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !content.trim() || !dept || !date) {
+      alert("모든 필수 입력 필드를 채워 주십시오.");
+      return;
+    }
+
+    try {
+      const isEdit = !!editingNotice;
+      const url = "/api/notices";
+      const method = isEdit ? "PUT" : "POST";
+      const payload = isEdit 
+        ? { id: editingNotice.id, title, content, dept, date } 
+        : { title, content, dept, date };
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        setModalOpen(false);
+        await loadNotices();
+      } else {
+        const err = await res.json();
+        alert(`저장 실패: ${err.error || "알 수 없는 에러"}`);
+      }
+    } catch (err: any) {
+      alert(`에러 발생: ${err.message}`);
+    }
+  };
+
+  // 5. 공지 삭제
+  const handleDelete = async (id: string) => {
+    if (!confirm("이 공지사항을 영구적으로 삭제하시겠습니까?")) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/notices?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        await loadNotices();
+      } else {
+        const err = await res.json();
+        alert(`삭제 실패: ${err.error || "알 수 없는 에러"}`);
+      }
+    } catch (err: any) {
+      alert(`에러 발생: ${err.message}`);
+    }
+  };
+
+  return (
+    <div className="h-full overflow-y-auto p-8 bg-slate-900 scrollbar">
+      <div className="max-w-6xl mx-auto space-y-8 pb-10">
+        
+        {/* 상단 타이틀 및 퀵 런처 */}
+        <div className="flex items-center justify-between border-b border-slate-800 pb-5 select-none">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
+              <CampaignIcon sx={{ fontSize: 28, color: "#009b9e" }} />
+              공지사항 관리 포털
+            </h1>
+            <p className="text-[11px] text-slate-400 font-bold">
+              사용자 규정 시스템 메인 화면 및 사이드바의 실시간 긴급 공지를 직접 추가하고 제어합니다.
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <IconButton 
+              size="small" 
+              onClick={loadNotices} 
+              sx={{ color: "slate.400", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", p: 1 }}
+              className="bg-slate-950/20 hover:bg-slate-950/50"
+            >
+              <RefreshIcon sx={{ fontSize: 18, color: "#009b9e" }} />
+            </IconButton>
+            <button
+              onClick={handleOpenAddModal}
+              className="bg-[#009b9e] hover:bg-[#008082] text-white text-xs font-black px-4.5 py-2.5 rounded-xl shadow-lg shadow-[#009b9e]/20 hover:shadow-[#009b9e]/30 transition-all flex items-center gap-1.5 active:scale-95 select-none cursor-pointer"
+            >
+              <AddIcon sx={{ fontSize: 16 }} />
+              신규 공지 등록
+            </button>
+          </div>
+        </div>
+
+        {/* 메인 리스트 테이블 */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-40 gap-4 bg-slate-950/20 border border-slate-800 rounded-2xl">
+            <CircularProgress size={30} sx={{ color: "#009b9e" }} />
+            <span className="text-slate-400 text-xs font-semibold">실시간 공지 색인 수집 중...</span>
+          </div>
+        ) : notices.length === 0 ? (
+          <div className="text-center py-40 border border-slate-800 rounded-2xl bg-slate-950/10 text-slate-500 text-xs font-bold select-none">
+            등록된 공지사항이 아직 존재하지 않습니다. 우측 상단의 신규 등록 버튼을 눌러 첫 공지를 띄워 보세요!
+          </div>
+        ) : (
+          <div className="bg-slate-950/20 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-950/60 border-b border-slate-800 text-slate-400 select-none font-bold">
+                    <th className="py-3 px-5 w-16 text-center font-black">번호</th>
+                    <th className="py-3 px-4 w-28 text-center font-black">작성 부서</th>
+                    <th className="py-3 px-4 font-black">공지사항 제목</th>
+                    <th className="py-3 px-4 w-32 text-center font-black">화면 노출일</th>
+                    <th className="py-3 px-5 w-24 text-center font-black">관리 액션</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/50">
+                  {notices.map((notice, idx) => (
+                    <tr 
+                      key={notice.id} 
+                      className="hover:bg-slate-950/30 transition-colors group"
+                    >
+                      <td className="py-3.5 px-5 text-center text-slate-500 font-bold select-none">{idx + 1}</td>
+                      <td className="py-3.5 px-4 text-center">
+                        <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-[10px] font-black select-none">
+                          {notice.dept}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <div className="space-y-1">
+                          <h4 className="font-black text-slate-200 text-xs group-hover:text-[#009b9e] transition-colors leading-snug">
+                            {notice.title}
+                          </h4>
+                          <p className="text-[10px] text-slate-500 font-bold max-w-xl truncate">
+                            {notice.content}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4 text-center text-slate-400 font-bold select-none">{notice.date}</td>
+                      <td className="py-3.5 px-5 text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <IconButton 
+                            size="small" 
+                            onClick={() => handleOpenEditModal(notice)}
+                            sx={{ color: "slate.400", p: 0.5 }}
+                            className="hover:bg-slate-800 rounded"
+                          >
+                            <EditIcon sx={{ fontSize: 16, color: "#009b9e" }} />
+                          </IconButton>
+                          <IconButton 
+                            size="small" 
+                            onClick={() => handleDelete(notice.id)}
+                            sx={{ color: "slate.400", p: 0.5 }}
+                            className="hover:bg-red-500/10 rounded"
+                          >
+                            <DeleteIcon sx={{ fontSize: 16, color: "#f87171" }} />
+                          </IconButton>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* 6. 공지 등록/수정 모달 폼 다이얼로그 (프리미엄 다크 글래스모피즘 테마) */}
+      {modalOpen && (
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 select-none">
+          <form 
+            onSubmit={handleSave}
+            className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh] hover:scale-[1.002] transition-all"
+          >
+            {/* 모달 헤더 */}
+            <div className="bg-gradient-to-r from-[#0c3161] to-[#092244] p-5 text-white flex items-center justify-between border-b border-slate-800">
+              <h3 className="text-base font-black tracking-tight flex items-center gap-2">
+                <CampaignIcon sx={{ color: "#009b9e", fontSize: 20 }} />
+                {editingNotice ? "공지사항 정보 개정" : "신규 긴급 공지 인입"}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setModalOpen(false)}
+                className="text-slate-400 hover:text-white text-base font-bold transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* 모달 내용 폼 */}
+            <div className="p-6 overflow-y-auto space-y-4 text-xs font-bold text-slate-300">
+              
+              {/* 제목 인풋 */}
+              <div className="space-y-1.5">
+                <label className="text-slate-400 flex items-center gap-1">
+                  <span className="text-[#009b9e]">•</span> 공지사항 제목
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="예: 학칙 개정에 따른 조문 최종 확정 공고"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#009b9e] font-bold"
+                />
+              </div>
+
+              {/* 작성부서 & 노출날짜 병렬 */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-slate-400 flex items-center gap-1">
+                    <span className="text-[#009b9e]">•</span> 작성 부서
+                  </label>
+                  <select
+                    value={dept}
+                    onChange={(e) => setDept(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#009b9e] font-extrabold cursor-pointer"
+                  >
+                    {deptOptions.map((opt) => (
+                      <option key={opt} value={opt} className="bg-slate-900">{opt}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-slate-400 flex items-center gap-1">
+                    <span className="text-[#009b9e]">•</span> 화면 노출일 (YYYY.MM.DD)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="2026.05.31"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#009b9e] font-bold"
+                  />
+                </div>
+              </div>
+
+              {/* 본문 에어리어 */}
+              <div className="space-y-1.5">
+                <label className="text-slate-400 flex items-center gap-1">
+                  <span className="text-[#009b9e]">•</span> 공지사항 상세 내용
+                </label>
+                <textarea
+                  required
+                  rows={6}
+                  placeholder="사용자 화면의 모달과 사이드바에 실시간 노출될 전체 본문 내용을 격식 있고 구체적으로 기술하십시오..."
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#009b9e] font-medium resize-none leading-relaxed"
+                />
+              </div>
+
+            </div>
+
+            {/* 모달 푸터 버튼 바 */}
+            <div className="p-4 bg-slate-950/60 border-t border-slate-800 flex justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setModalOpen(false)}
+                className="border border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-white text-xs font-black px-5 py-2.5 rounded-xl transition-all cursor-pointer select-none active:scale-95"
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                className="bg-[#009b9e] hover:bg-[#008082] text-white text-xs font-black px-5 py-2.5 rounded-xl shadow-lg shadow-[#009b9e]/10 transition-all cursor-pointer select-none active:scale-95"
+              >
+                {editingNotice ? "변경사항 저장" : "새 공지 발행"}
+              </button>
+            </div>
+
+          </form>
+        </div>
+      )}
+
+    </div>
+  );
+}

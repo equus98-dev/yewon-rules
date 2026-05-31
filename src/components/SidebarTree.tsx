@@ -54,6 +54,10 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [searchAttachmentTerm, setSearchAttachmentTerm] = useState("");
 
+  // 실시간 공지사항 탭 상태 추가
+  const [notices, setNotices] = useState<any[]>([]);
+  const [loadingNotices, setLoadingNotices] = useState(false);
+
   const tabTypes = ["field", "dept", "abc"];
 
   // 1. 규정 대분류 트리 데이터 패치
@@ -127,6 +131,27 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
     }
   }, [verticalTab, attachments.length]);
 
+  // 4. 공지사항 실시간 패치
+  useEffect(() => {
+    async function loadNotices() {
+      setLoadingNotices(true);
+      try {
+        const res = await fetch("/api/notices");
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setNotices(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch notices:", err);
+      } finally {
+        setLoadingNotices(false);
+      }
+    }
+    if (verticalTab === "공지" && notices.length === 0) {
+      loadNotices();
+    }
+  }, [verticalTab, notices.length]);
+
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
     setSearchTerm(""); // 탭 전환 시 검색어 초기화
@@ -195,15 +220,6 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
       );
     });
   };
-
-  // 더미 공지사항 목록
-  const dummyNotices = [
-    { id: 1, title: "2026학년도 제1학기 대학평의원회 규정 심의 결과 안내", date: "2026.05.20", dept: "기획처" },
-    { id: 2, title: "[공고] 학칙 및 학사행정규정 일부 개정 안 예고 수렴", date: "2026.05.14", dept: "교무처" },
-    { id: 3, title: "예원예술대학교 요람 및 규정집 편찬위원회 발족식 개최", date: "2026.05.02", dept: "총무처" },
-    { id: 4, title: "정부 재정지원 제한 평가 대비 정관 개정 완료 공지", date: "2026.04.28", dept: "기획처" },
-    { id: 5, title: "규정관리시스템 리뉴얼 오픈 안내", date: "2026.04.15", dept: "전산정보원" },
-  ];
 
   // 서식 검색 필터링
   const filteredAttachments = attachments.filter((att) =>
@@ -473,22 +489,36 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
         {/* 2-4) 공지사항 패널 */}
         {verticalTab === "공지" && (
           <div className="flex-1 overflow-y-auto p-2.5 scrollbar flex flex-col gap-2 bg-slate-50/30">
-            {dummyNotices.map((notice) => (
-              <div
-                key={notice.id}
-                className="w-full p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50/30 transition-all text-xs flex flex-col gap-1 shadow-sm"
-              >
-                <div className="flex items-center justify-between text-[9px] text-slate-400">
-                  <span className="font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">
-                    {notice.dept}
-                  </span>
-                  <span>{notice.date}</span>
-                </div>
-                <h4 className="font-extrabold text-slate-700 text-[11px] mt-1 leading-snug line-clamp-2">
-                  {notice.title}
-                </h4>
+            {loadingNotices ? (
+              <div className="flex flex-col items-center justify-center h-48 gap-2">
+                <CircularProgress size={20} />
+                <span className="text-[10px] text-slate-400">공지 로드 중...</span>
               </div>
-            ))}
+            ) : notices.length === 0 ? (
+              <div className="flex items-center justify-center h-48 text-slate-400 text-xs font-bold">
+                등록된 공지사항이 없습니다.
+              </div>
+            ) : (
+              notices.map((notice: any) => (
+                <div
+                  key={notice.id}
+                  onClick={() => {
+                    alert(`[공지사항 - ${notice.dept}]\n\n* 제목: ${notice.title}\n* 일자: ${notice.date}\n\n* 내용:\n${notice.content}`);
+                  }}
+                  className="w-full p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-[#0c3161]/5 hover:border-blue-300 transition-all text-xs flex flex-col gap-1 shadow-sm cursor-pointer active:scale-98"
+                >
+                  <div className="flex items-center justify-between text-[9px] text-slate-400">
+                    <span className="font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">
+                      {notice.dept}
+                    </span>
+                    <span>{notice.date}</span>
+                  </div>
+                  <h4 className="font-extrabold text-slate-700 text-[11px] mt-1 leading-snug line-clamp-2">
+                    {notice.title}
+                  </h4>
+                </div>
+              ))
+            )}
           </div>
         )}
 

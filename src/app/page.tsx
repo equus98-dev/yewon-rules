@@ -35,7 +35,29 @@ export default function Home() {
   const [recentRules, setRecentRules] = useState<any[]>([]);
   const [loadingRecent, setLoadingRecent] = useState(false);
 
-  // 대시보드 로드 시 최신 제개정 규정 패치
+  // 실시간 공지사항 연동을 위한 상태 정의
+  const [notices, setNotices] = useState<any[]>([]);
+  const [loadingNotices, setLoadingNotices] = useState(false);
+  const [selectedNotice, setSelectedNotice] = useState<any | null>(null);
+  const [noticeModalOpen, setNoticeModalOpen] = useState(false);
+
+  // 공지사항 로드 함수
+  const loadNotices = async () => {
+    setLoadingNotices(true);
+    try {
+      const res = await fetch("/api/notices");
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setNotices(data);
+      }
+    } catch (error) {
+      console.error("Failed to load notices:", error);
+    } finally {
+      setLoadingNotices(false);
+    }
+  };
+
+  // 대시보드 로드 시 최신 제개정 규정 및 공지사항 패치
   useEffect(() => {
     async function loadRecentRules() {
       setLoadingRecent(true);
@@ -56,6 +78,7 @@ export default function Home() {
       }
     }
     loadRecentRules();
+    loadNotices();
   }, []);
 
   // 검색 옵션 토글 핸들러
@@ -175,15 +198,6 @@ export default function Home() {
     setSearchQuery(tag);
     handleSearch(undefined, tag);
   };
-
-  // 더미 공지사항 목록
-  const dummyNotices = [
-    { id: 1, title: "2026학년도 제1학기 대학평의원회 규정 심의 결과 안내", date: "2026.05.20", dept: "기획처" },
-    { id: 2, title: "[공고] 학칙 및 학사행정규정 일부 개정 안 예고 수렴", date: "2026.05.14", dept: "교무처" },
-    { id: 3, title: "예원예술대학교 요람 및 규정집 편찬위원회 발족식 개최", date: "2026.05.02", dept: "총무처" },
-    { id: 4, title: "정부 재정지원 제한 평가 대비 정관 개정 완료 공지", date: "2026.04.28", dept: "기획처" },
-    { id: 5, title: "규정관리시스템 리뉴얼 오픈 안내", date: "2026.04.15", dept: "전산정보원" },
-  ];
 
   return (
     <div className="flex flex-col h-screen overflow-hidden text-slate-800">
@@ -949,26 +963,41 @@ export default function Home() {
                     </div>
 
                     <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 scrollbar">
-                      {dummyNotices.map((notice) => (
-                        <div
-                          key={notice.id}
-                          className="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-slate-50/50 cursor-pointer transition-colors group"
-                        >
-                          <div className="min-w-0 flex-1 pr-4">
-                            <h4 className="text-sm font-bold text-slate-700 truncate group-hover:text-blue-900 transition-colors">
-                              {notice.title}
-                            </h4>
-                            <p className="text-[11px] text-slate-400 mt-1">
-                              작성부서: {notice.dept}
-                            </p>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <span className="text-xs text-slate-400 font-medium">
-                              {notice.date}
-                            </span>
-                          </div>
+                      {loadingNotices ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-3">
+                          <CircularProgress size={20} sx={{ color: "#0c3161" }} />
+                          <span className="text-slate-400 text-[10px] font-bold">공지사항 인입 중...</span>
                         </div>
-                      ))}
+                      ) : notices.length === 0 ? (
+                        <div className="text-center py-24 text-slate-400 text-xs font-bold">
+                          등록된 공지사항이 아직 없습니다.
+                        </div>
+                      ) : (
+                        notices.map((notice: any) => (
+                          <div
+                            key={notice.id}
+                            onClick={() => {
+                              setSelectedNotice(notice);
+                              setNoticeModalOpen(true);
+                            }}
+                            className="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-[#0c3161]/5 cursor-pointer transition-all active:scale-98 group"
+                          >
+                            <div className="min-w-0 flex-1 pr-4 text-left">
+                              <h4 className="text-sm font-bold text-slate-700 truncate group-hover:text-blue-900 transition-colors">
+                                {notice.title}
+                              </h4>
+                              <p className="text-[11px] text-slate-400 mt-1">
+                                작성부서: {notice.dept}
+                              </p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="text-xs text-slate-400 font-medium">
+                                {notice.date}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </Paper>
 
@@ -986,6 +1015,51 @@ export default function Home() {
         </main>
 
       </div>
+
+      {/* 실시간 공지사항 상세 보기 모달 다이얼로그 (Tailwind CSS 글래스모피즘 테마) */}
+      {noticeModalOpen && selectedNotice && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-lg rounded-2xl border border-slate-200 shadow-2xl flex flex-col overflow-hidden max-h-[85vh] hover:scale-[1.005] transition-all">
+            
+            {/* 모달 헤더 */}
+            <div className="bg-gradient-to-r from-[#0c3161] to-[#092244] p-5 text-white flex flex-col gap-1.5 select-none">
+              <span className="text-[10px] font-black text-amber-300 bg-amber-400/20 px-2 py-0.5 rounded border border-amber-300/30 w-fit">
+                공지사항 ({selectedNotice.dept})
+              </span>
+              <h3 className="text-base font-black leading-snug">
+                {selectedNotice.title}
+              </h3>
+            </div>
+
+            {/* 메타 정보 */}
+            <div className="px-6 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-bold select-none">
+              <span>작성 부서: {selectedNotice.dept}</span>
+              <span>작성일: {selectedNotice.date}</span>
+            </div>
+
+            {/* 모달 본문 */}
+            <div className="p-6 overflow-y-auto flex-1 text-slate-700 text-xs leading-relaxed whitespace-pre-wrap font-medium">
+              {selectedNotice.content}
+            </div>
+
+            {/* 모달 푸터 버튼 */}
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setNoticeModalOpen(false);
+                  setSelectedNotice(null);
+                }}
+                className="bg-[#0c3161] hover:bg-[#092244] text-white text-xs font-black px-5 py-2.5 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                닫기
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
