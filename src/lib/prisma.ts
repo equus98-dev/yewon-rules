@@ -83,11 +83,6 @@ const createPrismaClient = (connectionString: string): PrismaClient => {
     const adapter = new PrismaNeon(pool as any);
     return new PrismaClient({
       adapter,
-      datasources: {
-        db: {
-          url: "postgresql://postgres.jagpwxgasudlnaoxfroe:Tmtmfh0022%24%26%2A@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
-        }
-      },
       log: ["error"],
     });
   } catch (e: any) {
