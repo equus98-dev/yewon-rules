@@ -2,12 +2,20 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { getPrisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Pool } from "@neondatabase/serverless";
+
+const poolConfig = {
+  host: "aws-1-ap-northeast-1.pooler.supabase.com",
+  port: 6543,
+  user: "postgres.jagpwxgasudlnaoxfroe",
+  password: "Tmtmfh0022$&*",
+  database: "postgres",
+  ssl: { rejectUnauthorized: false },
+};
 
 export async function GET(request: Request) {
+  const pool = new Pool(poolConfig);
   try {
-    const prisma = await getPrisma();
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("query") || "";
     const initialSound = searchParams.get("initialSound") || "";
@@ -17,276 +25,154 @@ export async function GET(request: Request) {
     const revisionType = searchParams.get("revisionType") || "";
     const categoryId = searchParams.get("categoryId") || "";
     const departmentId = searchParams.get("departmentId") || "";
-    const scope = searchParams.get("scope") || "current"; // current | history
-    const options = searchParams.get("options") || "all"; // all, title, body, attachment
+    const scope = searchParams.get("scope") || "current";
+    const options = searchParams.get("options") || "all";
 
-    // -------------------------------------------------------------
-    // CASE A: 비어있는 검색어는 이전과 동일하게 단순 규정 배열 반환 (사이드바/대시보드 호환용)
-    // -------------------------------------------------------------
+    // -------------------------------------------------------
+    // CASE A: 검색어 없음 - 단순 목록 반환
+    // -------------------------------------------------------
     if (!query) {
-      const where: Prisma.RuleWhereInput = {};
+      const conditions: string[] = [];
+      const values: any[] = [];
+      let idx = 1;
 
-      if (scope === "current") {
-        where.status = "EFFECTIVE";
+      if (scope === "current") { conditions.push(`r.status = 'EFFECTIVE'`); }
+      if (initialSound) { conditions.push(`r."initialSound" = $${idx++}`); values.push(initialSound); }
+      if (categoryId) { conditions.push(`r."categoryId" = $${idx++}`); values.push(categoryId); }
+      if (departmentId) { conditions.push(`r."departmentId" = $${idx++}`); values.push(departmentId); }
+
+      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+      // Revision 필터 조건
+      const revConds: string[] = [];
+      const revValues: any[] = [];
+      let revIdx = idx;
+      if (announcementNumber) { revConds.push(`"announcementNumber" ILIKE $${revIdx++}`); revValues.push(`%${announcementNumber}%`); }
+      if (enactmentStart) { revConds.push(`"enactmentDate" >= $${revIdx++}`); revValues.push(new Date(enactmentStart)); }
+      if (enactmentEnd) { revConds.push(`"enactmentDate" <= $${revIdx++}`); revValues.push(new Date(enactmentEnd)); }
+      if (revisionType) { revConds.push(`"revisionType" = $${revIdx++}`); revValues.push(revisionType); }
+
+      let finalWhereClause = whereClause;
+      if (revConds.length > 0) {
+        const revSubQuery = `EXISTS (SELECT 1 FROM "Revision" rev WHERE rev."ruleId" = r.id AND ${revConds.join(" AND ")})`;
+        finalWhereClause = conditions.length > 0 ? `${whereClause} AND ${revSubQuery}` : `WHERE ${revSubQuery}`;
       }
 
-      if (initialSound) {
-        where.initialSound = initialSound;
-      }
-
-      if (categoryId) {
-        where.categoryId = categoryId;
-      }
-
-      if (departmentId) {
-        where.departmentId = departmentId;
-      }
-
-      const revisionFilters: Prisma.RevisionWhereInput[] = [];
-      if (announcementNumber) {
-        revisionFilters.push({ announcementNumber: { contains: announcementNumber } });
-      }
-
-      if (enactmentStart || enactmentEnd) {
-        revisionFilters.push({
-          enactmentDate: {
-            gte: enactmentStart ? new Date(enactmentStart) : undefined,
-            lte: enactmentEnd ? new Date(enactmentEnd) : undefined,
-          },
-        });
-      }
-
-      if (revisionType) {
-        revisionFilters.push({ revisionType: revisionType as any });
-      }
-
-      if (revisionFilters.length > 0) {
-        where.revisions = {
-          some: {
-            AND: revisionFilters,
-          },
-        };
-      }
-
-      const rules = await prisma.rule.findMany({
-        where,
-        include: {
-          category: { select: { name: true } },
-          department: { select: { name: true } },
-          revisions: {
-            orderBy: { version: "desc" },
-            take: 1,
-            select: {
-              versionName: true,
-              enactmentDate: true,
-              announcementNumber: true,
-              revisionType: true,
-            },
-          },
-        },
-        orderBy: { title: "asc" },
-      });
-
-      const formattedRules = rules.map((rule) => {
-        const latestRevision = rule.revisions[0] || null;
-        return {
-          id: rule.id,
-          title: rule.title,
-          ruleNumber: rule.ruleNumber,
-          status: rule.status,
-          categoryName: rule.category.name,
-          departmentName: rule.department.name,
-          latestVersionName: latestRevision?.versionName || "제정",
-          enactmentDate: latestRevision?.enactmentDate || null,
-          announcementNumber: latestRevision?.announcementNumber || "",
-          revisionType: latestRevision?.revisionType || "ENACTMENT",
-        };
-      });
-
-      return NextResponse.json(formattedRules);
+      const res = await pool.query(
+        `SELECT
+          r.id, r.title, r."ruleNumber", r."initialSound", r.status, r."categoryId", r."departmentId",
+          c.name AS "categoryName", d.name AS "departmentName",
+          (SELECT "versionName" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "latestVersionName",
+          (SELECT "enactmentDate" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "enactmentDate",
+          (SELECT "announcementNumber" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "announcementNumber",
+          (SELECT "revisionType" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "revisionType"
+         FROM "Rule" r
+         LEFT JOIN "Category" c ON r."categoryId" = c.id
+         LEFT JOIN "Department" d ON r."departmentId" = d.id
+         ${finalWhereClause}
+         ORDER BY r.title ASC`,
+        [...values, ...revValues]
+      );
+      await pool.end();
+      return NextResponse.json(res.rows);
     }
 
-    // -------------------------------------------------------------
-    // CASE B: 검색어가 명시된 경우 고도화된 그룹별 매칭 처리 (규정명, 규정내용, 별표/별지)
-    // -------------------------------------------------------------
+    // -------------------------------------------------------
+    // CASE B: 검색어 있음 - 그룹별 매칭
+    // -------------------------------------------------------
     const optionList = options.split(",");
     const isAll = optionList.includes("all") || optionList.length === 0;
+    const scopeCond = scope === "current" ? `AND r.status = 'EFFECTIVE'` : "";
+    const catCond = categoryId ? `AND r."categoryId" = '${categoryId.replace(/'/g, "''")}'` : "";
+    const deptCond = departmentId ? `AND r."departmentId" = '${departmentId.replace(/'/g, "''")}'` : "";
+    const likeQuery = `%${query}%`;
 
-    // 1. 규정명 매칭 (Title/Rule Number Match)
+    // 1. 규정명 매칭
     let titleMatches: any[] = [];
     if (isAll || optionList.includes("title")) {
-      const titleWhere: Prisma.RuleWhereInput = {
-        AND: [
-          scope === "current" ? { status: "EFFECTIVE" } : {},
-          categoryId ? { categoryId } : {},
-          departmentId ? { departmentId } : {},
-          {
-            OR: [
-              { title: { contains: query } },
-              { ruleNumber: { contains: query } }
-            ]
-          }
-        ]
-      };
-
-      const matchedRules = await prisma.rule.findMany({
-        where: titleWhere,
-        include: {
-          category: { select: { name: true } },
-          department: { select: { name: true } },
-          revisions: {
-            orderBy: { version: "desc" },
-            take: 1,
-            select: {
-              versionName: true,
-              enactmentDate: true,
-              announcementNumber: true,
-            }
-          }
-        },
-        orderBy: { title: "asc" }
-      });
-
-      titleMatches = matchedRules.map(rule => {
-        const rev = rule.revisions[0] || null;
-        return {
-          id: rule.id,
-          title: rule.title,
-          ruleNumber: rule.ruleNumber,
-          categoryName: rule.category.name,
-          departmentName: rule.department.name,
-          latestVersionName: rev?.versionName || "제정",
-          enactmentDate: rev?.enactmentDate || null,
-          announcementNumber: rev?.announcementNumber || "",
-          status: rule.status
-        };
-      });
+      const r = await pool.query(
+        `SELECT
+          r.id, r.title, r."ruleNumber", r.status,
+          c.name AS "categoryName", d.name AS "departmentName",
+          (SELECT "versionName" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "latestVersionName",
+          (SELECT "enactmentDate" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "enactmentDate",
+          (SELECT "announcementNumber" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "announcementNumber"
+         FROM "Rule" r
+         LEFT JOIN "Category" c ON r."categoryId" = c.id
+         LEFT JOIN "Department" d ON r."departmentId" = d.id
+         WHERE (r.title ILIKE $1 OR r."ruleNumber" ILIKE $1) ${scopeCond} ${catCond} ${deptCond}
+         ORDER BY r.title ASC`,
+        [likeQuery]
+      );
+      titleMatches = r.rows;
     }
 
-    // 2. 규정내용 매칭 (Articles Match)
+    // 2. 규정내용 매칭
     let bodyMatches: any[] = [];
     if (isAll || optionList.includes("body")) {
-      const articles = await prisma.article.findMany({
-        where: {
-          AND: [
-            { contentText: { contains: query } },
-            {
-              revision: {
-                rule: {
-                  AND: [
-                    scope === "current" ? { status: "EFFECTIVE" } : {},
-                    categoryId ? { categoryId } : {},
-                    departmentId ? { departmentId } : {}
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        include: {
-          revision: {
-            include: {
-              rule: {
-                include: {
-                  category: { select: { name: true } },
-                  department: { select: { name: true } }
-                }
-              }
-            }
-          }
-        },
-        orderBy: { articleNumber: "asc" }
-      });
-
-      // 동일 규정별로 묶지 않고 각각의 조항 매칭을 리스트업하여 가치 극대화
-      bodyMatches = articles.map(art => {
-        const rule = art.revision.rule;
-        // 조항 매칭 텍스트 스니펫 생성
-        const text = art.contentText;
-        const index = text.toLowerCase().indexOf(query.toLowerCase());
+      const r = await pool.query(
+        `SELECT
+          a.id AS "articleId", a."articleNumber", a.title AS "articleTitle", a."contentText",
+          r.id, r.title, r."ruleNumber", r.status,
+          c.name AS "categoryName", d.name AS "departmentName",
+          rev."versionName" AS "latestVersionName", rev."enactmentDate"
+         FROM "Article" a
+         JOIN "Revision" rev ON a."revisionId" = rev.id
+         JOIN "Rule" r ON rev."ruleId" = r.id
+         LEFT JOIN "Category" c ON r."categoryId" = c.id
+         LEFT JOIN "Department" d ON r."departmentId" = d.id
+         WHERE a."contentText" ILIKE $1 ${scopeCond} ${catCond} ${deptCond}
+         ORDER BY a."articleNumber" ASC`,
+        [likeQuery]
+      );
+      bodyMatches = r.rows.map((art) => {
+        const text = art.contentText || "";
+        const lowerText = text.toLowerCase();
+        const lowerQuery = query.toLowerCase();
+        const index = lowerText.indexOf(lowerQuery);
         const start = Math.max(0, index - 30);
         const end = Math.min(text.length, index + query.length + 50);
         const snippet = (start > 0 ? "..." : "") + text.substring(start, end) + (end < text.length ? "..." : "");
-
         return {
-          id: rule.id,
-          title: rule.title,
-          ruleNumber: rule.ruleNumber,
-          categoryName: rule.category.name,
-          departmentName: rule.department.name,
-          articleTitle: `제${art.articleNumber}조 (${art.title})`,
+          id: art.id,
+          title: art.title,
+          ruleNumber: art.ruleNumber,
+          categoryName: art.categoryName,
+          departmentName: art.departmentName,
+          articleTitle: `제${art.articleNumber}조 (${art.articleTitle})`,
           snippet,
-          enactmentDate: art.revision.enactmentDate,
-          latestVersionName: art.revision.versionName
+          enactmentDate: art.enactmentDate,
+          latestVersionName: art.latestVersionName,
         };
       });
     }
 
-    // 3. 별표/별지 매칭 (Attachments Match)
+    // 3. 첨부파일 매칭
     let attachmentMatches: any[] = [];
     if (isAll || optionList.includes("attachment")) {
-      const attachments = await prisma.attachment.findMany({
-        where: {
-          AND: [
-            { title: { contains: query } },
-            {
-              rule: {
-                AND: [
-                  scope === "current" ? { status: "EFFECTIVE" } : {},
-                  categoryId ? { categoryId } : {},
-                  departmentId ? { departmentId } : {}
-                ]
-              }
-            }
-          ]
-        },
-        include: {
-          rule: {
-            include: {
-              category: { select: { name: true } },
-              department: { select: { name: true } },
-              revisions: {
-                orderBy: { version: "desc" },
-                take: 1,
-                select: {
-                  enactmentDate: true,
-                  versionName: true
-                }
-              }
-            }
-          }
-        },
-        orderBy: { title: "asc" }
-      });
-
-      attachmentMatches = attachments.map(att => {
-        const rule = att.rule;
-        const rev = rule.revisions[0] || null;
-        return {
-          id: att.id,
-          title: att.title,
-          fileUrl: att.fileUrl,
-          fileType: att.fileType,
-          ruleId: rule.id,
-          ruleTitle: rule.title,
-          ruleNumber: rule.ruleNumber,
-          categoryName: rule.category.name,
-          departmentName: rule.department.name,
-          latestVersionName: rev?.versionName || "제정",
-          enactmentDate: rev?.enactmentDate || null
-        };
-      });
+      const r = await pool.query(
+        `SELECT
+          a.id, a.title, a."fileUrl", a."fileType",
+          r.id AS "ruleId", r.title AS "ruleTitle", r."ruleNumber",
+          c.name AS "categoryName", d.name AS "departmentName",
+          (SELECT "versionName" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "latestVersionName",
+          (SELECT "enactmentDate" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "enactmentDate"
+         FROM "Attachment" a
+         JOIN "Rule" r ON a."ruleId" = r.id
+         LEFT JOIN "Category" c ON r."categoryId" = c.id
+         LEFT JOIN "Department" d ON r."departmentId" = d.id
+         WHERE a.title ILIKE $1 ${scopeCond} ${catCond} ${deptCond}
+         ORDER BY a.title ASC`,
+        [likeQuery]
+      );
+      attachmentMatches = r.rows;
     }
 
-    return NextResponse.json({
-      isGrouped: true,
-      titleMatches,
-      bodyMatches,
-      attachmentMatches
-    });
-
+    await pool.end();
+    return NextResponse.json({ isGrouped: true, titleMatches, bodyMatches, attachmentMatches });
   } catch (error: any) {
     console.error("[Search API Error]:", error);
+    await pool.end();
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }

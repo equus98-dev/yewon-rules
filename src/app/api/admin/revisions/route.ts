@@ -2,11 +2,21 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { getPrisma } from "@/lib/prisma";
+import { Pool } from "@neondatabase/serverless";
+
+const poolConfig = {
+  host: "aws-1-ap-northeast-1.pooler.supabase.com",
+  port: 6543,
+  user: "postgres.jagpwxgasudlnaoxfroe",
+  password: "Tmtmfh0022$&*",
+  database: "postgres",
+  ssl: { rejectUnauthorized: false },
+};
 
 export async function POST(request: Request) {
+  const pool = new Pool(poolConfig);
+  const client = await pool.connect();
   try {
-    const prisma = await getPrisma();
     const body = await request.json();
     const {
       ruleId,
@@ -16,117 +26,123 @@ export async function POST(request: Request) {
       effectiveDate,
       announcementNumber,
       description,
-      articles, // Array of newly drafted articles
+      articles,
     } = body;
 
     if (!ruleId || !versionName || !revisionType || !enactmentDate || !effectiveDate) {
+      client.release();
+      await pool.end();
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // 1. 해당 규정의 기존 최신 버전(이전 버전) 찾기
-    const previousRevisions = await prisma.revision.findMany({
-      where: { ruleId },
-      orderBy: { version: "desc" },
-      take: 1,
-      include: {
-        articles: true,
-      },
-    });
+    await client.query("BEGIN");
 
-    const previousRevision = previousRevisions[0];
+    // 1. 이전 최신 버전 조회
+    const prevRes = await client.query(
+      `SELECT id, version FROM "Revision" WHERE "ruleId" = $1 ORDER BY version DESC LIMIT 1`,
+      [ruleId]
+    );
+    const previousRevision = prevRes.rows[0] || null;
     const nextVersion = previousRevision ? previousRevision.version + 1 : 1;
 
-    const dateEnactment = new Date(enactmentDate);
-    const dateEffective = new Date(effectiveDate);
+    // 이전 버전의 조항 조회 (신구조문대비표용)
+    let oldArticles: any[] = [];
+    if (previousRevision) {
+      const oldArtRes = await client.query(
+        `SELECT id, "articleNumber", "contentText" FROM "Article" WHERE "revisionId" = $1`,
+        [previousRevision.id]
+      );
+      oldArticles = oldArtRes.rows;
+    }
 
-    // 2. 신규 Revision 레코드 생성
-    const newRevision = await prisma.revision.create({
-      data: {
+    // 2. 신규 Revision 생성
+    const newRevisionId = crypto.randomUUID();
+    await client.query(
+      `INSERT INTO "Revision" (id, "ruleId", version, "versionName", "revisionType", "enactmentDate", "effectiveDate", "announcementNumber", description, "createdAt", "updatedAt")
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())`,
+      [
+        newRevisionId,
         ruleId,
-        version: nextVersion,
+        nextVersion,
         versionName,
         revisionType,
-        enactmentDate: dateEnactment,
-        effectiveDate: dateEffective,
-        announcementNumber: announcementNumber || "공포",
-        description: description || `${versionName} 공포 반영`,
-      },
-    });
+        new Date(enactmentDate),
+        new Date(effectiveDate),
+        announcementNumber || "공포",
+        description || `${versionName} 공포 반영`,
+      ]
+    );
 
-    // 3. 신규 조항들(Articles) 데이터베이스에 저장
+    // 3. 신규 조항 저장
     const createdNewArticles: any[] = [];
     if (Array.isArray(articles) && articles.length > 0) {
       for (const art of articles) {
-        const savedArt = await prisma.article.create({
-          data: {
-            revisionId: newRevision.id,
-            chapter: art.chapter || null,
-            section: art.section || null,
-            articleNumber: parseInt(art.articleNumber) || 1,
-            title: art.title || "제목없음",
-            contentJson: art.contentJson || {},
-            contentText: art.contentText || "",
-            sortOrder: art.sortOrder || 1,
-          },
-        });
-        createdNewArticles.push(savedArt);
+        const artId = crypto.randomUUID();
+        await client.query(
+          `INSERT INTO "Article" (id, "revisionId", chapter, section, "articleNumber", title, "contentJson", "contentText", "sortOrder", "createdAt", "updatedAt")
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())`,
+          [
+            artId,
+            newRevisionId,
+            art.chapter || null,
+            art.section || null,
+            parseInt(art.articleNumber) || 1,
+            art.title || "제목없음",
+            JSON.stringify(art.contentJson || {}),
+            art.contentText || "",
+            art.sortOrder || 1,
+          ]
+        );
+        createdNewArticles.push({ id: artId, articleNumber: parseInt(art.articleNumber) || 1, contentText: art.contentText || "" });
       }
     }
 
-    // 4. 자동 신구조문대비표(ArticleComparison) 매핑 및 생성
-    if (previousRevision && createdNewArticles.length > 0) {
-      const oldArticles = previousRevision.articles;
-      
-      // 개정 전/후 조항 번호 기준으로 매칭하여 차이 비교 분석
-      const allArticleNumbers = Array.from(
+    // 4. 신구조문대비표(ArticleComparison) 자동 생성
+    if (oldArticles.length > 0 && createdNewArticles.length > 0) {
+      const allNums = Array.from(
         new Set([
           ...oldArticles.map((a) => a.articleNumber),
           ...createdNewArticles.map((a) => a.articleNumber),
         ])
       ).sort((a, b) => a - b);
 
-      for (const num of allArticleNumbers) {
+      for (const num of allNums) {
         const beforeArt = oldArticles.find((a) => a.articleNumber === num);
         const afterArt = createdNewArticles.find((a) => a.articleNumber === num);
 
         if (beforeArt && afterArt) {
-          // 둘 다 존재하는데 내용이 다른 경우 -> <개정> 생성
           if (beforeArt.contentText !== afterArt.contentText) {
-            await prisma.articleComparison.create({
-              data: {
-                revisionId: newRevision.id,
-                beforeArticleId: beforeArt.id,
-                afterArticleId: afterArt.id,
-                note: "일부 개정",
-              },
-            });
+            await client.query(
+              `INSERT INTO "ArticleComparison" (id, "revisionId", "beforeArticleId", "afterArticleId", note, "createdAt", "updatedAt")
+               VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`,
+              [crypto.randomUUID(), newRevisionId, beforeArt.id, afterArt.id, "일부 개정"]
+            );
           }
         } else if (beforeArt && !afterArt) {
-          // 개정 전에만 존재했던 경우 -> <삭제> 생성
-          await prisma.articleComparison.create({
-            data: {
-              revisionId: newRevision.id,
-              beforeArticleId: beforeArt.id,
-              afterArticleId: null,
-              note: "조항 삭제",
-            },
-          });
+          await client.query(
+            `INSERT INTO "ArticleComparison" (id, "revisionId", "beforeArticleId", "afterArticleId", note, "createdAt", "updatedAt")
+             VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`,
+            [crypto.randomUUID(), newRevisionId, beforeArt.id, null, "조항 삭제"]
+          );
         } else if (!beforeArt && afterArt) {
-          // 개정 후에 새로 생긴 경우 -> <신설> 생성
-          await prisma.articleComparison.create({
-            data: {
-              revisionId: newRevision.id,
-              beforeArticleId: null,
-              afterArticleId: afterArt.id,
-              note: "조항 신설",
-            },
-          });
+          await client.query(
+            `INSERT INTO "ArticleComparison" (id, "revisionId", "beforeArticleId", "afterArticleId", note, "createdAt", "updatedAt")
+             VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`,
+            [crypto.randomUUID(), newRevisionId, null, afterArt.id, "조항 신설"]
+          );
         }
       }
     }
 
-    return NextResponse.json({ success: true, revisionId: newRevision.id, version: nextVersion });
+    await client.query("COMMIT");
+    client.release();
+    await pool.end();
+
+    return NextResponse.json({ success: true, revisionId: newRevisionId, version: nextVersion });
   } catch (error: any) {
+    await client.query("ROLLBACK");
+    client.release();
+    await pool.end();
     console.error("[Admin Revision POST Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
