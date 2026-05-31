@@ -6,11 +6,13 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Cloudflare Pages/Workers(Edge Runtime)를 위한 전용 Prisma Client 생성
+// Cloudflare Pages/Workers(Edge Runtime)와 로컬 Node.js 하이브리드 구동을 위한 Prisma Client 생성
 const createPrismaClient = () => {
   const connectionString = process.env.DATABASE_URL;
+  // 에지 런타임 환경 감지
+  const isEdge = process.env.NEXT_RUNTIME === "edge";
   
-  if (connectionString) {
+  if (isEdge && connectionString) {
     try {
       const pool = new Pool({ connectionString });
       const adapter = new PrismaNeon(pool as any);
@@ -23,6 +25,7 @@ const createPrismaClient = () => {
     }
   }
 
+  // 로컬 개발 서버 등 일반 Node.js 런타임에서는 표준 Prisma Client를 구동하여 완벽한 안정성을 보장합니다.
   return new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   });
