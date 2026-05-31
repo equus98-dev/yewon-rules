@@ -93,20 +93,20 @@ export default function AdminLayout({
                 className="object-contain"
               />
             </div>
-            <div className="text-[11px] text-[#0c3161] font-black tracking-widest uppercase">
+            <div className="text-[13px] text-[#0c3161] font-black tracking-widest uppercase">
               관리자 시스템 포털
             </div>
           </div>
  
           {/* 사이드바 메뉴 리스트 */}
-          <nav className="p-4 space-y-1.5 mt-4">
+          <nav className="p-4 space-y-2 mt-4">
             {menuItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black transition-all cursor-pointer select-none active:scale-95 ${
+                  className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-[14px] font-black transition-all cursor-pointer select-none active:scale-95 ${
                     isActive
                       ? "bg-[#0c3161] text-white shadow-md shadow-[#0c3161]/20"
                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
@@ -121,22 +121,22 @@ export default function AdminLayout({
         </div>
  
         {/* 하단 푸터 - 사용자 서비스로 돌아가기 및 로그아웃 */}
-        <div className="p-4 border-t border-slate-200 space-y-2">
+        <div className="p-4 border-t border-slate-200 space-y-2.5">
           <button
             type="button"
             onClick={() => {
               localStorage.removeItem("yewon_admin_session");
               router.push("/admin/login");
             }}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-red-200 text-xs font-black text-red-600 hover:bg-red-50 transition-all active:scale-95 cursor-pointer"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-red-200 text-[13px] font-black text-red-600 hover:bg-red-50 transition-all active:scale-95 cursor-pointer"
           >
             로그아웃
           </button>
           <Link
             href="/"
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-slate-200 text-xs font-black text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 cursor-pointer"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-slate-200 text-[13px] font-black text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 cursor-pointer"
           >
-            <ExitToAppIcon sx={{ fontSize: 16 }} />
+            <ExitToAppIcon sx={{ fontSize: 18 }} />
             사용자 웹 화면
           </Link>
         </div>
@@ -146,13 +146,13 @@ export default function AdminLayout({
       <div className="flex-1 flex flex-col overflow-hidden bg-slate-50">
         
         {/* 헤더 바 */}
-        <header className="h-14 border-b border-slate-250 bg-white px-8 flex items-center justify-between shrink-0 select-none">
-          <div className="text-xs text-slate-500 font-bold">
+        <header className="h-16 border-b border-slate-250 bg-white px-8 flex items-center justify-between shrink-0 select-none">
+          <div className="text-sm text-slate-500 font-bold">
             예원예술대학교 대학규정 디지털 정비 사업
           </div>
           
-          <div className="flex items-center gap-4 text-xs font-bold text-slate-700">
-            <span className="bg-[#0c3161]/10 text-[#0c3161] px-2 py-0.5 rounded border border-[#0c3161]/20 text-[10px] font-black">
+          <div className="flex items-center gap-4 text-sm font-bold text-slate-700">
+            <span className="bg-[#0c3161]/10 text-[#0c3161] px-2.5 py-1 rounded border border-[#0c3161]/20 text-[11px] font-black">
               System Admin
             </span>
             <span>최고 관리자 님</span>
