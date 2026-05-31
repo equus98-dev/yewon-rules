@@ -70,6 +70,11 @@ const createPrismaClient = (connectionString: string): PrismaClient => {
   // 엔진이 에지 환경에서 주소를 잃어버리고 localhost를 탐색하는 현상을 완벽히 차단합니다.
   try {
     console.log("[Prisma] Explicit Connection Object Neon Serverless activation...");
+    
+    // WASM Query Engine이 구동될 때 schema.prisma의 env("DATABASE_URL") 값을 찾지 못해
+    // localhost 연결 오류를 내뿜는 것을 방지하기 위해, 강제로 process.env에 주소를 주입합니다.
+    process.env.DATABASE_URL = connectionString;
+
     const pool = new Pool({
       host: "aws-1-ap-northeast-1.pooler.supabase.com",
       port: 6543,
