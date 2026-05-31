@@ -259,10 +259,10 @@ export default function Home() {
       {/* ==================== 2. 메인 컨텐츠 영역 ==================== */}
       <div className="flex-1 flex overflow-hidden bg-slate-50">
         
-        {/* 좌측 사이드바 트리 (열기/닫기 가능한 슬라이딩 구조로 고도화) */}
+        {/* 좌측 사이드바 트리 (열기/닫기 가능한 슬라이딩 구조로 고도화 - 남색 세로 아이콘 메뉴바 상시 고정) */}
         <aside 
           className={`shrink-0 h-full hidden lg:block border-slate-200 z-10 transition-all duration-300 ease-in-out overflow-hidden ${
-            isSidebarOpen ? "w-[375px] border-r" : "w-0 border-r-0"
+            isSidebarOpen ? "w-[375px] border-r" : "w-[75px] border-r"
           }`}
         >
           <div className="w-[375px] h-full">

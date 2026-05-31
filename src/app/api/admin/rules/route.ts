@@ -248,3 +248,57 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }
+
+// 4. 규정 영구 삭제 (DELETE)
+export async function DELETE(request: Request) {
+  const pool = new Pool(poolConfig);
+  const client = await pool.connect();
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) {
+      client.release();
+      await pool.end();
+      return NextResponse.json({ error: "Missing rule ID" }, { status: 400 });
+    }
+
+    await client.query("BEGIN");
+
+    // 1) 자식 레코드: Article 삭제 (Revision과 연계)
+    await client.query(
+      `DELETE FROM "Article" WHERE "revisionId" IN (SELECT id FROM "Revision" WHERE "ruleId" = $1)`,
+      [id]
+    );
+
+    // 2) 자식 레코드: Comparison 삭제 (Revision과 연계)
+    await client.query(
+      `DELETE FROM "Comparison" WHERE "revisionId" IN (SELECT id FROM "Revision" WHERE "ruleId" = $1)`,
+      [id]
+    );
+
+    // 3) 자식 레코드: Attachment 삭제
+    await client.query(`DELETE FROM "Attachment" WHERE "ruleId" = $1`, [id]);
+
+    // 4) 자식 레코드: Revision 삭제
+    await client.query(`DELETE FROM "Revision" WHERE "ruleId" = $1`, [id]);
+
+    // 5) 부모 레코드: Rule 삭제
+    const ruleRes = await client.query(`DELETE FROM "Rule" WHERE id = $1 RETURNING *`, [id]);
+
+    await client.query("COMMIT");
+    client.release();
+    await pool.end();
+
+    if (ruleRes.rows.length === 0) {
+      return NextResponse.json({ error: "Rule not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: "규정이 성공적으로 삭제되었습니다." });
+  } catch (error: any) {
+    await client.query("ROLLBACK");
+    client.release();
+    await pool.end();
+    console.error("[Admin Rules DELETE Error]:", error);
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+  }
+}

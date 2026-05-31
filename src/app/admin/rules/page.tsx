@@ -20,6 +20,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useRouter as useNextRouter } from "next/navigation";
 
 export default function AdminRulesManagement() {
@@ -107,6 +108,27 @@ export default function AdminRulesManagement() {
         );
       } else {
         alert("상태 변경에 실패했습니다.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("네트워크 오류 발생");
+    }
+  };
+
+  // 규정 영구 삭제 핸들러
+  const handleDeleteRule = async (ruleId: string, title: string) => {
+    if (!confirm(`[경고] "${title}" 규정을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없으며, 이 규정에 포함된 모든 조항(Articles)과 개정 이력(Revisions)이 데이터베이스에서 영구적으로 소멸됩니다.`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/rules?id=${ruleId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("규정이 성공적으로 영구 삭제되었습니다.");
+        setRules((prev) => prev.filter((r) => r.id !== ruleId));
+      } else {
+        alert(`삭제 실패: ${data.error || "알 수 없는 에러"}`);
       }
     } catch (e) {
       console.error(e);
@@ -274,7 +296,7 @@ export default function AdminRulesManagement() {
                           <button
                             type="button"
                             onClick={() => handleToggleStatus(rule.id, rule.status)}
-                            className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-200 text-[10px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm"
+                            className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-200 text-[10px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm whitespace-nowrap"
                           >
                             <CheckCircleIcon sx={{ fontSize: 11 }} />
                             현행 복구
@@ -283,12 +305,22 @@ export default function AdminRulesManagement() {
                           <button
                             type="button"
                             onClick={() => handleToggleStatus(rule.id, rule.status)}
-                            className="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-1.5 rounded-lg border border-red-200 text-[10px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm"
+                            className="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-1.5 rounded-lg border border-red-200 text-[10px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm whitespace-nowrap"
                           >
                             <BlockIcon sx={{ fontSize: 11 }} />
                             규정 폐지
                           </button>
                         )}
+                        
+                        {/* 3) 규정 삭제 */}
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteRule(rule.id, rule.title)}
+                          className="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-lg border border-rose-200 text-[10px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm whitespace-nowrap"
+                        >
+                          <DeleteIcon sx={{ fontSize: 11 }} />
+                          규정 삭제
+                        </button>
                       </td>
                     </tr>
                   );
