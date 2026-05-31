@@ -204,7 +204,7 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
           label={
             <div className="flex items-center gap-1.5 py-0.5 select-none overflow-hidden">
               {icon}
-              <span className={`text-[12px] font-semibold text-slate-700 leading-relaxed truncate ${labelStyle}`}>{node.name}</span>
+              <span className={`text-[13.5px] font-semibold text-slate-700 leading-relaxed truncate ${labelStyle}`}>{node.name}</span>
             </div>
           }
           onClick={() => {
@@ -253,7 +253,7 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
               }`}
             >
               {item.icon}
-              <span className="text-[10px] tracking-tight">{item.label}</span>
+              <span className="text-[11.5px] tracking-tight">{item.label}</span>
             </button>
           );
         })}
@@ -284,7 +284,7 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
                   "& .MuiTab-root": {
                     minHeight: "36px",
                     py: 0.5,
-                    fontSize: "0.775rem",
+                    fontSize: "0.875rem",
                     fontWeight: "bold",
                   }
                 }}
@@ -312,7 +312,7 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
                   "& .MuiOutlinedInput-root": {
                     bgcolor: "white",
                     borderRadius: "6px",
-                    fontSize: "0.75rem",
+                    fontSize: "0.85rem",
                     height: "32px",
                   },
                 }}
@@ -391,17 +391,17 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="bg-blue-50 text-blue-800 px-1 py-0.5 rounded text-[9px] font-bold">
+                      <span className="bg-blue-50 text-blue-800 px-1 py-0.5 rounded text-[10px] font-bold">
                         {rule.departmentName}
                       </span>
-                      <span className="text-[9px] text-slate-400">
+                      <span className="text-[10.5px] text-slate-400">
                         {new Date(rule.enactmentDate).toLocaleDateString()}
                       </span>
                     </div>
-                    <h4 className="font-extrabold text-slate-800 text-[11px] line-clamp-1 mt-0.5">
+                    <h4 className="font-extrabold text-slate-800 text-[12.5px] line-clamp-1 mt-0.5">
                       {rule.title}
                     </h4>
-                    <div className="flex items-center justify-between text-[9px] text-slate-500 mt-1">
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1">
                       <span>공포번호: {rule.announcementNumber || "미지정"}</span>
                       <span className="text-blue-700 font-bold">{rule.latestVersionName}</span>
                     </div>
@@ -432,7 +432,7 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
                   "& .MuiOutlinedInput-root": {
                     bgcolor: "white",
                     borderRadius: "6px",
-                    fontSize: "0.75rem",
+                    fontSize: "0.85rem",
                     height: "32px",
                   },
                 }}
@@ -466,14 +466,14 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
                       rel="noopener noreferrer"
                       className="w-full p-2.5 rounded-lg border border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50/30 transition-all flex items-start gap-2.5 cursor-pointer text-left"
                     >
-                      <span className={`w-8 h-8 rounded shrink-0 flex items-center justify-center font-black text-[9px] uppercase ${typeBg}`}>
+                      <span className={`w-8 h-8 rounded shrink-0 flex items-center justify-center font-black text-[10.5px] uppercase ${typeBg}`}>
                         {att.fileType || "FIL"}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-extrabold text-slate-800 text-[11px] truncate" title={att.title}>
+                        <h4 className="font-extrabold text-slate-800 text-[12.5px] truncate" title={att.title}>
                           {att.title}
                         </h4>
-                        <p className="text-[9px] text-slate-400 mt-0.5 truncate">
+                        <p className="text-[10.5px] text-slate-400 mt-0.5 truncate">
                           규정: {att.rule.title}
                         </p>
                       </div>
@@ -507,13 +507,13 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
                   }}
                   className="w-full p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-[#0c3161]/5 hover:border-blue-300 transition-all text-xs flex flex-col gap-1 shadow-sm cursor-pointer active:scale-98"
                 >
-                  <div className="flex items-center justify-between text-[9px] text-slate-400">
-                    <span className="font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">
+                  <div className="flex items-center justify-between text-[10.5px] text-slate-400">
+                    <span className="font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 text-[10px]">
                       {notice.dept}
                     </span>
                     <span>{notice.date}</span>
                   </div>
-                  <h4 className="font-extrabold text-slate-700 text-[11px] mt-1 leading-snug line-clamp-2">
+                  <h4 className="font-extrabold text-slate-700 text-[12.5px] mt-1 leading-snug line-clamp-2">
                     {notice.title}
                   </h4>
                 </div>
