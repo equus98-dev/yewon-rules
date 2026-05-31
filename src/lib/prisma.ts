@@ -66,23 +66,28 @@ const createPrismaClient = (connectionString: string): PrismaClient => {
   }
 
   // 실서버 프로덕션 환경의 경우 묻지도 따지지도 않고 무조건 Neon Serverless 어댑터를 기동합니다.
-  // 이 때 특수문자($ & *)가 포함된 패스워드의 퍼센트 인코딩 혼선 및 플랫폼 URL 파서 오작동 버그를 
-  // 원천 차단하기 위해 쌩 비밀번호와 접속 정보를 분할 분리한 명시적 객체(Config Object)로 직접 주입합니다.
+  // 이 때 어댑터 생성과 함께 내부 WASM Query Engine에 연결 주소를 명시적으로 수동 전달(datasources)하여
+  // 엔진이 에지 환경에서 주소를 잃어버리고 localhost를 탐색하는 현상을 완벽히 차단합니다.
   try {
     console.log("[Prisma] Explicit Connection Object Neon Serverless activation...");
     const pool = new Pool({
       host: "aws-1-ap-northeast-1.pooler.supabase.com",
       port: 6543,
       user: "postgres.jagpwxgasudlnaoxfroe",
-      password: "Tmtmfh0022$&*", // 퍼센트 인코딩 혼선이 생기지 않도록 진짜 쌩 비밀번호를 안전 주입!
+      password: "Tmtmfh0022$&*", // 진짜 쌩 비밀번호를 안전 주입!
       database: "postgres",
       ssl: {
-        rejectUnauthorized: false // 에지 환경 SSL 핸드셰이크 안정성 확보
+        rejectUnauthorized: false // 에지 환경 SSL 안정성 보장
       }
     });
     const adapter = new PrismaNeon(pool as any);
     return new PrismaClient({
       adapter,
+      datasources: {
+        db: {
+          url: "postgresql://postgres.jagpwxgasudlnaoxfroe:Tmtmfh0022%24%26%2A@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+        }
+      },
       log: ["error"],
     });
   } catch (e: any) {
@@ -134,6 +139,7 @@ export const prisma = new Proxy({} as PrismaClient, {
     return value;
   }
 });
+
 
 
 
