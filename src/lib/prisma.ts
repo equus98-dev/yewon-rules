@@ -8,29 +8,34 @@ const globalForPrisma = globalThis as unknown as {
 
 // 1. Cloudflare Pages 및 Node.js 하이브리드 환경에서 환경 변수를 가장 확실하게 읽어오는 지능형 헬퍼
 const getConnectionString = (): string | undefined => {
-  // A. 일반 환경 변수 확인
-  if (process.env.DATABASE_URL) {
-    return process.env.DATABASE_URL;
+  // 입력된 문자열 주소가 유효한 postgresql 포맷인지 정밀 검사하는 헬퍼
+  const checkUrl = (url: any): boolean => {
+    return typeof url === "string" && url.trim().startsWith("postgresql://");
+  };
+
+  // A. 일반 환경 변수 확인 및 정규화
+  if (checkUrl(process.env.DATABASE_URL)) {
+    return process.env.DATABASE_URL!.trim();
   }
   
   // B. Cloudflare Global Scope 바인딩 확인
   const g = globalThis as any;
-  if (g.DATABASE_URL) {
-    return g.DATABASE_URL;
+  if (checkUrl(g.DATABASE_URL)) {
+    return g.DATABASE_URL.trim();
   }
-  if (g.env && g.env.DATABASE_URL) {
-    return g.env.DATABASE_URL;
+  if (g.env && checkUrl(g.env.DATABASE_URL)) {
+    return g.env.DATABASE_URL.trim();
   }
   
-  // C. 전역 식별자 최종 확인 (TypeScript 컴파일 에러 'Cannot find name DATABASE_URL' 방지를 위한 동적 프로퍼티 안전 참조)
+  // C. 전역 식별자 최종 확인 (TypeScript 컴파일 에러 방지를 위한 동적 프로퍼티 안전 참조)
   try {
     const gRef = globalThis as any;
-    if (gRef.DATABASE_URL) {
-      return gRef.DATABASE_URL;
+    if (checkUrl(gRef.DATABASE_URL)) {
+      return gRef.DATABASE_URL.trim();
     }
   } catch (e) {}
   
-  // D. [최종 안전장치] 플랫폼 환경변수 유실 버그 돌파를 위한 고정 Supabase 클라우드 직접 폴백
+  // D. [최종 안전장치] 플랫폼 환경변수 유실 및 포맷 손상 시를 위한 고정 Supabase 클라우드 직접 폴백
   return "postgresql://postgres.jagpwxgasudlnaoxfroe:Tmtmfh0022%24%26%2A@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true";
 };
 
@@ -61,7 +66,6 @@ const createPrismaClient = (connectionString: string | undefined): PrismaClient 
   }
 
   // 오직 실서버 프로덕션 환경(production)에서만 Neon Serverless 어댑터를 기동합니다.
-  // (Cloudflare Pages 환경의 NEXT_RUNTIME 판정 유실로 인한 우회를 원천 차단하기 위해 묻지도 따지지도 않고 Neon 어댑터를 강제 기동합니다.)
   const isProduction = process.env.NODE_ENV === "production";
   
   if (isProduction && connectionString) {
@@ -74,7 +78,17 @@ const createPrismaClient = (connectionString: string | undefined): PrismaClient 
         log: ["error"],
       });
     } catch (e) {
-      console.error("Failed to initialize Prisma Client with Neon adapter:", e);
+      console.error("Failed to initialize Prisma Client with Neon adapter, falling back to standard client:", e);
+      // [대량 방어코드] Neon 어댑터 초기화 도중 예외가 발생하더라도 함수가 undefined를 반환해 평생 에러를 유발하는 버그를 차단하고,
+      // 즉시 내장된 주소로 표준 PrismaClient를 빌드하여 반환합니다.
+      return new PrismaClient({
+        datasources: {
+          db: {
+            url: connectionString,
+          },
+        },
+        log: ["error"],
+      });
     }
   }
 
@@ -137,6 +151,7 @@ export const prisma = new Proxy({} as PrismaClient, {
     return value;
   }
 });
+
 
 
 
