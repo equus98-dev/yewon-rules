@@ -9,10 +9,10 @@ const globalForPrisma = globalThis as unknown as {
 // Cloudflare Pages/Workers(Edge Runtime)와 로컬 Node.js 하이브리드 구동을 위한 Prisma Client 생성
 const createPrismaClient = () => {
   const connectionString = process.env.DATABASE_URL;
-  // 에지 런타임 환경 감지
-  const isEdge = process.env.NEXT_RUNTIME === "edge";
+  // 오직 실서버 프로덕션 에지 런타임 환경에서만 Neon Serverless 어댑터를 기동합니다.
+  const isProdEdge = process.env.NODE_ENV === "production" && process.env.NEXT_RUNTIME === "edge";
   
-  if (isEdge && connectionString) {
+  if (isProdEdge && connectionString) {
     try {
       const pool = new Pool({ connectionString });
       const adapter = new PrismaNeon(pool as any);
