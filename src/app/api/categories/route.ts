@@ -26,7 +26,7 @@ export async function GET(request: Request) {
       const pool = new Pool(poolConfig);
       try {
         const rCats = await pool.query('SELECT id, name, "parentId", "sortOrder" FROM "Category" ORDER BY "sortOrder" ASC');
-        const rRules = await pool.query('SELECT id, title, "ruleNumber", status, "categoryId" FROM "Rule" ORDER BY title ASC');
+        const rRules = await pool.query('SELECT id, title, "ruleNumber", status, "categoryId" FROM "Rule" ORDER BY "ruleNumber" ASC');
         await pool.end();
 
         const categories = rCats.rows;
@@ -53,7 +53,7 @@ export async function GET(request: Request) {
             if (catNode) {
               catNode.rawRules.push({
                 id: rule.id,
-                name: `${rule.title} (${rule.ruleNumber})`,
+                name: `${rule.ruleNumber} ${rule.title}`,
                 type: "file",
                 status: rule.status,
               });
