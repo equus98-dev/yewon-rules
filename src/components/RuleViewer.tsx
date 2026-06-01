@@ -86,9 +86,11 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
         if (!Array.isArray(items)) return;
         items.forEach((item: any) => {
           if (item.type === "chapter") {
-            toc.push({ type: "chapter", id: `toc-${item.text.replace(new RegExp("\\s", "g"), '-')}`, text: item.text });
+            const chapterText = item.text || "";
+            toc.push({ type: "chapter", id: `toc-${chapterText.replace(new RegExp("\\s", "g"), '-')}`, text: chapterText });
           } else if (item.type === "article") {
-            toc.push({ type: "article", id: `toc-${item.num}`, text: item.num });
+            const articleNum = item.num || "";
+            toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
           }
         });
       } catch (e) {
@@ -328,36 +330,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
                     </div>
                   )}
 
-                  {/* 플로팅 액션 바 (선택된 조항이 있을 때만 표시) */}
-                  {selectedArticleIds.size > 0 && (
-                    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-6 z-50 animate-fade-in border border-slate-700">
-                      <div className="flex items-center gap-2">
-                        <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-                          {selectedArticleIds.size}
-                        </span>
-                        <span className="font-medium text-sm">개 조항 선택됨</span>
-                      </div>
-                      <div className="w-px h-6 bg-slate-700"></div>
-                      <div className="flex items-center gap-3">
-                        <Button 
-                          variant="contained" 
-                          size="small" 
-                          onClick={handlePrintSelected}
-                          className="bg-blue-500 hover:bg-blue-600 font-bold px-4"
-                        >
-                          선택 인쇄 (PDF 저장)
-                        </Button>
-                        <Button 
-                          variant="text" 
-                          size="small" 
-                          onClick={() => setSelectedArticleIds(new Set())}
-                          className="text-slate-300 hover:text-white"
-                        >
-                          선택 해제
-                        </Button>
-                      </div>
-                    </div>
-                  )}
+
                 </>
               ) : (
                 <div className="text-center py-12 text-slate-400">
@@ -570,6 +543,37 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
           )}
         </div>
       </div>
+
+      {/* 플로팅 액션 바 (선택된 조항이 있을 때만 표시) */}
+      {activeTab === 0 && selectedArticleIds.size > 0 && (
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-6 z-[100] animate-fade-in border border-slate-700">
+          <div className="flex items-center gap-2">
+            <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+              {selectedArticleIds.size}
+            </span>
+            <span className="font-medium text-sm">개 조항 선택됨</span>
+          </div>
+          <div className="w-px h-6 bg-slate-700"></div>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="contained" 
+              size="small" 
+              onClick={handlePrintSelected}
+              className="bg-blue-500 hover:bg-blue-600 font-bold px-4"
+            >
+              선택 인쇄 (PDF 저장)
+            </Button>
+            <Button 
+              variant="text" 
+              size="small" 
+              onClick={() => setSelectedArticleIds(new Set())}
+              className="text-slate-300 hover:text-white"
+            >
+              선택 해제
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -47,6 +47,13 @@ export async function GET(request: Request) {
         });
 
         // 규정들을 카테고리에 할당
+        // 먼저 rules를 자연 정렬(Natural Sort)하여 '2-0-2'가 '2-0-10'보다 앞에 오게 함
+        rules.sort((a, b) => {
+          if (!a.ruleNumber) return 1;
+          if (!b.ruleNumber) return -1;
+          return a.ruleNumber.localeCompare(b.ruleNumber, undefined, { numeric: true, sensitivity: 'base' });
+        });
+
         rules.forEach((rule) => {
           if (rule.categoryId) {
             const catNode = categoryMap.get(rule.categoryId);
