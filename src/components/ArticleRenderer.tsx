@@ -62,7 +62,7 @@ export default function ArticleRenderer({
         }
 
         // 특정 메타데이터 숨기기 (예: "예원예술대학교 학칙 2-0-2-")
-        if (item.type === "text" && item.text.match(/\d-\d-\d-/)) {
+        if (item.type === "text" && typeof item.text === "string" && item.text.match(/\d-\d-\d-/)) {
           return null;
         }
 
@@ -121,26 +121,27 @@ export default function ArticleRenderer({
           );
         } else {
           // 텍스트 렌더링
+          const safeText = typeof item.text === 'string' ? item.text : String(item.text || "");
           if (!hasSeenBody) {
             // 본문(장,조) 시작 전의 텍스트(주로 규정 제목, 제개정 이력 등)
-            const isTitle = item.text.includes("학칙") || item.text.includes("규정") || item.text.includes("정관") || item.text.includes("내규") || item.text.includes("세칙") || item.text.includes("요령");
-            const isHistory = item.text.includes("제정") || item.text.includes("개정") || item.text.includes("시행");
+            const isTitle = safeText.includes("학칙") || safeText.includes("규정") || safeText.includes("정관") || safeText.includes("내규") || safeText.includes("세칙") || safeText.includes("요령");
+            const isHistory = safeText.includes("제정") || safeText.includes("개정") || safeText.includes("시행");
             
             return (
               <div key={index} className="text-center w-full my-2">
                 {isTitle ? (
-                  <h1 className="text-[32px] font-bold text-black my-6">{item.text}</h1>
+                  <h1 className="text-[32px] font-bold text-black my-6">{safeText}</h1>
                 ) : isHistory ? (
-                  <p className="text-[14px] text-blue-600 font-medium my-1">[{item.text}]</p>
+                  <p className="text-[14px] text-blue-600 font-medium my-1">[{safeText}]</p>
                 ) : (
-                  <p className="text-[15px] text-black leading-[1.6]">{item.text}</p>
+                  <p className="text-[15px] text-black leading-[1.6]">{safeText}</p>
                 )}
               </div>
             );
           } else {
             return (
               <div key={index} className="text-black text-[15px] leading-[1.6] my-1 pl-[1.25rem]">
-                {item.text}
+                {safeText}
               </div>
             );
           }
