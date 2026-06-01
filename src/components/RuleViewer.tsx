@@ -306,7 +306,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
                     </div>
                     
                     {/* 조항들 차례대로 렌더링 */}
-                    {currentRevision.articles && currentRevision.articles.length > 0 ? (
+                    {currentRevision?.articles && currentRevision.articles.length > 0 ? (
                       <div className="pb-24">
                         {currentRevision.articles.map((article: any) => (
                           <ArticleRenderer

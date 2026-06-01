@@ -13,7 +13,7 @@ interface ArticleRendererProps {
   articleNumber: number;
   title: string;
   contentJson: any; // Prisma JsonValue
-  contentHtml?: string | null; // 관리자가 WYSIWYG 에디터로 작성한 HTML
+  contentHtml?: string | null;
   isSelectable?: boolean;
   selectedNums?: Set<string>;
   onToggleSelect?: (num: string) => void;
@@ -27,7 +27,6 @@ export default function ArticleRenderer({
   selectedNums,
   onToggleSelect,
 }: ArticleRendererProps) {
-  // 만약 관리자가 직접 에디터로 작성한 HTML이 존재한다면 최우선으로 렌더링
   if (contentHtml && contentHtml.trim().length > 0) {
     return (
       <div 
@@ -53,6 +52,8 @@ export default function ArticleRenderer({
   return (
     <div className="mb-8 animate-fade-in rule-viewer-content font-['Pretendard']">
       {items.map((item, index) => {
+        if (!item || typeof item !== 'object') return null;
+
         if (
           item.type === "chapter" ||
           item.type === "section" ||
@@ -61,7 +62,6 @@ export default function ArticleRenderer({
           hasSeenBody = true;
         }
 
-        // 특정 메타데이터 숨기기 (예: "예원예술대학교 학칙 2-0-2-")
         if (item.type === "text" && typeof item.text === "string" && item.text.match(/\d-\d-\d-/)) {
           return null;
         }
@@ -122,10 +122,8 @@ export default function ArticleRenderer({
             </div>
           );
         } else {
-          // 텍스트 렌더링
           if (!hasSeenBody) {
-            // 본문(장,조) 시작 전의 텍스트(주로 규정 제목, 제개정 이력 등)
-            const isTitle = safeText.includes("학칙") || safeText.includes("규정") || safeText.includes("정관") || safeText.includes("내규") || safeText.includes("세칙") || safeText.includes("요령");
+            const isTitle = safeText.includes("학칙") || safeText.includes("규정") || safeText.includes("강령") || safeText.includes("내규") || safeText.includes("세칙") || safeText.includes("법령");
             const isHistory = safeText.includes("제정") || safeText.includes("개정") || safeText.includes("시행");
             
             return (
