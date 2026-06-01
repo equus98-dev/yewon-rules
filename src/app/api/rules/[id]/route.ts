@@ -2,22 +2,15 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { Pool } from "@neondatabase/serverless";
+import { pool } from "@/lib/db";
 
-const poolConfig = {
-  host: "aws-1-ap-northeast-1.pooler.supabase.com",
-  port: 6543,
-  user: "postgres.jagpwxgasudlnaoxfroe",
-  password: "Tmtmfh0022$&*",
-  database: "postgres",
-  ssl: { rejectUnauthorized: false },
-};
+
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const pool = new Pool(poolConfig);
+  
   try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
@@ -37,7 +30,7 @@ export async function GET(
     );
 
     if (ruleRes.rows.length === 0) {
-      await pool.end();
+      
       return NextResponse.json({ error: "Rule not found" }, { status: 404 });
     }
     const ruleRow = ruleRes.rows[0];
@@ -57,7 +50,7 @@ export async function GET(
     );
 
     if (revisions.length === 0) {
-      await pool.end();
+      
       return NextResponse.json({
         id: ruleRow.id,
         title: ruleRow.title,
@@ -129,7 +122,7 @@ export async function GET(
 
     const targetRevision = revisions.find((r) => r.id === targetRevisionId);
 
-    await pool.end();
+    
 
     return NextResponse.json({
       id: ruleRow.id,
@@ -148,7 +141,7 @@ export async function GET(
     });
   } catch (error: any) {
     console.error("[Rule API Error]:", error);
-    await pool.end();
+    
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }

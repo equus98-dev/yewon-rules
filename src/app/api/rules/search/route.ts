@@ -2,19 +2,12 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { Pool } from "@neondatabase/serverless";
+import { pool } from "@/lib/db";
 
-const poolConfig = {
-  host: "aws-1-ap-northeast-1.pooler.supabase.com",
-  port: 6543,
-  user: "postgres.jagpwxgasudlnaoxfroe",
-  password: "Tmtmfh0022$&*",
-  database: "postgres",
-  ssl: { rejectUnauthorized: false },
-};
+
 
 export async function GET(request: Request) {
-  const pool = new Pool(poolConfig);
+  
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("query") || "";
@@ -73,7 +66,7 @@ export async function GET(request: Request) {
          ORDER BY r.title ASC`,
         [...values, ...revValues]
       );
-      await pool.end();
+      
       return NextResponse.json(res.rows);
     }
 
@@ -168,11 +161,11 @@ export async function GET(request: Request) {
       attachmentMatches = r.rows;
     }
 
-    await pool.end();
+    
     return NextResponse.json({ isGrouped: true, titleMatches, bodyMatches, attachmentMatches });
   } catch (error: any) {
     console.error("[Search API Error]:", error);
-    await pool.end();
+    
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }

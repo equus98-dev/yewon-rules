@@ -2,7 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { Pool } from "@neondatabase/serverless";
+import { pool } from "@/lib/db";
 
 // 초정밀 접속 설정 객체
 const poolConfig = {
@@ -23,11 +23,11 @@ export async function GET(request: Request) {
 
     // 1. 분야별 규정 트리 조회
     if (type === "field") {
-      const pool = new Pool(poolConfig);
+      
       try {
         const rCats = await pool.query('SELECT id, name, "parentId", "sortOrder" FROM "Category" ORDER BY "sortOrder" ASC');
         const rRules = await pool.query('SELECT id, title, "ruleNumber", status, "categoryId" FROM "Rule" ORDER BY "ruleNumber" ASC');
-        await pool.end();
+        
 
         const categories = rCats.rows;
         const rules = rRules.rows;
@@ -97,18 +97,18 @@ export async function GET(request: Request) {
         const treeData = rootNodes.map((node) => formatNode(node));
         return NextResponse.json(treeData);
       } catch (err: any) {
-        await pool.end();
+        
         throw err;
       }
     }
 
     // 2. 소관부서별 규정 트리 조회
     if (type === "dept") {
-      const pool = new Pool(poolConfig);
+      
       try {
         const rDepts = await pool.query('SELECT id, name, "sortOrder" FROM "Department" ORDER BY "sortOrder" ASC');
         const rRules = await pool.query('SELECT id, title, "ruleNumber", status, "departmentId" FROM "Rule" ORDER BY title ASC');
-        await pool.end();
+        
 
         const depts = rDepts.rows;
         const rules = rRules.rows;
@@ -129,17 +129,17 @@ export async function GET(request: Request) {
 
         return NextResponse.json(treeData);
       } catch (err: any) {
-        await pool.end();
+        
         throw err;
       }
     }
 
     // 3. 가나다순 규정 트리 조회
     if (type === "abc") {
-      const pool = new Pool(poolConfig);
+      
       try {
         const rRules = await pool.query('SELECT id, title, "ruleNumber", "initialSound", status FROM "Rule" ORDER BY title ASC');
-        await pool.end();
+        
 
         const rules = rRules.rows;
 
@@ -190,7 +190,7 @@ export async function GET(request: Request) {
 
         return NextResponse.json(treeData);
       } catch (err: any) {
-        await pool.end();
+        
         throw err;
       }
     }

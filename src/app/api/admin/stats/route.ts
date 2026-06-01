@@ -2,21 +2,9 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { Pool } from "@neondatabase/serverless";
+import { pool } from "@/lib/db";
 
 export async function GET(request: Request) {
-  // 런타임에 100% 무결하게 기동됨이 텔레메트리로 입증된 초정밀 접속 설정 객체
-  const pool = new Pool({
-    host: "aws-1-ap-northeast-1.pooler.supabase.com",
-    port: 6543,
-    user: "postgres.jagpwxgasudlnaoxfroe",
-    password: "Tmtmfh0022$&*", // 진짜 쌩 패스워드를 안전하게 주입
-    database: "postgres",
-    ssl: {
-      rejectUnauthorized: false // 에지 환경 SSL 안정성 보장
-    }
-  });
-
   try {
     // 1. 기초 지표 카운트 집계 (Prisma 엔진을 배제하고 초경량 순수 SQL로 정밀 가동)
     const rRules = await pool.query('SELECT COUNT(*)::int as count FROM "Rule"');
@@ -70,9 +58,6 @@ export async function GET(request: Request) {
       announcementNumber: rev.announcementNumber,
     }));
 
-    // 커넥션 자원 안전 반환
-    await pool.end();
-
     return NextResponse.json({
       counts: {
         rules: totalRules,
@@ -86,8 +71,6 @@ export async function GET(request: Request) {
     });
   } catch (error: any) {
     console.error("[Admin Stats API Error]:", error);
-    // 예외 시 커넥션 안전 해제
-    await pool.end();
     return NextResponse.json(
       { 
         error: error.message || "Internal Server Error",

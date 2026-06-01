@@ -2,7 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { Pool } from "@neondatabase/serverless";
+import { pool } from "@/lib/db";
 
 // 초정밀 접속 설정 객체
 const poolConfig = {
@@ -37,7 +37,7 @@ function getInitialSound(text: string): string {
 
 // 1. 전체 규정 마스터 목록 조회
 export async function GET(request: Request) {
-  const pool = new Pool(poolConfig);
+  
   try {
     const res = await pool.query(`
       SELECT 
@@ -72,18 +72,18 @@ export async function GET(request: Request) {
       enactmentDate: r.enactmentDate ? new Date(r.enactmentDate).toISOString().split("T")[0] : "-",
     }));
 
-    await pool.end();
+    
     return NextResponse.json(mappedRules);
   } catch (error: any) {
     console.error("[Admin Rules GET Error]:", error);
-    await pool.end();
+    
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }
 
 // 2. 신규 규정 제정 등록
 export async function POST(request: Request) {
-  const pool = new Pool(poolConfig);
+  
   const client = await pool.connect();
   try {
     const body = await request.json();
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
 
     if (!title || !ruleNumber || !categoryId || !departmentId || !enactmentDate) {
       client.release();
-      await pool.end();
+      
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -168,13 +168,13 @@ export async function POST(request: Request) {
 
     await client.query("COMMIT");
     client.release();
-    await pool.end();
+    
 
     return NextResponse.json({ success: true, ruleId });
   } catch (error: any) {
     await client.query("ROLLBACK");
     client.release();
-    await pool.end();
+    
 
     console.error("[Admin Rules POST Error]:", error);
     if (error.message && error.message.includes("duplicate key value violates unique constraint")) {
@@ -186,12 +186,12 @@ export async function POST(request: Request) {
 
 // 3. 규정 상태 수정 / 삭제(폐지)
 export async function PUT(request: Request) {
-  const pool = new Pool(poolConfig);
+  
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) {
-      await pool.end();
+      
       return NextResponse.json({ error: "Missing rule ID" }, { status: 400 });
     }
 
@@ -222,7 +222,7 @@ export async function PUT(request: Request) {
     }
 
     if (updates.length === 0) {
-      await pool.end();
+      
       return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
     }
 
@@ -233,7 +233,7 @@ export async function PUT(request: Request) {
     const queryText = `UPDATE "Rule" SET ${updates.join(", ")} WHERE id = $${idIdx} RETURNING *`;
     const res = await pool.query(queryText, values);
     
-    await pool.end();
+    
 
     if (res.rows.length === 0) {
       return NextResponse.json({ error: "Rule not found" }, { status: 404 });
@@ -244,21 +244,21 @@ export async function PUT(request: Request) {
     return NextResponse.json({ success: true, rule: ruleObj });
   } catch (error: any) {
     console.error("[Admin Rules PUT Error]:", error);
-    await pool.end();
+    
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }
 
 // 4. 규정 영구 삭제 (DELETE)
 export async function DELETE(request: Request) {
-  const pool = new Pool(poolConfig);
+  
   const client = await pool.connect();
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) {
       client.release();
-      await pool.end();
+      
       return NextResponse.json({ error: "Missing rule ID" }, { status: 400 });
     }
 
@@ -287,7 +287,7 @@ export async function DELETE(request: Request) {
 
     await client.query("COMMIT");
     client.release();
-    await pool.end();
+    
 
     if (ruleRes.rows.length === 0) {
       return NextResponse.json({ error: "Rule not found" }, { status: 404 });
@@ -297,7 +297,7 @@ export async function DELETE(request: Request) {
   } catch (error: any) {
     await client.query("ROLLBACK");
     client.release();
-    await pool.end();
+    
     console.error("[Admin Rules DELETE Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }

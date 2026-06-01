@@ -2,19 +2,12 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { Pool } from "@neondatabase/serverless";
+import { pool } from "@/lib/db";
 
-const poolConfig = {
-  host: "aws-1-ap-northeast-1.pooler.supabase.com",
-  port: 6543,
-  user: "postgres.jagpwxgasudlnaoxfroe",
-  password: "Tmtmfh0022$&*",
-  database: "postgres",
-  ssl: { rejectUnauthorized: false },
-};
+
 
 export async function POST(request: Request) {
-  const pool = new Pool(poolConfig);
+  
   const client = await pool.connect();
   try {
     const body = await request.json();
@@ -31,7 +24,7 @@ export async function POST(request: Request) {
 
     if (!ruleId || !versionName || !revisionType || !enactmentDate || !effectiveDate) {
       client.release();
-      await pool.end();
+      
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -136,13 +129,13 @@ export async function POST(request: Request) {
 
     await client.query("COMMIT");
     client.release();
-    await pool.end();
+    
 
     return NextResponse.json({ success: true, revisionId: newRevisionId, version: nextVersion });
   } catch (error: any) {
     await client.query("ROLLBACK");
     client.release();
-    await pool.end();
+    
     console.error("[Admin Revision POST Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
