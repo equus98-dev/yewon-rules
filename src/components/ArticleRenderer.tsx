@@ -67,7 +67,7 @@ export default function ArticleRenderer({
         }
 
         if (item.type === "chapter") {
-          const chapterText = item.text || "";
+          const chapterText = typeof item.text === 'string' ? item.text : String(item.text || "");
           return (
             <div key={index} id={`toc-${chapterText.replace(/\s/g, '-')}`} className="text-center w-full block mt-10 mb-4 pt-4">
               <span className="text-[20px] font-bold text-[#0054FF]">
