@@ -66,62 +66,63 @@ export default function ArticleRenderer({
           return null;
         }
 
+        const safeNum = item.num !== null && item.num !== undefined ? String(item.num) : "";
+        const safeText = item.text !== null && item.text !== undefined ? String(item.text) : "";
+
         if (item.type === "chapter") {
-          const chapterText = typeof item.text === 'string' ? item.text : String(item.text || "");
           return (
-            <div key={index} id={`toc-${chapterText.replace(/\s/g, '-')}`} className="text-center w-full block mt-10 mb-4 pt-4">
+            <div key={index} id={`toc-${safeText.replace(/\s/g, '-')}`} className="text-center w-full block mt-10 mb-4 pt-4">
               <span className="text-[20px] font-bold text-[#0054FF]">
-                {item.text}
+                {safeText}
               </span>
             </div>
           );
         } else if (item.type === "section") {
           return (
             <div key={index} className="text-center w-full block text-[18px] font-bold text-[#0054FF] mt-8 mb-4">
-              {item.text}
+              {safeText}
             </div>
           );
         } else if (item.type === "article") {
           return (
-            <div key={index} id={`toc-${item.num}`} className="mt-6 mb-2 text-[15px] text-black leading-[1.6] flex items-start gap-2 pt-2">
+            <div key={index} id={`toc-${safeNum}`} className="mt-6 mb-2 text-[15px] text-black leading-[1.6] flex items-start gap-2 pt-2">
               {isSelectable && onToggleSelect && (
                 <input
                   type="checkbox"
-                  checked={selectedNums ? selectedNums.has(item.num) : false}
-                  onChange={() => onToggleSelect(item.num)}
+                  checked={selectedNums ? selectedNums.has(safeNum) : false}
+                  onChange={() => onToggleSelect(safeNum)}
                   className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                 />
               )}
               <div>
-                <span className="font-bold mr-1">{item.num}</span>
-                <span className="font-normal">{item.text}</span>
+                <span className="font-bold mr-1">{safeNum}</span>
+                <span className="font-normal">{safeText}</span>
               </div>
             </div>
           );
         } else if (item.type === "paragraph") {
           return (
             <div key={index} className="flex text-black text-[15px] leading-[1.6] pl-[1.25rem] -ml-[1.25rem] mb-1">
-              <span className="font-normal mr-1 w-5 shrink-0 text-right inline-block">{item.num}</span>
-              <span className="font-normal flex-1">{item.text}</span>
+              <span className="font-normal mr-1 w-5 shrink-0 text-right inline-block">{safeNum}</span>
+              <span className="font-normal flex-1">{safeText}</span>
             </div>
           );
         } else if (item.type === "item") {
           return (
             <div key={index} className="flex text-black text-[15px] leading-[1.6] pl-[2.5rem] -ml-[1.25rem] mb-1">
-              <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block">{item.num}</span>
-              <span className="font-normal flex-1">{item.text}</span>
+              <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block">{safeNum}</span>
+              <span className="font-normal flex-1">{safeText}</span>
             </div>
           );
         } else if (item.type === "subitem") {
           return (
             <div key={index} className="flex text-black text-[15px] leading-[1.6] pl-[3.75rem] -ml-[1.25rem] mb-1">
-              <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block">{item.num}</span>
-              <span className="font-normal flex-1">{item.text}</span>
+              <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block">{safeNum}</span>
+              <span className="font-normal flex-1">{safeText}</span>
             </div>
           );
         } else {
           // 텍스트 렌더링
-          const safeText = typeof item.text === 'string' ? item.text : String(item.text || "");
           if (!hasSeenBody) {
             // 본문(장,조) 시작 전의 텍스트(주로 규정 제목, 제개정 이력 등)
             const isTitle = safeText.includes("학칙") || safeText.includes("규정") || safeText.includes("정관") || safeText.includes("내규") || safeText.includes("세칙") || safeText.includes("요령");
