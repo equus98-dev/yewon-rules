@@ -263,8 +263,10 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
       <div className="flex-1 h-full flex flex-col overflow-hidden bg-white">
         
         {/* 이너 패널 헤더 */}
-        <div className="h-14 border-b border-slate-200 flex items-center justify-center px-4 shrink-0 bg-slate-50 select-none">
-          <h2 className="text-sm font-black text-slate-800 tracking-tight text-center">{verticalTab}</h2>
+        <div className={`h-14 border-b border-slate-200 flex items-center justify-center px-4 shrink-0 select-none ${verticalTab === '규정' ? 'bg-[#009b9e] text-white' : 'bg-slate-50 text-slate-800'}`}>
+          <h2 className="text-sm font-black tracking-tight text-center">
+            {verticalTab === "규정" ? "규정목록" : verticalTab}
+          </h2>
         </div>
 
         {/* 2-1) 규정 탭 패널 */}
@@ -289,9 +291,9 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
                   }
                 }}
               >
-                <Tab label="분야" />
-                <Tab label="부서" />
-                <Tab label="가나다" />
+                <Tab label="규정별" />
+                <Tab label="부서별" />
+                <Tab label="가나다별" />
               </Tabs>
             </Box>
 
