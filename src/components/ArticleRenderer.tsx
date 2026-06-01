@@ -15,8 +15,8 @@ interface ArticleRendererProps {
   contentJson: any; // Prisma JsonValue
   contentHtml?: string | null; // 관리자가 WYSIWYG 에디터로 작성한 HTML
   isSelectable?: boolean;
-  isSelected?: boolean;
-  onToggleSelect?: (id: string) => void;
+  selectedNums?: Set<string>;
+  onToggleSelect?: (num: string) => void;
 }
 
 export default function ArticleRenderer({
@@ -24,7 +24,7 @@ export default function ArticleRenderer({
   contentJson,
   contentHtml,
   isSelectable,
-  isSelected,
+  selectedNums,
   onToggleSelect,
 }: ArticleRendererProps) {
   // 만약 관리자가 직접 에디터로 작성한 HTML이 존재한다면 최우선으로 렌더링
@@ -83,11 +83,11 @@ export default function ArticleRenderer({
         } else if (item.type === "article") {
           return (
             <div key={index} className="mt-6 mb-2 text-[15px] text-black leading-[1.6] flex items-start gap-2">
-              {isSelectable && id && onToggleSelect && (
+              {isSelectable && onToggleSelect && (
                 <input
                   type="checkbox"
-                  checked={isSelected}
-                  onChange={() => onToggleSelect(id)}
+                  checked={selectedNums ? selectedNums.has(item.num) : false}
+                  onChange={() => onToggleSelect(item.num)}
                   className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                 />
               )}

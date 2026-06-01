@@ -88,13 +88,13 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
     setSelectedArticleIds(new Set());
   };
 
-  const handleToggleArticleSelect = (articleId: string) => {
+  const handleToggleArticleSelect = (articleNum: string) => {
     setSelectedArticleIds((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(articleId)) {
-        newSet.delete(articleId);
+      if (newSet.has(articleNum)) {
+        newSet.delete(articleNum);
       } else {
-        newSet.add(articleId);
+        newSet.add(articleNum);
       }
       return newSet;
     });
@@ -103,8 +103,44 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
   const handlePrintSelected = () => {
     if (!currentRevision || selectedArticleIds.size === 0) return;
     
-    // 선택된 조항의 데이터만 필터링
-    const selectedArticles = currentRevision.articles.filter((a: any) => selectedArticleIds.has(a.id));
+    // 선택된 조항의 데이터만 필터링하기 위해 전체 contentJson 파싱
+    let printHtml = "";
+    
+    currentRevision.articles.forEach((a: any) => {
+      try {
+        let items = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
+        if (!Array.isArray(items)) return;
+        
+        let currentArticleNum: string | null = null;
+        let isSelected = false;
+        
+        items.forEach((item: any) => {
+          if (item.type === "article") {
+            currentArticleNum = item.num;
+            isSelected = selectedArticleIds.has(currentArticleNum);
+            if (isSelected) {
+              printHtml += `<div class="article-title">${item.num} ${item.text}</div>`;
+            }
+          } else if (item.type === "paragraph" || item.type === "item" || item.type === "subitem" || (item.type === "text" && !item.text.match(/\d-\d-\d-/))) {
+            // 현재 순회중인 텍스트가 선택된 조에 속해있다면 인쇄 내용에 포함
+            if (isSelected) {
+              const prefix = item.num ? `<span style="margin-right: 5px;">${item.num}</span>` : '';
+              let padding = "0px";
+              if (item.type === "item") padding = "15px";
+              if (item.type === "subitem") padding = "30px";
+              
+              printHtml += `<div class="article-content" style="padding-left: ${padding};">${prefix}${item.text}</div>`;
+            }
+          } else if (item.type === "chapter" || item.type === "section") {
+            // 장, 절이 바뀌면 소속 초기화
+            currentArticleNum = null;
+            isSelected = false;
+          }
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    });
     
     // 새 창에 인쇄용 화면 구성
     const printWindow = window.open('', '_blank');
@@ -120,10 +156,9 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
         <title>${title} - 선택 조항 인쇄</title>
         <style>
           body { font-family: 'Malgun Gothic', sans-serif; padding: 40px; color: #000; line-height: 1.6; }
-          h1 { text-align: center; font-size: 24px; margin-bottom: 30px; }
-          .article { margin-bottom: 20px; }
-          .article-title { font-weight: bold; margin-bottom: 10px; font-size: 16px; }
-          .article-content { margin-left: 15px; font-size: 14px; white-space: pre-wrap; }
+          h1 { text-align: center; font-size: 24px; margin-bottom: 40px; }
+          .article-title { font-weight: bold; margin-bottom: 10px; margin-top: 30px; font-size: 16px; }
+          .article-content { margin-left: 10px; font-size: 14px; margin-bottom: 4px; }
           @media print {
             body { padding: 0; }
             button { display: none; }
@@ -132,14 +167,9 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
       </head>
       <body>
         <h1>${title} (선택 조항 발췌)</h1>
-        ${selectedArticles.map((a: any) => `
-          <div class="article">
-            <div class="article-title">제${a.articleNumber}조(${a.title})</div>
-            <div class="article-content">${a.contentText}</div>
-          </div>
-        `).join('')}
+        ${printHtml}
         <script>
-          window.onload = function() { window.print(); }
+          window.onload = function() { setTimeout(function() { window.print(); }, 500); }
         </script>
       </body>
       </html>
@@ -243,7 +273,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
                           contentJson={article.contentJson}
                           contentHtml={article.contentHtml}
                           isSelectable={true}
-                          isSelected={selectedArticleIds.has(article.id)}
+                          selectedNums={selectedArticleIds}
                           onToggleSelect={handleToggleArticleSelect}
                         />
                       ))}
