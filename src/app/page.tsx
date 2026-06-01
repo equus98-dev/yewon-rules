@@ -165,7 +165,7 @@ export default function Home() {
 
       const res = await fetch(`/api/rules/search?${params.toString()}`);
       const data = await res.json();
-      if (Array.isArray(data)) {
+      if (Array.isArray(data) || data.isGrouped) {
         setSearchResults(data);
       } else {
         setSearchResults([]);
