@@ -117,7 +117,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
         items.forEach((item: any) => {
           if (item.type === "article") {
             currentArticleNum = item.num;
-            isSelected = selectedArticleIds.has(currentArticleNum);
+            isSelected = currentArticleNum ? selectedArticleIds.has(currentArticleNum) : false;
             if (isSelected) {
               printHtml += `<div class="article-title">${item.num} ${item.text}</div>`;
             }
