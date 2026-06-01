@@ -113,6 +113,9 @@ model Article {
   // 상세 내용 - 조 본문 혹은 "항/호/목" 구조를 가지는 정형화된 JSON 데이터
   contentJson   Json        
   
+  // 관리자가 WYSIWYG 에디터에서 직접 작성한 HTML (우선 순위가 가장 높음)
+  contentHtml   String?     @db.Text
+  
   // 검색 효율성을 위해 파싱된 텍스트 전문을 별도로 저장 (전문 검색용)
   contentText   String      @db.Text
   

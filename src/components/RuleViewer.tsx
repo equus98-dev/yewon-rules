@@ -105,16 +105,26 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
             </h1>
           </div>
 
-          {/* 현재 뷰잉 중인 개정 버전 표시 */}
+          {/* 현재 뷰잉 중인 개정 버전 표시 및 편집 버튼 */}
           {currentRevision && (
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-lg text-right">
-              <p className="text-xs text-blue-200 font-medium">표시중인 버전</p>
-              <p className="text-base font-bold text-amber-300">
-                {currentRevision.versionName} 
-                <span className="text-xs text-white font-normal ml-2">
-                  (공포일: {new Date(currentRevision.enactmentDate).toLocaleDateString()})
-                </span>
-              </p>
+            <div className="flex flex-col items-end gap-2">
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-lg text-right">
+                <p className="text-xs text-blue-200 font-medium">표시중인 버전</p>
+                <p className="text-base font-bold text-amber-300">
+                  {currentRevision.versionName} 
+                  <span className="text-xs text-white font-normal ml-2">
+                    (공포일: {new Date(currentRevision.enactmentDate).toLocaleDateString()})
+                  </span>
+                </p>
+              </div>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => window.location.href = `/admin/rules/${ruleId}/edit`}
+                className="text-white border-white/30 hover:bg-white/10"
+              >
+                규정 직접 편집하기
+              </Button>
             </div>
           )}
         </div>
@@ -165,6 +175,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
                         articleNumber={article.articleNumber}
                         title={article.title}
                         contentJson={article.contentJson}
+                        contentHtml={article.contentHtml}
                       />
                     ))
                   ) : (

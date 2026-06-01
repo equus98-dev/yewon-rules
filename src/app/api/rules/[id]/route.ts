@@ -82,7 +82,7 @@ export async function GET(
 
     // 5. 선택된 버전의 조항 목록 조회
     const articlesRes = await pool.query(
-      `SELECT id, chapter, section, "articleNumber", title, "contentJson", "contentText", "sortOrder"
+      `SELECT id, chapter, section, "articleNumber", title, "contentJson", "contentText", "contentHtml", "sortOrder"
        FROM "Article" WHERE "revisionId" = $1 ORDER BY "sortOrder" ASC`,
       [targetRevisionId]
     );

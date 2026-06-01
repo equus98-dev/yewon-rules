@@ -1,7 +1,7 @@
 import React from "react";
 
 interface ContentItem {
-  type: "paragraph" | "item" | "subitem" | string;
+  type: "chapter" | "section" | "article" | "paragraph" | "item" | "subitem" | "text" | string;
   num: string;
   text: string;
 }
@@ -12,16 +12,23 @@ interface ArticleRendererProps {
   articleNumber: number;
   title: string;
   contentJson: any; // Prisma JsonValue
+  contentHtml?: string | null; // 관리자가 WYSIWYG 에디터로 작성한 HTML
 }
 
 export default function ArticleRenderer({
-  chapter,
-  section,
-  articleNumber,
-  title,
   contentJson,
+  contentHtml,
 }: ArticleRendererProps) {
-  // JSON 파싱 안전장치
+  // 만약 관리자가 직접 에디터로 작성한 HTML이 존재한다면 최우선으로 렌더링
+  if (contentHtml && contentHtml.trim().length > 0) {
+    return (
+      <div 
+        className="mb-8 animate-fade-in rule-viewer-content font-['Pretendard'] ql-editor px-0 py-2"
+        dangerouslySetInnerHTML={{ __html: contentHtml }}
+      />
+    );
+  }
+
   let items: ContentItem[] = [];
   try {
     if (typeof contentJson === "string") {
@@ -33,61 +40,93 @@ export default function ArticleRenderer({
     console.error("Failed to parse contentJson:", e);
   }
 
+  let hasSeenBody = false;
+
   return (
-    <div className="mb-6 animate-fade-in rule-viewer-content">
-      {/* 장(Chapter) 표시 */}
-      {chapter && (
-        <div className="rule-chapter">
-          {chapter}
-        </div>
-      )}
+    <div className="mb-8 animate-fade-in rule-viewer-content font-['Pretendard']">
+      {items.map((item, index) => {
+        if (
+          item.type === "chapter" ||
+          item.type === "section" ||
+          item.type === "article"
+        ) {
+          hasSeenBody = true;
+        }
 
-      {/* 절(Section) 표시 */}
-      {section && (
-        <div className="rule-section">
-          {section}
-        </div>
-      )}
+        // 특정 메타데이터 숨기기 (예: "예원예술대학교 학칙 2-0-2-")
+        if (item.type === "text" && item.text.match(/\d-\d-\d-/)) {
+          return null;
+        }
 
-      {/* 조(Article) 표시 - 제1조(목적) 등 */}
-      <div className="rule-article">
-        <span className="text-blue-900 font-bold">제{articleNumber}조({title})</span>
-      </div>
-
-      {/* 항/호/목 하위 콘텐츠 정밀 들여쓰기 렌더링 */}
-      <div className="mt-2 space-y-1">
-        {items.map((item, index) => {
-          if (item.type === "paragraph") {
-            return (
-              <div key={index} className="rule-paragraph">
-                <span className="font-semibold text-blue-800 mr-1">{item.num}</span>
+        if (item.type === "chapter") {
+          return (
+            <div key={index} className="text-center w-full block mt-10 mb-4">
+              <span className="text-[20px] font-bold text-[#0054FF]">
                 {item.text}
-              </div>
-            );
-          } else if (item.type === "item") {
+              </span>
+            </div>
+          );
+        } else if (item.type === "section") {
+          return (
+            <div key={index} className="text-center w-full block text-[18px] font-bold text-[#0054FF] mt-8 mb-4">
+              {item.text}
+            </div>
+          );
+        } else if (item.type === "article") {
+          return (
+            <div key={index} className="mt-6 mb-2 text-[15px] text-black leading-[1.6]">
+              <span className="font-bold mr-1">{item.num}</span>
+              <span className="font-normal">{item.text}</span>
+            </div>
+          );
+        } else if (item.type === "paragraph") {
+          return (
+            <div key={index} className="flex text-black text-[15px] leading-[1.6] pl-[1.25rem] -ml-[1.25rem] mb-1">
+              <span className="font-normal mr-1 w-5 shrink-0 text-right inline-block">{item.num}</span>
+              <span className="font-normal flex-1">{item.text}</span>
+            </div>
+          );
+        } else if (item.type === "item") {
+          return (
+            <div key={index} className="flex text-black text-[15px] leading-[1.6] pl-[2.5rem] -ml-[1.25rem] mb-1">
+              <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block">{item.num}</span>
+              <span className="font-normal flex-1">{item.text}</span>
+            </div>
+          );
+        } else if (item.type === "subitem") {
+          return (
+            <div key={index} className="flex text-black text-[15px] leading-[1.6] pl-[3.75rem] -ml-[1.25rem] mb-1">
+              <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block">{item.num}</span>
+              <span className="font-normal flex-1">{item.text}</span>
+            </div>
+          );
+        } else {
+          // 텍스트 렌더링
+          if (!hasSeenBody) {
+            // 본문(장,조) 시작 전의 텍스트(주로 규정 제목, 제개정 이력 등)
+            const isTitle = item.text.includes("학칙") || item.text.includes("규정") || item.text.includes("정관") || item.text.includes("내규") || item.text.includes("세칙") || item.text.includes("요령");
+            const isHistory = item.text.includes("제정") || item.text.includes("개정") || item.text.includes("시행");
+            
             return (
-              <div key={index} className="rule-item">
-                <span className="font-medium text-slate-700 mr-1">{item.num}</span>
-                {item.text}
-              </div>
-            );
-          } else if (item.type === "subitem") {
-            return (
-              <div key={index} className="rule-subitem">
-                <span className="text-slate-600 mr-1">{item.num}</span>
-                {item.text}
+              <div key={index} className="text-center w-full my-2">
+                {isTitle ? (
+                  <h1 className="text-[32px] font-bold text-black my-6">{item.text}</h1>
+                ) : isHistory ? (
+                  <p className="text-[14px] text-blue-600 font-medium my-1">[{item.text}]</p>
+                ) : (
+                  <p className="text-[15px] text-black leading-[1.6]">{item.text}</p>
+                )}
               </div>
             );
           } else {
-            // 기본 텍스트 렌더링
             return (
-              <div key={index} className="pl-5 text-slate-800 text-sm">
-                {item.num} {item.text}
+              <div key={index} className="text-black text-[15px] leading-[1.6] my-1 pl-[1.25rem]">
+                {item.text}
               </div>
             );
           }
-        })}
-      </div>
+        }
+      })}
     </div>
   );
 }

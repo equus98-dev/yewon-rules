@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "node build-prep.js && prisma generate && next build && node build-post.js",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:rules": "npx tsx prisma/seed-all-rules.ts",
+    "extract:text": "npx tsx prisma/extract-hwp-text.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -21,10 +23,14 @@
     "next": "16.2.6",
     "pg": "^8.21.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-markdown": "^10.1.0",
+    "react-quill": "^2.0.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
