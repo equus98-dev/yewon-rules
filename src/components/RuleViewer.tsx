@@ -18,6 +18,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
   const [loading, setLoading] = useState(false);
   const [ruleData, setRuleData] = useState<any>(null);
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
+  const [selectedArticleIds, setSelectedArticleIds] = useState<Set<string>>(new Set());
 
   // 규정 데이터 패치 (선택한 버전 포함)
   useEffect(() => {
@@ -50,6 +51,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
   useEffect(() => {
     setSelectedVersion(null);
     setActiveTab(0);
+    setSelectedArticleIds(new Set());
   }, [ruleId]);
 
   if (loading && !ruleData) {
@@ -83,10 +85,72 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
   const handleVersionSelect = (verNum: number) => {
     setSelectedVersion(verNum);
     setActiveTab(0); // 본문 탭으로 바로 이동
+    setSelectedArticleIds(new Set());
+  };
+
+  const handleToggleArticleSelect = (articleId: string) => {
+    setSelectedArticleIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(articleId)) {
+        newSet.delete(articleId);
+      } else {
+        newSet.add(articleId);
+      }
+      return newSet;
+    });
+  };
+
+  const handlePrintSelected = () => {
+    if (!currentRevision || selectedArticleIds.size === 0) return;
+    
+    // 선택된 조항의 데이터만 필터링
+    const selectedArticles = currentRevision.articles.filter((a: any) => selectedArticleIds.has(a.id));
+    
+    // 새 창에 인쇄용 화면 구성
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert("팝업 차단이 설정되어 있습니다. 팝업 차단을 해제해 주세요.");
+      return;
+    }
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${title} - 선택 조항 인쇄</title>
+        <style>
+          body { font-family: 'Malgun Gothic', sans-serif; padding: 40px; color: #000; line-height: 1.6; }
+          h1 { text-align: center; font-size: 24px; margin-bottom: 30px; }
+          .article { margin-bottom: 20px; }
+          .article-title { font-weight: bold; margin-bottom: 10px; font-size: 16px; }
+          .article-content { margin-left: 15px; font-size: 14px; white-space: pre-wrap; }
+          @media print {
+            body { padding: 0; }
+            button { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>${title} (선택 조항 발췌)</h1>
+        ${selectedArticles.map((a: any) => `
+          <div class="article">
+            <div class="article-title">제${a.articleNumber}조(${a.title})</div>
+            <div class="article-content">${a.contentText}</div>
+          </div>
+        `).join('')}
+        <script>
+          window.onload = function() { window.print(); }
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 overflow-hidden">
+    <div className="flex flex-col h-full bg-slate-50 overflow-hidden relative">
       {/* 1. 규정 상단 메타 헤더 영역 (로열 블루 배경의 웅장한 타이틀바) */}
       <div className="bg-gradient-to-r from-blue-900 via-blue-950 to-slate-900 p-6 text-white shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -118,10 +182,10 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
                 </p>
               </div>
               <Button
-                variant="outlined"
+                variant="contained"
                 size="small"
                 onClick={() => window.location.href = `/admin/rules/${ruleId}/edit`}
-                className="text-white border-white/30 hover:bg-white/10"
+                sx={{ bgcolor: 'white', color: '#1e3a8a', '&:hover': { bgcolor: '#f1f5f9' }, fontWeight: 'bold' }}
               >
                 규정 직접 편집하기
               </Button>
@@ -167,20 +231,57 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
                   
                   {/* 조항들 차례대로 렌더링 */}
                   {currentRevision.articles && currentRevision.articles.length > 0 ? (
-                    currentRevision.articles.map((article: any) => (
-                      <ArticleRenderer
-                        key={article.id}
-                        chapter={article.chapter}
-                        section={article.section}
-                        articleNumber={article.articleNumber}
-                        title={article.title}
-                        contentJson={article.contentJson}
-                        contentHtml={article.contentHtml}
-                      />
-                    ))
+                    <div className="pb-24">
+                      {currentRevision.articles.map((article: any) => (
+                        <ArticleRenderer
+                          key={article.id}
+                          id={article.id}
+                          chapter={article.chapter}
+                          section={article.section}
+                          articleNumber={article.articleNumber}
+                          title={article.title}
+                          contentJson={article.contentJson}
+                          contentHtml={article.contentHtml}
+                          isSelectable={true}
+                          isSelected={selectedArticleIds.has(article.id)}
+                          onToggleSelect={handleToggleArticleSelect}
+                        />
+                      ))}
+                    </div>
                   ) : (
                     <div className="text-center py-12 text-slate-400">
                       등록된 조항 정보가 존재하지 않습니다.
+                    </div>
+                  )}
+
+                  {/* 플로팅 액션 바 (선택된 조항이 있을 때만 표시) */}
+                  {selectedArticleIds.size > 0 && (
+                    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-6 z-50 animate-fade-in border border-slate-700">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                          {selectedArticleIds.size}
+                        </span>
+                        <span className="font-medium text-sm">개 조항 선택됨</span>
+                      </div>
+                      <div className="w-px h-6 bg-slate-700"></div>
+                      <div className="flex items-center gap-3">
+                        <Button 
+                          variant="contained" 
+                          size="small" 
+                          onClick={handlePrintSelected}
+                          className="bg-blue-500 hover:bg-blue-600 font-bold px-4"
+                        >
+                          선택 인쇄 (PDF 저장)
+                        </Button>
+                        <Button 
+                          variant="text" 
+                          size="small" 
+                          onClick={() => setSelectedArticleIds(new Set())}
+                          className="text-slate-300 hover:text-white"
+                        >
+                          선택 해제
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </>

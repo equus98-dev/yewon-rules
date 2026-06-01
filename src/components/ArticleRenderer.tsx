@@ -7,17 +7,25 @@ interface ContentItem {
 }
 
 interface ArticleRendererProps {
+  id?: string;
   chapter?: string | null;
   section?: string | null;
   articleNumber: number;
   title: string;
   contentJson: any; // Prisma JsonValue
   contentHtml?: string | null; // 관리자가 WYSIWYG 에디터로 작성한 HTML
+  isSelectable?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 export default function ArticleRenderer({
+  id,
   contentJson,
   contentHtml,
+  isSelectable,
+  isSelected,
+  onToggleSelect,
 }: ArticleRendererProps) {
   // 만약 관리자가 직접 에디터로 작성한 HTML이 존재한다면 최우선으로 렌더링
   if (contentHtml && contentHtml.trim().length > 0) {
@@ -74,9 +82,19 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "article") {
           return (
-            <div key={index} className="mt-6 mb-2 text-[15px] text-black leading-[1.6]">
-              <span className="font-bold mr-1">{item.num}</span>
-              <span className="font-normal">{item.text}</span>
+            <div key={index} className="mt-6 mb-2 text-[15px] text-black leading-[1.6] flex items-start gap-2">
+              {isSelectable && id && onToggleSelect && (
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={() => onToggleSelect(id)}
+                  className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                />
+              )}
+              <div>
+                <span className="font-bold mr-1">{item.num}</span>
+                <span className="font-normal">{item.text}</span>
+              </div>
             </div>
           );
         } else if (item.type === "paragraph") {
