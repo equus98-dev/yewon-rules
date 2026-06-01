@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Tabs, Tab, Box, CircularProgress, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from "@mui/material";
 import ArticleRenderer from "./ArticleRenderer";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -77,6 +77,27 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
 
   const { title, ruleNumber, category, department, attachments, revisions, currentRevision } = ruleData;
 
+  const tocItems = useMemo(() => {
+    if (!currentRevision || !currentRevision.articles) return [];
+    let toc: any[] = [];
+    currentRevision.articles.forEach((a: any) => {
+      try {
+        let items = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
+        if (!Array.isArray(items)) return;
+        items.forEach((item: any) => {
+          if (item.type === "chapter") {
+            toc.push({ type: "chapter", id: `toc-${item.text.replace(new RegExp("\\s", "g"), '-')}`, text: item.text });
+          } else if (item.type === "article") {
+            toc.push({ type: "article", id: `toc-${item.num}`, text: item.num });
+          }
+        });
+      } catch (e) {
+        console.error("TOC parsing error", e);
+      }
+    });
+    return toc;
+  }, [currentRevision]);
+
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
@@ -121,7 +142,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
             if (isSelected) {
               printHtml += `<div class="article-title">${item.num} ${item.text}</div>`;
             }
-          } else if (item.type === "paragraph" || item.type === "item" || item.type === "subitem" || (item.type === "text" && !item.text.match(/\d-\d-\d-/))) {
+          } else if (item.type === "paragraph" || item.type === "item" || item.type === "subitem" || (item.type === "text" && !item.text.match(new RegExp("\\d-\\d-\\d-")))) {
             // 현재 순회중인 텍스트가 선택된 조에 속해있다면 인쇄 내용에 포함
             if (isSelected) {
               const prefix = item.num ? `<span style="margin-right: 5px;">${item.num}</span>` : '';
@@ -251,32 +272,55 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
 
           {/* [Tab 0] 현행규정 본문 탭 */}
           {activeTab === 0 && (
-            <div className="animate-fade-in bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
-              {currentRevision ? (
-                <>
-                  <div className="border-b border-slate-100 pb-4 mb-6 text-slate-500 text-sm flex items-center gap-2">
-                    <InfoIcon className="text-blue-500 text-sm" />
-                    본 규정은 <strong>{new Date(currentRevision.effectiveDate).toLocaleDateString()}</strong>일부로 시행되는 현행 규정의 조항 구조입니다.
-                  </div>
-                  
-                  {/* 조항들 차례대로 렌더링 */}
-                  {currentRevision.articles && currentRevision.articles.length > 0 ? (
-                    <div className="pb-24">
-                      {currentRevision.articles.map((article: any) => (
-                        <ArticleRenderer
-                          key={article.id}
-                          id={article.id}
-                          chapter={article.chapter}
-                          section={article.section}
-                          articleNumber={article.articleNumber}
-                          title={article.title}
-                          contentJson={article.contentJson}
-                          contentHtml={article.contentHtml}
-                          isSelectable={true}
-                          selectedNums={selectedArticleIds}
-                          onToggleSelect={handleToggleArticleSelect}
-                        />
+            <div className="flex flex-col md:flex-row gap-6 relative animate-fade-in">
+              {/* 좌측 목차(TOC) 네비게이션 바 */}
+              {tocItems.length > 0 && (
+                <div className="hidden md:block w-56 shrink-0">
+                  <div className="sticky top-0 bg-white border border-slate-200 rounded-xl shadow-sm max-h-[75vh] overflow-y-auto scrollbar p-4">
+                    <h3 className="font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100 sticky top-0 bg-white z-10">목차</h3>
+                    <ul className="space-y-1.5 text-[13.5px]">
+                      {tocItems.map((item, idx) => (
+                        <li key={idx} className={item.type === "chapter" ? "mt-4 font-bold text-blue-700" : "pl-3 text-slate-600 hover:text-blue-600 cursor-pointer"}>
+                          <a href={`#${item.id}`} onClick={(e) => {
+                            e.preventDefault();
+                            document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }}>
+                            {item.text}
+                          </a>
+                        </li>
                       ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {/* 본문 영역 */}
+              <div className="flex-1 min-w-0 bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
+                {currentRevision ? (
+                  <>
+                    <div className="border-b border-slate-100 pb-4 mb-6 text-slate-500 text-sm flex items-center gap-2">
+                      <InfoIcon className="text-blue-500 text-sm" />
+                      본 규정은 <strong>{new Date(currentRevision.effectiveDate).toLocaleDateString()}</strong>일부로 시행되는 현행 규정의 조항 구조입니다.
+                    </div>
+                    
+                    {/* 조항들 차례대로 렌더링 */}
+                    {currentRevision.articles && currentRevision.articles.length > 0 ? (
+                      <div className="pb-24">
+                        {currentRevision.articles.map((article: any) => (
+                          <ArticleRenderer
+                            key={article.id}
+                            id={article.id}
+                            chapter={article.chapter}
+                            section={article.section}
+                            articleNumber={article.articleNumber}
+                            title={article.title}
+                            contentJson={article.contentJson}
+                            contentHtml={article.contentHtml}
+                            isSelectable={true}
+                            selectedNums={selectedArticleIds}
+                            onToggleSelect={handleToggleArticleSelect}
+                          />
+                        ))}
                     </div>
                   ) : (
                     <div className="text-center py-12 text-slate-400">
@@ -320,6 +364,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
                   개정 이력이 기록되지 않았습니다.
                 </div>
               )}
+            </div>
             </div>
           )}
 

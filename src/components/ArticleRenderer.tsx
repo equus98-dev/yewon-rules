@@ -68,7 +68,7 @@ export default function ArticleRenderer({
 
         if (item.type === "chapter") {
           return (
-            <div key={index} className="text-center w-full block mt-10 mb-4">
+            <div key={index} id={`toc-${item.text.replace(/\s/g, '-')}`} className="text-center w-full block mt-10 mb-4 pt-4">
               <span className="text-[20px] font-bold text-[#0054FF]">
                 {item.text}
               </span>
@@ -82,7 +82,7 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "article") {
           return (
-            <div key={index} className="mt-6 mb-2 text-[15px] text-black leading-[1.6] flex items-start gap-2">
+            <div key={index} id={`toc-${item.num}`} className="mt-6 mb-2 text-[15px] text-black leading-[1.6] flex items-start gap-2 pt-2">
               {isSelectable && onToggleSelect && (
                 <input
                   type="checkbox"
