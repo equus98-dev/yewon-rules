@@ -85,6 +85,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
         let items = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
         if (!Array.isArray(items)) return;
         items.forEach((item: any) => {
+          if (!item || typeof item !== 'object') return;
           if (item.type === "chapter") {
             const chapterText = typeof item.text === 'string' ? item.text : String(item.text || "");
             toc.push({ type: "chapter", id: `toc-${chapterText.replace(new RegExp("\\s", "g"), '-')}`, text: chapterText });
@@ -138,6 +139,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
         let isSelected = false;
         
         items.forEach((item: any) => {
+          if (!item || typeof item !== 'object') return;
           if (item.type === "article") {
             currentArticleNum = item.num;
             isSelected = currentArticleNum ? selectedArticleIds.has(currentArticleNum) : false;
@@ -359,6 +361,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
                   <TableBody>
                     {revisions && revisions.length > 0 ? (
                       revisions.map((rev: any) => {
+                        if (!rev) return null;
                         const isCurrent = currentRevision?.id === rev.id;
                         return (
                           <TableRow
@@ -415,6 +418,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
             <div className="animate-fade-in space-y-6">
               {currentRevision?.comparisons && currentRevision.comparisons.length > 0 ? (
                 currentRevision.comparisons.map((comp: any) => {
+                  if (!comp) return null;
                   return (
                     <div key={comp.id} className="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
                       {/* 대비 헤더 */}
@@ -500,6 +504,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
               {attachments && attachments.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {attachments.map((file: any) => {
+                    if (!file) return null;
                     const isHwp = file.fileType?.toLowerCase() === "hwp";
                     const isPdf = file.fileType?.toLowerCase() === "pdf";
 
