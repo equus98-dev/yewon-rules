@@ -86,10 +86,10 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
         if (!Array.isArray(items)) return;
         items.forEach((item: any) => {
           if (item.type === "chapter") {
-            const chapterText = item.text || "";
+            const chapterText = typeof item.text === 'string' ? item.text : String(item.text || "");
             toc.push({ type: "chapter", id: `toc-${chapterText.replace(new RegExp("\\s", "g"), '-')}`, text: chapterText });
           } else if (item.type === "article") {
-            const articleNum = item.num || "";
+            const articleNum = typeof item.num === 'string' ? item.num : String(item.num || "");
             toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
           }
         });
@@ -144,7 +144,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
             if (isSelected) {
               printHtml += `<div class="article-title">${item.num} ${item.text}</div>`;
             }
-          } else if (item.type === "paragraph" || item.type === "item" || item.type === "subitem" || (item.type === "text" && !item.text.match(new RegExp("\\d-\\d-\\d-")))) {
+          } else if (item.type === "paragraph" || item.type === "item" || item.type === "subitem" || (item.type === "text" && typeof item.text === "string" && !item.text.match(new RegExp("\\d-\\d-\\d-")))) {
             // 현재 순회중인 텍스트가 선택된 조에 속해있다면 인쇄 내용에 포함
             if (isSelected) {
               const prefix = item.num ? `<span style="margin-right: 5px;">${item.num}</span>` : '';

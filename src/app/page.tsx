@@ -704,33 +704,28 @@ export default function Home() {
           ) : (
             
             /* CASE B: 대형 중앙 검색창이 있는 메인 대시보드 레이아웃 */
-            <div className="flex-1 overflow-y-auto p-6 md:p-12 scrollbar">
-              <div className="max-w-6xl mx-auto space-y-12">
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 scrollbar">
+              <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6 min-h-[750px]">
                 
-                {/* [파트 1] NSU 스타일로 대개편된 고품격 대형 검색 배너 */}
-                <div className="bg-gradient-to-br from-[#0c3161] via-[#092244] to-[#061830] rounded-3xl p-8 md:p-12 md:py-14 text-left text-white shadow-xl relative overflow-hidden flex flex-col items-start">
+                {/* [파트 1] 왼쪽 대형 검색 폼 (상단: 폼, 하단: 건물사진) */}
+                <div className="bg-gradient-to-b from-[#0c3161] via-[#092244] to-[#04101e] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col">
                   
-                  {/* 잔잔한 학교 배경이미지 오버레이 (우측 국한 배치 및 페이드 아웃 마스크) */}
-                  <div 
-                    className="absolute right-0 top-0 bottom-0 w-full md:w-[60%] lg:w-[50%] z-0 select-none pointer-events-none"
-                    style={{
-                      maskImage: "linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0))",
-                      WebkitMaskImage: "linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0))"
-                    }}
-                  >
+                  {/* 하단 학교 배경이미지 */}
+                  <div className="absolute left-0 right-0 bottom-0 top-1/2 z-0">
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#092244] to-transparent z-10" />
                     <Image
                       src="/yewon.jpg"
                       alt="예원예술대학교 전경"
                       fill
                       priority
-                      className="object-cover opacity-[0.35] mix-blend-overlay object-right"
+                      className="object-cover object-bottom opacity-60 mix-blend-luminosity"
                     />
                   </div>
 
                   {/* 배경 패턴 그래픽 데코레이션 */}
-                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] z-1"></div>
+                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] z-1 pointer-events-none"></div>
                   
-                  <div className="relative z-10 w-full max-w-3xl mr-auto text-left flex flex-col items-start">
+                  <div className="relative z-10 w-full p-8 md:p-10 flex-shrink-0 flex flex-col items-start">
                     
                     {/* 타이틀 */}
                     <div className="flex items-center justify-start mb-4 select-none">
@@ -903,15 +898,14 @@ export default function Home() {
                       </div>
 
                     </div>
-
                   </div>
                 </div>
 
-                {/* [파트 2] 하단 2단 레이아웃 (최근 제·개정 규정 vs 최근 공지사항) */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* [파트 2] 오른쪽 영역: 최근 제·개정 규정 및 최근 공지사항 수직 배치 */}
+                <div className="flex flex-col gap-6">
                   
                   {/* 2-1) 최근 제·개정 규정 게시판 */}
-                  <Paper className="p-6 border border-slate-200 rounded-2xl shadow-sm flex flex-col h-96" elevation={0}>
+                  <Paper className="p-6 border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px]" elevation={0}>
                     <div className="flex items-center justify-between border-b border-slate-100 pb-3.5 mb-4 shrink-0">
                       <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                         <GavelIcon className="text-blue-800" />
@@ -964,7 +958,7 @@ export default function Home() {
                   </Paper>
 
                   {/* 2-2) 최근 공지사항 게시판 */}
-                  <Paper className="p-6 border border-slate-200 rounded-2xl shadow-sm flex flex-col h-96" elevation={0}>
+                  <Paper className="p-6 border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px]" elevation={0}>
                     <div className="flex items-center justify-between border-b border-slate-100 pb-3.5 mb-4 shrink-0">
                       <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                         <CampaignIcon className="text-amber-500" />
