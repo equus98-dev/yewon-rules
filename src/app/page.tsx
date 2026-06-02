@@ -1044,12 +1044,12 @@ export default function Home() {
                   
                   {/* 2-1) 최근 제·개정 규정 게시판 */}
                   <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px] overflow-hidden" elevation={0}>
-                    <div className="bg-[#0c3161] px-5 py-3.5 flex items-center justify-between shrink-0">
+                    <div className="bg-[#8b0000] px-5 py-3.5 flex items-center justify-between shrink-0">
                       <h3 className="text-base font-extrabold text-white flex items-center gap-2 tracking-tight">
-                        <GavelIcon className="text-blue-200" fontSize="small" />
+                        <GavelIcon className="text-red-200" fontSize="small" />
                         최근 제·개정 규정
                       </h3>
-                      <span className="text-[11px] text-[#0c3161] font-black bg-blue-50 px-2.5 py-0.5 rounded shadow-sm">
+                      <span className="text-[11px] text-[#8b0000] font-black bg-red-50 px-2.5 py-0.5 rounded shadow-sm">
                         실시간 반영
                       </span>
                     </div>
@@ -1073,7 +1073,7 @@ export default function Home() {
                               className="flex items-center justify-between p-3.5 border border-slate-100 rounded-xl hover:bg-slate-50/80 cursor-pointer transition-colors group"
                             >
                               <div className="min-w-0 flex-1 pr-4">
-                                <h4 className={`text-[15px] font-extrabold text-slate-800 truncate group-hover:text-blue-900 transition-colors ${isAbolished ? "line-through text-slate-400" : ""}`}>
+                                <h4 className={`text-[15px] font-extrabold text-slate-800 truncate group-hover:text-red-900 transition-colors ${isAbolished ? "line-through text-slate-400" : ""}`}>
                                   {rule.title}
                                 </h4>
                                 <p className="text-[13.5px] font-semibold text-slate-500 mt-1.5">
@@ -1097,7 +1097,7 @@ export default function Home() {
 
                   {/* 2-2) 최근 공지사항 게시판 */}
                   <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px] overflow-hidden" elevation={0}>
-                    <div className="bg-[#092244] px-5 py-3.5 flex items-center justify-between shrink-0">
+                    <div className="bg-[#7a0000] px-5 py-3.5 flex items-center justify-between shrink-0">
                       <h3 className="text-base font-extrabold text-white flex items-center gap-2 tracking-tight">
                         <CampaignIcon className="text-amber-400" fontSize="small" />
                         최근 공지사항
