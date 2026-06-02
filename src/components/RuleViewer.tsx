@@ -133,7 +133,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
             </h1>
           </div>
 
-          {/* 현재 뷰잉 중인 개정 버전 표시 및 편집 버튼 */}
+          {/* 현재 뷰잉 중인 개정 버전 표시 */}
           {currentRevision && (
             <div className="flex flex-col items-end gap-2">
               <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-lg text-right">
@@ -145,14 +145,6 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
                   </span>
                 </p>
               </div>
-              <Button
-                variant="contained"
-                size="small"
-                onClick={() => window.location.href = `/admin/rules/${ruleId}/edit`}
-                sx={{ bgcolor: 'white', color: '#1e3a8a', '&:hover': { bgcolor: '#f1f5f9' }, fontWeight: 'bold' }}
-              >
-                규정 직접 편집하기
-              </Button>
             </div>
           )}
         </div>

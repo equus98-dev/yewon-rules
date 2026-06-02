@@ -932,21 +932,21 @@ export default function Home() {
                             <div
                               key={rule.id}
                               onClick={() => setActiveRuleId(rule.id)}
-                              className="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-slate-50/80 cursor-pointer transition-colors group"
+                              className="flex items-center justify-between p-3.5 border border-slate-100 rounded-xl hover:bg-slate-50/80 cursor-pointer transition-colors group"
                             >
                               <div className="min-w-0 flex-1 pr-4">
-                                <h4 className={`text-sm font-bold text-slate-800 truncate group-hover:text-blue-900 transition-colors ${isAbolished ? "line-through text-slate-400" : ""}`}>
+                                <h4 className={`text-[15px] font-extrabold text-slate-800 truncate group-hover:text-blue-900 transition-colors ${isAbolished ? "line-through text-slate-400" : ""}`}>
                                   {rule.title}
                                 </h4>
-                                <p className="text-[11px] text-slate-400 mt-1">
+                                <p className="text-[13.5px] font-semibold text-slate-500 mt-1.5">
                                   {rule.ruleNumber} | {rule.categoryName} | {rule.departmentName}
                                 </p>
                               </div>
                               <div className="text-right shrink-0">
-                                <span className="text-xs font-semibold text-blue-700 block">
+                                <span className="text-[14px] font-bold text-blue-700 block">
                                   {rule.latestVersionName}
                                 </span>
-                                <span className="text-[10px] text-slate-400 block mt-0.5">
+                                <span className="text-[12px] font-semibold text-slate-400 block mt-1">
                                   {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString() : "-"}
                                 </span>
                               </div>
@@ -987,18 +987,18 @@ export default function Home() {
                               setSelectedNotice(notice);
                               setNoticeModalOpen(true);
                             }}
-                            className="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-[#0c3161]/5 cursor-pointer transition-all active:scale-98 group"
+                            className="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-[#0c3161]/5 cursor-pointer transition-all active:scale-98 group"
                           >
                             <div className="min-w-0 flex-1 pr-4 text-left">
-                              <h4 className="text-sm font-bold text-slate-700 truncate group-hover:text-blue-900 transition-colors">
+                              <h4 className="text-[15px] font-extrabold text-slate-800 truncate group-hover:text-blue-900 transition-colors">
                                 {notice.title}
                               </h4>
-                              <p className="text-[11px] text-slate-400 mt-1">
+                              <p className="text-[15px] font-semibold text-slate-500 mt-1.5">
                                 작성부서: {notice.dept}
                               </p>
                             </div>
-                            <div className="text-right shrink-0">
-                              <span className="text-xs text-slate-400 font-medium">
+                            <div className="text-right shrink-0 self-end">
+                              <span className="text-[15px] text-slate-400 font-bold">
                                 {notice.date}
                               </span>
                             </div>

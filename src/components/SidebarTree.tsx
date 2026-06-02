@@ -190,22 +190,25 @@ export default function SidebarTree({ activeRuleId, onSelectRule }: SidebarTreeP
 
       // 아이콘 매칭: 폴더 색상을 남서울대 스타일의 cool slate-blue(#5d7a8c)로 맵핑
       const icon = isFile ? (
-        <GavelIcon className="text-blue-700 text-xs shrink-0" />
+        <GavelIcon className="text-blue-700 text-[16px] shrink-0" />
       ) : (
-        <FolderIcon className="text-[#5d7a8c] text-[16px] shrink-0" />
+        <FolderIcon className="text-[#5d7a8c] text-[18px] shrink-0" />
       );
 
       // 폐지 규정은 흐리게 및 취소선 표시
       const labelStyle = node.status === "ABOLISHED" ? "line-through text-slate-400" : "";
+      const textStyle = isFile 
+        ? "text-[15.5px] font-extrabold text-slate-800 tracking-tight" 
+        : "text-[14.5px] font-bold text-slate-700";
 
       return (
         <TreeItem
           key={node.id}
           itemId={node.id}
           label={
-            <div className="flex items-center gap-1.5 py-0.5 select-none overflow-hidden">
+            <div className="flex items-center gap-1.5 py-1 select-none overflow-hidden">
               {icon}
-              <span className={`text-[13.5px] font-semibold text-slate-700 leading-relaxed truncate ${labelStyle}`}>{node.name}</span>
+              <span className={`${textStyle} leading-relaxed truncate ${labelStyle}`}>{node.name}</span>
             </div>
           }
           onClick={() => {
