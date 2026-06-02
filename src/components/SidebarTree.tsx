@@ -529,11 +529,13 @@ export default function SidebarTree({ activeRuleId, onSelectRule }: SidebarTreeP
         {/* 2-5) 조직도 패널 */}
         {verticalTab === "조직도" && (
           <div className="flex-1 overflow-y-auto p-4 flex items-start justify-center bg-slate-50/30">
-            <img 
-              src="/docs/1.jpg" 
-              alt="조직도" 
-              className="w-full h-auto object-contain shadow-sm border border-slate-200 rounded-md"
-            />
+            <a href="/docs/1.jpg" target="_blank" rel="noopener noreferrer" className="cursor-pointer block w-full hover:opacity-90 transition-opacity" title="크게 보기">
+              <img 
+                src="/docs/1.jpg" 
+                alt="조직도" 
+                className="w-full h-auto object-contain shadow-sm border border-slate-200 rounded-md"
+              />
+            </a>
           </div>
         )}
 
