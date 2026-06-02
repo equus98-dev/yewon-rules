@@ -224,8 +224,8 @@ export default function SidebarTree({ activeRuleId, onSelectRule }: SidebarTreeP
 
   // 서식 검색 필터링
   const filteredAttachments = attachments.filter((att) =>
-    att.title.toLowerCase().includes(searchAttachmentTerm.toLowerCase()) ||
-    att.rule.title.toLowerCase().includes(searchAttachmentTerm.toLowerCase())
+    (att.title && att.title.toLowerCase().includes(searchAttachmentTerm.toLowerCase())) ||
+    (att.ruleTitle && att.ruleTitle.toLowerCase().includes(searchAttachmentTerm.toLowerCase()))
   );
 
   // 1단 세로바 아이템 정보
@@ -478,7 +478,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule }: SidebarTreeP
                           {att.title}
                         </h4>
                         <p className="text-[10.5px] text-slate-400 mt-0.5 truncate">
-                          규정: {att.rule.title}
+                          규정: {att.ruleTitle || "미지정"}
                         </p>
                       </div>
                       <FileDownloadIcon className="text-slate-300 hover:text-blue-700 text-sm shrink-0 self-center" />
