@@ -102,7 +102,7 @@ export default function ArticleRenderer({
               {isSelectable && onToggleSelect && (
                 <input
                   type="checkbox"
-                  checked={selectedNums ? selectedNums.has(safeNum) : false}
+                  checked={selectedNums && typeof selectedNums.has === 'function' ? selectedNums.has(safeNum) : false}
                   onChange={() => onToggleSelect(safeNum)}
                   className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                 />
