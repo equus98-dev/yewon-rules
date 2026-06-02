@@ -866,10 +866,10 @@ export default function Home() {
                   <div className="relative z-10 w-full p-8 md:p-10 flex-shrink-0 flex flex-col items-start">
                     
                     {/* 타이틀 */}
-                    <div className="flex items-center justify-start mb-4 select-none">
-                      <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight flex items-center">
+                    <div className="flex items-center justify-start mb-5 select-none">
+                      <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight flex items-center">
                         <span className="text-[#fbf2d5] font-black">예원예술대학교</span>
-                        <span className="text-white/20 font-light mx-2.5 text-2xl md:text-3xl select-none">|</span>
+                        <span className="text-white/20 font-light mx-2.5 text-xl md:text-2xl select-none">|</span>
                         <span>규정관리시스템</span>
                       </h2>
                     </div>
@@ -951,10 +951,10 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* 3. 제개정기간 */}
+                      {/* 3. 제·개정기간 */}
                       <div className="grid grid-cols-1 sm:grid-cols-[100px_1fr] items-center gap-2 sm:gap-4">
                         <label className="font-extrabold text-white flex items-center gap-1.5 text-[13px] sm:text-[15px]">
-                          <span className="text-blue-400">•</span> 제개정기간
+                          <span className="text-blue-400">•</span> 제·개정기간
                         </label>
                         <div className="flex flex-wrap items-center gap-2.5">
                           <input
