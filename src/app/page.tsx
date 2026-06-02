@@ -877,10 +877,10 @@ export default function Home() {
                     {/* NSU 스타일 고급 상세 검색 폼 (배경을 투명화하여 뒷배경의 학교 전경이 보임) */}
                     <div className="w-full text-left text-sm text-slate-200 space-y-4 bg-[#071e3d]/25 backdrop-blur-lg p-6 rounded-2xl border border-white/5 shadow-2xl">
                       
-                      {/* 1. 검색영역 */}
+                      {/* 1. 검색구분 */}
                       <div className="grid grid-cols-1 sm:grid-cols-[100px_1fr] items-center gap-2 sm:gap-4">
                         <label className="font-extrabold text-white flex items-center gap-1.5 text-[13px] sm:text-[15px]">
-                          <span className="text-blue-400">•</span> 검색영역
+                          <span className="text-blue-400">•</span> 검색구분
                         </label>
                         <div className="flex items-center gap-6">
                           <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-slate-200 hover:text-white text-[13px] sm:text-[14.5px]">
@@ -951,10 +951,10 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* 3. 개정기간 */}
+                      {/* 3. 제개정기간 */}
                       <div className="grid grid-cols-1 sm:grid-cols-[100px_1fr] items-center gap-2 sm:gap-4">
                         <label className="font-extrabold text-white flex items-center gap-1.5 text-[13px] sm:text-[15px]">
-                          <span className="text-blue-400">•</span> 개정기간
+                          <span className="text-blue-400">•</span> 제개정기간
                         </label>
                         <div className="flex flex-wrap items-center gap-2.5">
                           <input
@@ -1018,20 +1018,20 @@ export default function Home() {
                         </div>
                       </form>
 
-                      {/* 하단 가나다검색 & 개정일검색 링크 */}
+                      {/* 하단 가나다별 검색 & 제개정일별 검색 링크 */}
                       <div className="flex justify-end gap-4 text-xs sm:text-sm font-bold text-blue-300 pt-1 border-t border-white/5 mt-2">
                         <button
                           onClick={() => handleTagClick("학칙")}
                           className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer select-none"
                         >
-                          🔤 가나다검색
+                          🔤 가나다별 검색
                         </button>
                         <span className="text-white/20">|</span>
                         <button
                           onClick={() => handleQuickDate("1m")}
                           className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer select-none"
                         >
-                          📅 개정일검색
+                          📅 제개정일별 검색
                         </button>
                       </div>
 
