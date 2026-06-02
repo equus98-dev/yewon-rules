@@ -14,10 +14,37 @@ interface RuleViewerProps {
 }
 
 export default function RuleViewer({ ruleId }: RuleViewerProps) {
+  // 1. 상태 및 훅은 모두 최상단에 선언
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [ruleData, setRuleData] = useState<any>(null);
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
+
+  const currentRevision = ruleData?.currentRevision;
+
+  const tocItems = useMemo(() => {
+    if (!currentRevision || !currentRevision.articles) return [];
+    let toc: any[] = [];
+    currentRevision.articles.forEach((a: any) => {
+      try {
+        let items = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
+        if (!Array.isArray(items)) return;
+        items.forEach((item: any) => {
+          if (!item || typeof item !== 'object') return;
+          if (item.type === "chapter") {
+            const chapterText = typeof item.text === 'string' ? item.text : String(item.text || "");
+            toc.push({ type: "chapter", id: `toc-${chapterText.replace(new RegExp("\\s", "g"), '-')}`, text: chapterText });
+          } else if (item.type === "article") {
+            const articleNum = typeof item.num === 'string' ? item.num : String(item.num || "");
+            toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
+          }
+        });
+      } catch (e) {
+        console.error("TOC parsing error", e);
+      }
+    });
+    return toc;
+  }, [currentRevision]);
 
   // 규정 데이터 패치 (선택한 버전 포함)
   useEffect(() => {
@@ -73,31 +100,8 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
     );
   }
 
-  const { title, ruleNumber, category, department, attachments, revisions, currentRevision } = ruleData;
+  const { title, ruleNumber, category, department, attachments, revisions } = ruleData;
 
-  const tocItems = useMemo(() => {
-    if (!currentRevision || !currentRevision.articles) return [];
-    let toc: any[] = [];
-    currentRevision.articles.forEach((a: any) => {
-      try {
-        let items = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
-        if (!Array.isArray(items)) return;
-        items.forEach((item: any) => {
-          if (!item || typeof item !== 'object') return;
-          if (item.type === "chapter") {
-            const chapterText = typeof item.text === 'string' ? item.text : String(item.text || "");
-            toc.push({ type: "chapter", id: `toc-${chapterText.replace(new RegExp("\\s", "g"), '-')}`, text: chapterText });
-          } else if (item.type === "article") {
-            const articleNum = typeof item.num === 'string' ? item.num : String(item.num || "");
-            toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
-          }
-        });
-      } catch (e) {
-        console.error("TOC parsing error", e);
-      }
-    });
-    return toc;
-  }, [currentRevision]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
