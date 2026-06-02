@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Tabs, Tab, Box, CircularProgress, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 import ArticleRenderer from "./ArticleRenderer";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import HistoryIcon from "@mui/icons-material/History";
@@ -15,7 +15,6 @@ interface RuleViewerProps {
 
 export default function RuleViewer({ ruleId }: RuleViewerProps) {
   // 1. 상태 및 훅은 모두 최상단에 선언
-  const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [ruleData, setRuleData] = useState<any>(null);
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
@@ -73,10 +72,9 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
     loadRule();
   }, [ruleId, selectedVersion]);
 
-  // ruleId가 바뀔 때마다 버전 초기화 및 탭을 본문(0)으로 전환
+  // ruleId가 바뀔 때마다 버전 초기화
   useEffect(() => {
     setSelectedVersion(null);
-    setActiveTab(0);
   }, [ruleId]);
 
   if (loading && !ruleData) {
@@ -102,15 +100,9 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
 
   const { title, ruleNumber, category, department, attachments, revisions } = ruleData;
 
-
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
-
   // 버전을 직접 클릭하여 해당 버전의 본문을 로딩
   const handleVersionSelect = (verNum: number) => {
     setSelectedVersion(verNum);
-    setActiveTab(0); // 본문 탭으로 바로 이동
   };
 
   const [hideHistory, setHideHistory] = useState(false);
@@ -137,7 +129,9 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
           >
             {revisions?.map((rev: any) => (
               <option key={rev.version} value={rev.version}>
-                {new Date(rev.enactmentDate).toISOString().split('T')[0]} {rev.revisionType || '개정'}
+                {rev.enactmentDate && !isNaN(new Date(rev.enactmentDate).getTime()) 
+                  ? new Date(rev.enactmentDate).toLocaleDateString() 
+                  : "날짜없음"} {rev.revisionType || '개정'}
               </option>
             ))}
           </select>
