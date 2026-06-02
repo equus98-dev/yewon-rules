@@ -402,11 +402,11 @@ export default function Home() {
                                     {rule.title}
                                   </button>
                                 </td>
-                                <td className="py-4 px-4 text-center text-slate-600 font-bold text-[15px]">
+                                <td className="py-4 px-4 text-center text-slate-600 font-medium text-[15px]">
                                   {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString() : "-"}
                                 </td>
                                 <td className="py-4 px-4 text-center">
-                                  <span className="text-[15px] text-slate-400 font-bold">-</span>
+                                  <span className="text-[15px] text-slate-400 font-medium">-</span>
                                 </td>
                                 <td className="py-4 px-4 text-center">
                                   <button
@@ -415,7 +415,7 @@ export default function Home() {
                                       setActiveRuleId(rule.id);
                                       setActiveCategoryId(null);
                                     }}
-                                    className="text-[14px] font-bold text-slate-500 hover:text-blue-700 hover:underline cursor-pointer"
+                                    className="text-[14px] font-medium text-slate-500 hover:text-blue-700 hover:underline cursor-pointer"
                                   >
                                     전체보기
                                   </button>

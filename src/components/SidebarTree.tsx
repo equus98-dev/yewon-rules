@@ -5,7 +5,7 @@ import { Tabs, Tab, Box, TextField, CircularProgress, Typography } from "@mui/ma
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
 import FolderIcon from "@mui/icons-material/Folder";
-import GavelIcon from "@mui/icons-material/Gavel";
+import ArticleIcon from "@mui/icons-material/Article";
 import SearchIcon from "@mui/icons-material/Search";
 
 // 수직 네비게이션을 위한 아이콘들 임포트
@@ -191,7 +191,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
 
       // 아이콘 매칭: 폴더 색상을 남서울대 스타일의 cool slate-blue(#5d7a8c)로 맵핑
       const icon = isFile ? (
-        <GavelIcon className="text-blue-700 text-[16px] shrink-0" />
+        <ArticleIcon className="text-blue-800 text-[18px] shrink-0" />
       ) : (
         <FolderIcon className="text-[#5d7a8c] text-[18px] shrink-0" />
       );
@@ -274,7 +274,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
         
         {/* 이너 패널 헤더 */}
         <div className={`h-14 border-b border-slate-200 flex items-center justify-center px-4 shrink-0 select-none ${verticalTab === '규정' ? 'bg-[#009b9e] text-white' : 'bg-slate-50 text-slate-800'}`}>
-          <h2 className="text-sm font-black tracking-tight text-center">
+          <h2 className="text-[18px] font-black tracking-tight text-center">
             {verticalTab === "규정" ? "규정목록" : verticalTab}
           </h2>
         </div>
