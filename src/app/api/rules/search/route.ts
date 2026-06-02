@@ -2,12 +2,10 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { pool } from "@/lib/db";
-
-
+import { createPool } from "@/lib/db";
 
 export async function GET(request: Request) {
-  
+  const pool = createPool();
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("query") || "";
@@ -21,9 +19,6 @@ export async function GET(request: Request) {
     const scope = searchParams.get("scope") || "current";
     const options = searchParams.get("options") || "all";
 
-    // -------------------------------------------------------
-    // CASE A: 검색어 없음 - 단순 목록 반환
-    // -------------------------------------------------------
     if (!query) {
       const conditions: string[] = [];
       const values: any[] = [];
@@ -36,7 +31,6 @@ export async function GET(request: Request) {
 
       const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-      // Revision 필터 조건
       const revConds: string[] = [];
       const revValues: any[] = [];
       let revIdx = idx;
@@ -66,13 +60,9 @@ export async function GET(request: Request) {
          ORDER BY r.title ASC`,
         [...values, ...revValues]
       );
-      
       return NextResponse.json(res.rows);
     }
 
-    // -------------------------------------------------------
-    // CASE B: 검색어 있음 - 그룹별 매칭
-    // -------------------------------------------------------
     const optionList = options.split(",");
     const isAll = optionList.includes("all") || optionList.length === 0;
     const scopeCond = scope === "current" ? `AND r.status = 'EFFECTIVE'` : "";
@@ -80,7 +70,6 @@ export async function GET(request: Request) {
     const deptCond = departmentId ? `AND r."departmentId" = '${departmentId.replace(/'/g, "''")}'` : "";
     const likeQuery = `%${query}%`;
 
-    // 1. 규정명 매칭
     let titleMatches: any[] = [];
     if (isAll || optionList.includes("title")) {
       const r = await pool.query(
@@ -100,7 +89,6 @@ export async function GET(request: Request) {
       titleMatches = r.rows;
     }
 
-    // 2. 규정내용 매칭
     let bodyMatches: any[] = [];
     if (isAll || optionList.includes("body")) {
       const r = await pool.query(
@@ -140,7 +128,6 @@ export async function GET(request: Request) {
       });
     }
 
-    // 3. 첨부파일 매칭
     let attachmentMatches: any[] = [];
     if (isAll || optionList.includes("attachment")) {
       const r = await pool.query(
@@ -161,11 +148,11 @@ export async function GET(request: Request) {
       attachmentMatches = r.rows;
     }
 
-    
     return NextResponse.json({ isGrouped: true, titleMatches, bodyMatches, attachmentMatches });
   } catch (error: any) {
     console.error("[Search API Error]:", error);
-    
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+  } finally {
+    await pool.end();
   }
 }

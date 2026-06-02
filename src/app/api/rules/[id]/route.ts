@@ -2,21 +2,18 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { pool } from "@/lib/db";
-
-
+import { createPool } from "@/lib/db";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  
+  const pool = createPool();
   try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
     const versionParam = searchParams.get("version");
 
-    // 1. 규정 기본 정보 조회
     const ruleRes = await pool.query(
       `SELECT 
         r.id, r.title, r."ruleNumber", r.status, r."categoryId", r."departmentId",
@@ -30,12 +27,10 @@ export async function GET(
     );
 
     if (ruleRes.rows.length === 0) {
-      
       return NextResponse.json({ error: "Rule not found" }, { status: 404 });
     }
     const ruleRow = ruleRes.rows[0];
 
-    // 2. 연혁 목록 조회
     const revisionsRes = await pool.query(
       `SELECT id, version, "versionName", "revisionType", "enactmentDate", "effectiveDate", "announcementNumber", description
        FROM "Revision" WHERE "ruleId" = $1 ORDER BY version DESC`,
@@ -43,14 +38,12 @@ export async function GET(
     );
     const revisions = revisionsRes.rows;
 
-    // 3. 첨부파일 조회
     const attachmentsRes = await pool.query(
       `SELECT id, title, "fileUrl", "fileType", "createdAt" FROM "Attachment" WHERE "ruleId" = $1 ORDER BY "createdAt" ASC`,
       [id]
     );
 
     if (revisions.length === 0) {
-      
       return NextResponse.json({
         id: ruleRow.id,
         title: ruleRow.title,
@@ -64,7 +57,6 @@ export async function GET(
       });
     }
 
-    // 4. 조회할 버전 결정
     let targetRevisionId = "";
     if (versionParam) {
       const versionNum = parseInt(versionParam, 10);
@@ -73,14 +65,12 @@ export async function GET(
     }
     if (!targetRevisionId) targetRevisionId = revisions[0].id;
 
-    // 5. 선택된 버전의 조항 목록 조회
     const articlesRes = await pool.query(
       `SELECT id, chapter, section, "articleNumber", title, "contentJson", "contentText", "contentHtml", "sortOrder"
        FROM "Article" WHERE "revisionId" = $1 ORDER BY "sortOrder" ASC`,
       [targetRevisionId]
     );
 
-    // 6. 신구조문대비표 조회
     const comparisonsRes = await pool.query(
       `SELECT 
         ac.id, ac."beforeArticleId", ac."afterArticleId", ac.note,
@@ -122,8 +112,6 @@ export async function GET(
 
     const targetRevision = revisions.find((r) => r.id === targetRevisionId);
 
-    
-
     return NextResponse.json({
       id: ruleRow.id,
       title: ruleRow.title,
@@ -141,7 +129,8 @@ export async function GET(
     });
   } catch (error: any) {
     console.error("[Rule API Error]:", error);
-    
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+  } finally {
+    await pool.end();
   }
 }
