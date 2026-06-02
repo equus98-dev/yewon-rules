@@ -140,7 +140,7 @@ export default function ArticleRenderer({
               <div className="flex-1 w-full flex flex-col md:flex-row md:items-baseline md:justify-between">
                 <div className="flex-1">
                   <span className="font-bold mr-1 text-[#0054FF]">{safeNum}</span>
-                  <span className="font-bold text-[#0054FF]">{renderTextWithHistory(safeText)}</span>
+                  <span className="font-bold text-slate-800">{renderTextWithHistory(safeText)}</span>
                 </div>
                 {!hideHistory && historyDates.length > 0 && (
                   <div className="text-[12px] text-blue-600 font-medium whitespace-pre-wrap text-right ml-4 shrink-0 mt-1 md:mt-0 opacity-80">
