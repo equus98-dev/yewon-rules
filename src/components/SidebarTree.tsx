@@ -338,7 +338,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule }: SidebarTreeP
                 </div>
               ) : (
                 <SimpleTreeView
-                  selectedItems={activeRuleId ? activeRuleId : undefined}
+                  selectedItems={activeRuleId || null}
                   slots={{
                     expandIcon: ClosedIcon,
                     collapseIcon: OpenedIcon,
