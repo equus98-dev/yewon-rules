@@ -48,6 +48,7 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
   const [loading, setLoading] = useState(false);
   const [ruleData, setRuleData] = useState<any>(null);
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
+  const [hideHistory, setHideHistory] = useState(false);
 
   const currentRevision = ruleData?.currentRevision;
 
@@ -134,8 +135,6 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
   const handleVersionSelect = (verNum: number) => {
     setSelectedVersion(verNum);
   };
-
-  const [hideHistory, setHideHistory] = useState(false);
 
   return (
     <div className="flex flex-col h-full bg-white overflow-hidden relative border border-slate-200">
