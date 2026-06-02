@@ -1044,12 +1044,12 @@ export default function Home() {
                   
                   {/* 2-1) 최근 제·개정 규정 게시판 */}
                   <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px] overflow-hidden" elevation={0}>
-                    <div className="bg-[#8b0000] px-5 py-3.5 flex items-center justify-between shrink-0">
+                    <div className="bg-[#5c0000] px-5 py-3.5 flex items-center justify-between shrink-0">
                       <h3 className="text-base font-extrabold text-white flex items-center gap-2 tracking-tight">
                         <GavelIcon className="text-red-200" fontSize="small" />
                         최근 제·개정 규정
                       </h3>
-                      <span className="text-[11px] text-[#8b0000] font-black bg-red-50 px-2.5 py-0.5 rounded shadow-sm">
+                      <span className="text-[11px] text-[#5c0000] font-black bg-red-50 px-2.5 py-0.5 rounded shadow-sm">
                         실시간 반영
                       </span>
                     </div>
@@ -1081,7 +1081,7 @@ export default function Home() {
                                 </p>
                               </div>
                               <div className="text-right shrink-0">
-                                <span className="text-[14px] font-bold text-blue-700 block">
+                                <span className="text-[14px] font-bold text-red-700 block">
                                   {rule.latestVersionName}
                                 </span>
                                 <span className="text-[12px] font-semibold text-slate-400 block mt-1">
@@ -1097,7 +1097,7 @@ export default function Home() {
 
                   {/* 2-2) 최근 공지사항 게시판 */}
                   <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px] overflow-hidden" elevation={0}>
-                    <div className="bg-[#7a0000] px-5 py-3.5 flex items-center justify-between shrink-0">
+                    <div className="bg-[#092244] px-5 py-3.5 flex items-center justify-between shrink-0">
                       <h3 className="text-base font-extrabold text-white flex items-center gap-2 tracking-tight">
                         <CampaignIcon className="text-amber-400" fontSize="small" />
                         최근 공지사항
