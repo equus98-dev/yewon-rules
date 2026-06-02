@@ -65,17 +65,32 @@ export default function ArticleRenderer({
   // 정규식: <개정 ...> 또는 <신설 ...> 등 연혁 텍스트를 파싱하여 스타일을 다르게 적용
   const renderTextWithHistory = (text: string) => {
     if (hideHistory) {
-      // 연혁 숨기기: <개정 ...> 텍스트 자체를 날려버림
-      return text.replace(/<[^>]*>/g, "");
+      // 연혁 숨기기
+      text = text.replace(/<(?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>]*>/gi, "");
     }
     
-    // 연혁 표시: <개정 ...> 부분을 파란색으로 렌더링
-    const parts = text.split(/(<[^>]*>)/g);
+    // 연혁 표시: <개정 ...> 부분을 파란색으로 렌더링하기 위한 문자열 준비
+    let htmlText = text.replace(
+      /(<(?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>]*>)/gi,
+      (match) => `<span class="text-[#000080] text-[13px] ml-1">${match.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
+    );
+
+    // 테이블 등 HTML 태그가 포함되어 있다면 dangerouslySetInnerHTML 사용
+    if (/<table|<tr|<td|<th|<br|<p/i.test(htmlText)) {
+      return (
+        <span 
+          className="html-table-wrapper block w-full overflow-x-auto"
+          dangerouslySetInnerHTML={{ __html: htmlText }} 
+        />
+      );
+    }
+
+    const parts = text.split(/(<(?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>]*>)/gi);
     return parts.map((part, i) => {
       if (part.startsWith("<") && part.endsWith(">")) {
         return <span key={i} className="text-[#000080] text-[13px] ml-1">{part}</span>;
       }
-      return part;
+      return <React.Fragment key={i}>{part}</React.Fragment>;
     });
   };
 

@@ -123,3 +123,31 @@
   box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.08), 0 8px 10px -6px rgba(30, 58, 138, 0.08);
   border-color: #bfdbfe;
 }
+
+/* 본문 내 표(Table) 프리미엄 스타일 */
+.html-table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+
+.html-table-wrapper th,
+.html-table-wrapper td {
+  border: 1px solid #cbd5e1;
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  color: #334155;
+  vertical-align: middle;
+}
+
+.html-table-wrapper th {
+  background-color: #f8fafc;
+  font-weight: 700;
+  color: #0c3161;
+}
+
+.html-table-wrapper tr:hover td {
+  background-color: #f1f5f9;
+}
