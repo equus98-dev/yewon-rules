@@ -346,18 +346,18 @@ export default function Home() {
               <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col gap-4">
                   {/* 카테고리 뷰 헤더 타이틀 */}
-                  <div className="flex items-end justify-between border-b-2 border-[#1e3a8a] pb-3 select-none">
-                    <h2 className="text-[22px] font-black text-slate-900 tracking-tight flex items-center gap-2">
+                  <div className="flex items-end justify-between border-b-[3px] border-[#1e3a8a] pb-4 select-none">
+                    <h2 className="text-[28px] font-black text-slate-900 tracking-tight flex items-center gap-2">
                       {activeCategoryName}
                     </h2>
-                    <span className="text-[11px] text-slate-500 font-bold tracking-wider">
+                    <span className="text-[14px] text-slate-600 font-bold tracking-wider">
                       HOME &gt; 전자규정집 &gt; {activeCategoryName}
                     </span>
                   </div>
 
                   {/* 건수 및 페이지 표시 */}
-                  <div className="flex items-center text-xs font-bold text-slate-700 select-none mb-2">
-                    <span className="mr-2">전체: <span className="text-blue-700">{categoryRules.length}</span>건</span>
+                  <div className="flex items-center text-[15px] font-extrabold text-slate-700 select-none mb-3 mt-1">
+                    <span className="mr-3">전체: <span className="text-blue-700">{categoryRules.length}</span>건</span>
                     <span>페이지: 1/1</span>
                   </div>
 
@@ -371,51 +371,51 @@ export default function Home() {
                     ) : (
                       <table className="w-full text-sm border-collapse">
                         <thead>
-                          <tr className="bg-slate-50/50 border-b border-slate-200 text-slate-700 text-[12px] select-none">
-                            <th className="py-3.5 px-4 font-black w-16 text-center border-r border-slate-100">번호</th>
-                            <th className="py-3.5 px-4 font-black text-left">제목△</th>
-                            <th className="py-3.5 px-4 font-black w-28 text-center">제·개정일 ▽</th>
-                            <th className="py-3.5 px-4 font-black w-24 text-center">다운로드</th>
-                            <th className="py-3.5 px-4 font-black w-24 text-center">전체보기</th>
+                          <tr className="bg-slate-50 border-b-2 border-slate-200 text-slate-800 text-[16px] select-none">
+                            <th className="py-4 px-4 font-black w-20 text-center border-r border-slate-200">번호</th>
+                            <th className="py-4 px-4 font-black text-left">제목△</th>
+                            <th className="py-4 px-4 font-black w-32 text-center">제·개정일 ▽</th>
+                            <th className="py-4 px-4 font-black w-28 text-center">다운로드</th>
+                            <th className="py-4 px-4 font-black w-28 text-center">전체보기</th>
                           </tr>
                         </thead>
                         <tbody>
                           {categoryRules.length === 0 ? (
                             <tr>
-                              <td colSpan={5} className="py-16 text-center text-slate-400 text-xs font-bold">
+                              <td colSpan={5} className="py-20 text-center text-slate-400 text-[15px] font-bold">
                                 등록된 규정이 없습니다.
                               </td>
                             </tr>
                           ) : (
                             categoryRules.map((rule, idx) => (
                               <tr key={rule.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors">
-                                <td className="py-3.5 px-4 text-center text-slate-500 font-bold text-xs">{idx + 1}</td>
-                                <td className="py-3.5 px-4">
+                                <td className="py-4 px-4 text-center text-slate-500 font-extrabold text-[16px]">{idx + 1}</td>
+                                <td className="py-4 px-4">
                                   <button
                                     type="button"
                                     onClick={() => {
                                       setActiveRuleId(rule.id);
                                       setActiveCategoryId(null);
                                     }}
-                                    className="text-slate-800 font-bold hover:text-blue-800 cursor-pointer text-[13.5px] transition-colors"
+                                    className="text-slate-800 font-black hover:text-blue-800 cursor-pointer text-[16.5px] transition-colors"
                                   >
                                     {rule.title}
                                   </button>
                                 </td>
-                                <td className="py-3.5 px-4 text-center text-slate-600 font-medium text-[11px]">
+                                <td className="py-4 px-4 text-center text-slate-600 font-bold text-[15px]">
                                   {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString() : "-"}
                                 </td>
-                                <td className="py-3.5 px-4 text-center">
-                                  <span className="text-xs text-slate-400">-</span>
+                                <td className="py-4 px-4 text-center">
+                                  <span className="text-[15px] text-slate-400 font-bold">-</span>
                                 </td>
-                                <td className="py-3.5 px-4 text-center">
+                                <td className="py-4 px-4 text-center">
                                   <button
                                     type="button"
                                     onClick={() => {
                                       setActiveRuleId(rule.id);
                                       setActiveCategoryId(null);
                                     }}
-                                    className="text-xs text-slate-500 hover:text-blue-700 hover:underline cursor-pointer"
+                                    className="text-[14px] font-bold text-slate-500 hover:text-blue-700 hover:underline cursor-pointer"
                                   >
                                     전체보기
                                   </button>
@@ -429,13 +429,13 @@ export default function Home() {
                     
                     {/* 페이징 하단 바 (장식) */}
                     {!loadingCategory && categoryRules.length > 0 && (
-                      <div className="flex items-center justify-center py-5 border-t border-slate-200 bg-white">
-                        <div className="flex gap-1">
-                          <button className="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-400 text-xs cursor-pointer">«</button>
-                          <button className="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-400 text-xs cursor-pointer">&lt;</button>
-                          <button className="px-2.5 py-1 bg-[#0c3161] text-white text-xs font-bold">1</button>
-                          <button className="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-400 text-xs cursor-pointer">&gt;</button>
-                          <button className="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-400 text-xs cursor-pointer">»</button>
+                      <div className="flex items-center justify-center py-6 border-t border-slate-200 bg-white">
+                        <div className="flex gap-1.5">
+                          <button className="px-3 py-1.5 border border-slate-200 bg-slate-50 text-slate-500 font-bold text-[14px] cursor-pointer hover:bg-slate-100 transition-colors">«</button>
+                          <button className="px-3 py-1.5 border border-slate-200 bg-slate-50 text-slate-500 font-bold text-[14px] cursor-pointer hover:bg-slate-100 transition-colors">&lt;</button>
+                          <button className="px-4 py-1.5 bg-[#0c3161] text-white text-[15px] font-black shadow-sm">1</button>
+                          <button className="px-3 py-1.5 border border-slate-200 bg-slate-50 text-slate-500 font-bold text-[14px] cursor-pointer hover:bg-slate-100 transition-colors">&gt;</button>
+                          <button className="px-3 py-1.5 border border-slate-200 bg-slate-50 text-slate-500 font-bold text-[14px] cursor-pointer hover:bg-slate-100 transition-colors">»</button>
                         </div>
                       </div>
                     )}
