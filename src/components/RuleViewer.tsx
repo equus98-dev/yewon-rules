@@ -13,7 +13,37 @@ interface RuleViewerProps {
   ruleId: string;
 }
 
-export default function RuleViewer({ ruleId }: RuleViewerProps) {
+class RuleViewerErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 text-red-600 bg-red-50 h-full overflow-auto">
+          <h2 className="text-xl font-bold mb-4">RuleViewer 렌더링 중 치명적 오류 발생!</h2>
+          <pre className="text-sm bg-white p-4 border border-red-200 rounded whitespace-pre-wrap">{this.state.error?.toString()}</pre>
+          <pre className="text-xs bg-white p-4 border border-red-200 rounded mt-2 overflow-x-auto">{this.state.error?.stack}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function RuleViewer(props: RuleViewerProps) {
+  return (
+    <RuleViewerErrorBoundary>
+      <RuleViewerInner {...props} />
+    </RuleViewerErrorBoundary>
+  );
+}
+
+function RuleViewerInner({ ruleId }: RuleViewerProps) {
   // 1. 상태 및 훅은 모두 최상단에 선언
   const [loading, setLoading] = useState(false);
   const [ruleData, setRuleData] = useState<any>(null);
