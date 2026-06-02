@@ -212,7 +212,8 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
               <span className={`${textStyle} leading-relaxed truncate ${labelStyle}`}>{node.name}</span>
             </div>
           }
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             if (isFile) {
               onSelectRule(node.id);
             } else {

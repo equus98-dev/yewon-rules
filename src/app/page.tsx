@@ -373,7 +373,7 @@ export default function Home() {
                         <thead>
                           <tr className="bg-slate-50 border-b-2 border-slate-200 text-slate-800 text-[16px] select-none">
                             <th className="py-4 px-4 font-black w-20 text-center border-r border-slate-200">번호</th>
-                            <th className="py-4 px-4 font-black text-left">제목△</th>
+                            <th className="py-4 px-4 font-black text-center">제목</th>
                             <th className="py-4 px-4 font-black w-32 text-center">제·개정일 ▽</th>
                             <th className="py-4 px-4 font-black w-28 text-center">다운로드</th>
                             <th className="py-4 px-4 font-black w-28 text-center">전체보기</th>

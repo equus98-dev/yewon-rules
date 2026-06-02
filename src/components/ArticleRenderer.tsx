@@ -200,8 +200,9 @@ export default function ArticleRenderer({
               </div>
             );
           } else {
+            const isAddendum = safeText.replace(/\s+/g, "").startsWith("부칙");
             return (
-              <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] my-1.5 pl-[1.25rem] w-full">
+              <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] pl-[1.25rem] w-full ${isAddendum ? 'mt-20 mb-4 font-bold text-[16px]' : 'my-1.5'}`}>
                 {renderTextWithHistory(safeText)}
               </div>
             );
