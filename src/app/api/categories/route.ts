@@ -71,7 +71,39 @@ export async function GET(request: Request) {
         };
       }
 
-      return NextResponse.json(rootNodes.map((node) => formatNode(node)));
+      const formattedRootNodes = rootNodes.map((node) => formatNode(node));
+      
+      // 그룹화 로직 추가: "제3편 대학운영 (제1장 행정)" 형태를 상하위로 분리
+      const groupedNodes: any[] = [];
+      const parentMap = new Map<string, any>();
+
+      formattedRootNodes.forEach((node) => {
+        const match = node.name.match(/^(.*?)\s*\((.*?)\)$/);
+        if (match) {
+          const parentName = match[1].trim();
+          const childName = match[2].trim();
+          
+          if (!parentMap.has(parentName)) {
+            const newParent = {
+              id: `virtual-${parentName}`,
+              name: parentName,
+              type: "folder",
+              children: []
+            };
+            parentMap.set(parentName, newParent);
+            groupedNodes.push(newParent);
+          }
+          
+          parentMap.get(parentName).children.push({
+            ...node,
+            name: childName
+          });
+        } else {
+          groupedNodes.push(node);
+        }
+      });
+
+      return NextResponse.json(groupedNodes);
     }
 
     if (type === "dept") {

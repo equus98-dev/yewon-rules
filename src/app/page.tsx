@@ -314,7 +314,7 @@ export default function Home() {
         </aside>
 
         {/* 우측 메인 영역 */}
-        <main className="flex-1 h-full overflow-hidden bg-slate-100 flex flex-col relative">
+        <main className="flex-1 h-full overflow-hidden bg-slate-100 flex flex-col relative pl-6">
           
           {/* 사이드바 접기/펴기 고급 세로 결합식 핸들 버튼 (프리미엄 윈도우 UI - 남색 테마 상단 배치) */}
           <div 
@@ -337,7 +337,7 @@ export default function Home() {
           </div>
           {activeRuleId ? (
             /* 규정 뷰어 표시 */
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden h-full bg-white shadow-[-4px_0_15px_rgba(0,0,0,0.03)] border-l border-slate-200">
               <RuleViewer ruleId={activeRuleId} />
             </div>
           ) : activeCategoryId ? (
@@ -397,7 +397,7 @@ export default function Home() {
                                       setActiveRuleId(rule.id);
                                       setActiveCategoryId(null);
                                     }}
-                                    className="text-slate-800 font-black hover:text-blue-800 cursor-pointer text-[16.5px] transition-colors"
+                                    className="text-slate-800 font-medium hover:text-blue-800 cursor-pointer text-[15.5px] transition-colors"
                                   >
                                     {rule.title}
                                   </button>
