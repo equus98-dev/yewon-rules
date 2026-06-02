@@ -352,6 +352,11 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
                     collapseIcon: OpenedIcon,
                   }}
                   sx={{
+                    "& .MuiTreeItem-groupTransition": {
+                      marginLeft: "12px",
+                      paddingLeft: "8px",
+                      borderLeft: "1px dashed #cbd5e1"
+                    },
                     "& .MuiTreeItem-content": {
                       borderRadius: "4px",
                       margin: "0.5px 0",
