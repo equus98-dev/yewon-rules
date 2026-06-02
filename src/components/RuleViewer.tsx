@@ -18,7 +18,6 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
   const [loading, setLoading] = useState(false);
   const [ruleData, setRuleData] = useState<any>(null);
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
-  const [selectedArticleIds, setSelectedArticleIds] = useState<Set<string>>(new Set());
 
   // 규정 데이터 패치 (선택한 버전 포함)
   useEffect(() => {
@@ -51,7 +50,6 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
   useEffect(() => {
     setSelectedVersion(null);
     setActiveTab(0);
-    setSelectedArticleIds(new Set());
   }, [ruleId]);
 
   if (loading && !ruleData) {
@@ -109,99 +107,6 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
   const handleVersionSelect = (verNum: number) => {
     setSelectedVersion(verNum);
     setActiveTab(0); // 본문 탭으로 바로 이동
-    setSelectedArticleIds(new Set());
-  };
-
-  const handleToggleArticleSelect = (articleNum: string) => {
-    setSelectedArticleIds((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(articleNum)) {
-        newSet.delete(articleNum);
-      } else {
-        newSet.add(articleNum);
-      }
-      return newSet;
-    });
-  };
-
-  const handlePrintSelected = () => {
-    if (!currentRevision || selectedArticleIds.size === 0) return;
-    
-    // 선택된 조항의 데이터만 필터링하기 위해 전체 contentJson 파싱
-    let printHtml = "";
-    
-    currentRevision.articles.forEach((a: any) => {
-      try {
-        let items = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
-        if (!Array.isArray(items)) return;
-        
-        let currentArticleNum: string | null = null;
-        let isSelected = false;
-        
-        items.forEach((item: any) => {
-          if (!item || typeof item !== 'object') return;
-          if (item.type === "article") {
-            currentArticleNum = item.num;
-            isSelected = currentArticleNum ? selectedArticleIds.has(currentArticleNum) : false;
-            if (isSelected) {
-              printHtml += `<div class="article-title">${item.num} ${item.text}</div>`;
-            }
-          } else if (item.type === "paragraph" || item.type === "item" || item.type === "subitem" || (item.type === "text" && typeof item.text === "string" && !item.text.match(new RegExp("\\d-\\d-\\d-")))) {
-            // 현재 순회중인 텍스트가 선택된 조에 속해있다면 인쇄 내용에 포함
-            if (isSelected) {
-              const prefix = item.num ? `<span style="margin-right: 5px;">${item.num}</span>` : '';
-              let padding = "0px";
-              if (item.type === "item") padding = "15px";
-              if (item.type === "subitem") padding = "30px";
-              
-              printHtml += `<div class="article-content" style="padding-left: ${padding};">${prefix}${item.text}</div>`;
-            }
-          } else if (item.type === "chapter" || item.type === "section") {
-            // 장, 절이 바뀌면 소속 초기화
-            currentArticleNum = null;
-            isSelected = false;
-          }
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    });
-    
-    // 새 창에 인쇄용 화면 구성
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      alert("팝업 차단이 설정되어 있습니다. 팝업 차단을 해제해 주세요.");
-      return;
-    }
-
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>${title} - 선택 조항 인쇄</title>
-        <style>
-          body { font-family: 'Malgun Gothic', sans-serif; padding: 40px; color: #000; line-height: 1.6; }
-          h1 { text-align: center; font-size: 24px; margin-bottom: 40px; }
-          .article-title { font-weight: bold; margin-bottom: 10px; margin-top: 30px; font-size: 16px; }
-          .article-content { margin-left: 10px; font-size: 14px; margin-bottom: 4px; }
-          @media print {
-            body { padding: 0; }
-            button { display: none; }
-          }
-        </style>
-      </head>
-      <body>
-        <h1>${title} (선택 조항 발췌)</h1>
-        ${printHtml}
-        <script>
-          window.onload = function() { setTimeout(function() { window.print(); }, 500); }
-        </script>
-      </body>
-      </html>
-    `;
-
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
   };
 
   return (
@@ -320,9 +225,6 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
                             title={article.title}
                             contentJson={article.contentJson}
                             contentHtml={article.contentHtml}
-                            isSelectable={true}
-                            selectedNums={selectedArticleIds}
-                            onToggleSelect={handleToggleArticleSelect}
                           />
                         ))}
                     </div>
@@ -549,36 +451,6 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
         </div>
       </div>
 
-      {/* 플로팅 액션 바 (선택된 조항이 있을 때만 표시) */}
-      {activeTab === 0 && selectedArticleIds.size > 0 && (
-        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-6 z-[100] animate-fade-in border border-slate-700">
-          <div className="flex items-center gap-2">
-            <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-              {selectedArticleIds.size}
-            </span>
-            <span className="font-medium text-sm">개 조항 선택됨</span>
-          </div>
-          <div className="w-px h-6 bg-slate-700"></div>
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="contained" 
-              size="small" 
-              onClick={handlePrintSelected}
-              className="bg-blue-500 hover:bg-blue-600 font-bold px-4"
-            >
-              선택 인쇄 (PDF 저장)
-            </Button>
-            <Button 
-              variant="text" 
-              size="small" 
-              onClick={() => setSelectedArticleIds(new Set())}
-              className="text-slate-300 hover:text-white"
-            >
-              선택 해제
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -14,18 +14,12 @@ interface ArticleRendererProps {
   title: string;
   contentJson: any; // Prisma JsonValue
   contentHtml?: string | null;
-  isSelectable?: boolean;
-  selectedNums?: Set<string>;
-  onToggleSelect?: (num: string) => void;
 }
 
 export default function ArticleRenderer({
   id,
   contentJson,
   contentHtml,
-  isSelectable,
-  selectedNums,
-  onToggleSelect,
 }: ArticleRendererProps) {
   if (contentHtml && contentHtml.trim().length > 0) {
     return (
@@ -99,14 +93,6 @@ export default function ArticleRenderer({
         } else if (item.type === "article") {
           return (
             <div key={index} id={`toc-${safeNum}`} className="mt-6 mb-2 text-[15px] text-black leading-[1.6] flex items-start gap-2 pt-2">
-              {isSelectable && onToggleSelect && (
-                <input
-                  type="checkbox"
-                  checked={selectedNums && typeof selectedNums.has === 'function' ? selectedNums.has(safeNum) : false}
-                  onChange={() => onToggleSelect(safeNum)}
-                  className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                />
-              )}
               <div>
                 <span className="font-bold mr-1">{safeNum}</span>
                 <span className="font-normal">{safeText}</span>
