@@ -26,6 +26,7 @@ interface TreeNode {
 
 interface SidebarTreeProps {
   onSelectRule: (ruleId: string) => void;
+  onSelectCategory?: (categoryId: string, categoryName: string) => void;
   activeRuleId?: string | null;
 }
 
@@ -36,7 +37,7 @@ const OpenedIcon = () => (
   <span className="text-[10px] text-slate-500 font-bold select-none mr-0.5">▼</span>
 );
 
-export default function SidebarTree({ activeRuleId, onSelectRule }: SidebarTreeProps) {
+export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCategory }: SidebarTreeProps) {
   // 1단 세로 메뉴 탭 상태: "규정" | "최신 제·개정" | "서식" | "공지" | "조직도"
   const [verticalTab, setVerticalTab] = useState<"규정" | "최신 제·개정" | "서식" | "공지" | "조직도">("규정");
 
@@ -214,6 +215,10 @@ export default function SidebarTree({ activeRuleId, onSelectRule }: SidebarTreeP
           onClick={() => {
             if (isFile) {
               onSelectRule(node.id);
+            } else {
+              if (onSelectCategory) {
+                onSelectCategory(node.id.replace("cat-", ""), node.name);
+              }
             }
           }}
         >

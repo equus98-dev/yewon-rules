@@ -22,6 +22,12 @@ export default function Home() {
   const [searchResults, setSearchResults] = useState<any>([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
   
+  // 카테고리 뷰 관련 상태
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [activeCategoryName, setActiveCategoryName] = useState<string | null>(null);
+  const [categoryRules, setCategoryRules] = useState<any[]>([]);
+  const [loadingCategory, setLoadingCategory] = useState(false);
+  
   // 1. 상세 검색을 위한 상태 정의 (NSU 스타일)
   const [scope, setScope] = useState<"current" | "history">("current");
   const [optionAll, setOptionAll] = useState(true);
@@ -182,6 +188,9 @@ export default function Home() {
   const handleGoHome = () => {
     setActiveRuleId(null);
     setIsSearching(false);
+    setActiveCategoryId(null);
+    setActiveCategoryName(null);
+    setCategoryRules([]);
     setSearchQuery("");
     setSearchResults([]);
     setScope("current");
@@ -199,6 +208,28 @@ export default function Home() {
   const handleTagClick = (tag: string) => {
     setSearchQuery(tag);
     handleSearch(undefined, tag);
+  };
+
+  const handleCategorySelect = async (categoryId: string, categoryName: string) => {
+    setActiveRuleId(null);
+    setIsSearching(false);
+    setActiveCategoryId(categoryId);
+    setActiveCategoryName(categoryName);
+    setLoadingCategory(true);
+    try {
+      const res = await fetch(`/api/rules/search?categoryId=${categoryId}&query=`);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setCategoryRules(data);
+      } else {
+        setCategoryRules([]);
+      }
+    } catch(e) {
+      console.error(e);
+      setCategoryRules([]);
+    } finally {
+      setLoadingCategory(false);
+    }
   };
 
   return (
@@ -273,6 +304,10 @@ export default function Home() {
                 const cleanId = ruleId.replace("cat-", "").replace("dept-", "").replace("abc-", "");
                 setActiveRuleId(cleanId);
                 setIsSearching(false); // 상세 보기 시 검색 결과 모드 해제
+                setActiveCategoryId(null);
+              }}
+              onSelectCategory={(categoryId, categoryName) => {
+                handleCategorySelect(categoryId, categoryName);
               }}
             />
           </div>
@@ -304,6 +339,109 @@ export default function Home() {
             /* 규정 뷰어 표시 */
             <div className="flex-1 overflow-hidden">
               <RuleViewer ruleId={activeRuleId} />
+            </div>
+          ) : activeCategoryId ? (
+            /* 카테고리(분야/부서/폴더) 뷰 표시 */
+            <div className="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar">
+              <div className="max-w-6xl mx-auto">
+                <div className="flex flex-col gap-4">
+                  {/* 카테고리 뷰 헤더 타이틀 */}
+                  <div className="flex items-end justify-between border-b-2 border-[#1e3a8a] pb-3 select-none">
+                    <h2 className="text-[22px] font-black text-slate-900 tracking-tight flex items-center gap-2">
+                      {activeCategoryName}
+                    </h2>
+                    <span className="text-[11px] text-slate-500 font-bold tracking-wider">
+                      HOME &gt; 전자규정집 &gt; {activeCategoryName}
+                    </span>
+                  </div>
+
+                  {/* 건수 및 페이지 표시 */}
+                  <div className="flex items-center text-xs font-bold text-slate-700 select-none mb-2">
+                    <span className="mr-2">전체: <span className="text-blue-700">{categoryRules.length}</span>건</span>
+                    <span>페이지: 1/1</span>
+                  </div>
+
+                  {/* 규정 목록 테이블 */}
+                  <div className="bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden">
+                    {loadingCategory ? (
+                      <div className="flex flex-col items-center justify-center py-24 gap-4">
+                        <CircularProgress size={30} sx={{ color: "#0c3161" }} />
+                        <span className="text-slate-500 text-xs font-semibold">규정 목록 로드 중...</span>
+                      </div>
+                    ) : (
+                      <table className="w-full text-sm border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50/50 border-b border-slate-200 text-slate-700 text-[12px] select-none">
+                            <th className="py-3.5 px-4 font-black w-16 text-center border-r border-slate-100">번호</th>
+                            <th className="py-3.5 px-4 font-black text-left">제목△</th>
+                            <th className="py-3.5 px-4 font-black w-28 text-center">제·개정일 ▽</th>
+                            <th className="py-3.5 px-4 font-black w-24 text-center">다운로드</th>
+                            <th className="py-3.5 px-4 font-black w-24 text-center">전체보기</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {categoryRules.length === 0 ? (
+                            <tr>
+                              <td colSpan={5} className="py-16 text-center text-slate-400 text-xs font-bold">
+                                등록된 규정이 없습니다.
+                              </td>
+                            </tr>
+                          ) : (
+                            categoryRules.map((rule, idx) => (
+                              <tr key={rule.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                                <td className="py-3.5 px-4 text-center text-slate-500 font-bold text-xs">{idx + 1}</td>
+                                <td className="py-3.5 px-4">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setActiveRuleId(rule.id);
+                                      setActiveCategoryId(null);
+                                    }}
+                                    className="text-slate-800 font-bold hover:text-blue-800 cursor-pointer text-[13.5px] transition-colors"
+                                  >
+                                    {rule.title}
+                                  </button>
+                                </td>
+                                <td className="py-3.5 px-4 text-center text-slate-600 font-medium text-[11px]">
+                                  {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString() : "-"}
+                                </td>
+                                <td className="py-3.5 px-4 text-center">
+                                  <span className="text-xs text-slate-400">-</span>
+                                </td>
+                                <td className="py-3.5 px-4 text-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setActiveRuleId(rule.id);
+                                      setActiveCategoryId(null);
+                                    }}
+                                    className="text-xs text-slate-500 hover:text-blue-700 hover:underline cursor-pointer"
+                                  >
+                                    전체보기
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    )}
+                    
+                    {/* 페이징 하단 바 (장식) */}
+                    {!loadingCategory && categoryRules.length > 0 && (
+                      <div className="flex items-center justify-center py-5 border-t border-slate-200 bg-white">
+                        <div className="flex gap-1">
+                          <button className="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-400 text-xs cursor-pointer">«</button>
+                          <button className="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-400 text-xs cursor-pointer">&lt;</button>
+                          <button className="px-2.5 py-1 bg-[#0c3161] text-white text-xs font-bold">1</button>
+                          <button className="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-400 text-xs cursor-pointer">&gt;</button>
+                          <button className="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-400 text-xs cursor-pointer">»</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           ) : isSearching ? (
             /* 검색 결과 목록 표시 (남서울대 규정 통합 검색 스타일 그룹 대시보드) */
