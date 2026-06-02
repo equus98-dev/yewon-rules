@@ -1011,9 +1011,8 @@ export default function Home() {
                 </div>
                 
                 {/* [파트 3] 풋터 영역 */}
-                <footer className="text-center text-xs text-slate-400 py-6 border-t border-slate-200 mt-12">
+                <footer className="text-center text-sm font-medium text-slate-500 py-6 border-t border-slate-200 mt-12">
                   <p>Copyright &copy; 2026 예원예술대학교. All Rights Reserved.</p>
-                  <p className="mt-1 text-slate-300">개발 에이전트: Antigravity AI Engine (Ver 2.5)</p>
                 </footer>
 
               </div>

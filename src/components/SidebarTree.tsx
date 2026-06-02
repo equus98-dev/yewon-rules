@@ -14,6 +14,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import DescriptionIcon from "@mui/icons-material/Description";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
 
 interface TreeNode {
   id: string;
@@ -35,9 +36,9 @@ const OpenedIcon = () => (
   <span className="text-[10px] text-slate-500 font-bold select-none mr-0.5">▼</span>
 );
 
-export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeProps) {
-  // 1단 수직 메뉴 바 인덱스/상태: "규정" | "최신 제·개정" | "서식" | "공지"
-  const [verticalTab, setVerticalTab] = useState<"규정" | "최신 제·개정" | "서식" | "공지">("규정");
+export default function SidebarTree({ activeRuleId, onSelectRule }: SidebarTreeProps) {
+  // 1단 세로 메뉴 탭 상태: "규정" | "최신 제·개정" | "서식" | "공지" | "조직도"
+  const [verticalTab, setVerticalTab] = useState<"규정" | "최신 제·개정" | "서식" | "공지" | "조직도">("규정");
 
   // 규정 탭 내부 상태
   const [tabIndex, setTabIndex] = useState(0); // 0: 분야별, 1: 소관부서별, 2: 가나다순
@@ -233,6 +234,7 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
     { id: "최신 제·개정" as const, label: "최신 제·개정", icon: <HistoryIcon sx={{ fontSize: 22 }} /> },
     { id: "서식" as const, label: "서식", icon: <DescriptionIcon sx={{ fontSize: 22 }} /> },
     { id: "공지" as const, label: "공지", icon: <CampaignIcon sx={{ fontSize: 22 }} /> },
+    { id: "조직도" as const, label: "조직도", icon: <AccountTreeIcon sx={{ fontSize: 22 }} /> },
   ];
 
   return (
@@ -521,6 +523,17 @@ export default function SidebarTree({ onSelectRule, activeRuleId }: SidebarTreeP
                 </div>
               ))
             )}
+          </div>
+        )}
+
+        {/* 2-5) 조직도 패널 */}
+        {verticalTab === "조직도" && (
+          <div className="flex-1 overflow-y-auto p-4 flex items-start justify-center bg-slate-50/30">
+            <img 
+              src="/docs/1.jpg" 
+              alt="조직도" 
+              className="w-full h-auto object-contain shadow-sm border border-slate-200 rounded-md"
+            />
           </div>
         )}
 
