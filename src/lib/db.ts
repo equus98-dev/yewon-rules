@@ -1,13 +1,12 @@
-import { Pool } from "@neondatabase/serverless";
+import { Pool, neonConfig } from "@neondatabase/serverless";
 
-const poolConfig = {
-  host: "aws-1-ap-northeast-1.pooler.supabase.com",
-  port: 6543,
-  user: "postgres.jagpwxgasudlnaoxfroe",
-  password: "Tmtmfh0022$&*",
-  database: "postgres",
-  ssl: { rejectUnauthorized: false },
-};
+// Enable HTTP-based pool queries for Cloudflare Edge Runtime
+// This avoids WebSocket/TCP handshake issues in edge environments
+neonConfig.poolQueryViaFetch = true;
+neonConfig.fetchConnectionCache = true;
 
-// Singleton pool instance for Edge runtime
-export const pool = new Pool(poolConfig);
+const connectionString =
+  "postgresql://postgres.jagpwxgasudlnaoxfroe:Tmtmfh0022%24%26%2A@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres";
+
+// Singleton pool - uses HTTP fetch in edge runtime with poolQueryViaFetch=true
+export const pool = new Pool({ connectionString, ssl: { rejectUnauthorized: false } });
