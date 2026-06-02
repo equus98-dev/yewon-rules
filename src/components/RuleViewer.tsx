@@ -113,340 +113,143 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
     setActiveTab(0); // 본문 탭으로 바로 이동
   };
 
-  return (
-    <div className="flex flex-col h-full bg-slate-50 overflow-hidden relative">
-      {/* 1. 규정 상단 메타 헤더 영역 (로열 블루 배경의 웅장한 타이틀바) */}
-      <div className="bg-gradient-to-r from-blue-900 via-blue-950 to-slate-900 p-6 text-white shadow-md">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <span className="bg-amber-500 text-slate-900 text-xs px-2.5 py-1 rounded font-bold uppercase tracking-wider">
-                {category?.name || "분류 없음"}
-              </span>
-              <span className="text-blue-200 text-sm font-semibold">
-                소관부서: {department?.name || "미지정"}
-              </span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mt-2 flex items-baseline gap-3">
-              {title}
-              <span className="text-amber-400 text-lg font-semibold">{ruleNumber}</span>
-            </h1>
-          </div>
+  const [hideHistory, setHideHistory] = useState(false);
 
-          {/* 현재 뷰잉 중인 개정 버전 표시 */}
-          {currentRevision && (
-            <div className="flex flex-col items-end gap-2">
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-lg text-right">
-                <p className="text-xs text-blue-200 font-medium">표시중인 버전</p>
-                <p className="text-base font-bold text-amber-300">
-                  {currentRevision.versionName} 
-                  <span className="text-xs text-white font-normal ml-2">
-                    (공포일: {new Date(currentRevision.enactmentDate).toLocaleDateString()})
-                  </span>
-                </p>
+  return (
+    <div className="flex flex-col h-full bg-white overflow-hidden relative border border-slate-200">
+      
+      {/* 1. 상단 타이틀 및 브레드크럼 */}
+      <div className="bg-white border-b border-slate-200 px-6 py-4 shrink-0 flex items-center justify-between z-10 shadow-sm relative">
+        <h1 className="text-2xl font-black text-slate-800 tracking-tight ml-2">{title}</h1>
+        <div className="text-[11px] text-slate-500 font-medium tracking-wider">
+          HOME &gt; 전자규정집 &gt; {category?.name || "분류"} &gt; {title}
+        </div>
+      </div>
+
+      {/* 2. 툴바 (버전 변경, 검색, 버튼들) */}
+      <div className="bg-slate-50 border-b border-slate-200 px-4 py-2 shrink-0 flex flex-wrap items-center justify-between gap-4 z-10 shadow-sm">
+        <div className="flex items-center gap-2">
+          {/* 버전 셀렉트 */}
+          <select 
+            className="border border-slate-300 rounded px-2 py-1 text-xs font-bold text-slate-700 bg-white min-w-[140px] focus:outline-none focus:border-blue-500 cursor-pointer"
+            value={selectedVersion || (currentRevision?.version ?? "")}
+            onChange={(e) => handleVersionSelect(Number(e.target.value))}
+          >
+            {revisions?.map((rev: any) => (
+              <option key={rev.version} value={rev.version}>
+                {new Date(rev.enactmentDate).toISOString().split('T')[0]} {rev.revisionType || '개정'}
+              </option>
+            ))}
+          </select>
+
+          {/* 본문 검색 */}
+          <div className="flex items-center bg-white border border-slate-300 rounded overflow-hidden">
+            <input 
+              type="text" 
+              placeholder="전자규정집 내용 검색" 
+              className="px-2 py-1 text-xs outline-none w-[160px]"
+            />
+            <button className="px-2 py-1 text-blue-700 bg-slate-50 border-l border-slate-300 hover:bg-slate-100 font-black cursor-pointer text-xs">Q</button>
+            <button className="px-1.5 py-1 text-slate-500 bg-slate-50 border-l border-slate-300 hover:bg-slate-100 text-xs font-black cursor-pointer">&lt;</button>
+            <button className="px-1.5 py-1 text-slate-500 bg-slate-50 border-l border-slate-300 hover:bg-slate-100 text-xs font-black cursor-pointer">&gt;</button>
+          </div>
+        </div>
+
+        {/* 액션 버튼 그룹 */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <button className="flex items-center gap-1 px-2.5 py-1 border border-blue-200 bg-white text-blue-700 text-[11px] font-bold rounded hover:bg-blue-50 transition-colors cursor-pointer">
+            <FileDownloadIcon sx={{ fontSize: 14 }} /> 다운로드
+          </button>
+          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
+            <InfoIcon sx={{ fontSize: 14 }} className="text-blue-500" /> 개정정보
+          </button>
+          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
+            <ArticleIcon sx={{ fontSize: 14 }} className="text-slate-400" /> 개정문
+          </button>
+          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
+            <ArticleIcon sx={{ fontSize: 14 }} className="text-emerald-500" /> 기안문
+          </button>
+          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
+            <CompareArrowsIcon sx={{ fontSize: 14 }} className="text-purple-500" /> 신구대비표
+          </button>
+          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
+            <ArticleIcon sx={{ fontSize: 14 }} className="text-slate-600" /> 2단보기
+          </button>
+          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
+            <ArticleIcon sx={{ fontSize: 14 }} className="text-blue-500" /> 전체보기
+          </button>
+        </div>
+      </div>
+
+      {/* 3. 2단 분할 본문 영역 */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* 좌측 목차 (TOC) */}
+        <div className="w-[320px] bg-white border-r border-slate-200 overflow-y-auto scrollbar shrink-0 flex flex-col">
+          <div className="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 sticky top-0 z-10">
+            <HistoryIcon className="text-blue-700" sx={{ fontSize: 16 }} />
+            <span className="font-bold text-sm text-slate-800">목차 ({tocItems.filter(i => i.type === 'article').length})</span>
+          </div>
+          <ul className="p-3 space-y-1.5">
+            {tocItems.map((item, idx) => (
+              <li key={idx} className={item.type === "chapter" ? "mt-4 mb-2 px-2 py-1.5 bg-slate-50 border-y border-slate-200 font-bold text-slate-700 text-[13px] tracking-tight" : "px-3 py-1 text-slate-600 hover:text-blue-700 hover:font-bold hover:bg-slate-50 cursor-pointer text-[13px] flex gap-1 transition-all"}>
+                <a href={`#${item.id}`} className="block w-full" onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}>
+                  {item.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* 우측 본문 */}
+        <div className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex justify-between items-start mb-6 border-b border-slate-100 pb-2">
+              <label className="flex items-center gap-1.5 cursor-pointer text-[13px] font-bold text-slate-600 select-none hover:text-blue-700">
+                <input 
+                  type="checkbox" 
+                  checked={hideHistory} 
+                  onChange={() => setHideHistory(!hideHistory)}
+                  className="w-4 h-4 cursor-pointer accent-blue-600"
+                />
+                연혁숨기기
+              </label>
+              
+              <div className="text-right text-[13px] font-bold text-slate-500 flex items-center gap-1">
+                <InfoIcon sx={{ fontSize: 16 }} className="text-[#0c3161]" />
+                담당부서: <span className="text-slate-800">{department?.name || "미지정"}</span>
               </div>
             </div>
-          )}
+
+            <h2 className="text-[34px] font-black text-center text-slate-900 mb-14 tracking-tight mt-6">{title}</h2>
+            
+            {/* 조항 렌더링 */}
+            {currentRevision?.articles && currentRevision.articles.length > 0 ? (
+              <div className="pb-32">
+                {currentRevision.articles.map((article: any) => (
+                  <ArticleRenderer
+                    key={article.id}
+                    id={article.id}
+                    chapter={article.chapter}
+                    section={article.section}
+                    articleNumber={article.articleNumber}
+                    title={article.title}
+                    contentJson={article.contentJson}
+                    contentHtml={article.contentHtml}
+                    hideHistory={hideHistory}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-24 text-slate-400 font-bold text-lg">
+                등록된 조항 정보가 존재하지 않습니다.
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* 2. 4대 핵심 탭 메뉴바 */}
-      <Box sx={{ borderBottom: 1, borderColor: "divider", bgcolor: "white", px: 2, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          indicatorColor="primary"
-          textColor="primary"
-          aria-label="규정 상세 탭 메뉴"
-        >
-          <Tab icon={<ArticleIcon className="text-lg mr-1" />} iconPosition="start" label="현행규정 본문" />
-          <Tab icon={<HistoryIcon className="text-lg mr-1" />} iconPosition="start" label="제·개정 연혁" />
-          <Tab icon={<CompareArrowsIcon className="text-lg mr-1" />} iconPosition="start" label="신구조문 대비표" />
-          <Tab icon={<FileDownloadIcon className="text-lg mr-1" />} iconPosition="start" label={`관련 서식 (${attachments?.length || 0})`} />
-        </Tabs>
-      </Box>
-
-      {/* 3. 탭 상세 내용 컨테이너 (스크롤 가능 영역) */}
-      <div className="flex-1 overflow-y-auto p-6 scrollbar">
-        <div className="max-w-5xl mx-auto">
-          {loading && (
-            <div className="fixed inset-0 bg-white/60 z-50 flex items-center justify-center">
-              <CircularProgress size={40} />
-            </div>
-          )}
-
-          {/* [Tab 0] 현행규정 본문 탭 */}
-          {activeTab === 0 && (
-            <div className="flex flex-col md:flex-row gap-6 relative animate-fade-in">
-              {/* 좌측 목차(TOC) 네비게이션 바 */}
-              {tocItems.length > 0 && (
-                <div className="hidden md:block w-56 shrink-0">
-                  <div className="sticky top-0 bg-white border border-slate-200 rounded-xl shadow-sm max-h-[75vh] overflow-y-auto scrollbar p-4">
-                    <h3 className="font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100 sticky top-0 bg-white z-10">목차</h3>
-                    <ul className="space-y-1.5 text-[13.5px]">
-                      {tocItems.map((item, idx) => (
-                        <li key={idx} className={item.type === "chapter" ? "mt-4 font-bold text-blue-700" : "pl-3 text-slate-600 hover:text-blue-600 cursor-pointer"}>
-                          <a href={`#${item.id}`} onClick={(e) => {
-                            e.preventDefault();
-                            document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                          }}>
-                            {item.text}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              )}
-
-              {/* 본문 영역 */}
-              <div className="flex-1 min-w-0 bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
-                {currentRevision ? (
-                  <>
-                    <div className="border-b border-slate-100 pb-4 mb-6 text-slate-500 text-sm flex items-center gap-2">
-                      <InfoIcon className="text-blue-500 text-sm" />
-                      본 규정은 <strong>{new Date(currentRevision.effectiveDate).toLocaleDateString()}</strong>일부로 시행되는 현행 규정의 조항 구조입니다.
-                    </div>
-                    
-                    {/* 조항들 차례대로 렌더링 */}
-                    {currentRevision?.articles && currentRevision.articles.length > 0 ? (
-                      <div className="pb-24">
-                        {currentRevision.articles.map((article: any) => (
-                          <ArticleRenderer
-                            key={article.id}
-                            id={article.id}
-                            chapter={article.chapter}
-                            section={article.section}
-                            articleNumber={article.articleNumber}
-                            title={article.title}
-                            contentJson={article.contentJson}
-                            contentHtml={article.contentHtml}
-                          />
-                        ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 text-slate-400">
-                      등록된 조항 정보가 존재하지 않습니다.
-                    </div>
-                  )}
-
-
-                </>
-              ) : (
-                <div className="text-center py-12 text-slate-400">
-                  개정 이력이 기록되지 않았습니다.
-                </div>
-              )}
-            </div>
-            </div>
-          )}
-
-          {/* [Tab 1] 제·개정 연혁 탭 */}
-          {activeTab === 1 && (
-            <div className="animate-fade-in">
-              <TableContainer component={Paper} elevation={0} className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                <Table sx={{ minWidth: 650 }} aria-label="규정 연혁 테이블">
-                  <TableHead className="bg-slate-50">
-                    <TableRow>
-                      <TableCell className="font-bold text-slate-700">차수/개정구분</TableCell>
-                      <TableCell className="font-bold text-slate-700" align="center">공포일자</TableCell>
-                      <TableCell className="font-bold text-slate-700" align="center">공포번호</TableCell>
-                      <TableCell className="font-bold text-slate-700" align="center">시행일자</TableCell>
-                      <TableCell className="font-bold text-slate-700">주요 제·개정 이유</TableCell>
-                      <TableCell className="font-bold text-slate-700" align="center">본문조회</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {revisions && revisions.length > 0 ? (
-                      revisions.map((rev: any) => {
-                        if (!rev) return null;
-                        const isCurrent = currentRevision?.id === rev.id;
-                        return (
-                          <TableRow
-                            key={rev.id}
-                            className={`hover:bg-slate-50 transition-colors ${isCurrent ? "bg-blue-50/40" : ""}`}
-                          >
-                            <TableCell className="font-semibold text-blue-900">
-                              {rev.versionName}
-                              {isCurrent && (
-                                <span className="ml-2 bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">
-                                  조회중
-                                </span>
-                              )}
-                            </TableCell>
-                            <TableCell align="center">
-                              {new Date(rev.enactmentDate).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell align="center">{rev.announcementNumber}</TableCell>
-                            <TableCell align="center">
-                              {new Date(rev.effectiveDate).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell className="text-slate-600 max-w-xs truncate" title={rev.description || "이유 없음"}>
-                              {rev.description || "-"}
-                            </TableCell>
-                            <TableCell align="center">
-                              <Button
-                                size="small"
-                                variant={isCurrent ? "contained" : "outlined"}
-                                color="primary"
-                                onClick={() => handleVersionSelect(rev.version)}
-                                className="text-xs px-2.5 py-1"
-                              >
-                                조회
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={6} align="center" className="py-12 text-slate-400">
-                          제·개정 연혁 이력이 기록되지 않았습니다.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </div>
-          )}
-
-          {/* [Tab 2] 신구조문 대비표 탭 */}
-          {activeTab === 2 && (
-            <div className="animate-fade-in space-y-6">
-              {currentRevision?.comparisons && currentRevision.comparisons.length > 0 ? (
-                currentRevision.comparisons.map((comp: any) => {
-                  if (!comp) return null;
-                  return (
-                    <div key={comp.id} className="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
-                      {/* 대비 헤더 */}
-                      <div className="bg-slate-50 px-5 py-3 border-b border-slate-100 flex justify-between items-center text-sm font-semibold text-slate-700">
-                        <span>
-                          {comp.beforeArticle
-                            ? `제${comp.beforeArticle.articleNumber}조(${comp.beforeArticle.title}) 대비`
-                            : `신설조문 - 제${comp.afterArticle?.articleNumber}조(${comp.afterArticle?.title})`}
-                        </span>
-                        {comp.note && (
-                          <span className="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded">
-                            비고: {comp.note}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* 2단 분할 대비 내용 */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
-                        {/* 1) 개정 전 조항 */}
-                        <div className="p-5">
-                          <p className="text-xs text-rose-600 font-bold mb-2 uppercase tracking-wide">
-                            개정 전 (구조문)
-                          </p>
-                          {comp.beforeArticle ? (
-                            <div>
-                              <p className="font-bold text-slate-800 text-sm mb-2">
-                                제{comp.beforeArticle.articleNumber}조 ({comp.beforeArticle.title})
-                              </p>
-                              <div className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">
-                                {comp.beforeArticle.contentText}
-                              </div>
-                            </div>
-                          ) : (
-                            <p className="text-slate-400 text-sm italic">해당 조항 없음 (신설)</p>
-                          )}
-                        </div>
-
-                        {/* 2) 개정 후 조항 */}
-                        <div className="p-5 bg-emerald-50/10">
-                          <p className="text-xs text-emerald-600 font-bold mb-2 uppercase tracking-wide">
-                            개정 후 (현행조문)
-                          </p>
-                          {comp.afterArticle ? (
-                            <div>
-                              <p className="font-bold text-slate-800 text-sm mb-2">
-                                제{comp.afterArticle.articleNumber}조 ({comp.afterArticle.title})
-                              </p>
-                              <div className="text-slate-800 text-sm leading-relaxed whitespace-pre-wrap font-medium">
-                                {comp.afterArticle.contentText}
-                              </div>
-                            </div>
-                          ) : (
-                            <p className="text-rose-600 text-sm italic">해당 조항 폐지</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="bg-white text-center py-16 border border-slate-200 rounded-xl text-slate-400 shadow-sm">
-                  <CompareArrowsIcon sx={{ fontSize: 50 }} className="mb-2 text-slate-300" />
-                  <p className="text-lg font-medium">신구조문 대비표 정보가 존재하지 않습니다.</p>
-                  <p className="text-xs mt-1 text-slate-400">
-                    본 개정 차수에는 등록된 대비표 매핑 데이터가 없거나, 단순 제정(신설) 건일 수 있습니다.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* [Tab 3] 관련 서식 / 첨부파일 탭 */}
-          {activeTab === 3 && (
-            <div className="animate-fade-in bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <FileDownloadIcon className="text-blue-700" />
-                규정 관련 첨부서식 다운로드
-              </h3>
-              <p className="text-sm text-slate-500 mb-6">
-                본 규정과 관련된 기안지, 별지 서식, 작성 가이드 및 관련 파일 목록입니다. 파일명을 클릭하면 즉시 안전하게 다운로드가 실행됩니다.
-              </p>
-
-              {attachments && attachments.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {attachments.map((file: any) => {
-                    if (!file) return null;
-                    const isHwp = file.fileType?.toLowerCase() === "hwp";
-                    const isPdf = file.fileType?.toLowerCase() === "pdf";
-
-                    let typeBg = "bg-slate-100 text-slate-600";
-                    if (isHwp) typeBg = "bg-rose-50 text-rose-700 border border-rose-100";
-                    if (isPdf) typeBg = "bg-red-50 text-red-700 border border-red-100";
-
-                    return (
-                      <a
-                        key={file.id}
-                        href={`/api/download?fileUrl=${encodeURIComponent(file.fileUrl)}`}
-                        download
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-4 p-4 border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-blue-300 transition-all premium-card-hover group"
-                      >
-                        <span className={`w-12 h-12 flex items-center justify-center rounded-lg font-bold text-xs uppercase ${typeBg}`}>
-                          {file.fileType || "FILE"}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-bold text-slate-800 truncate group-hover:text-blue-700 transition-colors">
-                            {file.title}
-                          </h4>
-                          {file.fileSize && (
-                            <p className="text-xs text-slate-400 mt-1">
-                              파일크기: {(file.fileSize / 1024).toFixed(1)} KB
-                            </p>
-                          )}
-                        </div>
-                        <FileDownloadIcon className="text-slate-400 group-hover:text-blue-700 transition-colors" />
-                      </a>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-12 text-slate-400 border border-dashed border-slate-200 rounded-lg">
-                  등록된 첨부 파일이나 서식이 존재하지 않습니다.
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
     </div>
   );
 }
