@@ -905,18 +905,18 @@ export default function Home() {
                 <div className="flex flex-col gap-6">
                   
                   {/* 2-1) 최근 제·개정 규정 게시판 */}
-                  <Paper className="p-6 border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px]" elevation={0}>
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3.5 mb-4 shrink-0">
-                      <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <GavelIcon className="text-blue-800" />
+                  <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px] overflow-hidden" elevation={0}>
+                    <div className="bg-[#0c3161] px-5 py-3.5 flex items-center justify-between shrink-0">
+                      <h3 className="text-base font-extrabold text-white flex items-center gap-2 tracking-tight">
+                        <GavelIcon className="text-blue-200" fontSize="small" />
                         최근 제·개정 규정
                       </h3>
-                      <span className="text-xs text-blue-700 font-semibold bg-blue-50 px-2 py-0.5 rounded">
+                      <span className="text-[11px] text-[#0c3161] font-black bg-blue-50 px-2.5 py-0.5 rounded shadow-sm">
                         실시간 반영
                       </span>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 scrollbar">
+                    <div className="flex-1 overflow-y-auto space-y-3.5 p-5 bg-white scrollbar">
                       {loadingRecent ? (
                         <div className="flex justify-center items-center h-full">
                           <CircularProgress size={30} />
@@ -958,18 +958,18 @@ export default function Home() {
                   </Paper>
 
                   {/* 2-2) 최근 공지사항 게시판 */}
-                  <Paper className="p-6 border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px]" elevation={0}>
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3.5 mb-4 shrink-0">
-                      <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <CampaignIcon className="text-amber-500" />
+                  <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px] overflow-hidden" elevation={0}>
+                    <div className="bg-[#092244] px-5 py-3.5 flex items-center justify-between shrink-0">
+                      <h3 className="text-base font-extrabold text-white flex items-center gap-2 tracking-tight">
+                        <CampaignIcon className="text-amber-400" fontSize="small" />
                         최근 공지사항
                       </h3>
-                      <IconButton size="small" onClick={() => window.location.reload()}>
-                        <RefreshIcon className="text-slate-400 text-sm" />
+                      <IconButton size="small" onClick={() => window.location.reload()} sx={{ color: "rgba(255,255,255,0.7)", "&:hover": { color: "white" } }}>
+                        <RefreshIcon fontSize="small" />
                       </IconButton>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 scrollbar">
+                    <div className="flex-1 overflow-y-auto space-y-3.5 p-5 bg-white scrollbar">
                       {loadingNotices ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-3">
                           <CircularProgress size={20} sx={{ color: "#0c3161" }} />
