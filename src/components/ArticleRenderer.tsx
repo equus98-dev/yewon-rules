@@ -38,13 +38,26 @@ export default function ArticleRenderer({
 
   let items: ContentItem[] = [];
   try {
+    let parsed = contentJson;
     if (typeof contentJson === "string") {
-      items = JSON.parse(contentJson);
-    } else if (Array.isArray(contentJson)) {
-      items = contentJson as ContentItem[];
+      parsed = JSON.parse(contentJson);
+    }
+    
+    if (Array.isArray(parsed)) {
+      items = parsed as ContentItem[];
+    } else if (parsed && typeof parsed === "object") {
+      if (Array.isArray(parsed.paragraphs)) {
+        items = parsed.paragraphs.map((p: any) => ({ type: "paragraph", num: "", text: String(p) }));
+      } else {
+        items = [];
+      }
     }
   } catch (e) {
     console.error("Failed to parse contentJson:", e);
+  }
+
+  if (!Array.isArray(items)) {
+    items = [];
   }
 
   let hasSeenBody = false;
