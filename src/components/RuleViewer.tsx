@@ -229,17 +229,7 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
         {/* 우측 본문 */}
         <div className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative">
           <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-start mb-6 border-b border-slate-100 pb-2">
-              <label className="flex items-center gap-1.5 cursor-pointer text-[13px] font-bold text-slate-600 select-none hover:text-blue-700">
-                <input 
-                  type="checkbox" 
-                  checked={hideHistory} 
-                  onChange={() => setHideHistory(!hideHistory)}
-                  className="w-4 h-4 cursor-pointer accent-blue-600"
-                />
-                연혁숨기기
-              </label>
-              
+            <div className="flex justify-end items-start mb-6 border-b border-slate-100 pb-2">
               <div className="text-right text-[13px] font-bold text-slate-500 flex items-center gap-1">
                 <InfoIcon sx={{ fontSize: 16 }} className="text-[#0c3161]" />
                 담당부서: <span className="text-slate-800">{department?.name || "미지정"}</span>

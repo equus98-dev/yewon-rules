@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface ContentItem {
   type: "chapter" | "section" | "article" | "paragraph" | "item" | "subitem" | "text" | string;
@@ -23,6 +25,8 @@ export default function ArticleRenderer({
   contentHtml,
   hideHistory = false,
 }: ArticleRendererProps) {
+  const [modalHistory, setModalHistory] = useState<string[] | null>(null);
+
   if (contentHtml && contentHtml.trim().length > 0) {
     return (
       <div 
@@ -69,7 +73,7 @@ export default function ArticleRenderer({
     const parts = text.split(/(<[^>]*>)/g);
     return parts.map((part, i) => {
       if (part.startsWith("<") && part.endsWith(">")) {
-        return <span key={i} className="text-[#0054FF] text-[13px] ml-1">{part}</span>;
+        return <span key={i} className="text-[#000080] text-[13px] ml-1">{part}</span>;
       }
       return part;
     });
@@ -98,20 +102,19 @@ export default function ArticleRenderer({
         if (item.type === "chapter") {
           return (
             <div key={index} id={`toc-${safeText.replace(/\s/g, '-')}`} className="text-center w-full block mt-12 mb-6 pt-4">
-              <span className="text-[20px] font-black text-slate-800 tracking-tight">
+              <span className="text-[20px] font-black text-[#000080] tracking-tight">
                 {safeText}
               </span>
             </div>
           );
         } else if (item.type === "section") {
           return (
-            <div key={index} className="text-center w-full block text-[18px] font-bold text-slate-800 mt-8 mb-4">
+            <div key={index} className="text-center w-full block text-[18px] font-bold text-[#000080] mt-8 mb-4">
               {safeText}
             </div>
           );
         } else if (item.type === "article") {
           // 뱃지 및 연혁 생성 로직
-          // contentJson 안의 텍스트들을 모두 스캔해서 '개정'이나 '제정' 내역을 찾음
           let historyDates = [];
           for (let i = index; i < items.length; i++) {
             if (i !== index && items[i]?.type === "article") break;
@@ -128,25 +131,34 @@ export default function ArticleRenderer({
 
           // 뱃지 결정 (임의로 개정 이력이 있으면 [개], 없으면 [연] 표시)
           const badgeType = historyDates.some(h => h.includes("개정")) ? "개" : "연";
-          const badgeColor = badgeType === "개" ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-blue-50 text-blue-600 border border-blue-200";
+          const badgeColor = badgeType === "개" ? "bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100" : "bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100";
+
+          // 제목 추출 (예: "(목적)")
+          let parsedTitle = "";
+          let parsedBody = safeText;
+          if (safeText.startsWith("(")) {
+            const match = safeText.match(/^(\([^)]+\))(.*)/);
+            if (match) {
+              parsedTitle = match[1];
+              parsedBody = match[2];
+            }
+          }
 
           return (
             <div key={index} id={`toc-${safeNum}`} className="mt-8 mb-2 text-[14.5px] text-slate-800 leading-[1.7] flex items-start gap-2 pt-2 relative w-full">
               {!hideHistory && (
-                <span className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 ${badgeColor}`}>
+                <button 
+                  onClick={() => setModalHistory(historyDates.length > 0 ? historyDates : ["개정 이력이 없습니다."])}
+                  className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors ${badgeColor}`}
+                >
                   {badgeType}
-                </span>
+                </button>
               )}
               <div className="flex-1 w-full flex flex-col md:flex-row md:items-baseline md:justify-between">
                 <div className="flex-1">
-                  <span className="font-bold mr-1 text-[#0054FF]">{safeNum}</span>
-                  <span className="font-bold text-slate-800">{renderTextWithHistory(safeText)}</span>
+                  <span className="font-bold mr-1 text-[#000080]">{safeNum}{parsedTitle}</span>
+                  <span className="font-normal text-slate-800">{renderTextWithHistory(parsedBody)}</span>
                 </div>
-                {!hideHistory && historyDates.length > 0 && (
-                  <div className="text-[12px] text-blue-600 font-medium whitespace-pre-wrap text-right ml-4 shrink-0 mt-1 md:mt-0 opacity-80">
-                    {historyDates.join("\n")}
-                  </div>
-                )}
               </div>
             </div>
           );
@@ -196,6 +208,22 @@ export default function ArticleRenderer({
           }
         }
       })}
+
+      <Dialog open={modalHistory !== null} onClose={() => setModalHistory(null)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ p: 0 }}>
+          <div className="flex justify-between items-center bg-slate-50 border-b border-slate-200 px-4 py-3">
+            <span className="text-[15px] font-bold text-slate-800">개정 이력</span>
+            <IconButton size="small" onClick={() => setModalHistory(null)} sx={{ p: 0.5 }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </div>
+        </DialogTitle>
+        <DialogContent className="p-6 bg-white">
+          <pre className="whitespace-pre-wrap text-[13.5px] font-['Pretendard'] text-slate-700 leading-relaxed font-medium mt-2">
+            {modalHistory?.join("\n")}
+          </pre>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

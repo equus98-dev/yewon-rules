@@ -191,7 +191,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
 
       // 아이콘 매칭: 폴더 색상을 남서울대 스타일의 cool slate-blue(#5d7a8c)로 맵핑
       const icon = isFile ? (
-        <ArticleIcon className="text-blue-800 text-[18px] shrink-0" />
+        <ArticleIcon className="text-slate-400 text-[18px] shrink-0" />
       ) : (
         <FolderIcon className="text-[#5d7a8c] text-[18px] shrink-0" />
       );
