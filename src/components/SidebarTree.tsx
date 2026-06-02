@@ -464,7 +464,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule }: SidebarTreeP
                   return (
                     <a
                       key={att.id}
-                      href={att.fileUrl}
+                      href={`/api/download?fileUrl=${encodeURIComponent(att.fileUrl)}`}
                       download
                       target="_blank"
                       rel="noopener noreferrer"

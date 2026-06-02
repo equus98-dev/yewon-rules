@@ -417,7 +417,7 @@ export default function RuleViewer({ ruleId }: RuleViewerProps) {
                     return (
                       <a
                         key={file.id}
-                        href={file.fileUrl}
+                        href={`/api/download?fileUrl=${encodeURIComponent(file.fileUrl)}`}
                         download
                         target="_blank"
                         rel="noopener noreferrer"
