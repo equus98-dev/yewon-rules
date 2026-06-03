@@ -64,7 +64,7 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
         // 부칙 (8000번대)인 경우 하위 조항을 TOC에 개별적으로 넣지 않고 '부칙' 하나만 추가
         if (a.articleNumber >= 8000 && a.articleNumber < 9000) {
            if (!toc.some(t => t.text.replace(/\s+/g, '') === "부칙")) {
-               toc.push({ type: "chapter", id: "toc-addendum", text: "부칙" });
+               toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: "부칙" });
            }
            return;
         }
@@ -88,15 +88,6 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
         console.error("TOC parsing error", e);
       }
     });
-    
-    // Add attachments to TOC if any
-    if (ruleData?.attachments && ruleData.attachments.length > 0) {
-      toc.push({ type: "chapter", id: "toc-attachments", text: "별표 / 서식" });
-      ruleData.attachments.forEach((att: any, idx: number) => {
-        const title = att.title.replace(/\.(hwp|pdf|doc|docx|xls|xlsx)$/i, "");
-        toc.push({ type: "article", id: `toc-attachment-${idx}`, text: title });
-      });
-    }
     
     return toc;
   }, [currentRevision, ruleData?.attachments]);
