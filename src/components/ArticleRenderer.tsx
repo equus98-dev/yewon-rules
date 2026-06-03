@@ -17,6 +17,7 @@ interface ArticleRendererProps {
   contentJson: any; // Prisma JsonValue
   contentHtml?: string | null;
   hideHistory?: boolean;
+  hasHtmlAttachments?: boolean;
 }
 
 export default function ArticleRenderer({
@@ -26,6 +27,7 @@ export default function ArticleRenderer({
   contentJson,
   contentHtml,
   hideHistory = false,
+  hasHtmlAttachments = true,
 }: ArticleRendererProps) {
   const [modalHistory, setModalHistory] = useState<string[] | null>(null);
 
@@ -34,16 +36,28 @@ export default function ArticleRenderer({
     const isOrgChart = title.includes("조직도") || title.includes("기구표") || contentHtml.includes("조직도");
     const wrapperClass = isOrgChart ? "org-chart-wrapper" : "html-table-wrapper";
 
+    let cleanHtml = contentHtml;
+    if (articleNumber >= 9000) {
+      // HWP 파싱 중 HTML 자체에 별지 제목이 중복 포함된 경우 이를 제거 (첫 번째 P 태그가 제목인 경우)
+      const match = cleanHtml.match(/^(\s*<p[^>]*>.*?<\/p>\s*)/i);
+      if (match) {
+        const pText = match[0].replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
+        if (/^(?:\[|〔)(별지|별표|서식)/.test(pText)) {
+          cleanHtml = cleanHtml.replace(match[0], '');
+        }
+      }
+    }
+
     return (
       <div id={id} className="animate-fade-in rule-viewer-content font-['Pretendard'] w-full">
         {articleNumber >= 9000 && (
-          <div className="mt-16 mb-8 border-t-2 border-slate-300 pt-10 text-center w-full">
-            <span className="text-[22px] font-black text-[#000080] tracking-tight">{title}</span>
+          <div className="mt-16 mb-8 border-t-2 border-slate-300 pt-10 text-left w-full">
+            <span className="text-[20px] font-black text-[#000080] tracking-tight">{title}</span>
           </div>
         )}
         <div 
           className={`mb-8 ql-editor ${wrapperClass} px-0 py-2 w-full`}
-          dangerouslySetInnerHTML={{ __html: contentHtml }}
+          dangerouslySetInnerHTML={{ __html: cleanHtml }}
         />
       </div>
     );
@@ -73,15 +87,23 @@ export default function ArticleRenderer({
     items = [];
   }
 
-  // 본문 하단(또는 부칙 하단)에 딸려들어온 별표/별지/서식 텍스트는 이미지 첨부파일로 대체되므로, 본문 렌더링에서 제외합니다.
+  let textAttachments: ContentItem[] = [];
+
   const attachmentStartIndex = items.findIndex((item) => {
     if (!item || !item.text) return false;
     const textStr = String(item.text).trim();
-    return textStr.startsWith("[별지") || textStr.startsWith("[별표") || textStr.startsWith("[서식");
+    return /^(?:\[|〔)(별지|별표|서식)/.test(textStr);
   });
 
   if (attachmentStartIndex !== -1) {
-    items = items.slice(0, attachmentStartIndex);
+    if (hasHtmlAttachments) {
+      // 본문 하단(또는 부칙 하단)에 딸려들어온 별표/별지/서식 텍스트는 별도 HTML 첨부파일이 있으므로 숨김 처리
+      items = items.slice(0, attachmentStartIndex);
+    } else {
+      // HTML 첨부파일이 없는 규정의 경우(예: 문화예술대학원 학사운영 규정) 텍스트를 별지 데이터로 살려서 렌더링
+      textAttachments = items.slice(attachmentStartIndex);
+      items = items.slice(0, attachmentStartIndex);
+    }
   }
 
   let hasSeenBody = false;
@@ -284,6 +306,25 @@ export default function ArticleRenderer({
             );
           }
         }
+      })}
+
+      {/* HTML 파일이 없는 텍스트 기반 별지 렌더링 */}
+      {textAttachments.map((item, index) => {
+        const textStr = String(item.text || "").trim();
+        const isTitle = /^(?:\[|〔)(별지|별표|서식)/.test(textStr);
+        if (isTitle) {
+           const safeText = textStr.replace(/^〔/, '[').replace(/〕$/, ']');
+           return (
+              <div key={`attach-${index}`} id={`toc-text-attach-${articleNumber}-${index}`} className="mt-16 mb-8 border-t-2 border-slate-300 pt-10 text-left w-full">
+                <span className="text-[20px] font-black text-[#000080] tracking-tight">{safeText}</span>
+              </div>
+           );
+        }
+        return (
+           <div key={`attach-${index}`} className="ml-4 mb-2 text-[15px] leading-[1.7] text-slate-800 break-keep">
+             {renderTextWithHistory(textStr)}
+           </div>
+        );
       })}
 
       <Dialog open={modalHistory !== null} onClose={() => setModalHistory(null)} maxWidth="sm" fullWidth>

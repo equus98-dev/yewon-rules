@@ -68,6 +68,25 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
            if (!toc.some(t => t.text.replace(/\s+/g, '') === "부칙")) {
                toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: "부칙" });
            }
+           
+           // HTML 별지가 없는 경우 부칙 내의 텍스트 기반 별지를 스캔하여 TOC에 추가
+           const hasHtmlAttachments = currentRevision.articles.some((art: any) => art.articleNumber >= 9000);
+           if (!hasHtmlAttachments) {
+              const textAttachments = items.filter((item: any) => {
+                 if (!item || !item.text) return false;
+                 return /^(?:\[|〔)(별지|별표|서식)/.test(String(item.text).trim());
+              });
+              if (textAttachments.length > 0) {
+                 if (!toc.some(t => t.id === "toc-attachments")) {
+                    toc.push({ type: "chapter", id: "toc-attachments", text: "별지 목록" });
+                 }
+                 textAttachments.forEach((item: any, i: number) => {
+                    let safeText = String(item.text).trim();
+                    safeText = safeText.replace(/^〔/, '[').replace(/〕$/, ']'); // TOC 표시용 괄호 정규화
+                    toc.push({ type: "attachment", id: `toc-text-attach-${a.articleNumber}-${i}`, text: safeText });
+                 });
+              }
+           }
            return;
         }
         
@@ -295,19 +314,24 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
             {/* 조항 렌더링 */}
             {currentRevision?.articles && currentRevision.articles.length > 0 ? (
               <div className="pb-32">
-                {currentRevision.articles.map((article: any) => (
-                  <ArticleRenderer 
-                    key={`article-${article.id}`}
-                    id={`toc-${article.articleNumber}`}
-                    chapter={article.chapter}
-                    section={article.section}
-                    articleNumber={article.articleNumber}
-                    title={article.title}
-                    contentJson={article.contentJson}
-                    contentHtml={article.contentHtml}
-                    hideHistory={hideHistory}
-                  />
-                ))}
+                {currentRevision.articles.map((a: any) => {
+                  const hasHtmlAttachments = currentRevision?.articles?.some((art: any) => art.articleNumber >= 9000) || false;
+                  
+                  return (
+                    <ArticleRenderer
+                      key={a.id}
+                      id={`toc-${a.articleNumber}`}
+                      chapter={a.chapter}
+                      section={a.section}
+                      articleNumber={a.articleNumber}
+                      title={a.title}
+                      contentJson={a.contentJson}
+                      contentHtml={a.contentHtml}
+                      hideHistory={hideHistory}
+                      hasHtmlAttachments={hasHtmlAttachments}
+                    />
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-20 text-slate-400">조항 내용이 없습니다.</div>
