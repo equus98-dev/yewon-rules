@@ -60,6 +60,15 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
       try {
         let items = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
         if (!Array.isArray(items)) return;
+
+        // 부칙 (8000번대)인 경우 하위 조항을 TOC에 개별적으로 넣지 않고 '부칙' 하나만 추가
+        if (a.articleNumber >= 8000 && a.articleNumber < 9000) {
+           if (!toc.some(t => t.text.replace(/\s+/g, '') === "부칙")) {
+               toc.push({ type: "chapter", id: "toc-addendum", text: "부칙" });
+           }
+           return;
+        }
+
         items.forEach((item: any) => {
           if (!item || typeof item !== 'object') return;
           if (item.type === "chapter") {
