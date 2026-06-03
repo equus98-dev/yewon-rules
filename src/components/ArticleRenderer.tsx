@@ -199,7 +199,8 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "item") {
           const isAddendum = isAddendumItem(safeText);
-          const showAddendumHeader = isAddendum && !addendumStarted;
+          const isNumOne = safeNum.trim() === "1." || safeNum.trim() === "1";
+          const showAddendumHeader = isAddendum && (!addendumStarted || isNumOne);
           if (isAddendum) addendumStarted = true;
 
           return (
