@@ -290,19 +290,11 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
                       {attachments.map((att: any, idx: number) => {
                         const title = att.title.replace(/\.(hwp|pdf|doc|docx|xls|xlsx)$/i, "");
                         return (
-                          <div key={att.id} id={`toc-attachment-${idx}`} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-lg hover:bg-blue-50 transition-colors">
+                          <div key={att.id} id={`toc-attachment-${idx}`} className="flex items-center p-4 bg-slate-50 border border-slate-200 rounded-lg hover:bg-blue-50 transition-colors">
                             <div className="flex items-center gap-3">
                               <AttachFileIcon className="text-slate-400" />
                               <span className="font-bold text-slate-700 text-[14.5px]">{title}</span>
                             </div>
-                            <a
-                              href={`/api/download?fileUrl=${encodeURIComponent(att.fileUrl)}`}
-                              download
-                              className="flex items-center gap-1.5 px-4 py-2 bg-white border border-blue-200 text-blue-700 text-[13px] font-bold rounded shadow-sm hover:bg-blue-600 hover:text-white transition-all"
-                            >
-                              <FileDownloadIcon sx={{ fontSize: 16 }} />
-                              다운로드
-                            </a>
                           </div>
                         );
                       })}
