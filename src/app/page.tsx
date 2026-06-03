@@ -49,30 +49,52 @@ export default function Home() {
   const [selectedNotice, setSelectedNotice] = useState<any | null>(null);
   const [noticeModalOpen, setNoticeModalOpen] = useState(false);
 
-  // 관리자 인증 상태
+  // 관리자 인증 상태 및 세션 타이머
   const [isAdmin, setIsAdmin] = useState(false);
+  const [sessionTimeLeft, setSessionTimeLeft] = useState<number>(1800);
 
   useEffect(() => {
-    const sessionTime = localStorage.getItem("yewon_admin_session");
-    if (sessionTime && sessionTime !== "authorized") {
-      const time = parseInt(sessionTime, 10);
-      if (Date.now() - time < 30 * 60 * 1000) {
-        setIsAdmin(true);
-        // 세션 연장
+    let timerId: NodeJS.Timeout;
+
+    const checkSession = () => {
+      const sessionTime = localStorage.getItem("yewon_admin_session");
+      if (sessionTime && sessionTime !== "authorized") {
+        const time = parseInt(sessionTime, 10);
+        const elapsed = Math.floor((Date.now() - time) / 1000);
+        const remaining = 1800 - elapsed;
+        if (remaining > 0) {
+          setIsAdmin(true);
+          setSessionTimeLeft(remaining);
+        } else {
+          // 세션 만료
+          localStorage.removeItem("yewon_admin_session");
+          setIsAdmin(false);
+          window.location.reload();
+        }
+      } else if (sessionTime === "authorized") {
         localStorage.setItem("yewon_admin_session", Date.now().toString());
+        setIsAdmin(true);
+        setSessionTimeLeft(1800);
       } else {
-        localStorage.removeItem("yewon_admin_session");
+        setIsAdmin(false);
       }
-    } else if (sessionTime === "authorized") {
-      localStorage.setItem("yewon_admin_session", Date.now().toString());
-      setIsAdmin(true);
-    }
+    };
+
+    checkSession();
+    timerId = setInterval(checkSession, 1000);
+
+    return () => clearInterval(timerId);
   }, []);
 
   const handleAdminLogout = () => {
     localStorage.removeItem("yewon_admin_session");
     setIsAdmin(false);
     window.location.reload();
+  };
+
+  const handleExtendSession = () => {
+    localStorage.setItem("yewon_admin_session", Date.now().toString());
+    setSessionTimeLeft(1800);
   };
 
   // 공지사항 로드 함수
@@ -290,9 +312,23 @@ export default function Home() {
           {/* 관리자 로그인 버튼 추가 */}
           {isAdmin ? (
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-[#0c3161] select-none">
-                관리자님 안녕하세요!
-              </span>
+              <div className="flex items-center gap-1.5 mr-1">
+                <span className="text-sm font-bold text-[#0c3161] select-none">
+                  관리자님 안녕하세요!
+                </span>
+                <div className="flex items-center bg-slate-100 rounded-full px-2 py-0.5 border border-slate-200 shadow-inner">
+                  <span className="text-[11px] font-black text-rose-600 mr-1.5 font-mono w-[34px] text-center">
+                    {Math.floor(sessionTimeLeft / 60)}:{String(sessionTimeLeft % 60).padStart(2, "0")}
+                  </span>
+                  <button
+                    onClick={handleExtendSession}
+                    className="text-[10px] font-bold bg-white text-slate-600 border border-slate-300 rounded px-1.5 py-0.5 hover:bg-slate-50 hover:text-blue-700 transition-colors cursor-pointer active:scale-95"
+                    title="세션 시간 30분으로 연장"
+                  >
+                    연장
+                  </button>
+                </div>
+              </div>
               <Button
                 component={Link}
                 href="/admin"
@@ -307,7 +343,7 @@ export default function Home() {
                   py: 0.5,
                   minHeight: "32px",
                 }}
-                className="font-bold text-xs active:scale-95 transition-all text-white font-sans ml-1"
+                className="font-bold text-xs active:scale-95 transition-all text-white font-sans"
               >
                 관리자 페이지
               </Button>
