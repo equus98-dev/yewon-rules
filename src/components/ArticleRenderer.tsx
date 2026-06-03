@@ -91,7 +91,7 @@ export default function ArticleRenderer({
     // 테이블 등 HTML 태그가 포함되어 있다면 dangerouslySetInnerHTML 사용
     if (/<table|<tr|<td|<th|<br|<p/i.test(htmlText)) {
       return (
-        <span 
+        <div 
           className="html-table-wrapper block w-full overflow-x-auto"
           dangerouslySetInnerHTML={{ __html: htmlText }} 
         />
@@ -128,6 +128,7 @@ export default function ArticleRenderer({
         const safeText = item.text !== null && item.text !== undefined ? String(item.text) : "";
 
         if (item.type === "chapter") {
+          if (index > 0 && items[index - 1]?.type === "chapter" && items[index - 1]?.text === item.text) return null;
           return (
             <div key={index} id={`toc-${safeText.replace(/\s/g, '-')}`} className="text-center w-full block mt-12 mb-6 pt-4">
               <span className="text-[20px] font-black text-[#000080] tracking-tight">
@@ -136,6 +137,7 @@ export default function ArticleRenderer({
             </div>
           );
         } else if (item.type === "section") {
+          if (index > 0 && items[index - 1]?.type === "section" && items[index - 1]?.text === item.text) return null;
           return (
             <div key={index} className="text-center w-full block text-[18px] font-bold text-[#000080] mt-8 mb-4">
               {safeText}

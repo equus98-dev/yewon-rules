@@ -64,7 +64,12 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
           if (!item || typeof item !== 'object') return;
           if (item.type === "chapter") {
             const chapterText = typeof item.text === 'string' ? item.text : String(item.text || "");
+            if (toc.length > 0 && toc[toc.length - 1].type === "chapter" && toc[toc.length - 1].text === chapterText) return;
             toc.push({ type: "chapter", id: `toc-${chapterText.replace(new RegExp("\\s", "g"), '-')}`, text: chapterText });
+          } else if (item.type === "section") {
+            const sectionText = typeof item.text === 'string' ? item.text : String(item.text || "");
+            if (toc.length > 0 && toc[toc.length - 1].type === "section" && toc[toc.length - 1].text === sectionText) return;
+            toc.push({ type: "section", id: `toc-${sectionText.replace(new RegExp("\\s", "g"), '-')}`, text: sectionText });
           } else if (item.type === "article") {
             const articleNum = typeof item.num === 'string' ? item.num : String(item.num || "");
             toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
