@@ -62,7 +62,17 @@ function EditorContent() {
       try {
         const res = await fetch("/api/admin/rules");
         const data = await res.json();
-        setRules(data);
+        const sortedData = data.sort((a: any, b: any) => {
+          const aParts = (a.ruleNumber || "").split('-').map(Number);
+          const bParts = (b.ruleNumber || "").split('-').map(Number);
+          for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+            const aVal = aParts[i] || 0;
+            const bVal = bParts[i] || 0;
+            if (aVal !== bVal) return aVal - bVal;
+          }
+          return a.title.localeCompare(b.title);
+        });
+        setRules(sortedData);
         if (ruleIdParam) {
           setSelectedRuleId(ruleIdParam);
         } else if (data.length > 0) {
