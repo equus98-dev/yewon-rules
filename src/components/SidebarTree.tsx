@@ -199,7 +199,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
       // 폐지 규정은 흐리게 및 취소선 표시
       const labelStyle = node.status === "ABOLISHED" ? "line-through text-slate-400" : "";
       const textStyle = isFile 
-        ? "text-[15.5px] font-extrabold text-slate-800 tracking-tight" 
+        ? "text-[14.5px] font-medium text-slate-800 tracking-tight" 
         : "text-[14.5px] font-bold text-slate-700";
 
       return (

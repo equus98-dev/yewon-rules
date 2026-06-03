@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { CircularProgress, Typography } from "@mui/material";
 import ArticleRenderer from "./ArticleRenderer";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -9,6 +9,7 @@ import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import ArticleIcon from "@mui/icons-material/Article";
 import InfoIcon from "@mui/icons-material/Info";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 interface RuleViewerProps {
   ruleId: string;
@@ -50,6 +51,7 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
   const [ruleData, setRuleData] = useState<any>(null);
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
   const [hideHistory, setHideHistory] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const currentRevision = ruleData?.currentRevision;
 
@@ -119,9 +121,12 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
     loadRule();
   }, [ruleId, selectedVersion]);
 
-  // ruleId가 바뀔 때마다 버전 초기화
+  // ruleId가 바뀔 때마다 버전 초기화 및 스크롤 맨 위로 이동
   useEffect(() => {
     setSelectedVersion(null);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
   }, [ruleId]);
 
   if (loading && !ruleData) {
@@ -255,7 +260,7 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
         </div>
 
         {/* 우측 본문 */}
-        <div className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative scroll-smooth">
           <div className="max-w-4xl mx-auto">
             <div className="flex justify-end items-start mb-6 border-b border-slate-100 pb-2">
               <div className="text-right text-[13px] font-bold text-slate-500 flex items-center gap-1">
@@ -270,9 +275,9 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
             {currentRevision?.articles && currentRevision.articles.length > 0 ? (
               <div className="pb-32">
                 {currentRevision.articles.map((article: any) => (
-                  <ArticleRenderer
-                    key={article.id}
-                    id={article.id}
+                  <ArticleRenderer 
+                    key={`article-${article.id}`}
+                    id={`toc-${article.articleNumber}`}
                     chapter={article.chapter}
                     section={article.section}
                     articleNumber={article.articleNumber}
@@ -282,13 +287,24 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
                     hideHistory={hideHistory}
                   />
                 ))}
-
               </div>
             ) : (
-              <div className="text-center py-24 text-slate-400 font-bold text-lg">
-                등록된 조항 정보가 존재하지 않습니다.
-              </div>
+              <div className="text-center py-20 text-slate-400">조항 내용이 없습니다.</div>
             )}
+            
+            {/* 맨위로 가기 버튼 */}
+            <button 
+              onClick={() => {
+                if (scrollRef.current) {
+                  scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+              className="fixed bottom-8 right-10 z-50 bg-white border border-slate-200 text-slate-500 shadow hover:shadow-md hover:text-[#0c3161] hover:border-blue-200 p-2.5 rounded-full transition-all group flex items-center justify-center cursor-pointer"
+              title="맨위로 이동"
+            >
+              <KeyboardArrowUpIcon />
+            </button>
+            
           </div>
         </div>
       </div>
