@@ -308,24 +308,79 @@ export default function ArticleRenderer({
         }
       })}
 
-      {/* HTML 파일이 없는 텍스트 기반 별지 렌더링 */}
-      {textAttachments.map((item, index) => {
-        const textStr = String(item.text || "").trim();
-        const isTitle = /^(?:\[|〔)(별지|별표|서식)/.test(textStr);
-        if (isTitle) {
-           const safeText = textStr.replace(/^〔/, '[').replace(/〕$/, ']');
-           return (
-              <div key={`attach-${index}`} id={`toc-text-attach-${articleNumber}-${index}`} className="mt-10 mb-6 border-t border-slate-300 pt-6 text-left w-full">
-                <span className="text-[17px] font-bold text-[#000080] tracking-tight">{safeText}</span>
-              </div>
-           );
+      {/* HTML 파일이 없는 텍스트 기반 별지 렌더링 (디자인 포맷팅 적용) */}
+      {(() => {
+        const groups: { title: string, id: string, items: any[] }[] = [];
+        let currentGroup: { title: string, id: string, items: any[] } | null = null;
+
+        for (let i = 0; i < textAttachments.length; i++) {
+          const item = textAttachments[i];
+          const textStr = String(item.text || "").trim();
+          const isTitle = /^(?:\[|〔)(별지|별표|서식)/.test(textStr);
+          
+          if (isTitle) {
+            if (currentGroup) groups.push(currentGroup);
+            const safeText = textStr.replace(/^〔/, '[').replace(/〕$/, ']');
+            currentGroup = { title: safeText, id: `toc-text-attach-${articleNumber}-${i}`, items: [] };
+          } else {
+            if (!currentGroup) {
+               currentGroup = { title: "", id: `toc-text-attach-${articleNumber}-fallback`, items: [] };
+            }
+            currentGroup.items.push(item);
+          }
         }
-        return (
-           <div key={`attach-${index}`} className="ml-4 mb-2 text-[15px] leading-[1.7] text-slate-800 break-keep">
-             {renderTextWithHistory(textStr)}
+        if (currentGroup) groups.push(currentGroup);
+
+        return groups.map((g, gIdx) => (
+           <div key={`group-${gIdx}`} className="mt-10 mb-12 w-full">
+             {g.title && (
+               <div id={g.id} className="mb-4 border-t border-slate-300 pt-6 text-left w-full">
+                 <span className="text-[17px] font-bold text-[#000080] tracking-tight">{g.title}</span>
+               </div>
+             )}
+             {g.items.length > 0 && (
+               <div className="bg-[#fdfdfd] border border-slate-200 rounded-md p-10 shadow-[0_2px_12px_rgba(0,0,0,0.04)] w-full">
+                 <div className="flex flex-col gap-2 w-full">
+                   {g.items.map((item, i) => {
+                      const textStr = String(item.text || "").trim();
+                      if (!textStr) return null;
+                      
+                      let fullTextStr = textStr;
+                      if (item.num) {
+                        fullTextStr = `${item.num} ${textStr}`;
+                      }
+                      
+                      let itemClass = "text-[15px] leading-[1.8] text-slate-800 break-keep";
+                      
+                      // 문서 양식 자동 스타일링 휴리스틱
+                      if (i === 0 && fullTextStr.length < 30 && !item.num) {
+                         itemClass += " text-center font-black text-[22px] tracking-wide mb-10 mt-2";
+                      } else if (fullTextStr === "- 다 음 -") {
+                         itemClass += " text-center font-bold my-6";
+                      } else if (fullTextStr.includes("년") && fullTextStr.includes("월") && fullTextStr.includes("일") && fullTextStr.length < 20) {
+                         itemClass += " text-center mt-16 mb-6 tracking-widest text-[16px]";
+                      } else if (fullTextStr.includes("(인)") || fullTextStr.includes("서명") || fullTextStr.startsWith("신 청 인") || fullTextStr.startsWith("저작자")) {
+                         itemClass += " text-right font-bold text-[16px] pr-8 mb-8";
+                      } else if (fullTextStr.includes("총장 귀하") || fullTextStr.includes("총 장 귀 하")) {
+                         itemClass += " text-center font-black text-[22px] tracking-widest mt-12 mb-6";
+                      } else if (item.type === "item" || item.type === "subitem" || /^\d+\./.test(fullTextStr)) {
+                         itemClass += " ml-4 mb-2 text-justify";
+                      } else {
+                         itemClass += " text-justify mb-2";
+                      }
+
+                      return (
+                        <div key={`item-${i}`} className={itemClass}>
+                          {renderTextWithHistory(fullTextStr)}
+                        </div>
+                      );
+                   })}
+                 </div>
+               </div>
+             )}
            </div>
-        );
-      })}
+        ));
+      })()}
 
       <Dialog open={modalHistory !== null} onClose={() => setModalHistory(null)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ p: 0 }}>
