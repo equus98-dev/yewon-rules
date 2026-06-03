@@ -153,6 +153,60 @@ export default function ArticleRenderer({
     });
   };
 
+  // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
+  const formatGluedText = (text: string, isArticleBody: boolean = false) => {
+    if (text.length < 150) return <span className={isArticleBody ? "font-normal text-slate-800" : ""}>{renderTextWithHistory(text)}</span>;
+
+    let formatted = text
+      .replace(/(?:^|\s)(①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩|⑪|⑫|⑬|⑭|⑮)/g, '\n$1')
+      .replace(/(?:^|\s)(\d{1,2}\.)\s+(?=[^\d])/g, '\n$1 ')
+      .replace(/(?:^|\s)([가-하]\.)\s+/g, '\n$1 ')
+      .replace(/(?:^|\s)(제\d+조의?\d*\([^)]+\))/g, '\n\n$1')
+      .replace(/(?:^|\s)(제\d+장\s+[^\s]+)/g, '\n\n$1');
+
+    if (!formatted.includes('\n')) return <span className={isArticleBody ? "font-normal text-slate-800" : ""}>{renderTextWithHistory(text)}</span>;
+
+    const lines = formatted.split('\n').map(l => l.trim()).filter(l => l);
+
+    return (
+      <>
+        {lines.map((trimmed, idx) => {
+          let lineClass = "break-keep";
+          let isInline = false;
+
+          if (/^[①-⑮]/.test(trimmed)) {
+             lineClass += " ml-2 mt-3 font-bold text-slate-800 block";
+          } else if (/^\d{1,2}\./.test(trimmed)) {
+             lineClass += " ml-6 text-slate-700 block mt-1";
+          } else if (/^[가-하]\./.test(trimmed)) {
+             lineClass += " ml-10 text-slate-700 block mt-1";
+          } else if (/^제\d+조/.test(trimmed)) {
+             lineClass += " mt-8 text-[16px] font-bold text-[#000080] block";
+          } else if (/^제\d+장/.test(trimmed)) {
+             lineClass += " mt-12 text-[18px] font-black text-center text-[#000080] block";
+          } else {
+             if (idx === 0 && isArticleBody) {
+                isInline = true;
+                lineClass += " font-normal text-slate-800";
+             } else {
+                lineClass += " block mt-1";
+             }
+          }
+
+          if (isInline) {
+             return <span key={`glued-${idx}`} className={lineClass}>{renderTextWithHistory(trimmed)} </span>;
+          }
+
+          return (
+            <div key={`glued-${idx}`} className={lineClass}>
+              {renderTextWithHistory(trimmed)}
+            </div>
+          );
+        })}
+      </>
+    );
+  };
+
   return (
     <div id={id} className="mb-6 animate-fade-in rule-viewer-content font-['Pretendard']">
       {items.map((item, index) => {
@@ -251,7 +305,7 @@ export default function ArticleRenderer({
               <div className="flex-1 w-full flex flex-col md:flex-row md:items-baseline md:justify-between">
                 <div className="flex-1">
                   <span className="font-bold mr-1 text-[#000080]">{safeNum}{parsedTitle}</span>
-                  <span className="font-normal text-slate-800">{renderTextWithHistory(parsedBody)}</span>
+                  {formatGluedText(parsedBody, true)}
                 </div>
               </div>
             </div>
@@ -301,7 +355,7 @@ export default function ArticleRenderer({
             const isAddendum = safeText.replace(/\s+/g, "").startsWith("부칙");
             return (
               <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full ${isAddendum ? 'mt-16 mb-4 font-bold text-[16px] text-left border-t-2 border-slate-300 pt-8' : 'pl-[1.25rem] my-1.5'}`}>
-                {renderTextWithHistory(safeText)}
+                {formatGluedText(safeText, false)}
               </div>
             );
           }
