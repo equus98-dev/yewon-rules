@@ -340,11 +340,10 @@ export default function ArticleRenderer({
                 <a 
                   href="/admin/editor" 
                   target="_blank"
-                  className="shrink-0 whitespace-nowrap mt-0.5 inline-flex items-center gap-0.5 px-1.5 py-[3px] rounded text-[10px] font-bold bg-white text-slate-500 hover:bg-blue-50 hover:text-blue-700 border border-slate-300 shadow-sm transition-all cursor-pointer"
+                  className="w-5 h-5 shrink-0 flex items-center justify-center rounded mt-0.5 cursor-pointer transition-colors bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 hover:text-green-700"
                   title="입안편집기에서 이 조항 수정하기"
                 >
-                  <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                  수정
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                 </a>
               )}
               {!hideHistory && (
