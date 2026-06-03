@@ -315,8 +315,8 @@ export default function ArticleRenderer({
         if (isTitle) {
            const safeText = textStr.replace(/^〔/, '[').replace(/〕$/, ']');
            return (
-              <div key={`attach-${index}`} id={`toc-text-attach-${articleNumber}-${index}`} className="mt-16 mb-8 border-t-2 border-slate-300 pt-10 text-left w-full">
-                <span className="text-[20px] font-black text-[#000080] tracking-tight">{safeText}</span>
+              <div key={`attach-${index}`} id={`toc-text-attach-${articleNumber}-${index}`} className="mt-10 mb-6 border-t border-slate-300 pt-6 text-left w-full">
+                <span className="text-[17px] font-bold text-[#000080] tracking-tight">{safeText}</span>
               </div>
            );
         }
