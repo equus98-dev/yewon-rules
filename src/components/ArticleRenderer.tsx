@@ -61,6 +61,10 @@ export default function ArticleRenderer({
   }
 
   let hasSeenBody = false;
+  let addendumStarted = false;
+
+  const isAddendumItem = (text: string) =>
+    /^\(시행일\)|^\(폐지|^\(적용예외|^\(경과조치|^\(적용범위|^\(준용\)/.test(text.trim());
 
   // 정규식: <개정 ...> 또는 <신설 ...> 등 연혁 텍스트를 파싱하여 스타일을 다르게 적용
   const renderTextWithHistory = (text: string) => {
@@ -194,11 +198,22 @@ export default function ArticleRenderer({
             </div>
           );
         } else if (item.type === "item") {
+          const isAddendum = isAddendumItem(safeText);
+          const showAddendumHeader = isAddendum && !addendumStarted;
+          if (isAddendum) addendumStarted = true;
+
           return (
-            <div key={index} className="flex text-slate-800 text-[14.5px] leading-[1.7] pl-[2.5rem] -ml-[1.25rem] mb-1.5 w-full">
-              <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block text-slate-600">{safeNum}</span>
-              <span className="font-normal flex-1">{renderTextWithHistory(safeText)}</span>
-            </div>
+            <React.Fragment key={index}>
+              {showAddendumHeader && (
+                <div className="mt-20 mb-4 font-bold text-[16px] text-slate-800 border-t-2 border-slate-300 pt-8">
+                  부 칙
+                </div>
+              )}
+              <div className={`flex text-slate-800 text-[14.5px] leading-[1.7] ${isAddendum ? 'pl-[2rem]' : 'pl-[2.5rem]'} -ml-[1.25rem] mb-1.5 w-full`}>
+                <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block text-slate-600">{safeNum}</span>
+                <span className="font-normal flex-1">{renderTextWithHistory(safeText)}</span>
+              </div>
+            </React.Fragment>
           );
         } else if (item.type === "subitem") {
           return (

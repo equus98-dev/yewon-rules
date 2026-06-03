@@ -8,6 +8,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import ArticleIcon from "@mui/icons-material/Article";
 import InfoIcon from "@mui/icons-material/Info";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 
 interface RuleViewerProps {
   ruleId: string;
@@ -73,8 +74,18 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
         console.error("TOC parsing error", e);
       }
     });
+    
+    // Add attachments to TOC if any
+    if (ruleData?.attachments && ruleData.attachments.length > 0) {
+      toc.push({ type: "chapter", id: "toc-attachments", text: "별표 / 서식" });
+      ruleData.attachments.forEach((att: any, idx: number) => {
+        const title = att.title.replace(/\.(hwp|pdf|doc|docx|xls|xlsx)$/i, "");
+        toc.push({ type: "article", id: `toc-attachment-${idx}`, text: title });
+      });
+    }
+    
     return toc;
-  }, [currentRevision]);
+  }, [currentRevision, ruleData?.attachments]);
 
   // 규정 데이터 패치 (선택한 버전 포함)
   useEffect(() => {
@@ -254,6 +265,36 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
                     hideHistory={hideHistory}
                   />
                 ))}
+
+                {/* 첨부파일 (별지/별표) 렌더링 */}
+                {attachments && attachments.length > 0 && (
+                  <div className="mt-24 pt-8 border-t-2 border-slate-300">
+                    <div id="toc-attachments" className="text-center w-full block mb-10">
+                      <span className="text-[20px] font-black text-[#000080] tracking-tight">별표 / 서식</span>
+                    </div>
+                    <div className="space-y-3">
+                      {attachments.map((att: any, idx: number) => {
+                        const title = att.title.replace(/\.(hwp|pdf|doc|docx|xls|xlsx)$/i, "");
+                        return (
+                          <div key={att.id} id={`toc-attachment-${idx}`} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-lg hover:bg-blue-50 transition-colors">
+                            <div className="flex items-center gap-3">
+                              <AttachFileIcon className="text-slate-400" />
+                              <span className="font-bold text-slate-700 text-[14.5px]">{title}</span>
+                            </div>
+                            <a
+                              href={att.fileUrl}
+                              download
+                              className="flex items-center gap-1.5 px-4 py-2 bg-white border border-blue-200 text-blue-700 text-[13px] font-bold rounded shadow-sm hover:bg-blue-600 hover:text-white transition-all"
+                            >
+                              <FileDownloadIcon sx={{ fontSize: 16 }} />
+                              다운로드
+                            </a>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-24 text-slate-400 font-bold text-lg">

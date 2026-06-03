@@ -12,6 +12,24 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
+/** title이 "의N(실제제목)" 형태인 경우를 감지하여 표시용 레이블을 반환 */
+function getArticleLabel(articleNumber: number, title: string): string {
+  const subMatch = title.match(/^의(\d+)\((.*)\)$/);
+  if (subMatch) {
+    return `제${articleNumber}조의${subMatch[1]}(${subMatch[2]})`;
+  }
+  return `제${articleNumber}조${title ? ` (${title})` : ''}`;
+}
+
+/** 조항 번호 뱃지용 짧은 레이블 */
+function getArticleNumBadge(articleNumber: number, title: string): string {
+  const subMatch = title.match(/^의(\d+)/);
+  if (subMatch) {
+    return `제 ${articleNumber} 조의 ${subMatch[1]}`;
+  }
+  return `제 ${articleNumber} 조`;
+}
+
 function EditorContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -450,7 +468,7 @@ function EditorContent() {
                       <div className="flex items-center justify-between gap-4 select-none">
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] font-black bg-slate-100 text-slate-650 px-2 py-0.5 rounded border border-slate-200">
-                            제 {art.articleNumber} 조
+                            {getArticleNumBadge(art.articleNumber, art.title)}
                           </span>
                           {tagText && (
                             <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${tagBg}`}>
@@ -536,14 +554,14 @@ function EditorContent() {
                     if (art.isDeleted) {
                       return (
                         <div key={idx} className="text-slate-400 italic">
-                          제{art.articleNumber}조 ({art.title})은 **삭제**합니다.
+                          {getArticleLabel(art.articleNumber, art.title)}은 **삭제**합니다.
                         </div>
                       );
                     }
                     return (
                       <div key={idx} className="space-y-1">
                         <div className="font-extrabold text-slate-900">
-                          제{art.articleNumber}조 ({art.title})
+                          {getArticleLabel(art.articleNumber, art.title)}
                           {art.isNew && <span className="ml-2 text-emerald-600 text-xs font-bold">[신설]</span>}
                           {art.isModified && <span className="ml-2 text-amber-600 text-xs font-bold">[개정]</span>}
                         </div>
@@ -622,8 +640,8 @@ function EditorContent() {
                         if (hasNoChange) {
                           return (
                             <tr key={num} className="border-b border-slate-100 text-slate-400 select-none">
-                              <td className="py-3 px-5 border-r border-slate-150 italic">제{num}조 ({oldArt.title}) - (생 략)</td>
-                              <td className="py-3 px-5 border-r border-slate-150 italic">제{num}조 ({oldArt.title}) - (현행과 같음)</td>
+                              <td className="py-3 px-5 border-r border-slate-150 italic">{getArticleLabel(num, oldArt.title)} - (생 략)</td>
+                              <td className="py-3 px-5 border-r border-slate-150 italic">{getArticleLabel(num, oldArt.title)} - (현행과 같음)</td>
                               <td className="py-3 px-5 text-center text-slate-400 font-semibold">-</td>
                             </tr>
                           );
@@ -636,7 +654,7 @@ function EditorContent() {
                             <td className="py-4 px-5 border-r border-slate-200 text-slate-700 leading-relaxed align-top">
                               {oldArt ? (
                                 <div className="space-y-1">
-                                  <div className="font-black text-slate-500 font-sans">제{oldArt.articleNumber}조 ({oldArt.title})</div>
+                                  <div className="font-black text-slate-500 font-sans">{getArticleLabel(oldArt.articleNumber, oldArt.title)}</div>
                                   <p className="whitespace-pre-wrap mt-1.5 font-bold">{oldArt.contentText}</p>
                                 </div>
                               ) : (
@@ -650,7 +668,7 @@ function EditorContent() {
                             <td className="py-4 px-5 border-r border-slate-200 text-slate-700 leading-relaxed align-top">
                               {draftArt && !draftArt.isDeleted ? (
                                 <div className="space-y-1">
-                                  <div className="font-black text-[#0c3161] font-sans">제{draftArt.articleNumber}조 ({draftArt.title})</div>
+                                  <div className="font-black text-[#0c3161] font-sans">{getArticleLabel(draftArt.articleNumber, draftArt.title)}</div>
                                   <p className="whitespace-pre-wrap mt-1.5 bg-amber-50 p-2.5 rounded border border-amber-100 text-slate-800 font-bold">
                                     {draftArt.contentText}
                                   </p>
