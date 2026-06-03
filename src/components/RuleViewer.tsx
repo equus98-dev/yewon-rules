@@ -91,6 +91,15 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
       }
     });
     
+    // Add attachments to TOC if any
+    if (ruleData?.attachments && ruleData.attachments.length > 0) {
+      toc.push({ type: "chapter", id: "toc-attachments", text: "별표 / 서식" });
+      ruleData.attachments.forEach((att: any, idx: number) => {
+        const title = att.title.replace(/\.(hwp|pdf|doc|docx|xls|xlsx)$/i, "");
+        toc.push({ type: "attachment", id: `attachment-link-${att.fileUrl}`, text: title });
+      });
+    }
+    
     return toc;
   }, [currentRevision, ruleData?.attachments]);
 
@@ -240,6 +249,8 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
                 itemClass = "mt-4 mb-2 px-2 py-1.5 bg-slate-50 border-y border-slate-200 font-bold text-slate-700 text-[13px] tracking-tight";
               } else if (item.type === "section") {
                 itemClass = "mt-3 mb-1 px-3 py-1 bg-blue-50/30 text-blue-800 font-bold text-[13px] border-l-2 border-blue-500 tracking-tight";
+              } else if (item.type === "attachment") {
+                itemClass = "px-4 py-1 text-slate-600 hover:text-blue-700 hover:font-bold hover:bg-slate-50 cursor-pointer text-[13px] flex gap-1 transition-all flex items-center before:content-['•'] before:mr-1.5 before:text-slate-400";
               } else {
                 // Article items can have slight indent
                 itemClass = "px-4 py-1 text-slate-600 hover:text-blue-700 hover:font-bold hover:bg-slate-50 cursor-pointer text-[13px] flex gap-1 transition-all";
@@ -247,7 +258,8 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
               
               return (
               <li key={idx} className={itemClass}>
-                <a href={`#${item.id}`} className="block w-full" onClick={(e) => {
+                <a href={item.type === "attachment" ? item.id.replace("attachment-link-", "") : `#${item.id}`} target={item.type === "attachment" ? "_blank" : "_self"} className="block w-full" onClick={(e) => {
+                  if (item.type === "attachment") return; // Let the native link open in new tab
                   e.preventDefault();
                   document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}>
@@ -261,15 +273,20 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
 
         {/* 우측 본문 */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative scroll-smooth">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex justify-end items-start mb-6 border-b border-slate-100 pb-2">
-              <div className="text-right text-[13px] font-bold text-slate-500 flex items-center gap-1">
-                <InfoIcon sx={{ fontSize: 16 }} className="text-[#0c3161]" />
-                담당부서: <span className="text-slate-800">{department?.name || "미지정"}</span>
+          <div className="max-w-4xl mx-auto mt-4">
+            {/* 규정 제목 */}
+            <h2 className="text-[26px] font-black text-center text-slate-900 mb-8 tracking-tight break-keep">{title}</h2>
+            
+            {/* 법령 정보 (시행일, 담당부서) */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 border-b-2 border-slate-700 pb-3 gap-3">
+              <div className="text-[14px] font-medium text-[#1E5D9B]">
+                [시행 {currentRevision?.enactmentDate ? new Date(currentRevision.enactmentDate).toLocaleDateString('ko-KR') : "미정"}] 
+                [{currentRevision?.version ? `제${currentRevision.version}호` : ""}{currentRevision?.promulgationDate ? `, ${new Date(currentRevision.promulgationDate).toLocaleDateString('ko-KR')}` : ""}{currentRevision?.revisionType ? `, ${currentRevision.revisionType}` : ""}]
+              </div>
+              <div className="text-right text-[13.5px] font-medium text-slate-700 flex items-center justify-end gap-1">
+                담당부서: <span className="font-bold">{department?.name || "미지정"}</span>
               </div>
             </div>
-
-            <h2 className="text-[34px] font-black text-center text-slate-900 mb-14 tracking-tight mt-6">{title}</h2>
             
             {/* 조항 렌더링 */}
             {currentRevision?.articles && currentRevision.articles.length > 0 ? (
