@@ -30,7 +30,7 @@ export default function ArticleRenderer({
   if (contentHtml && contentHtml.trim().length > 0) {
     return (
       <div 
-        className="mb-8 animate-fade-in rule-viewer-content font-['Pretendard'] ql-editor px-0 py-2"
+        className="mb-8 animate-fade-in rule-viewer-content font-['Pretendard'] ql-editor html-table-wrapper px-0 py-2"
         dangerouslySetInnerHTML={{ __html: contentHtml }}
       />
     );
@@ -230,7 +230,7 @@ export default function ArticleRenderer({
             return (
               <div key={index} className="text-center w-full my-2">
                 {isTitle ? (
-                  <h1 className="text-[32px] font-black text-slate-800 my-6">{safeText}</h1>
+                  <h1 className="text-[24px] font-bold text-slate-800 my-6">{safeText}</h1>
                 ) : isHistory && !hideHistory ? (
                   <p className="text-[14px] text-blue-600 font-medium my-1">[{safeText}]</p>
                 ) : !isHistory ? (
