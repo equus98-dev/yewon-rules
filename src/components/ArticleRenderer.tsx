@@ -201,17 +201,9 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "item") {
           const isAddendum = isAddendumItem(safeText);
-          const isNumOne = safeNum.trim() === "1." || safeNum.trim() === "1";
-          const showAddendumHeader = isAddendum && (!addendumStarted || isNumOne);
-          if (isAddendum) addendumStarted = true;
 
           return (
             <React.Fragment key={index}>
-              {showAddendumHeader && (
-                <div className="mt-20 mb-4 font-bold text-[16px] text-slate-800 border-t-2 border-slate-300 pt-8">
-                  부 칙
-                </div>
-              )}
               <div className={`flex text-slate-800 text-[14.5px] leading-[1.7] ${isAddendum ? 'pl-[2rem]' : 'pl-[2.5rem]'} -ml-[1.25rem] mb-1.5 w-full`}>
                 <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block text-slate-600">{safeNum}</span>
                 <span className="font-normal flex-1">{renderTextWithHistory(safeText)}</span>
@@ -244,7 +236,7 @@ export default function ArticleRenderer({
           } else {
             const isAddendum = safeText.replace(/\s+/g, "").startsWith("부칙");
             return (
-              <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] pl-[1.25rem] w-full ${isAddendum ? 'mt-20 mb-4 font-bold text-[16px]' : 'my-1.5'}`}>
+              <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full ${isAddendum ? 'mt-16 mb-4 font-bold text-[16px] text-center border-t-2 border-slate-300 pt-8' : 'pl-[1.25rem] my-1.5'}`}>
                 {renderTextWithHistory(safeText)}
               </div>
             );

@@ -280,27 +280,6 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
                   />
                 ))}
 
-                {/* 첨부파일 (별지/별표) 렌더링 */}
-                {attachments && attachments.length > 0 && (
-                  <div className="mt-24 pt-8 border-t-2 border-slate-300">
-                    <div id="toc-attachments" className="text-center w-full block mb-10">
-                      <span className="text-[20px] font-black text-[#000080] tracking-tight">별표 / 서식</span>
-                    </div>
-                    <div className="space-y-3">
-                      {attachments.map((att: any, idx: number) => {
-                        const title = att.title.replace(/\.(hwp|pdf|doc|docx|xls|xlsx)$/i, "");
-                        return (
-                          <div key={att.id} id={`toc-attachment-${idx}`} className="flex items-center p-4 bg-slate-50 border border-slate-200 rounded-lg hover:bg-blue-50 transition-colors">
-                            <div className="flex items-center gap-3">
-                              <AttachFileIcon className="text-slate-400" />
-                              <span className="font-bold text-slate-700 text-[14.5px]">{title}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
               </div>
             ) : (
               <div className="text-center py-24 text-slate-400 font-bold text-lg">
