@@ -124,30 +124,48 @@
   border-color: #bfdbfe;
 }
 
-/* 본문 내 표(Table) 프리미엄 스타일 */
+/* 본문 내 표(Table) 프리미엄 스타일 (인라인 스타일 무시) */
 .html-table-wrapper table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  font-size: 0.85rem;
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  font-size: 0.9rem !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  background-color: white !important;
+}
+
+.html-table-wrapper th,
+.html-table-wrapper td,
+.html-table-wrapper p,
+.html-table-wrapper span {
+  font-family: 'Pretendard', sans-serif !important;
 }
 
 .html-table-wrapper th,
 .html-table-wrapper td {
-  border: 1px solid #cbd5e1;
-  padding: 0.5rem 0.75rem;
-  text-align: center;
-  color: #334155;
-  vertical-align: middle;
+  border: 1px solid #e2e8f0 !important;
+  padding: 0.75rem 1rem !important;
+  color: #334155 !important;
+  vertical-align: middle !important;
+  background-color: transparent !important;
 }
 
+/* 첫 번째 행을 헤더처럼 취급 (HWP는 th 대신 td를 쓰는 경우가 많음) */
+.html-table-wrapper tr:first-child td,
 .html-table-wrapper th {
-  background-color: #f8fafc;
-  font-weight: 700;
-  color: #0c3161;
+  background-color: #f8fafc !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  text-align: center !important;
+}
+
+.html-table-wrapper tr:nth-child(even) td {
+  background-color: #fafbfc !important;
 }
 
 .html-table-wrapper tr:hover td {
-  background-color: #f1f5f9;
+  background-color: #f1f5f9 !important;
 }
