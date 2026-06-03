@@ -169,3 +169,54 @@
 .html-table-wrapper tr:hover td {
   background-color: #f1f5f9 !important;
 }
+
+/* 조직도 전용 스타일 (인라인 스타일 우선, 그리드선 숨김) */
+.org-chart-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  padding: 2rem 0;
+}
+
+.org-chart-wrapper table {
+  width: 100% !important;
+  max-width: 1000px;
+  margin: 0 auto !important;
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+  background-color: transparent !important;
+}
+
+.org-chart-wrapper td,
+.org-chart-wrapper th {
+  padding: 0 !important;
+  font-family: 'Pretendard', sans-serif !important;
+  vertical-align: middle !important;
+}
+
+/* 박스 형태의 텍스트가 있는 셀에 대한 디자인 개선 */
+.org-chart-wrapper td[style*="border-left: #000000 0.425250pt solid"][style*="border-right: #000000 0.425250pt solid"] {
+  background-color: #ffffff !important;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  padding: 8px !important;
+}
+
+.org-chart-wrapper td[style*="border-left: #000000 0.425250pt solid"][style*="border-right: #000000 0.425250pt solid"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(30, 58, 138, 0.1);
+  border-color: #000080 !important;
+}
+
+.org-chart-wrapper p {
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  font-size: 13px !important;
+  color: #1e293b !important;
+  word-break: keep-all;
+}
+
+.org-chart-wrapper td[style*="border-left: #000000 0.425250pt solid"][style*="border-right: #000000 0.425250pt solid"] p {
+  font-weight: 600 !important;
+}

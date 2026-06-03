@@ -21,6 +21,7 @@ interface ArticleRendererProps {
 
 export default function ArticleRenderer({
   id,
+  title = "",
   contentJson,
   contentHtml,
   hideHistory = false,
@@ -28,9 +29,13 @@ export default function ArticleRenderer({
   const [modalHistory, setModalHistory] = useState<string[] | null>(null);
 
   if (contentHtml && contentHtml.trim().length > 0) {
+    // 제목이나 내용에 조직도/기구표가 있으면 인라인 스타일을 우선하는 org-chart-wrapper 적용
+    const isOrgChart = title.includes("조직도") || title.includes("기구표") || contentHtml.includes("조직도");
+    const wrapperClass = isOrgChart ? "org-chart-wrapper" : "html-table-wrapper";
+
     return (
       <div 
-        className="mb-8 animate-fade-in rule-viewer-content font-['Pretendard'] ql-editor html-table-wrapper px-0 py-2"
+        className={`mb-8 animate-fade-in rule-viewer-content font-['Pretendard'] ql-editor ${wrapperClass} px-0 py-2`}
         dangerouslySetInnerHTML={{ __html: contentHtml }}
       />
     );
