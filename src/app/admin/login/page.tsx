@@ -23,8 +23,8 @@ export default function AdminLoginPage() {
     // 0.8초의 인공 대기시간을 두어 고급스러운 로딩 애니메이션 유도
     setTimeout(() => {
       if (username === "admin" && password === "yewon0555") {
-        // 세션 인증 키 발급
-        localStorage.setItem("yewon_admin_session", "authorized");
+        // 세션 인증 키 발급 (30분 유지시간 설정을 위해 현재 타임스탬프 저장)
+        localStorage.setItem("yewon_admin_session", Date.now().toString());
         router.push("/admin");
       } else {
         setError("아이디 또는 비밀번호가 올바르지 않습니다.");

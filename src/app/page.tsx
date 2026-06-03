@@ -49,6 +49,32 @@ export default function Home() {
   const [selectedNotice, setSelectedNotice] = useState<any | null>(null);
   const [noticeModalOpen, setNoticeModalOpen] = useState(false);
 
+  // 관리자 인증 상태
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const sessionTime = localStorage.getItem("yewon_admin_session");
+    if (sessionTime && sessionTime !== "authorized") {
+      const time = parseInt(sessionTime, 10);
+      if (Date.now() - time < 30 * 60 * 1000) {
+        setIsAdmin(true);
+        // 세션 연장
+        localStorage.setItem("yewon_admin_session", Date.now().toString());
+      } else {
+        localStorage.removeItem("yewon_admin_session");
+      }
+    } else if (sessionTime === "authorized") {
+      localStorage.setItem("yewon_admin_session", Date.now().toString());
+      setIsAdmin(true);
+    }
+  }, []);
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem("yewon_admin_session");
+    setIsAdmin(false);
+    window.location.reload();
+  };
+
   // 공지사항 로드 함수
   const loadNotices = async () => {
     setLoadingNotices(true);
@@ -262,24 +288,68 @@ export default function Home() {
           </Button>
 
           {/* 관리자 로그인 버튼 추가 */}
-          <Button
-            component={Link}
-            href="/admin"
-            variant="contained"
-            sx={{
-              bgcolor: "#0c3161",
-              "&:hover": { bgcolor: "#092244" },
-              borderRadius: "8px",
-              fontWeight: "bold",
-              fontSize: "0.775rem",
-              px: 2,
-              py: 0.5,
-              minHeight: "32px",
-            }}
-            className="font-bold text-xs active:scale-95 transition-all text-white font-sans"
-          >
-            관리자 로그인
-          </Button>
+          {isAdmin ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-[#0c3161] select-none">
+                관리자님 안녕하세요!
+              </span>
+              <Button
+                component={Link}
+                href="/admin"
+                variant="contained"
+                sx={{
+                  bgcolor: "#0c3161",
+                  "&:hover": { bgcolor: "#092244" },
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                  fontSize: "0.775rem",
+                  px: 1.5,
+                  py: 0.5,
+                  minHeight: "32px",
+                }}
+                className="font-bold text-xs active:scale-95 transition-all text-white font-sans ml-1"
+              >
+                관리자 페이지
+              </Button>
+              <Button
+                onClick={handleAdminLogout}
+                variant="outlined"
+                sx={{
+                  borderColor: "#cbd5e1",
+                  color: "#64748b",
+                  "&:hover": { borderColor: "#94a3b8", bgcolor: "#f1f5f9" },
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                  fontSize: "0.775rem",
+                  px: 1.5,
+                  py: 0.5,
+                  minHeight: "32px",
+                }}
+                className="font-bold text-xs active:scale-95 transition-all font-sans"
+              >
+                로그아웃
+              </Button>
+            </div>
+          ) : (
+            <Button
+              component={Link}
+              href="/admin"
+              variant="contained"
+              sx={{
+                bgcolor: "#0c3161",
+                "&:hover": { bgcolor: "#092244" },
+                borderRadius: "8px",
+                fontWeight: "bold",
+                fontSize: "0.775rem",
+                px: 2,
+                py: 0.5,
+                minHeight: "32px",
+              }}
+              className="font-bold text-xs active:scale-95 transition-all text-white font-sans"
+            >
+              관리자 로그인
+            </Button>
+          )}
 
           <span className="text-xs text-slate-400 font-medium hidden sm:inline">
             Yewon Arts University Rule Management
@@ -338,7 +408,7 @@ export default function Home() {
           {activeRuleId ? (
             /* 규정 뷰어 표시 */
             <div className="flex-1 overflow-hidden h-full bg-white shadow-[-4px_0_15px_rgba(0,0,0,0.03)] border-l border-slate-200">
-              <RuleViewer ruleId={activeRuleId} />
+              <RuleViewer ruleId={activeRuleId} isAdmin={isAdmin} />
             </div>
           ) : activeCategoryId ? (
             /* 카테고리(분야/부서/폴더) 뷰 표시 */

@@ -18,6 +18,7 @@ interface ArticleRendererProps {
   contentHtml?: string | null;
   hideHistory?: boolean;
   hasHtmlAttachments?: boolean;
+  isAdmin?: boolean;
 }
 
 export default function ArticleRenderer({
@@ -28,6 +29,7 @@ export default function ArticleRenderer({
   contentHtml,
   hideHistory = false,
   hasHtmlAttachments = true,
+  isAdmin = false,
 }: ArticleRendererProps) {
   const [modalHistory, setModalHistory] = useState<string[] | null>(null);
 
@@ -342,9 +344,20 @@ export default function ArticleRenderer({
                   {badgeType}
                 </button>
               )}
-              <div className="flex-1 w-full flex flex-col md:flex-row md:items-baseline md:justify-between">
+              <div className="flex-1 w-full flex flex-col md:flex-row md:items-baseline md:justify-between group">
                 <div className="flex-1">
                   <span className="font-bold mr-1 text-[#000080]">{safeNum}{parsedTitle}</span>
+                  {isAdmin && (
+                    <a 
+                      href="/admin/editor" 
+                      target="_blank"
+                      className="ml-1 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-white text-slate-500 hover:bg-blue-50 hover:text-blue-700 border border-slate-300 shadow-sm transition-all relative -top-0.5 cursor-pointer"
+                      title="입안편집기에서 이 조항 수정하기"
+                    >
+                      <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                      수정
+                    </a>
+                  )}
                   {formatGluedText(parsedBody, true)}
                 </div>
               </div>

@@ -13,6 +13,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 interface RuleViewerProps {
   ruleId: string;
+  isAdmin?: boolean;
 }
 
 class RuleViewerErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
@@ -56,7 +57,7 @@ export default function RuleViewer(props: RuleViewerProps) {
   );
 }
 
-function RuleViewerInner({ ruleId }: RuleViewerProps) {
+function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   // 1. 상태 및 훅은 모두 최상단에 선언
   const [loading, setLoading] = useState(false);
   const [ruleData, setRuleData] = useState<any>(null);
@@ -346,6 +347,7 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
                       contentHtml={a.contentHtml}
                       hideHistory={hideHistory}
                       hasHtmlAttachments={hasHtmlAttachments}
+                      isAdmin={isAdmin}
                     />
                   );
                 })}
