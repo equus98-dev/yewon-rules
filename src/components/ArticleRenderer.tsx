@@ -154,7 +154,7 @@ export default function ArticleRenderer({
     const parts = decodedText.split(/(<(?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>]*>)/gi);
     return parts.map((part, i) => {
       if (part.startsWith("<") && part.endsWith(">")) {
-        return <span key={i} className="text-[#000080] text-[13px] ml-1">{part}</span>;
+        return <span key={i} className="text-blue-500 text-[13px] ml-1">{part}</span>;
       }
       return <React.Fragment key={i}>{part}</React.Fragment>;
     });
@@ -309,68 +309,69 @@ export default function ArticleRenderer({
             </div>
           );
         } else if (item.type === "article") {
-          // 뱃지 및 연혁 생성 로직
-          let historyDates = [];
-          for (let i = index; i < items.length; i++) {
-            if (i !== index && items[i]?.type === "article") break;
-            const textStr = String(items[i]?.text || "");
-            if (textStr.includes("<제정")) {
-              const match = textStr.match(/<제정(.*?)>/);
-              if (match) historyDates.push(`제정 ${match[1].trim()}`);
+          return (() => {
+            let hasSeenBody = false;
+            const articleItem = item;
+            let historyDates: string[] = [];
+            let badgeType = "연";
+            let badgeColor = "bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100";
+            let parsedTitle = "";
+            
+            const safeText = String(articleItem.text || "").trim();
+            const datesMatches = safeText.match(/\((?:삭제|개정|신설|전문개정|본조신설)\s*[^)]+\)/g);
+            if (datesMatches) {
+              datesMatches.forEach(match => {
+                const cleaned = match.replace(/[()]/g, '').trim();
+                historyDates.push(cleaned);
+              });
             }
-            if (textStr.includes("<개정")) {
-              const match = textStr.match(/<개정(.*?)>/);
+            if (safeText.includes("<개정")) {
+              const match = safeText.match(/<개정(.*?)>/);
               if (match) historyDates.push(`개정 ${match[1].trim()}`);
             }
-          }
-
-          // 뱃지 결정 (임의로 개정 이력이 있으면 [개], 없으면 [연] 표시)
-          const badgeType = historyDates.some(h => h.includes("개정")) ? "개" : "연";
-          const badgeColor = badgeType === "개" ? "bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100" : "bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100";
-
-          // 제목 추출 (예: "(목적)")
-          let parsedTitle = "";
-          let parsedBody = safeText;
-          if (safeText.startsWith("(") && !/^\((삭제|개정|신설|전문개정|본조신설)/.test(safeText)) {
-            const match = safeText.match(/^(\([^)]+\))(.*)/);
-            if (match) {
-              parsedTitle = match[1];
-              parsedBody = match[2];
+            badgeType = historyDates.some(h => h.includes("개정")) ? "개" : "연";
+            badgeColor = badgeType === "개" ? "bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100" : "bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100";
+            
+            if (safeText.startsWith("(") && !/^\((삭제|개정|신설|전문개정|본조신설)/.test(safeText)) {
+              const match = safeText.match(/^(\([^)]+\))(.*)/);
+              if (match) {
+                parsedTitle = match[1];
+              }
             }
-          }
 
-          return (
-            <div key={index} id={`toc-${safeNum}`} className="mt-8 mb-2 text-[14.5px] text-slate-800 leading-[1.7] flex items-start gap-2 pt-2 relative w-full">
-              {isAdmin && (
-                <button 
-                  onClick={() => {
-                    if (window.confirm("본 수정기능은 규정개정이 아닌 단순오타만 수정이 가능합니다.\n개정이 필요한 경우 입안편집기를 이용하시기 바랍니다.")) {
-                      setEditItems(JSON.parse(JSON.stringify(items)));
-                      setIsEditing(true);
-                    }
-                  }}
-                  className="w-5 h-5 shrink-0 flex items-center justify-center rounded mt-0.5 cursor-pointer transition-colors bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 hover:text-green-700"
-                  title="이 조항 텍스트 바로 수정하기"
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                </button>
-              )}
-              {!hideHistory && (
-                <button 
-                  onClick={() => setModalHistory(historyDates.length > 0 ? historyDates : ["개정 이력이 없습니다."])}
-                  className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors ${badgeColor}`}
-                >
-                  {badgeType}
-                </button>
-              )}
-              <div className="flex-1 w-full group">
-                <div className="w-full break-keep" style={{ paddingLeft: '20px', textIndent: '-20px' }}>
-                  <span className="font-bold mr-1 text-[#000080]">{safeNum}{parsedTitle}</span>
-                  {formatGluedText(parsedBody, true)}
+            return (
+              <div className="mt-8 mb-2 flex items-start gap-2 pt-2 relative w-full">
+                {isAdmin && (
+                  <button 
+                    onClick={() => {
+                      if (window.confirm("본 수정기능은 규정개정이 아닌 단순오타만 수정이 가능합니다.\n개정이 필요한 경우 입안편집기를 이용하시기 바랍니다.")) {
+                        setEditItems(JSON.parse(JSON.stringify(items)));
+                        setIsEditing(true);
+                      }
+                    }}
+                    className="w-5 h-5 shrink-0 flex items-center justify-center rounded mt-0.5 cursor-pointer transition-colors bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 hover:text-green-700"
+                    title="이 조항 텍스트 바로 수정하기"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                  </button>
+                )}
+                {!hideHistory && (
+                  <button 
+                    onClick={() => setModalHistory(historyDates.length > 0 ? historyDates : ["개정 이력이 없습니다."])}
+                    className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
+                  >
+                    {badgeType}
+                  </button>
+                )}
+                <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
+                  <div id={`toc-${safeNum}`} className="w-full break-keep mb-1.5 inline-block">
+                    <span className="font-bold mr-1 text-[#000080]">{safeNum}{parsedTitle}</span>
+                    {safeText.replace(parsedTitle, "").trim() && <span className="font-normal">{renderTextWithHistory(safeText.replace(parsedTitle, "").trim())}</span>}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
+            );
+          })();
         } else if (item.type === "paragraph") {
           return (
             <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] mb-1.5 pr-4 break-keep w-full" style={{ paddingLeft: '20px', textIndent: '-20px' }}>
@@ -528,8 +529,8 @@ export default function ArticleRenderer({
           </div>
           <div className="space-y-3 bg-white p-4 border border-slate-200 rounded-lg shadow-inner max-h-[50vh] overflow-y-auto scrollbar">
             {editItems.map((item, idx) => (
-              <div key={idx} className="flex gap-2 items-start relative">
-                {item.num && <span className="font-bold shrink-0 mt-2 text-[#0c3161] w-6">{item.num}</span>}
+              <div key={idx} className="flex gap-3 items-start relative">
+                {item.num && <span className="font-bold shrink-0 mt-2.5 text-[#0c3161] whitespace-nowrap min-w-[1.5rem]">{item.num}</span>}
                 <textarea
                   className="w-full border border-slate-300 rounded p-2.5 text-[14px] text-slate-800 focus:outline-none focus:border-blue-500 min-h-[60px] resize-y shadow-sm transition-colors focus:bg-blue-50/20 leading-relaxed font-['Pretendard']"
                   value={item.text}
