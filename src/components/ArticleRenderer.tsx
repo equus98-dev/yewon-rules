@@ -35,10 +35,17 @@ export default function ArticleRenderer({
     const wrapperClass = isOrgChart ? "org-chart-wrapper" : "html-table-wrapper";
 
     return (
-      <div 
-        className={`mb-8 animate-fade-in rule-viewer-content font-['Pretendard'] ql-editor ${wrapperClass} px-0 py-2`}
-        dangerouslySetInnerHTML={{ __html: contentHtml }}
-      />
+      <div id={id} className="animate-fade-in rule-viewer-content font-['Pretendard'] w-full">
+        {articleNumber >= 9000 && (
+          <div className="mt-16 mb-8 border-t-2 border-slate-300 pt-10 text-center w-full">
+            <span className="text-[22px] font-black text-[#000080] tracking-tight">{title}</span>
+          </div>
+        )}
+        <div 
+          className={`mb-8 ql-editor ${wrapperClass} px-0 py-2 w-full`}
+          dangerouslySetInnerHTML={{ __html: contentHtml }}
+        />
+      </div>
     );
   }
 

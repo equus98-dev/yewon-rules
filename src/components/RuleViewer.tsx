@@ -70,6 +70,11 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
            }
            return;
         }
+        
+        // 별지, 서식, 별표 (9000번대)인 경우 여기서 처리하지 않고 하단에서 일괄 처리
+        if (a.articleNumber >= 9000) {
+           return;
+        }
 
         items.forEach((item: any) => {
           if (!item || typeof item !== 'object') return;
@@ -91,12 +96,12 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
       }
     });
     
-    // Add attachments to TOC if any
-    if (ruleData?.attachments && ruleData.attachments.length > 0) {
+    // Add attachments from articles to TOC
+    const attachmentArticles = currentRevision.articles.filter((a: any) => a.articleNumber >= 9000);
+    if (attachmentArticles.length > 0) {
       toc.push({ type: "chapter", id: "toc-attachments", text: "별지 목록" });
-      ruleData.attachments.forEach((att: any, idx: number) => {
-        const title = att.title.replace(/\.(hwp|pdf|doc|docx|xls|xlsx)$/i, "");
-        toc.push({ type: "attachment", id: `attachment-link-${att.fileUrl}`, text: title });
+      attachmentArticles.forEach((a: any) => {
+        toc.push({ type: "attachment", id: `toc-${a.articleNumber}`, text: a.title });
       });
     }
     
@@ -258,8 +263,7 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
               
               return (
               <li key={idx} className={itemClass}>
-                <a href={item.type === "attachment" ? item.id.replace("attachment-link-", "") : `#${item.id}`} target={item.type === "attachment" ? "_blank" : "_self"} className="block w-full" onClick={(e) => {
-                  if (item.type === "attachment") return; // Let the native link open in new tab
+                <a href={`#${item.id}`} className="block w-full" onClick={(e) => {
                   e.preventDefault();
                   document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}>
