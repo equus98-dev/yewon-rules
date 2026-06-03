@@ -151,20 +151,38 @@ export default function ArticleRenderer({
         const safeNum = item.num !== null && item.num !== undefined ? String(item.num) : "";
         const safeText = item.text !== null && item.text !== undefined ? String(item.text) : "";
 
-        if (item.type === "chapter") {
-          if (index > 0 && items[index - 1]?.type === "chapter" && items[index - 1]?.text === item.text) return null;
+        if (item.type === "chapter" || item.type === "section") {
+          const isChapter = item.type === "chapter";
+          if (index > 0 && items[index - 1]?.type === item.type && items[index - 1]?.text === item.text) return null;
+          
+          let titlePart = safeText;
+          let historyParts: string[] = [];
+          
+          const historyRegex = /(<[^>]+>)/g;
+          const matches = safeText.match(historyRegex);
+          if (matches) {
+             historyParts = matches;
+             titlePart = safeText.replace(historyRegex, "").trim();
+          }
+
+          const containerClass = isChapter 
+            ? "text-center w-full mt-12 mb-6 pt-4 flex flex-col items-center gap-1.5"
+            : "text-center w-full mt-8 mb-4 flex flex-col items-center gap-1";
+          
+          const titleClass = isChapter
+            ? "text-[20px] font-black text-[#000080] tracking-tight"
+            : "text-[18px] font-bold text-[#000080]";
+
           return (
-            <div key={index} id={`toc-${safeText.replace(/\s/g, '-')}`} className="text-center w-full block mt-12 mb-6 pt-4">
-              <span className="text-[20px] font-black text-[#000080] tracking-tight">
-                {safeText}
+            <div key={index} id={isChapter ? `toc-${safeText.replace(/\s/g, '-')}` : undefined} className={containerClass}>
+              <span className={titleClass}>
+                {titlePart}
               </span>
-            </div>
-          );
-        } else if (item.type === "section") {
-          if (index > 0 && items[index - 1]?.type === "section" && items[index - 1]?.text === item.text) return null;
-          return (
-            <div key={index} className="text-center w-full block text-[18px] font-bold text-[#000080] mt-8 mb-4">
-              {safeText}
+              {!hideHistory && historyParts.length > 0 && (
+                <span className="text-[#000080] text-[13px] font-medium">
+                  {historyParts.join(" ")}
+                </span>
+              )}
             </div>
           );
         } else if (item.type === "article") {
