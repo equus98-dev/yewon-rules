@@ -10,6 +10,7 @@ interface ContentItem {
 
 interface ArticleRendererProps {
   id?: string;
+  articleId?: string;
   chapter?: string | null;
   section?: string | null;
   articleNumber: number;
@@ -23,6 +24,7 @@ interface ArticleRendererProps {
 
 export default function ArticleRenderer({
   id,
+  articleId,
   title = "",
   articleNumber,
   contentJson,
@@ -32,6 +34,9 @@ export default function ArticleRenderer({
   isAdmin = false,
 }: ArticleRendererProps) {
   const [modalHistory, setModalHistory] = useState<string[] | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editItems, setEditItems] = useState<ContentItem[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   if (contentHtml && contentHtml.trim().length > 0) {
     // 제목이나 내용에 조직도/기구표가 있으면 인라인 스타일을 우선하는 org-chart-wrapper 적용
@@ -337,14 +342,18 @@ export default function ArticleRenderer({
           return (
             <div key={index} id={`toc-${safeNum}`} className="mt-8 mb-2 text-[14.5px] text-slate-800 leading-[1.7] flex items-start gap-2 pt-2 relative w-full">
               {isAdmin && (
-                <a 
-                  href="/admin/editor" 
-                  target="_blank"
+                <button 
+                  onClick={() => {
+                    if (window.confirm("본 수정기능은 규정개정이 아닌 단순오타만 수정이 가능합니다.\n개정이 필요한 경우 입안편집기를 이용하시기 바랍니다.")) {
+                      setEditItems(JSON.parse(JSON.stringify(items)));
+                      setIsEditing(true);
+                    }
+                  }}
                   className="w-5 h-5 shrink-0 flex items-center justify-center rounded mt-0.5 cursor-pointer transition-colors bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 hover:text-green-700"
-                  title="입안편집기에서 이 조항 수정하기"
+                  title="이 조항 텍스트 바로 수정하기"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                </a>
+                </button>
               )}
               {!hideHistory && (
                 <button 
@@ -501,6 +510,81 @@ export default function ArticleRenderer({
           <pre className="whitespace-pre-wrap text-[13.5px] font-['Pretendard'] text-slate-700 leading-relaxed font-medium mt-2">
             {modalHistory?.join("\n")}
           </pre>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditing} onClose={() => !isSaving && setIsEditing(false)} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ p: 0 }}>
+          <div className="flex justify-between items-center bg-slate-50 border-b border-slate-200 px-4 py-3">
+            <span className="font-bold text-[#0c3161] flex items-center gap-2"><svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg> 단순 오타 수정 (인라인 편집)</span>
+            <IconButton size="small" onClick={() => !isSaving && setIsEditing(false)} sx={{ p: 0.5 }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </div>
+        </DialogTitle>
+        <DialogContent className="p-6 bg-slate-50">
+          <div className="bg-red-50 border border-red-200 text-red-700 text-[13px] p-3 rounded mb-4 font-bold leading-relaxed shadow-sm">
+            ⚠️ 이 기능은 띄어쓰기나 단순 오타 수정에만 사용하십시오. 규정 내용 자체의 개정이 필요할 경우 반드시 [입안편집기]를 통해 개정안을 기안해야 합니다.
+          </div>
+          <div className="space-y-3 bg-white p-4 border border-slate-200 rounded-lg shadow-inner max-h-[50vh] overflow-y-auto scrollbar">
+            {editItems.map((item, idx) => (
+              <div key={idx} className="flex gap-2 items-start relative">
+                {item.num && <span className="font-bold shrink-0 mt-2 text-[#0c3161] w-6">{item.num}</span>}
+                <textarea
+                  className="w-full border border-slate-300 rounded p-2.5 text-[14px] text-slate-800 focus:outline-none focus:border-blue-500 min-h-[60px] resize-y shadow-sm transition-colors focus:bg-blue-50/20 leading-relaxed font-['Pretendard']"
+                  value={item.text}
+                  onChange={(e) => {
+                    const newItems = [...editItems];
+                    newItems[idx].text = e.target.value;
+                    setEditItems(newItems);
+                  }}
+                  placeholder="텍스트를 입력하세요"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex justify-end gap-2">
+            <button
+              className="px-4 py-2 border border-slate-300 text-slate-600 bg-white rounded font-bold text-sm hover:bg-slate-50 transition-colors"
+              onClick={() => setIsEditing(false)}
+              disabled={isSaving}
+            >
+              취소
+            </button>
+            <button
+              className="px-4 py-2 bg-[#0c3161] text-white rounded font-bold text-sm hover:bg-blue-800 flex items-center gap-2 transition-colors shadow-sm"
+              onClick={async () => {
+                if (!articleId) return;
+                setIsSaving(true);
+                try {
+                  const newText = editItems.map(i => {
+                    if (i.type === 'article' || i.type === 'text') return i.text;
+                    if (i.type === 'paragraph') return i.num ? `${i.num} ${i.text}` : i.text;
+                    return `${i.num} ${i.text}`;
+                  }).join('\n');
+                  const res = await fetch(`/api/admin/articles/${articleId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      contentText: newText,
+                      contentJson: editItems
+                    })
+                  });
+                  if (!res.ok) throw new Error('저장 실패');
+                  alert('성공적으로 수정되었습니다.');
+                  window.location.reload();
+                } catch (e) {
+                  console.error(e);
+                  alert('저장 중 오류가 발생했습니다.');
+                } finally {
+                  setIsSaving(false);
+                }
+              }}
+              disabled={isSaving}
+            >
+              {isSaving ? "저장 중..." : "수정 완료"}
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

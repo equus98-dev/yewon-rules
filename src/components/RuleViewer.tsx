@@ -339,6 +339,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                     <ArticleRenderer
                       key={a.id}
                       id={`toc-${a.articleNumber}`}
+                      articleId={a.id}
                       chapter={a.chapter}
                       section={a.section}
                       articleNumber={a.articleNumber}
