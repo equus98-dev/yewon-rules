@@ -66,6 +66,17 @@ export default function ArticleRenderer({
     items = [];
   }
 
+  // 본문 하단(또는 부칙 하단)에 딸려들어온 별표/별지/서식 텍스트는 이미지 첨부파일로 대체되므로, 본문 렌더링에서 제외합니다.
+  const attachmentStartIndex = items.findIndex((item) => {
+    if (!item || !item.text) return false;
+    const textStr = String(item.text).trim();
+    return textStr.startsWith("[별지") || textStr.startsWith("[별표") || textStr.startsWith("[서식");
+  });
+
+  if (attachmentStartIndex !== -1) {
+    items = items.slice(0, attachmentStartIndex);
+  }
+
   let hasSeenBody = false;
   let addendumStarted = false;
 
@@ -114,7 +125,7 @@ export default function ArticleRenderer({
   };
 
   return (
-    <div className="mb-6 animate-fade-in rule-viewer-content font-['Pretendard']">
+    <div id={id} className="mb-6 animate-fade-in rule-viewer-content font-['Pretendard']">
       {items.map((item, index) => {
         if (!item || typeof item !== 'object') return null;
 

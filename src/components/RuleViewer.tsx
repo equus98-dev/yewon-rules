@@ -93,7 +93,7 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
     
     // Add attachments to TOC if any
     if (ruleData?.attachments && ruleData.attachments.length > 0) {
-      toc.push({ type: "chapter", id: "toc-attachments", text: "별표 / 서식" });
+      toc.push({ type: "chapter", id: "toc-attachments", text: "별지 목록" });
       ruleData.attachments.forEach((att: any, idx: number) => {
         const title = att.title.replace(/\.(hwp|pdf|doc|docx|xls|xlsx)$/i, "");
         toc.push({ type: "attachment", id: `attachment-link-${att.fileUrl}`, text: title });
