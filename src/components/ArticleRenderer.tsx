@@ -161,76 +161,83 @@ export default function ArticleRenderer({
     });
   };
 
-  // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
-  const formatGluedText = (text: string, isArticleBody: boolean = false) => {
-    if (text.length < 50 || /<table|<tr|<td|<th/i.test(text)) {
-        return <span className={isArticleBody ? "font-normal text-slate-800" : ""}>{renderTextWithHistory(text)}</span>;
-    }
-
-    let formatted = text
-      .replace(/(①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩|⑪|⑫|⑬|⑭|⑮)/g, '\n$1')
-      .replace(/(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/g, '\n$1 ')
-      .replace(/(^|\s)([가-하]\.)\s+/g, '$1\n$2 ')
-      .replace(/(제\d+조의?\d*\([^)]+\))/g, '\n\n$1')
-      .replace(/(제\d+장\s+[^\s]+)/g, '\n\n$1');
-
-    const lines = formatted.split('\n').map(l => l.trim()).filter(l => l);
-
-    return (
-      <>
         {lines.map((trimmed, idx) => {
-          let lineClass = "break-keep";
-          let isInline = false;
+          let lineClass = "break-keep text-slate-800";
+          let isInline = (idx === 0 && isArticleBody);
 
           if (/^[①-⑮]/.test(trimmed)) {
              const numMatch = trimmed.match(/^([①-⑮])\s*(.*)/);
              if (numMatch) {
+               if (isInline) {
+                 return (
+                   <span key={`glued-${idx}`} className="font-normal text-slate-800 break-keep inline">
+                     <span className="mr-1">{numMatch[1]}</span>
+                     {renderTextWithHistory(numMatch[2])}{" "}
+                   </span>
+                 );
+               }
                return (
-                  <div key={`glued-${idx}`} className="mt-1 mb-1.5 w-full break-keep text-slate-800" style={{ paddingLeft: '20px', textIndent: '-20px' }}>
+                  <div key={`glued-${idx}`} className="w-full break-keep text-slate-800" style={{ paddingLeft: '20px', textIndent: '-20px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                   </div>
                );
              }
-             lineClass += " mt-2 text-slate-800 block";
+             lineClass += " block";
           } else if (/^\d{1,2}\./.test(trimmed)) {
              const numMatch = trimmed.match(/^(\d{1,2}\.)\s*(.*)/);
              if (numMatch) {
+               if (isInline) {
+                 return (
+                   <span key={`glued-${idx}`} className="font-normal text-slate-800 break-keep inline">
+                     <span className="mr-1">{numMatch[1]}</span>
+                     {renderTextWithHistory(numMatch[2])}{" "}
+                   </span>
+                 );
+               }
                return (
-                  <div key={`glued-${idx}`} className="mt-1 mb-1.5 w-full break-keep text-slate-800" style={{ paddingLeft: '36px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} className="w-full break-keep text-slate-800" style={{ paddingLeft: '36px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                   </div>
                );
              }
-             lineClass += " ml-2 text-slate-700 block mt-2";
+             lineClass += " ml-2 block";
           } else if (/^[가-하]\./.test(trimmed)) {
              const numMatch = trimmed.match(/^([가-하]\.)\s*(.*)/);
              if (numMatch) {
+               if (isInline) {
+                 return (
+                   <span key={`glued-${idx}`} className="font-normal text-slate-800 break-keep inline">
+                     <span className="mr-1">{numMatch[1]}</span>
+                     {renderTextWithHistory(numMatch[2])}{" "}
+                   </span>
+                 );
+               }
                return (
-                  <div key={`glued-${idx}`} className="mt-1 mb-1.5 w-full break-keep text-slate-800" style={{ paddingLeft: '52px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} className="w-full break-keep text-slate-800" style={{ paddingLeft: '52px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                   </div>
                );
              }
-             lineClass += " ml-4 text-slate-700 block mt-1";
+             lineClass += " ml-4 block";
           } else if (/^제\d+조/.test(trimmed)) {
              const match = trimmed.match(/^(제\d+조의?\d*\([^)]+\))(.*)/);
              if (match) {
                  const title = match[1];
                  const body = match[2].trim();
                  return (
-                    <div key={`glued-${idx}`} className="mt-8 text-[16px] block break-keep">
+                    <div key={`glued-${idx}`} className="mt-4 text-[16px] block break-keep text-slate-800">
                        <span className="font-bold mr-1 text-[#000080]">{title}</span>
                        <span className="font-normal text-slate-800">{renderTextWithHistory(body)}</span>
                     </div>
                  );
              } else {
-                 lineClass += " mt-8 text-[16px] font-bold text-[#000080] block";
+                 lineClass += " mt-4 text-[16px] font-bold text-[#000080] block";
              }
           } else if (/^제\d+장/.test(trimmed)) {
-             lineClass += " mt-12 text-[18px] font-black text-center text-[#000080] block";
+             lineClass += " mt-8 text-[18px] font-black text-center text-[#000080] block";
           } else {
              if (idx === 0 && isArticleBody) {
                 isInline = true;
@@ -341,7 +348,7 @@ export default function ArticleRenderer({
             }
 
             return (
-              <div className="mt-8 mb-2 flex items-start gap-2 pt-2 relative w-full">
+              <div className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
                 {isAdmin && (
                   <button 
                     onClick={() => {
@@ -373,7 +380,7 @@ export default function ArticleRenderer({
                   </button>
                 )}
                 <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
-                  <div id={`toc-${safeNum}`} className="w-full break-keep mb-1.5 inline-block">
+                  <div id={`toc-${safeNum}`} className="w-full break-keep inline-block">
                     <span className="font-bold mr-1 text-[#000080]">{safeNum}{parsedTitle}</span>
                     {safeText.replace(parsedTitle, "").trim() && <span className="font-normal">{renderTextWithHistory(safeText.replace(parsedTitle, "").trim())}</span>}
                   </div>
@@ -383,7 +390,7 @@ export default function ArticleRenderer({
           })();
         } else if (item.type === "paragraph") {
           return (
-            <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] mb-1.5 pr-4 break-keep w-full" style={{ paddingLeft: '20px', textIndent: '-20px' }}>
+            <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] pr-4 break-keep w-full" style={{ paddingLeft: '20px', textIndent: '-20px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
             </div>
@@ -393,7 +400,7 @@ export default function ArticleRenderer({
 
           return (
             <React.Fragment key={index}>
-              <div className="text-slate-800 text-[14.5px] leading-[1.7] mb-1.5 pr-4 break-keep w-full" style={{ paddingLeft: isAddendum ? '20px' : '36px', textIndent: isAddendum ? '-20px' : '-16px' }}>
+              <div className="text-slate-800 text-[14.5px] leading-[1.7] pr-4 break-keep w-full" style={{ paddingLeft: isAddendum ? '20px' : '36px', textIndent: isAddendum ? '-20px' : '-16px' }}>
                 <span className="font-normal mr-1">{safeNum}</span>
                 <span className="font-normal">{renderTextWithHistory(safeText)}</span>
               </div>
@@ -401,7 +408,7 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "subitem") {
           return (
-            <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] mb-1.5 pr-4 break-keep w-full" style={{ paddingLeft: '52px', textIndent: '-16px' }}>
+            <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] pr-4 break-keep w-full" style={{ paddingLeft: '52px', textIndent: '-16px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
             </div>
