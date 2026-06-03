@@ -175,10 +175,37 @@ export default function ArticleRenderer({
           let isInline = false;
 
           if (/^[①-⑮]/.test(trimmed)) {
+             const numMatch = trimmed.match(/^([①-⑮])\s*(.*)/);
+             if (numMatch) {
+               return (
+                  <div key={`glued-${idx}`} className="flex text-slate-800 mt-2 mb-1.5 w-full ml-[6px]">
+                     <span className="font-normal mr-1 w-5 shrink-0 text-right inline-block text-slate-600">{numMatch[1]}</span>
+                     <span className="font-normal flex-1">{renderTextWithHistory(numMatch[2])}</span>
+                  </div>
+               );
+             }
              lineClass += " ml-2 mt-3 text-slate-800 block";
           } else if (/^\d{1,2}\./.test(trimmed)) {
+             const numMatch = trimmed.match(/^(\d{1,2}\.)\s*(.*)/);
+             if (numMatch) {
+               return (
+                  <div key={`glued-${idx}`} className="flex text-slate-800 mt-2 mb-1.5 w-full ml-[18px]">
+                     <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block text-slate-600">{numMatch[1]}</span>
+                     <span className="font-normal flex-1">{renderTextWithHistory(numMatch[2])}</span>
+                  </div>
+               );
+             }
              lineClass += " ml-6 text-slate-700 block mt-2";
           } else if (/^[가-하]\./.test(trimmed)) {
+             const numMatch = trimmed.match(/^([가-하]\.)\s*(.*)/);
+             if (numMatch) {
+               return (
+                  <div key={`glued-${idx}`} className="flex text-slate-800 mt-2 mb-1.5 w-full ml-[38px]">
+                     <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block text-slate-600">{numMatch[1]}</span>
+                     <span className="font-normal flex-1">{renderTextWithHistory(numMatch[2])}</span>
+                  </div>
+               );
+             }
              lineClass += " ml-10 text-slate-700 block mt-1";
           } else if (/^제\d+조/.test(trimmed)) {
              const match = trimmed.match(/^(제\d+조의?\d*\([^)]+\))(.*)/);
@@ -325,7 +352,7 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "paragraph") {
           return (
-            <div key={index} className="flex text-slate-800 text-[14.5px] leading-[1.7] pl-[1.25rem] -ml-[1.25rem] mb-1.5 w-full">
+            <div key={index} className="flex text-slate-800 text-[14.5px] leading-[1.7] pl-[34px] mb-1.5 pr-4">
               <span className="font-normal mr-1 w-5 shrink-0 text-right inline-block text-slate-600">{safeNum}</span>
               <span className="font-normal flex-1">{renderTextWithHistory(safeText)}</span>
             </div>
@@ -335,7 +362,7 @@ export default function ArticleRenderer({
 
           return (
             <React.Fragment key={index}>
-              <div className={`flex text-slate-800 text-[14.5px] leading-[1.7] ${isAddendum ? 'pl-[2rem]' : 'pl-[2.5rem]'} -ml-[1.25rem] mb-1.5 w-full`}>
+              <div className={`flex text-slate-800 text-[14.5px] leading-[1.7] ${isAddendum ? 'pl-[34px]' : 'pl-[46px]'} mb-1.5 pr-4`}>
                 <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block text-slate-600">{safeNum}</span>
                 <span className="font-normal flex-1">{renderTextWithHistory(safeText)}</span>
               </div>
@@ -343,7 +370,7 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "subitem") {
           return (
-            <div key={index} className="flex text-slate-800 text-[14.5px] leading-[1.7] pl-[3.75rem] -ml-[1.25rem] mb-1.5 w-full">
+            <div key={index} className="flex text-slate-800 text-[14.5px] leading-[1.7] pl-[66px] mb-1.5 pr-4">
               <span className="font-normal mr-1 w-6 shrink-0 text-right inline-block text-slate-600">{safeNum}</span>
               <span className="font-normal flex-1">{renderTextWithHistory(safeText)}</span>
             </div>
