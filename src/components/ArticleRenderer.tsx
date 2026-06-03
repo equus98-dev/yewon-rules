@@ -22,6 +22,7 @@ interface ArticleRendererProps {
 export default function ArticleRenderer({
   id,
   title = "",
+  articleNumber,
   contentJson,
   contentHtml,
   hideHistory = false,
@@ -223,7 +224,7 @@ export default function ArticleRenderer({
             </div>
           );
         } else {
-          if (!hasSeenBody) {
+          if (!hasSeenBody && articleNumber < 8000) {
             const isTitle = safeText.includes("학칙") || safeText.includes("규정") || safeText.includes("강령") || safeText.includes("내규") || safeText.includes("세칙") || safeText.includes("법령");
             const isHistory = safeText.includes("제정") || safeText.includes("개정") || safeText.includes("시행");
             
