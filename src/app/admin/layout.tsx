@@ -27,9 +27,17 @@ export default function AdminLayout({
       return;
     }
 
-    // 클라이언트 사이드 인증 체크
+    // 클라이언트 사이드 인증 체크 (타임스탬프 30분 검증)
     const session = localStorage.getItem("yewon_admin_session");
-    if (session === "authorized") {
+    if (session && session !== "authorized") {
+      const time = parseInt(session, 10);
+      if (Date.now() - time < 30 * 60 * 1000) {
+        setAuthorized(true);
+      } else {
+        setAuthorized(false);
+        router.push("/admin/login");
+      }
+    } else if (session === "authorized") {
       setAuthorized(true);
     } else {
       setAuthorized(false);
