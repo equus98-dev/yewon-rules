@@ -155,16 +155,16 @@ export default function ArticleRenderer({
 
   // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
   const formatGluedText = (text: string, isArticleBody: boolean = false) => {
-    if (text.length < 150) return <span className={isArticleBody ? "font-normal text-slate-800" : ""}>{renderTextWithHistory(text)}</span>;
+    if (text.length < 50 || /<table|<tr|<td|<th/i.test(text)) {
+        return <span className={isArticleBody ? "font-normal text-slate-800" : ""}>{renderTextWithHistory(text)}</span>;
+    }
 
     let formatted = text
-      .replace(/(?:^|\s)(①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩|⑪|⑫|⑬|⑭|⑮)/g, '\n$1')
-      .replace(/(?:^|\s)(\d{1,2}\.)\s+(?=[^\d])/g, '\n$1 ')
-      .replace(/(?:^|\s)([가-하]\.)\s+/g, '\n$1 ')
-      .replace(/(?:^|\s)(제\d+조의?\d*\([^)]+\))/g, '\n\n$1')
-      .replace(/(?:^|\s)(제\d+장\s+[^\s]+)/g, '\n\n$1');
-
-    if (!formatted.includes('\n')) return <span className={isArticleBody ? "font-normal text-slate-800" : ""}>{renderTextWithHistory(text)}</span>;
+      .replace(/(①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩|⑪|⑫|⑬|⑭|⑮)/g, '\n$1')
+      .replace(/(\d{1,2}\.)\s+(?=[^\d])/g, '\n$1 ')
+      .replace(/([가-하]\.)\s+/g, '\n$1 ')
+      .replace(/(제\d+조의?\d*\([^)]+\))/g, '\n\n$1')
+      .replace(/(제\d+장\s+[^\s]+)/g, '\n\n$1');
 
     const lines = formatted.split('\n').map(l => l.trim()).filter(l => l);
 
@@ -175,13 +175,25 @@ export default function ArticleRenderer({
           let isInline = false;
 
           if (/^[①-⑮]/.test(trimmed)) {
-             lineClass += " ml-2 mt-3 font-bold text-slate-800 block";
+             lineClass += " ml-2 mt-3 text-slate-800 block";
           } else if (/^\d{1,2}\./.test(trimmed)) {
-             lineClass += " ml-6 text-slate-700 block mt-1";
+             lineClass += " ml-6 text-slate-700 block mt-2";
           } else if (/^[가-하]\./.test(trimmed)) {
              lineClass += " ml-10 text-slate-700 block mt-1";
           } else if (/^제\d+조/.test(trimmed)) {
-             lineClass += " mt-8 text-[16px] font-bold text-[#000080] block";
+             const match = trimmed.match(/^(제\d+조의?\d*\([^)]+\))(.*)/);
+             if (match) {
+                 const title = match[1];
+                 const body = match[2].trim();
+                 return (
+                    <div key={`glued-${idx}`} className="mt-8 text-[16px] block break-keep">
+                       <span className="font-bold mr-1 text-[#000080]">{title}</span>
+                       <span className="font-normal text-slate-800">{renderTextWithHistory(body)}</span>
+                    </div>
+                 );
+             } else {
+                 lineClass += " mt-8 text-[16px] font-bold text-[#000080] block";
+             }
           } else if (/^제\d+장/.test(trimmed)) {
              lineClass += " mt-12 text-[18px] font-black text-center text-[#000080] block";
           } else {
@@ -226,31 +238,32 @@ export default function ArticleRenderer({
 
         const safeNum = item.num !== null && item.num !== undefined ? String(item.num) : "";
         const safeText = item.text !== null && item.text !== undefined ? String(item.text) : "";
+        const isSubsection = item.type === "text" && /^제\d+관/.test(safeText.trim());
 
-        if (item.type === "chapter" || item.type === "section") {
+        if (item.type === "chapter" || item.type === "section" || isSubsection) {
           const isChapter = item.type === "chapter";
           if (index > 0 && items[index - 1]?.type === item.type && items[index - 1]?.text === item.text) return null;
           
-          let titlePart = safeText;
+          let titlePart = safeText.trim();
           let historyParts: string[] = [];
           
-          const historyRegex = /(<[^>]+>)/g;
-          const matches = safeText.match(historyRegex);
+          const historyRegex = /(<[^>]+>|\([^)]*(개정|삭제|신설|전문개정|본조신설)[^)]*\))/g;
+          const matches = titlePart.match(historyRegex);
           if (matches) {
              historyParts = matches;
-             titlePart = safeText.replace(historyRegex, "").trim();
+             titlePart = titlePart.replace(historyRegex, "").trim();
           }
 
           const containerClass = isChapter 
             ? "text-center w-full mt-12 mb-6 pt-4 flex flex-col items-center gap-1.5"
-            : "text-center w-full mt-8 mb-4 flex flex-col items-center gap-1";
+            : (isSubsection ? "text-center w-full mt-8 mb-4 flex flex-col items-center gap-1" : "text-center w-full mt-10 mb-4 flex flex-col items-center gap-1");
           
           const titleClass = isChapter
             ? "text-[20px] font-black text-[#000080] tracking-tight"
-            : "text-[18px] font-bold text-[#000080]";
+            : (isSubsection ? "text-[16px] font-bold text-slate-700" : "text-[18px] font-bold text-[#000080]");
 
           return (
-            <div key={index} id={isChapter ? `toc-${safeText.replace(/\s/g, '-')}` : undefined} className={containerClass}>
+            <div key={index} id={isChapter || item.type === 'section' || isSubsection ? `toc-${safeText.trim().replace(/\s/g, '-')}` : undefined} className={containerClass}>
               <span className={titleClass}>
                 {titlePart}
               </span>
@@ -284,7 +297,7 @@ export default function ArticleRenderer({
           // 제목 추출 (예: "(목적)")
           let parsedTitle = "";
           let parsedBody = safeText;
-          if (safeText.startsWith("(")) {
+          if (safeText.startsWith("(") && !/^\((삭제|개정|신설|전문개정|본조신설)/.test(safeText)) {
             const match = safeText.match(/^(\([^)]+\))(.*)/);
             if (match) {
               parsedTitle = match[1];

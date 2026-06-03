@@ -37,6 +37,17 @@ class RuleViewerErrorBoundary extends React.Component<{children: React.ReactNode
   }
 }
 
+const getRevisionTypeName = (type: string | undefined | null) => {
+  if (!type) return "개정";
+  switch(type) {
+    case "ENACTMENT": return "제정";
+    case "AMENDMENT": return "일부개정";
+    case "TOTAL_AMENDMENT": return "전부개정";
+    case "ABOLITION": return "폐지";
+    default: return type;
+  }
+};
+
 export default function RuleViewer(props: RuleViewerProps) {
   return (
     <RuleViewerErrorBoundary>
@@ -108,6 +119,10 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
           } else if (item.type === "article") {
             const articleNum = typeof item.num === 'string' ? item.num : String(item.num || "");
             toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
+          } else if (item.type === "text" && /^제\d+관/.test(String(item.text || "").trim())) {
+            const subsectionText = String(item.text).trim();
+            if (toc.length > 0 && toc[toc.length - 1].type === "subsection" && toc[toc.length - 1].text === subsectionText) return;
+            toc.push({ type: "subsection", id: `toc-${subsectionText.replace(new RegExp("\\s", "g"), '-')}`, text: subsectionText });
           }
         });
       } catch (e) {
@@ -214,7 +229,7 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
               <option key={rev.version} value={rev.version}>
                 {rev.enactmentDate && !isNaN(new Date(rev.enactmentDate).getTime()) 
                   ? new Date(rev.enactmentDate).toLocaleDateString() 
-                  : "날짜없음"} {rev.revisionType || '개정'}
+                  : "날짜없음"} {getRevisionTypeName(rev.revisionType)}
               </option>
             ))}
           </select>
@@ -273,11 +288,13 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
                 itemClass = "mt-4 mb-2 px-2 py-1.5 bg-slate-50 border-y border-slate-200 font-bold text-slate-700 text-[13px] tracking-tight";
               } else if (item.type === "section") {
                 itemClass = "mt-3 mb-1 px-3 py-1 bg-blue-50/30 text-blue-800 font-bold text-[13px] border-l-2 border-blue-500 tracking-tight";
+              } else if (item.type === "subsection") {
+                itemClass = "mt-2 mb-1 pl-6 pr-3 py-1 text-[#000080] font-bold text-[12.5px] tracking-tight before:content-['└'] before:mr-1.5 before:text-blue-400";
               } else if (item.type === "attachment") {
                 itemClass = "px-4 py-1 text-slate-600 hover:text-blue-700 hover:font-bold hover:bg-slate-50 cursor-pointer text-[13px] flex gap-1 transition-all flex items-center before:content-['•'] before:mr-1.5 before:text-slate-400";
               } else {
                 // Article items can have slight indent
-                itemClass = "px-4 py-1 text-slate-600 hover:text-blue-700 hover:font-bold hover:bg-slate-50 cursor-pointer text-[13px] flex gap-1 transition-all";
+                itemClass = "px-5 py-1 text-slate-600 hover:text-blue-700 hover:font-bold hover:bg-slate-50 cursor-pointer text-[13px] flex gap-1 transition-all";
               }
               
               return (
@@ -304,7 +321,7 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 border-b-2 border-slate-700 pb-3 gap-3">
               <div className="text-[14px] font-medium text-[#1E5D9B]">
                 [시행 {currentRevision?.enactmentDate ? new Date(currentRevision.enactmentDate).toLocaleDateString('ko-KR') : "미정"}] 
-                [{currentRevision?.version ? `제${currentRevision.version}호` : ""}{currentRevision?.promulgationDate ? `, ${new Date(currentRevision.promulgationDate).toLocaleDateString('ko-KR')}` : ""}{currentRevision?.revisionType ? `, ${currentRevision.revisionType}` : ""}]
+                [{currentRevision?.version ? `제${currentRevision.version}호` : ""}{currentRevision?.promulgationDate ? `, ${new Date(currentRevision.promulgationDate).toLocaleDateString('ko-KR')}` : ""}{currentRevision?.revisionType ? `, ${getRevisionTypeName(currentRevision.revisionType)}` : ""}]
               </div>
               <div className="text-right text-[13.5px] font-medium text-slate-700 flex items-center justify-end gap-1">
                 담당부서: <span className="font-bold">{department?.name || "미지정"}</span>
