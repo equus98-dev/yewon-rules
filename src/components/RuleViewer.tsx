@@ -229,8 +229,19 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
             <span className="font-bold text-sm text-slate-800">목차 ({tocItems.filter(i => i.type === 'article').length})</span>
           </div>
           <ul className="p-3 space-y-1.5">
-            {tocItems.map((item, idx) => (
-              <li key={idx} className={item.type === "chapter" ? "mt-4 mb-2 px-2 py-1.5 bg-slate-50 border-y border-slate-200 font-bold text-slate-700 text-[13px] tracking-tight" : "px-3 py-1 text-slate-600 hover:text-blue-700 hover:font-bold hover:bg-slate-50 cursor-pointer text-[13px] flex gap-1 transition-all"}>
+            {tocItems.map((item, idx) => {
+              let itemClass = "px-3 py-1 text-slate-600 hover:text-blue-700 hover:font-bold hover:bg-slate-50 cursor-pointer text-[13px] flex gap-1 transition-all";
+              if (item.type === "chapter") {
+                itemClass = "mt-4 mb-2 px-2 py-1.5 bg-slate-50 border-y border-slate-200 font-bold text-slate-700 text-[13px] tracking-tight";
+              } else if (item.type === "section") {
+                itemClass = "mt-3 mb-1 px-3 py-1 bg-blue-50/30 text-blue-800 font-bold text-[13px] border-l-2 border-blue-500 tracking-tight";
+              } else {
+                // Article items can have slight indent
+                itemClass = "px-4 py-1 text-slate-600 hover:text-blue-700 hover:font-bold hover:bg-slate-50 cursor-pointer text-[13px] flex gap-1 transition-all";
+              }
+              
+              return (
+              <li key={idx} className={itemClass}>
                 <a href={`#${item.id}`} className="block w-full" onClick={(e) => {
                   e.preventDefault();
                   document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -238,7 +249,8 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
                   {item.text}
                 </a>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </div>
 

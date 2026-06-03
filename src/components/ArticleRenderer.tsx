@@ -242,7 +242,7 @@ export default function ArticleRenderer({
           } else {
             const isAddendum = safeText.replace(/\s+/g, "").startsWith("부칙");
             return (
-              <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full ${isAddendum ? 'mt-16 mb-4 font-bold text-[16px] text-center border-t-2 border-slate-300 pt-8' : 'pl-[1.25rem] my-1.5'}`}>
+              <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full ${isAddendum ? 'mt-16 mb-4 font-bold text-[16px] text-left border-t-2 border-slate-300 pt-8' : 'pl-[1.25rem] my-1.5'}`}>
                 {renderTextWithHistory(safeText)}
               </div>
             );
