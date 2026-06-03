@@ -44,8 +44,9 @@ function groupArticles(contentJson) {
       // Case 2: num="제N조(title)" 형태
       const matchSimple = item.num.match(/제(\d+)조[（(]?([^)）]*)[)）]?/);
       
-      // Case 3: text가 "의N(title) ..." 또는 "의N ..." 형태로 시작하는 경우
-      const textStartsWithSub = item.text.match(/^의(\d+)[（(]?([^)）]*)[)）]?\s*(.*)/s);
+      // Case 3: text가 "의N(title) ..." 또는 " N(title) ..." 형태로 시작하는 경우
+      const textStartsWithSub = item.text.match(/^의(\d+)[（(]?([^)）]*)[)）]?\s*(.*)/s) 
+                             || item.text.match(/^\s*(\d+)\s*[（(]([^)）]+)[)）]\s*(.*)/s);
 
       if (matchFull) {
         // "제4조의2(외부위원의 임기 등)" 형태
@@ -126,9 +127,11 @@ try {
       if (Array.isArray(art.contentJson)) {
         for (const item of art.contentJson) {
           allJsonItems.push(item);
-          // text가 "의N(...)"으로 시작하는 article 타입 감지
-          if (item.type === 'article' && /^의\d+/.test(item.text?.trim())) {
-            hasSubArticle = true;
+          // text가 "의N(...)" 또는 " N(...)"으로 시작하는 article 타입 감지
+          if (item.type === 'article') {
+            if (/^의\d+/.test(item.text?.trim()) || /^\d+\s*[（(]/.test(item.text?.trim())) {
+              hasSubArticle = true;
+            }
           }
           // num에 의N 형태가 있는 경우도 감지
           if (item.type === 'article' && /제\d+조\s*의\d+/.test(item.num)) {
