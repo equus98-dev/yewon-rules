@@ -320,8 +320,8 @@ function RuleViewerInner({ ruleId }: RuleViewerProps) {
             {/* 법령 정보 (시행일, 담당부서) */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 border-b-2 border-slate-700 pb-3 gap-3">
               <div className="text-[14px] font-medium text-[#1E5D9B]">
-                [시행 {currentRevision?.enactmentDate ? new Date(currentRevision.enactmentDate).toLocaleDateString('ko-KR') : "미정"}] 
-                [{currentRevision?.version ? `제${currentRevision.version}호` : ""}{currentRevision?.promulgationDate ? `, ${new Date(currentRevision.promulgationDate).toLocaleDateString('ko-KR')}` : ""}{currentRevision?.revisionType ? `, ${getRevisionTypeName(currentRevision.revisionType)}` : ""}]
+                [시행 {currentRevision?.effectiveDate ? new Date(currentRevision.effectiveDate).toLocaleDateString('ko-KR') : (currentRevision?.enactmentDate ? new Date(currentRevision.enactmentDate).toLocaleDateString('ko-KR') : "미정")}] 
+                [{currentRevision?.revisionType ? getRevisionTypeName(currentRevision.revisionType) : ""}{currentRevision?.enactmentDate ? ` ${new Date(currentRevision.enactmentDate).toLocaleDateString('ko-KR')}` : ""}]
               </div>
               <div className="text-right text-[13.5px] font-medium text-slate-700 flex items-center justify-end gap-1">
                 담당부서: <span className="font-bold">{department?.name || "미지정"}</span>
