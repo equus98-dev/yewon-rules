@@ -81,7 +81,7 @@ export async function GET(
        FROM "ArticleComparison" ac
        LEFT JOIN "Article" ba ON ac."beforeArticleId" = ba.id
        LEFT JOIN "Article" aa ON ac."afterArticleId" = aa.id
-       WHERE ac."revisionId" = $1`,
+       WHERE ac."revisionId" = $1 AND (ac.note IS NULL OR ac.note NOT LIKE '[단순오타수정전본문]%')`,
       [targetRevisionId]
     );
 

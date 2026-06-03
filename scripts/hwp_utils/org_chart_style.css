@@ -1,0 +1,17 @@
+/* 조직도 전용 스타일 (인라인 스타일 우선, 그리드선 숨김) */
+.org-chart-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem auto;
+  font-size: 0.9rem;
+}
+.org-chart-wrapper td,
+.org-chart-wrapper th {
+  padding: 0;
+  vertical-align: middle;
+}
+.org-chart-wrapper p {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
