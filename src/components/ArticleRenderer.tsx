@@ -161,6 +161,23 @@ export default function ArticleRenderer({
     });
   };
 
+  // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
+  const formatGluedText = (text: string, isArticleBody: boolean = false) => {
+    if (text.length < 50 || /<table|<tr|<td|<th/i.test(text)) {
+        return <span className={isArticleBody ? "font-normal text-slate-800" : ""}>{renderTextWithHistory(text)}</span>;
+    }
+
+    let formatted = text
+      .replace(/(①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩|⑪|⑫|⑬|⑭|⑮)/g, '\n$1')
+      .replace(/(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/g, '\n$1 ')
+      .replace(/(^|\s)([가-하]\.)\s+/g, '$1\n$2 ')
+      .replace(/(제\d+조의?\d*\([^)]+\))/g, '\n\n$1')
+      .replace(/(제\d+장\s+[^\s]+)/g, '\n\n$1');
+
+    const lines = formatted.split('\n').map(l => l.trim()).filter(l => l);
+
+    return (
+      <>
         {lines.map((trimmed, idx) => {
           let lineClass = "break-keep text-slate-800";
           let isInline = (idx === 0 && isArticleBody);
