@@ -133,13 +133,13 @@ export default function ArticleRenderer({
 
     if (hideHistory) {
       // 연혁 숨기기
-      decodedText = decodedText.replace(/<(?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>]*>/gi, "");
+      decodedText = decodedText.replace(/([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi, "");
     }
     
     // 연혁 표시: <개정 ...> 부분을 파란색으로 렌더링하기 위한 문자열 준비
     let htmlText = decodedText.replace(
-      /(<(?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>]*>)/gi,
-      (match) => `<span class="text-[#000080] text-[13px] ml-1">${match.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
+      /([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi,
+      (match) => `<span class="text-blue-500 text-[13px] ml-1">${match.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
     );
 
     // 테이블 등 HTML 태그가 포함되어 있다면 dangerouslySetInnerHTML 사용
@@ -152,9 +152,9 @@ export default function ArticleRenderer({
       );
     }
 
-    const parts = decodedText.split(/(<(?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>]*>)/gi);
+    const parts = decodedText.split(/([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi);
     return parts.map((part, i) => {
-      if (part.startsWith("<") && part.endsWith(">")) {
+      if ((part.startsWith("<") && part.endsWith(">")) || (part.startsWith("(") && part.endsWith(")"))) {
         return <span key={i} className="text-blue-500 text-[13px] ml-1">{part}</span>;
       }
       return <React.Fragment key={i}>{part}</React.Fragment>;
