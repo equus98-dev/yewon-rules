@@ -1,14 +1,13 @@
 // export const runtime = "edge";
 
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { createPool } from "@/lib/db";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const pool = createPool();
   try {
     const { id } = await params;
     const body = await request.json();
@@ -18,36 +17,40 @@ export async function PATCH(
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // 수정 대상 Revision에 포함된 Article들을 가져옵니다.
-    const articles = await prisma.article.findMany({
-      where: { revisionId: revisionId },
-      orderBy: { sortOrder: 'asc' },
-    });
+    const res = await pool.query(
+      `SELECT id FROM "Article" WHERE "revisionId" = $1 ORDER BY "sortOrder" ASC`,
+      [revisionId]
+    );
+    const articles = res.rows;
 
     if (articles.length === 0) {
       return NextResponse.json({ error: "No articles found for this revision" }, { status: 404 });
     }
 
-    // 첫 번째 Article에 HTML 콘텐츠를 통째로 저장하고, 나머지는 빈 HTML로 처리하여
-    // 렌더링 시 중복되지 않도록 합니다.
     const firstArticle = articles[0];
 
-    await prisma.$transaction([
-      prisma.article.update({
-        where: { id: firstArticle.id },
-        data: { contentHtml: contentHtml },
-      }),
-      ...articles.slice(1).map((article) =>
-        prisma.article.update({
-          where: { id: article.id },
-          data: { contentHtml: " " }, // 공백으로 채워 렌더링 시 무시되도록 함
-        })
-      ),
-    ]);
+    await pool.query('BEGIN');
+    
+    await pool.query(
+      `UPDATE "Article" SET "contentHtml" = $1 WHERE id = $2`,
+      [contentHtml, firstArticle.id]
+    );
+
+    for (let i = 1; i < articles.length; i++) {
+      await pool.query(
+        `UPDATE "Article" SET "contentHtml" = $1 WHERE id = $2`,
+        [" ", articles[i].id]
+      );
+    }
+    
+    await pool.query('COMMIT');
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
+    await pool.query('ROLLBACK');
     console.error("[Admin Rule API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+  } finally {
+    await pool.end();
   }
 }
