@@ -94,6 +94,10 @@ function EditorContent() {
       setLoading(true);
       try {
         const res = await fetch(`/api/rules/${selectedRuleId}`);
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`서버 에러: ${text}`);
+        }
         const data = await res.json();
         setRuleDetail(data);
 
