@@ -1,0 +1,1 @@
+SELECT r.id, r.title, r.status, c.name AS categoryName, (SELECT versionName FROM Revision WHERE ruleId = r.id ORDER BY version DESC LIMIT 1) AS latestVersionName FROM Rule r LEFT JOIN Category c ON r.categoryId = c.id WHERE r.status = 'EFFECTIVE' ORDER BY r.title ASC LIMIT 5;  
