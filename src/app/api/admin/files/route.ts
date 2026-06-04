@@ -32,10 +32,74 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  return NextResponse.json(
-    { 
-      error: "현재 시스템은 Cloudflare Pages 클라우드 서버에 배포되어 있어 로컬 파일 업로드가 지원되지 않습니다. 실제 HWP 파일을 업로드하시려면 개발자에게 Supabase Storage 연동을 요청해 주세요." 
-    }, 
-    { status: 501 } // 501 Not Implemented
-  );
+  const pool = createPool();
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.json(
+        { error: "Supabase 설정이 누락되었습니다. (NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY 환경 변수를 확인해 주세요.)" },
+        { status: 500 }
+      );
+    }
+
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const formData = await request.formData();
+    const file = formData.get("file") as File;
+    const ruleId = formData.get("ruleId") as string;
+    const title = formData.get("title") as string;
+    const attachmentId = formData.get("attachmentId") as string;
+
+    if (!file || !ruleId || !title || !attachmentId) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = new Uint8Array(arrayBuffer);
+
+    // 고유 파일명 생성
+    const ext = file.name.split('.').pop();
+    const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${ext}`;
+    
+    // Supabase rules 버킷에 업로드
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("rules")
+      .upload(uniqueFileName, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("[Supabase Upload Error]:", uploadError);
+      return NextResponse.json({ error: `파일 업로드 실패: ${uploadError.message}` }, { status: 500 });
+    }
+
+    // Public URL 가져오기
+    const { data: publicUrlData } = supabase.storage
+      .from("rules")
+      .getPublicUrl(uploadData.path);
+
+    const publicUrl = publicUrlData.publicUrl;
+
+    // 데이터베이스 업데이트
+    await pool.query(
+      `UPDATE "Attachment" 
+       SET "fileUrl" = $1, "fileSize" = $2, "fileType" = $3
+       WHERE id = $4`,
+      [publicUrl, file.size, file.type, attachmentId]
+    );
+
+    return NextResponse.json({ 
+      success: true, 
+      fileUrl: publicUrl 
+    });
+  } catch (error: any) {
+    console.error("[Admin Files API POST Error]:", error);
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+  } finally {
+    await pool.end();
+  }
 }

@@ -905,8 +905,8 @@ export default function Home() {
                                               <td className="py-2.5 px-3 text-center text-slate-400 font-bold align-middle">{idx + 1}</td>
                                               <td className="py-2.5 px-3 font-extrabold text-slate-800 flex items-center justify-between gap-4">
                                                 <a
-                                                  href={att.fileUrl}
-                                                  download
+                                                  href={att.fileUrl.startsWith('http') ? `${att.fileUrl}?download=${encodeURIComponent(att.title + '.hwp')}` : att.fileUrl}
+                                                  download={att.fileUrl.startsWith('http') ? undefined : true}
                                                   target="_blank"
                                                   rel="noopener noreferrer"
                                                   className="flex items-center gap-2 hover:text-blue-700 cursor-pointer min-w-0"

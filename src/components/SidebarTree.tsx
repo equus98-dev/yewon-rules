@@ -478,8 +478,8 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
                   return (
                     <a
                       key={att.id}
-                      href={`/api/download?fileUrl=${encodeURIComponent(att.fileUrl)}`}
-                      download
+                      href={att.fileUrl.startsWith('http') ? `${att.fileUrl}?download=${encodeURIComponent(att.title + '.hwp')}` : `/api/download?fileUrl=${encodeURIComponent(att.fileUrl)}`}
+                      download={att.fileUrl.startsWith('http') ? undefined : true}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full p-2.5 rounded-lg border border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50/30 transition-all flex items-start gap-2.5 cursor-pointer text-left"
