@@ -565,8 +565,8 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
           onClose={() => setOrgChartOpen(false)} 
           maxWidth="lg" 
           fullWidth
-          PaperProps={{
-            sx: {
+          sx={{
+            '& .MuiDialog-paper': {
               bgcolor: 'transparent',
               boxShadow: 'none',
               m: 2,
