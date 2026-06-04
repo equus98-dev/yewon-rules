@@ -7,24 +7,18 @@ export async function GET(
   { params }: { params: Promise<{ key: string }> }
 ) {
   try {
-    const { getRequestContext } = await import("@cloudflare/next-on-pages");
-    const ctx = getRequestContext();
-    const env = ctx?.env as any;
-
+    const env = process.env as any;
     if (!env || !env.STORAGE) {
-      return NextResponse.json(
-        { error: "Cloudflare R2 Storage binding not found" },
-        { status: 500 }
-      );
+      return new NextResponse("Cloudflare R2 스토리지 바인딩(STORAGE)을 찾을 수 없습니다.", { status: 500 });
     }
-
+    const r2 = env.STORAGE;
     const { key } = await params;
     if (!key) {
       return NextResponse.json({ error: "Missing key" }, { status: 400 });
     }
 
     // R2 버킷에서 파일 가져오기
-    const object = await env.STORAGE.get(key);
+    const object = await r2.get(key);
 
     if (!object) {
       return NextResponse.json({ error: "File not found" }, { status: 404 });
