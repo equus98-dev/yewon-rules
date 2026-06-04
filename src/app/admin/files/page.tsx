@@ -212,7 +212,7 @@ export default function AdminFilesManagement() {
                         <div className="flex items-center gap-2 shrink-0 ml-4">
                           <a 
                             href={file.fileUrl} 
-                            download 
+                            download={`${file.title}.hwp`}
                             className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors"
                           >
                             <DownloadIcon sx={{ fontSize: 16 }} />
