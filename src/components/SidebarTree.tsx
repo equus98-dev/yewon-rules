@@ -27,6 +27,7 @@ interface TreeNode {
 interface SidebarTreeProps {
   onSelectRule: (ruleId: string) => void;
   onSelectCategory?: (categoryId: string, categoryName: string) => void;
+  onTabChange?: (tab: string) => void;
   activeRuleId?: string | null;
 }
 
@@ -37,7 +38,7 @@ const OpenedIcon = () => (
   <span className="text-[10px] text-slate-500 font-bold select-none mr-0.5">▼</span>
 );
 
-export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCategory }: SidebarTreeProps) {
+export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCategory, onTabChange }: SidebarTreeProps) {
   // 1단 세로 메뉴 탭 상태: "규정" | "최신 제·개정" | "서식" | "공지" | "조직도"
   const [verticalTab, setVerticalTab] = useState<"규정" | "최신 제·개정" | "서식" | "공지" | "조직도">("규정");
 
@@ -259,7 +260,10 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
           return (
             <button
               key={item.id}
-              onClick={() => setVerticalTab(item.id)}
+              onClick={() => {
+                setVerticalTab(item.id);
+                if (onTabChange) onTabChange(item.id);
+              }}
               className={`w-14 h-14 flex flex-col items-center justify-center gap-1 rounded-xl cursor-pointer transition-all duration-200 active:scale-95 ${
                 isActive
                   ? "bg-white text-[#0c3161] font-bold shadow-md"

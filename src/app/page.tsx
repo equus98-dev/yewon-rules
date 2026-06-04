@@ -24,6 +24,7 @@ export default function Home() {
   
   // 카테고리 뷰 관련 상태
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [activeVerticalTab, setActiveVerticalTab] = useState<string>("규정");
   const [activeCategoryName, setActiveCategoryName] = useState<string | null>(null);
   const [categoryRules, setCategoryRules] = useState<any[]>([]);
   const [loadingCategory, setLoadingCategory] = useState(false);
@@ -411,9 +412,18 @@ export default function Home() {
                 setActiveRuleId(cleanId);
                 setIsSearching(false); // 상세 보기 시 검색 결과 모드 해제
                 setActiveCategoryId(null);
+                setActiveVerticalTab("규정"); // 규정 선택 시 자동으로 규정 탭으로 이동
               }}
               onSelectCategory={(categoryId, categoryName) => {
                 handleCategorySelect(categoryId, categoryName);
+              }}
+              onTabChange={(tab) => {
+                setActiveVerticalTab(tab);
+                if (tab === "조직도") {
+                  setActiveRuleId(null);
+                  setActiveCategoryId(null);
+                  setIsSearching(false);
+                }
               }}
             />
           </div>
@@ -441,7 +451,21 @@ export default function Home() {
               )}
             </button>
           </div>
-          {activeRuleId ? (
+          {activeVerticalTab === "조직도" ? (
+            <div className="flex-1 overflow-y-auto p-10 flex flex-col items-center justify-start bg-slate-100">
+              <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden mt-6 mb-12 flex flex-col">
+                <div className="bg-[#0c3161] p-4 flex items-center justify-between">
+                  <h2 className="text-white font-extrabold text-xl">예원예술대학교 기구표 (조직도)</h2>
+                  <a href="/docs/1.jpg" download="예원예술대학교_기구표.jpg" className="px-4 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-bold transition-colors">
+                    다운로드
+                  </a>
+                </div>
+                <div className="p-8 flex justify-center">
+                  <img src="/docs/1.jpg" alt="조직도" className="w-full h-auto object-contain" />
+                </div>
+              </div>
+            </div>
+          ) : activeRuleId ? (
             /* 규정 뷰어 표시 */
             <div className="flex-1 overflow-hidden h-full bg-white shadow-[-4px_0_15px_rgba(0,0,0,0.03)] border-l border-slate-200">
               <RuleViewer ruleId={activeRuleId} isAdmin={isAdmin} />
