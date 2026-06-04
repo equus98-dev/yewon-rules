@@ -9,4 +9,4 @@ database_id = "f448ab63-128a-4e09-a1e1-02095e73d92e"
 
 [[r2_buckets]]
 binding = "STORAGE"
-bucket_name = "yewon-rules-storage"
+bucket_name = "yewon-attachments"
