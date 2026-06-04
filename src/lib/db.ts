@@ -1,13 +1,10 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
-
 export function getD1() {
-  const ctx = getRequestContext();
-  const env = ctx?.env as any;
-  if (!env || !env.DB) {
-    const keys = env ? Object.keys(env).join(', ') : 'env is undefined';
-    throw new Error(`D1 Database binding 'DB' not found in edge environment. Available bindings: ${keys}`);
+  const db = process.env.DB;
+  if (!db) {
+    const keys = process.env ? Object.keys(process.env).join(', ') : 'env is undefined';
+    throw new Error(`D1 Database binding 'DB' not found. Available bindings: ${keys}`);
   }
-  return env.DB;
+  return db;
 }
 
 // A wrapper to make D1 behave similarly to pg.Pool for easy migration

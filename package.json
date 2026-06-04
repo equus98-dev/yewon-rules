@@ -17,6 +17,7 @@
     "@mui/icons-material": "^9.0.1",
     "@mui/material": "^9.0.1",
     "@mui/x-tree-view": "^9.1.0",
+    "@opennextjs/cloudflare": "^1.19.11",
     "@supabase/supabase-js": "^2.107.0",
     "cfb": "^1.2.2",
     "cheerio": "^1.2.0",
@@ -39,7 +40,8 @@
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
     "tsx": "^4.22.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.97.0"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
