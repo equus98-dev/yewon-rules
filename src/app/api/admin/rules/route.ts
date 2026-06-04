@@ -47,8 +47,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const pool = createPool();
-  const client = await pool.connect();
+  let client;
   try {
+    client = await pool.connect();
     const body = await request.json();
     const { title, ruleNumber, categoryId, departmentId, enactmentDate, announcementNumber, fileUrl, articles } = body;
     if (!title || !ruleNumber || !categoryId || !departmentId || !enactmentDate) {
@@ -89,14 +90,14 @@ export async function POST(request: Request) {
     await client.query("COMMIT");
     return NextResponse.json({ success: true, ruleId });
   } catch (error: any) {
-    await client.query("ROLLBACK");
+    if (client) await client.query("ROLLBACK");
     console.error("[Admin Rules POST Error]:", error);
     if (error.message?.includes("duplicate key value violates unique constraint")) {
       return NextResponse.json({ error: "이미 존재하는 규정 번호입니다." }, { status: 409 });
     }
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    client.release();
+    if (client) client.release();
     await pool.end();
   }
 }
@@ -132,14 +133,15 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   const pool = createPool();
-  const client = await pool.connect();
+  let client;
   try {
+    client = await pool.connect();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "Missing rule ID" }, { status: 400 });
     await client.query("BEGIN");
     await client.query(`DELETE FROM "Article" WHERE "revisionId" IN (SELECT id FROM "Revision" WHERE "ruleId" = $1)`, [id]);
-    await client.query(`DELETE FROM "Comparison" WHERE "revisionId" IN (SELECT id FROM "Revision" WHERE "ruleId" = $1)`, [id]);
+    await client.query(`DELETE FROM "ArticleComparison" WHERE "revisionId" IN (SELECT id FROM "Revision" WHERE "ruleId" = $1)`, [id]);
     await client.query(`DELETE FROM "Attachment" WHERE "ruleId" = $1`, [id]);
     await client.query(`DELETE FROM "Revision" WHERE "ruleId" = $1`, [id]);
     const ruleRes = await client.query(`DELETE FROM "Rule" WHERE id = $1 RETURNING *`, [id]);
@@ -147,11 +149,11 @@ export async function DELETE(request: Request) {
     if (ruleRes.rows.length === 0) return NextResponse.json({ error: "Rule not found" }, { status: 404 });
     return NextResponse.json({ success: true, message: "규정이 성공적으로 삭제되었습니다." });
   } catch (error: any) {
-    await client.query("ROLLBACK");
+    if (client) await client.query("ROLLBACK");
     console.error("[Admin Rules DELETE Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    client.release();
+    if (client) client.release();
     await pool.end();
   }
 }

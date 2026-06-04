@@ -6,8 +6,9 @@ import { createPool } from "@/lib/db";
 
 export async function POST(request: Request) {
   const pool = createPool();
-  const client = await pool.connect();
+  let client;
   try {
+    client = await pool.connect();
     const body = await request.json();
     const { ruleId, versionName, revisionType, enactmentDate, effectiveDate, announcementNumber, description, articles } = body;
 
@@ -71,11 +72,11 @@ export async function POST(request: Request) {
     await client.query("COMMIT");
     return NextResponse.json({ success: true, revisionId: newRevisionId, version: nextVersion });
   } catch (error: any) {
-    await client.query("ROLLBACK");
+    if (client) await client.query("ROLLBACK");
     console.error("[Admin Revision POST Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    client.release();
+    if (client) client.release();
     await pool.end();
   }
 }

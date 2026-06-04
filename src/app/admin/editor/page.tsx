@@ -240,16 +240,23 @@ function EditorContent() {
         }),
       });
 
-      const data = await res.json();
+      let data;
+      const textResponse = await res.text();
+      try {
+        data = JSON.parse(textResponse);
+      } catch (e) {
+        throw new Error(`Server returned non-JSON response: ${textResponse}`);
+      }
+
       if (res.ok) {
         alert(`🎉 ${versionName} 배포가 성공적으로 완료되었습니다!`);
         router.push("/admin/rules");
       } else {
         alert(data.error || "배포 실패");
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("네트워크 오류");
+      alert(`네트워크/서버 오류: ${e.message}`);
     } finally {
       setSaving(false);
     }
