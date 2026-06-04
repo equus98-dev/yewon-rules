@@ -88,7 +88,7 @@ export async function POST(request: Request) {
       `UPDATE "Attachment" 
        SET "fileUrl" = $1, "fileSize" = $2, "fileType" = $3
        WHERE id = $4`,
-      [publicUrl, file.size, file.type, attachmentId]
+      [publicUrl, file.size, ext?.toUpperCase() || 'HWP', attachmentId]
     );
 
     return NextResponse.json({ 
