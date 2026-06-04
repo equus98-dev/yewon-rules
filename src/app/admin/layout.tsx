@@ -10,6 +10,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import EditIcon from "@mui/icons-material/Edit";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import CampaignIcon from "@mui/icons-material/Campaign";
+import FolderIcon from "@mui/icons-material/Folder";
 
 export default function AdminLayout({
   children,
@@ -70,6 +71,11 @@ export default function AdminLayout({
       label: "규정 관리",
       href: "/admin/rules",
       icon: <MenuBookIcon sx={{ fontSize: 18 }} />,
+    },
+    {
+      label: "서식/규정파일 관리",
+      href: "/admin/files",
+      icon: <FolderIcon sx={{ fontSize: 18 }} />,
     },
     {
       label: "입안편집기 (DLMS)",
