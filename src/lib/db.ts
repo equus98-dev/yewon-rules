@@ -20,6 +20,7 @@ class D1PoolWrapper {
   private convertSql(sql: string) {
     let newSql = sql.replace(/\$(\d+)/g, '?$1');
     newSql = newSql.replace(/NOW\(\)/gi, "CURRENT_TIMESTAMP");
+    newSql = newSql.replace(/ILIKE/gi, "LIKE");
     // SQLite doesn't support RETURNING * in older versions, but D1 does.
     return newSql;
   }
@@ -33,7 +34,8 @@ class D1PoolWrapper {
       return { rows: [], rowCount: 0 };
     }
 
-    const stmt = this.db.prepare(this.convertSql(sql)).bind(...params);
+    const safeParams = params.map(p => (p instanceof Date ? p.toISOString() : p));
+    const stmt = this.db.prepare(this.convertSql(sql)).bind(...safeParams);
     const { results } = await stmt.all();
     return { rows: results || [], rowCount: results?.length || 0 };
   }
