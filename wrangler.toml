@@ -1,0 +1,8 @@
+name = "yewon-rules"
+compatibility_date = "2024-03-20"
+pages_build_output_dir = ".vercel/output/static"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "yewon-rules-db"
+database_id = "이곳에_생성하신_D1_database_id를_입력하세요"

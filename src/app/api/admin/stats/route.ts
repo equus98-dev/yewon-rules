@@ -7,13 +7,14 @@ import { createPool } from "@/lib/db";
 export async function GET(request: Request) {
   const pool = createPool();
   try {
-    const rRules = await pool.query('SELECT COUNT(*)::int as count FROM "Rule"');
-    const rCategories = await pool.query('SELECT COUNT(*)::int as count FROM "Category"');
-    const rDepartments = await pool.query('SELECT COUNT(*)::int as count FROM "Department"');
-    const rAttachments = await pool.query('SELECT COUNT(*)::int as count FROM "Attachment"');
+    const rRules = await pool.query('SELECT COUNT(*) as count FROM "Rule"');
+    const rCategories = await pool.query('SELECT COUNT(*) as count FROM "Category"');
+    const rDepartments = await pool.query('SELECT COUNT(*) as count FROM "Department"');
+    const rAttachments = await pool.query('SELECT COUNT(*) as count FROM "Attachment"');
     const rDepts = await pool.query(`
-      SELECT d.id, d.name, COUNT(r.id)::int as count 
+      SELECT d.id, d.name, COUNT(r.id) as count 
       FROM "Department" d
+
       LEFT JOIN "Rule" r ON r."departmentId" = d.id
       GROUP BY d.id, d.name, d."sortOrder"
       ORDER BY d."sortOrder" ASC

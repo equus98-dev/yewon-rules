@@ -30,7 +30,7 @@ export async function GET(request: Request) {
       LEFT JOIN "Department" d ON r."departmentId" = d.id
       ORDER BY r.title ASC
     `);
-    return NextResponse.json(res.rows.map((r) => ({
+    return NextResponse.json(res.rows.map((r: any) => ({
       id: r.id, title: r.title, ruleNumber: r.ruleNumber, initialSound: r.initialSound,
       status: r.status, categoryId: r.categoryId, categoryName: r.categoryName || "미분류",
       departmentId: r.departmentId, departmentName: r.departmentName || "미지정",

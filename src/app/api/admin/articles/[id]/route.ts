@@ -68,7 +68,7 @@ export async function GET(
       [id]
     );
 
-    const history = historyRes.rows.map(row => ({
+    const history = historyRes.rows.map((row: any) => ({
       id: row.id,
       createdAt: row.createdAt,
       beforeText: row.note.replace('[단순오타수정전본문]', '')

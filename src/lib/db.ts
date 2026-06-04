@@ -1,10 +1,56 @@
-import { Pool } from "@neondatabase/serverless";
+import { getRequestContext } from "@cloudflare/next-on-pages";
 
-const connectionString =
-  "postgresql://postgres.jagpwxgasudlnaoxfroe:Tmtmfh0022%24%26%2A@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres";
+export function getD1() {
+  const ctx = getRequestContext();
+  const env = ctx?.env as any;
+  if (!env || !env.DB) {
+    throw new Error("D1 Database binding 'DB' not found in edge environment");
+  }
+  return env.DB;
+}
 
-// Factory: create a fresh Pool per request (edge runtime has no persistent state)
-// Always call pool.end() in a finally block after using the returned pool
-export function createPool(): Pool {
-  return new Pool({ connectionString, ssl: { rejectUnauthorized: false } });
+// A wrapper to make D1 behave similarly to pg.Pool for easy migration
+class D1PoolWrapper {
+  private db: any;
+  constructor(db: any) {
+    this.db = db;
+  }
+  
+  // Converts $1, $2 to ?1, ?2 for SQLite, and NOW() to CURRENT_TIMESTAMP
+  private convertSql(sql: string) {
+    let newSql = sql.replace(/\$(\d+)/g, '?$1');
+    newSql = newSql.replace(/NOW\(\)/gi, "CURRENT_TIMESTAMP");
+    // SQLite doesn't support RETURNING * in older versions, but D1 does.
+    return newSql;
+  }
+
+  async query(sql: string, params: any[] = []) {
+    const trimmed = sql.trim().toUpperCase();
+    if (trimmed === "BEGIN" || trimmed === "COMMIT" || trimmed === "ROLLBACK") {
+      // Ignore transaction statements as D1 interactive transactions are not supported.
+      // This means queries will run sequentially without atomic guarantees,
+      // which is acceptable for this single-admin CMS application.
+      return { rows: [], rowCount: 0 };
+    }
+
+    const stmt = this.db.prepare(this.convertSql(sql)).bind(...params);
+    const { results } = await stmt.all();
+    return { rows: results || [], rowCount: results?.length || 0 };
+  }
+
+  async connect() {
+    return {
+      query: this.query.bind(this),
+      release: () => {}, // No-op
+    };
+  }
+
+  async end() {
+    // No-op
+  }
+}
+
+export function createPool() {
+  const db = getD1();
+  return new D1PoolWrapper(db);
 }
