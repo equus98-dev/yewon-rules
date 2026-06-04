@@ -72,11 +72,15 @@ export async function POST(request: Request) {
     await client.query("COMMIT");
     return NextResponse.json({ success: true, revisionId: newRevisionId, version: nextVersion });
   } catch (error: any) {
-    if (client) await client.query("ROLLBACK");
+    if (client) {
+      try { await client.query("ROLLBACK"); } catch (e) { console.error("Rollback error:", e); }
+    }
     console.error("[Admin Revision POST Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    if (client) client.release();
-    await pool.end();
+    if (client) {
+      try { client.release(); } catch (e) { console.error("Release error:", e); }
+    }
+    try { await pool.end(); } catch (e) { console.error("Pool end error:", e); }
   }
 }
