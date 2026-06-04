@@ -5,8 +5,9 @@ import { NextResponse } from "next/server";
 import { createPool } from "@/lib/db";
 
 export async function GET(request: Request) {
-  const pool = createPool();
+  let pool: any;
   try {
+    pool = createPool();
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("query") || "";
     const initialSound = searchParams.get("initialSound") || "";
@@ -153,6 +154,6 @@ export async function GET(request: Request) {
     console.error("[Search API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }

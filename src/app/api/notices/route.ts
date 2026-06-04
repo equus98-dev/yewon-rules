@@ -5,8 +5,9 @@ import { NextResponse } from "next/server";
 import { createPool } from "@/lib/db";
 
 export async function GET(request: Request) {
-  const pool = createPool();
+  let pool: any;
   try {
+    pool = createPool();
     const res = await pool.query('SELECT id, title, content, dept, date, "createdAt", "updatedAt" FROM "Notice" ORDER BY "createdAt" DESC');
     const notices = res.rows.map((row) => ({ ...row, date: row.date || "-" }));
     return NextResponse.json(notices);
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
     console.error("[Notice GET API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }
 
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
     console.error("[Notice POST API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }
 
@@ -56,7 +57,7 @@ export async function PUT(request: Request) {
     console.error("[Notice PUT API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }
 
@@ -73,6 +74,6 @@ export async function DELETE(request: Request) {
     console.error("[Notice DELETE API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }

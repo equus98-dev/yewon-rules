@@ -4,7 +4,8 @@ export function getD1() {
   const ctx = getRequestContext();
   const env = ctx?.env as any;
   if (!env || !env.DB) {
-    throw new Error("D1 Database binding 'DB' not found in edge environment");
+    const keys = env ? Object.keys(env).join(', ') : 'env is undefined';
+    throw new Error(`D1 Database binding 'DB' not found in edge environment. Available bindings: ${keys}`);
   }
   return env.DB;
 }
