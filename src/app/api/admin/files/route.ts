@@ -50,10 +50,9 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const ruleId = formData.get("ruleId") as string;
-    const title = formData.get("title") as string;
     const attachmentId = formData.get("attachmentId") as string;
 
-    if (!file || !ruleId || !title || !attachmentId) {
+    if (!file || !ruleId || !attachmentId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
