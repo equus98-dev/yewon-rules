@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Tabs, Tab, Box, TextField, CircularProgress, Typography } from "@mui/material";
+import { Tabs, Tab, Box, TextField, CircularProgress, Typography, Dialog } from "@mui/material";
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
 import FolderIcon from "@mui/icons-material/Folder";
@@ -40,6 +40,9 @@ const OpenedIcon = () => (
 export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCategory }: SidebarTreeProps) {
   // 1단 세로 메뉴 탭 상태: "규정" | "최신 제·개정" | "서식" | "공지" | "조직도"
   const [verticalTab, setVerticalTab] = useState<"규정" | "최신 제·개정" | "서식" | "공지" | "조직도">("규정");
+
+  // 조직도 모달 상태
+  const [orgChartOpen, setOrgChartOpen] = useState(false);
 
   // 규정 탭 내부 상태
   const [tabIndex, setTabIndex] = useState(0); // 0: 분야별, 1: 소관부서별, 2: 가나다순
@@ -543,15 +546,48 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
         {/* 2-5) 조직도 패널 */}
         {verticalTab === "조직도" && (
           <div className="flex-1 overflow-y-auto p-4 flex items-start justify-center bg-slate-50/30">
-            <a href="/docs/1.jpg" target="_blank" rel="noopener noreferrer" className="cursor-pointer block w-full hover:opacity-90 transition-opacity" title="크게 보기">
+            <div 
+              onClick={() => setOrgChartOpen(true)} 
+              className="cursor-pointer block w-full hover:opacity-90 transition-opacity" 
+              title="크게 보기"
+            >
               <img 
                 src="/docs/1.jpg" 
                 alt="조직도" 
                 className="w-full h-auto object-contain shadow-sm border border-slate-200 rounded-md"
               />
-            </a>
+            </div>
           </div>
         )}
+
+        <Dialog 
+          open={orgChartOpen} 
+          onClose={() => setOrgChartOpen(false)} 
+          maxWidth="lg" 
+          fullWidth
+          PaperProps={{
+            sx: {
+              bgcolor: 'transparent',
+              boxShadow: 'none',
+              m: 2,
+              maxHeight: '90vh'
+            }
+          }}
+        >
+          <div className="relative w-full h-full flex flex-col items-center justify-center">
+            <button 
+              onClick={() => setOrgChartOpen(false)}
+              className="absolute -top-4 -right-4 bg-white text-slate-800 hover:bg-slate-100 rounded-full w-10 h-10 flex items-center justify-center shadow-lg z-50 text-xl font-bold border border-slate-200"
+            >
+              ✕
+            </button>
+            <img 
+              src="/docs/1.jpg" 
+              alt="조직도 크게 보기" 
+              className="w-full h-auto max-h-[85vh] object-contain rounded-xl shadow-2xl bg-white"
+            />
+          </div>
+        </Dialog>
 
       </div>
     </div>
