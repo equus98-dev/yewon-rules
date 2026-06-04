@@ -34,18 +34,16 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const pool = createPool();
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
+    const { getRequestContext } = await import("@cloudflare/next-on-pages");
+    const ctx = getRequestContext();
+    const env = ctx?.env as any;
+    
+    if (!env || !env.STORAGE) {
       return NextResponse.json(
-        { error: "Supabase 설정이 누락되었습니다. (NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY 환경 변수를 확인해 주세요.)" },
+        { error: "Cloudflare R2 스토리지 바인딩(STORAGE)을 찾을 수 없습니다." },
         { status: 500 }
       );
     }
-
-    const { createClient } = await import("@supabase/supabase-js");
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
@@ -59,29 +57,19 @@ export async function POST(request: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = new Uint8Array(arrayBuffer);
 
-    // 고유 파일명 생성
+    // 고유 파일명(key) 생성
     const ext = file.name.split('.').pop();
     const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${ext}`;
     
-    // Supabase rules 버킷에 업로드
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("rules")
-      .upload(uniqueFileName, buffer, {
+    // Cloudflare R2 버킷에 업로드
+    await env.STORAGE.put(uniqueFileName, buffer, {
+      httpMetadata: {
         contentType: file.type,
-        upsert: false,
-      });
+      },
+    });
 
-    if (uploadError) {
-      console.error("[Supabase Upload Error]:", uploadError);
-      return NextResponse.json({ error: `파일 업로드 실패: ${uploadError.message}` }, { status: 500 });
-    }
-
-    // Public URL 가져오기
-    const { data: publicUrlData } = supabase.storage
-      .from("rules")
-      .getPublicUrl(uploadData.path);
-
-    const publicUrl = publicUrlData.publicUrl;
+    // Public API URL 생성 (파일 다운로드용 라우트)
+    const publicUrl = `/api/files/${uniqueFileName}`;
 
     // 데이터베이스 업데이트
     await pool.query(
