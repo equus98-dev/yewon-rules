@@ -64,6 +64,9 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
   const [notices, setNotices] = useState<any[]>([]);
   const [loadingNotices, setLoadingNotices] = useState(false);
 
+  // 에러 팝업 상태
+  const [errorPopup, setErrorPopup] = useState<string | null>(null);
+
   const tabTypes = ["field", "dept", "abc"];
 
   // 1. 규정 대분류 트리 데이터 패치
@@ -73,14 +76,19 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
       try {
         const type = tabTypes[tabIndex];
         const res = await fetch(`/api/categories?type=${type}`);
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`API Error: [${res.status}] ${text}`);
+        }
         const data = await res.json();
         if (Array.isArray(data)) {
           setTreeData(data);
         } else {
           setTreeData([]);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to load tree data:", error);
+        setErrorPopup(error.message || "Failed to load categories");
         setTreeData([]);
       } finally {
         setLoading(false);
@@ -97,6 +105,10 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
       setLoadingRecent(true);
       try {
         const res = await fetch("/api/rules/search?query=");
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`API Error: [${res.status}] ${text}`);
+        }
         const data = await res.json();
         if (Array.isArray(data)) {
           // 공포일자(enactmentDate) 내림차순 정렬
@@ -105,8 +117,9 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
           );
           setRecentRules(sorted);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to fetch recent rules:", err);
+        setErrorPopup(err.message || "Failed to load recent rules");
       } finally {
         setLoadingRecent(false);
       }
@@ -122,12 +135,17 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
       setLoadingAttachments(true);
       try {
         const res = await fetch("/api/attachments");
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`API Error: [${res.status}] ${text}`);
+        }
         const data = await res.json();
         if (Array.isArray(data)) {
           setAttachments(data);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to fetch attachments:", err);
+        setErrorPopup(err.message || "Failed to load attachments");
       } finally {
         setLoadingAttachments(false);
       }
@@ -143,12 +161,17 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
       setLoadingNotices(true);
       try {
         const res = await fetch("/api/notices");
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`API Error: [${res.status}] ${text}`);
+        }
         const data = await res.json();
         if (Array.isArray(data)) {
           setNotices(data);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to fetch notices:", err);
+        setErrorPopup(err.message || "Failed to load notices");
       } finally {
         setLoadingNotices(false);
       }
@@ -590,6 +613,29 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
               alt="조직도 크게 보기" 
               className="w-full h-auto max-h-[85vh] object-contain rounded-xl shadow-2xl bg-white"
             />
+          </div>
+        </Dialog>
+
+        {/* 에러 팝업 모달 */}
+        <Dialog 
+          open={!!errorPopup} 
+          onClose={() => setErrorPopup(null)} 
+          maxWidth="sm" 
+          fullWidth
+        >
+          <div className="p-6 flex flex-col gap-4">
+            <h3 className="text-lg font-bold text-red-600">데이터를 불러오는 중 오류가 발생했습니다.</h3>
+            <p className="text-sm text-slate-700 font-mono whitespace-pre-wrap bg-slate-100 p-4 rounded-md overflow-x-auto max-h-64 overflow-y-auto">
+              {errorPopup}
+            </p>
+            <div className="flex justify-end mt-2">
+              <button
+                onClick={() => setErrorPopup(null)}
+                className="px-4 py-2 bg-slate-800 text-white rounded-md text-sm font-bold hover:bg-slate-700"
+              >
+                닫기
+              </button>
+            </div>
           </div>
         </Dialog>
 
