@@ -166,7 +166,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           url += `?version=${selectedVersion}`;
         }
         const res = await fetch(url);
-        const data = await res.json();
+        const data = (await res.json()) as any;
         setRuleData(data);
         
         // 처음 로드 시에는 현재 로드된 버전의 숫자를 selectedVersion에 동기화

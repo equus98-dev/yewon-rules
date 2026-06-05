@@ -33,7 +33,7 @@ export default function AdminFilesManagement() {
     async function loadCategories() {
       try {
         const res = await fetch("/api/categories?type=field");
-        const data = await res.json();
+        const data = (await res.json()) as any;
         
         // Convert to RichTreeView format
         const convertToMuiTree = (nodes: any[]): any[] => {
@@ -82,7 +82,7 @@ export default function AdminFilesManagement() {
     try {
       const res = await fetch(`/api/admin/files?ruleId=${ruleId}`);
       if (!res.ok) throw new Error("Failed to load");
-      const data = await res.json();
+      const data = (await res.json()) as any;
       setAttachments(data);
     } catch (e) {
       console.error(e);
@@ -121,7 +121,7 @@ export default function AdminFilesManagement() {
         body: formData,
       });
       
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (!res.ok) throw new Error(data.error || "업로드 실패");
       
       alert("파일이 성공적으로 교체되었습니다.");

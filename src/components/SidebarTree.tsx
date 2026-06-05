@@ -80,7 +80,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
           const text = await res.text();
           throw new Error(`API Error: [${res.status}] ${text}`);
         }
-        const data = await res.json();
+        const data = (await res.json()) as any;
         if (Array.isArray(data)) {
           setTreeData(data);
         } else {
@@ -109,7 +109,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
           const text = await res.text();
           throw new Error(`API Error: [${res.status}] ${text}`);
         }
-        const data = await res.json();
+        const data = (await res.json()) as any;
         if (Array.isArray(data)) {
           // 공포일자(enactmentDate) 내림차순 정렬
           const sorted = data.sort(
@@ -139,7 +139,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
           const text = await res.text();
           throw new Error(`API Error: [${res.status}] ${text}`);
         }
-        const data = await res.json();
+        const data = (await res.json()) as any;
         if (Array.isArray(data)) {
           setAttachments(data);
         }
@@ -165,7 +165,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
           const text = await res.text();
           throw new Error(`API Error: [${res.status}] ${text}`);
         }
-        const data = await res.json();
+        const data = (await res.json()) as any;
         if (Array.isArray(data)) {
           setNotices(data);
         }

@@ -103,7 +103,7 @@ export default function Home() {
     setLoadingNotices(true);
     try {
       const res = await fetch("/api/notices");
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (Array.isArray(data)) {
         setNotices(data);
       }
@@ -120,7 +120,7 @@ export default function Home() {
       setLoadingRecent(true);
       try {
         const res = await fetch("/api/rules/search?query=");
-        const data = await res.json();
+        const data = (await res.json()) as any;
         if (Array.isArray(data)) {
           // enactmentDate 기준 최근순으로 5개만 노출
           const sorted = data.sort(
@@ -219,7 +219,7 @@ export default function Home() {
       if (enactmentEnd) params.append("enactmentEnd", enactmentEnd);
 
       const res = await fetch(`/api/rules/search?${params.toString()}`);
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (Array.isArray(data) || data.isGrouped) {
         setSearchResults(data);
       } else {
@@ -267,7 +267,7 @@ export default function Home() {
     setLoadingCategory(true);
     try {
       const res = await fetch(`/api/rules/search?categoryId=${categoryId}&query=`);
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (Array.isArray(data)) {
         setCategoryRules(data);
       } else {

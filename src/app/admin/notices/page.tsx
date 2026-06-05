@@ -29,7 +29,7 @@ export default function AdminNotices() {
     setLoading(true);
     try {
       const res = await fetch("/api/notices");
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (Array.isArray(data)) {
         setNotices(data);
       }
@@ -99,7 +99,7 @@ export default function AdminNotices() {
         setModalOpen(false);
         await loadNotices();
       } else {
-        const err = await res.json();
+        const err = (await res.json()) as any;
         alert(`저장 실패: ${err.error || "알 수 없는 에러"}`);
       }
     } catch (err: any) {
@@ -121,7 +121,7 @@ export default function AdminNotices() {
       if (res.ok) {
         await loadNotices();
       } else {
-        const err = await res.json();
+        const err = (await res.json()) as any;
         alert(`삭제 실패: ${err.error || "알 수 없는 에러"}`);
       }
     } catch (err: any) {

@@ -123,7 +123,7 @@ export default function AdminRulesManagement() {
       const res = await fetch(`/api/admin/rules?id=${ruleId}`, {
         method: "DELETE",
       });
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (res.ok) {
         alert("규정이 성공적으로 영구 삭제되었습니다.");
         setRules((prev) => prev.filter((r) => r.id !== ruleId));
@@ -160,7 +160,7 @@ export default function AdminRulesManagement() {
         }),
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (res.ok) {
         alert("규정 제정 등록이 성공적으로 완료되었습니다!");
         window.location.reload();

@@ -53,7 +53,7 @@ export default function RuleEditPage({ id }: { id: string }) {
       try {
         const res = await fetch(`/api/rules/${id}`);
         if (!res.ok) throw new Error("규정을 불러오는데 실패했습니다.");
-        const data = await res.json();
+        const data = (await res.json()) as any;
         
         setRuleData(data);
         const rev = data.currentRevision;
