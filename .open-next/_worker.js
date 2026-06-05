@@ -14,7 +14,6 @@ export { DOShardedTagCache } from "./.build/durable-objects/sharded-tag-cache.js
 export { BucketCachePurge } from "./.build/durable-objects/bucket-cache-purge.js";
 export default {
     async fetch(request, env, ctx) {
-        throw new Error("WORKER IS DEFINITELY RUNNING!");
         return runWithCloudflareRequestContext(request, env, ctx, async () => {
             const response = maybeGetSkewProtectionResponse(request);
             if (response) {
