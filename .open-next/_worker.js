@@ -1,5 +1,3 @@
-import { createRequire } from "node:module";
-globalThis.require = createRequire("file:///worker.js");
 //@ts-expect-error: Will be resolved by wrangler build
 import { handleCdnCgiImageRequest, handleImageRequest } from "./cloudflare/images.js";
 //@ts-expect-error: Will be resolved by wrangler build
@@ -16,6 +14,7 @@ export { DOShardedTagCache } from "./.build/durable-objects/sharded-tag-cache.js
 export { BucketCachePurge } from "./.build/durable-objects/bucket-cache-purge.js";
 export default {
     async fetch(request, env, ctx) {
+        throw new Error("WORKER IS DEFINITELY RUNNING!");
         return runWithCloudflareRequestContext(request, env, ctx, async () => {
             const response = maybeGetSkewProtectionResponse(request);
             if (response) {

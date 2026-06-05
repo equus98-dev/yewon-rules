@@ -8,3 +8,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 # AI Agent Workflow Rule: Auto Git Push
 Whenever you make changes to the source code or fix a bug in this project, you MUST ALWAYS execute `git add`, `git commit -m "..."`, and `git push origin main` at the end of your workflow so that the changes are automatically deployed to the production server. Do not wait for the user to remind you!
 <!-- END:git-push-rule -->
+
+<!-- BEGIN:korean-language-rule -->
+# AI Agent Workflow Rule: Korean Language
+You MUST always communicate and respond to the USER in Korean (한국어). 
+Do NOT reply in English unless specifically asked to translate or output English code/text.
+<!-- END:korean-language-rule -->
