@@ -15,7 +15,7 @@ export async function GET(
     if (!env || !env.STORAGE) {
       return NextResponse.json(
         { error: "Cloudflare R2 Storage binding not found" },
-        { status: 500 }
+        { status: 400 }
       );
     }
 
@@ -46,6 +46,6 @@ export async function GET(
     });
   } catch (error: any) {
     console.error("[Files API GET Error]:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 400 });
   }
 }

@@ -152,7 +152,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ isGrouped: true, titleMatches, bodyMatches, attachmentMatches });
   } catch (error: any) {
     console.error("[Search API Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) await pool.end();
   }

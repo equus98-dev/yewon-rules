@@ -49,7 +49,7 @@ export async function PATCH(
   } catch (error: any) {
     await pool.query('ROLLBACK');
     console.error("[Admin Rule API Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) await pool.end();
   }

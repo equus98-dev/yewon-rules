@@ -34,6 +34,6 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("Download proxy error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 400 });
   }
 }

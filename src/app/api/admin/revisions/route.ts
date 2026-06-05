@@ -76,7 +76,7 @@ export async function POST(request: Request) {
       try { await client.query("ROLLBACK"); } catch (e) { console.error("Rollback error:", e); }
     }
     console.error("[Admin Revision POST Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (client) {
       try { client.release(); } catch (e) { console.error("Release error:", e); }

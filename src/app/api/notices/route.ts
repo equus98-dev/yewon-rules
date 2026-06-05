@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     return NextResponse.json(notices);
   } catch (error: any) {
     console.error("[Notice GET API Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) if (pool) await pool.end();
   }
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     return NextResponse.json(res.rows[0], { status: 201 });
   } catch (error: any) {
     console.error("[Notice POST API Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) if (pool) await pool.end();
   }
@@ -57,7 +57,7 @@ export async function PUT(request: Request) {
     return NextResponse.json(res.rows[0]);
   } catch (error: any) {
     console.error("[Notice PUT API Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) if (pool) await pool.end();
   }
@@ -75,7 +75,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ message: "공지사항이 성공적으로 삭제되었습니다." });
   } catch (error: any) {
     console.error("[Notice DELETE API Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) if (pool) await pool.end();
   }

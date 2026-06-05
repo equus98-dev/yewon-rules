@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     return NextResponse.json(res.rows);
   } catch (error: any) {
     console.error("[Admin Files API GET Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) await pool.end();
   }
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     if (!env || !env.STORAGE) {
       return NextResponse.json(
         { error: "Cloudflare R2 스토리지 바인딩(STORAGE)을 찾을 수 없습니다." },
-        { status: 500 }
+        { status: 400 }
       );
     }
 
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     });
   } catch (error: any) {
     console.error("[Admin Files API POST Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) await pool.end();
   }

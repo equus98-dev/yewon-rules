@@ -40,7 +40,7 @@ export async function GET(request: Request) {
     })));
   } catch (error: any) {
     console.error("[Admin Rules GET Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) await pool.end();
   }
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
     if (error.message?.includes("duplicate key value violates unique constraint")) {
       return NextResponse.json({ error: "이미 존재하는 규정 번호입니다." }, { status: 409 });
     }
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (client) {
       try { client.release(); } catch (e) { console.error("Release error:", e); }
@@ -131,7 +131,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({ success: true, rule: res.rows[0] });
   } catch (error: any) {
     console.error("[Admin Rules PUT Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) await pool.end();
   }
@@ -159,7 +159,7 @@ export async function DELETE(request: Request) {
       try { await client.query("ROLLBACK"); } catch (e) { console.error("Rollback error:", e); }
     }
     console.error("[Admin Rules DELETE Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (client) {
       try { client.release(); } catch (e) { console.error("Release error:", e); }

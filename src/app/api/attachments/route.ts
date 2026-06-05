@@ -25,7 +25,7 @@ export async function GET() {
     return NextResponse.json(res.rows);
   } catch (error: any) {
     console.error("[Attachments GET Error]:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) await pool.end();
   }
