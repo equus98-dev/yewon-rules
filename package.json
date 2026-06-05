@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack",
-    "pages:build": "node patch-opennext.js && npx @opennextjs/cloudflare build && node rename-worker.js",
+    "build": "next build",
+    "pages:build": "npx @cloudflare/next-on-pages",
     "start": "next start",
     "lint": "eslint",
     "seed:rules": "npx tsx prisma/seed-all-rules.ts",
@@ -17,21 +17,21 @@
     "@mui/icons-material": "^9.0.1",
     "@mui/material": "^9.0.1",
     "@mui/x-tree-view": "^9.1.0",
-    "@opennextjs/cloudflare": "^1.19.11",
     "@prisma/adapter-d1": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@supabase/supabase-js": "^2.107.0",
     "cfb": "^1.2.2",
     "cheerio": "^1.2.0",
     "iconv-lite": "^0.7.2",
-    "next": "^16.2.7",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "next": "14.2.15",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-markdown": "^10.1.0",
     "react-quill": "^2.0.0",
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.7",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
@@ -43,7 +43,7 @@
     "tailwindcss": "^4",
     "tsx": "^4.22.3",
     "typescript": "^5",
-    "wrangler": "^4.98.0"
+    "wrangler": "^3.99.0"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

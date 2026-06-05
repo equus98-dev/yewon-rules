@@ -1,1 +1,0 @@
-globalThis.__RSC_MANIFEST=(globalThis.__RSC_MANIFEST||{});globalThis.__RSC_MANIFEST["/api/rules/search/route"]={"moduleLoading":{"prefix":"/_next/"},"ssrModuleMapping":{},"edgeSSRModuleMapping":{},"clientModules":{},"entryCSSFiles":{"F:\\예원예술대학교_규정관리시스템\\src\\app\\api\\rules\\search\\route":[]},"rscModuleMapping":{},"edgeRscModuleMapping":{}};

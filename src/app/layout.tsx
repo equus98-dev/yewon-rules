@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
 
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "예원예술대학교 규정관리시스템",
   description: "예원예술대학교 규정관리시스템입니다. 분야별, 부서별, 가나다순 규정을 한눈에 편리하게 탐색하십시오.",

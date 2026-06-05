@@ -1,0 +1,1126 @@
+{
+    "wallTime": 72,
+    "cpuTime": 70,
+    "truncated": false,
+    "executionModel": "stateless",
+    "outcome": "ok",
+    "scriptVersion": {
+        "id": "e2754d04-4fee-457c-822a-7599548ce995"
+    },
+    "scriptName": "pages-worker--14412277-production",
+    "diagnosticsChannelEvents": [],
+    "exceptions": [],
+    "logs": [
+        {
+            "message": [
+                "⨯",
+                "Error: Failed to load external module next/dist/compiled/next-server/app-page-turbo.runtime.prod.js: TypeError: Cannot read properties of undefined (reading 'require')"
+            ],
+            "level": "error",
+            "timestamp": 1780625834109
+        }
+    ],
+    "eventTimestamp": 1780625833955,
+    "event": {
+        "request": {
+            "url": "https://66eac1a0.yewon-rules.pages.dev/",
+            "method": "GET",
+            "headers": {
+                "accept": "*/*",
+                "accept-encoding": "gzip, br",
+                "cf-connecting-ip": "220.66.32.1",
+                "cf-ipcountry": "KR",
+                "cf-ray": "a06bae0628adc093",
+                "cf-visitor": "{\"scheme\":\"https\"}",
+                "connection": "Keep-Alive",
+                "host": "66eac1a0.yewon-rules.pages.dev",
+                "user-agent": "curl/8.19.0",
+                "x-forwarded-proto": "https",
+                "x-real-ip": "220.66.32.1"
+            },
+            "cf": {
+                "httpProtocol": "HTTP/1.1",
+                "requestPriority": "",
+                "edgeRequestKeepAliveStatus": 1,
+                "requestHeaderNames": {},
+                "clientTcpRtt": 4,
+                "clientQuicRtt": 0,
+                "colo": "ICN",
+                "asn": 3786,
+                "asOrganization": "Yewon Arts University",
+                "country": "KR",
+                "isEUCountry": false,
+                "city": "Uijeongbu-si",
+                "continent": "AS",
+                "region": "Gyeonggi-do",
+                "regionCode": "41",
+                "timezone": "Asia/Seoul",
+                "longitude": "127.0474",
+                "latitude": "37.7415",
+                "postalCode": "11649",
+                "tlsVersion": "TLSv1.3",
+                "tlsCipher": "AEAD-AES256-GCM-SHA384",
+                "tlsClientRandom": "L6go9hvZtdnLQkKx/m1Ku43sf8PL9sCunq1SEnx2lUk=",
+                "tlsClientCiphersSha1": "kTkJ+HAwBvIuoPFncb1wEDLcgfg=",
+                "tlsClientExtensionsSha1": "p2XN7z/lcnmBD9Q+f8xSyG4x4VA=",
+                "tlsClientExtensionsSha1Le": "ydwLHTahJx17MvHnnvv2lsdgs/g=",
+                "tlsExportedAuthenticator": {
+                    "clientHandshake": "e5da65f9856941fb96a5392f4faa33b4a0e7fd2601530bbe6da524bab848a8a5213f9031a3b4aa00ee8aac400e49c0a7",
+                    "serverHandshake": "866b8cdc370add312fe74cb18694e32e377fb9a16c6548f2f0a2ed11ed97c3ddac9fcfa9c6b57f3c9702324b9b97cb3b",
+                    "clientFinished": "baa3e1876ea1ab335ddd27d2e91a4117d29b436ea94248608c20e3b4b1ade088eb00fb6946b9bbdaf11105644f6c80ff",
+                    "serverFinished": "38c45f2da4772ab032382d623399b52bf029e997d2b6154dfb1ed36f02682389de65bcf774394880d723abc969df8751"
+                },
+                "tlsClientHelloLength": "468",
+                "tlsClientAuth": {
+                    "certPresented": "0",
+                    "certVerified": "NONE",
+                    "certRevoked": "0",
+                    "certIssuerDN": "",
+                    "certSubjectDN": "",
+                    "certIssuerDNRFC2253": "",
+                    "certSubjectDNRFC2253": "",
+                    "certIssuerDNLegacy": "",
+                    "certSubjectDNLegacy": "",
+                    "certSerial": "",
+                    "certIssuerSerial": "",
+                    "certSKI": "",
+                    "certIssuerSKI": "",
+                    "certFingerprintSHA1": "",
+                    "certFingerprintSHA256": "",
+                    "certNotBefore": "",
+                    "certNotAfter": "",
+                    "certRFC9440": "",
+                    "certRFC9440TooLarge": false,
+                    "certChainRFC9440": "",
+                    "certChainRFC9440TooLarge": false
+                },
+                "verifiedBotCategory": "",
+                "edgeL4": {
+                    "deliveryRate": 883509
+                },
+                "pagesHostName": "66eac1a0.yewon-rules.pages.dev",
+                "botManagement": {
+                    "corporateProxy": false,
+                    "verifiedBot": false,
+                    "jsDetection": {
+                        "passed": false
+                    },
+                    "staticResource": false,
+                    "detectionIds": {},
+                    "score": 99
+                }
+            }
+        },
+        "response": {
+            "status": 500
+        }
+    }
+}
+{
+    "wallTime": 5,
+    "cpuTime": 5,
+    "truncated": false,
+    "executionModel": "stateless",
+    "outcome": "ok",
+    "scriptVersion": {
+        "id": "e2754d04-4fee-457c-822a-7599548ce995"
+    },
+    "scriptName": "pages-worker--14412277-production",
+    "diagnosticsChannelEvents": [],
+    "exceptions": [],
+    "logs": [
+        {
+            "message": [
+                "⨯",
+                "TypeError: components.ComponentMod.handler is not a function"
+            ],
+            "level": "error",
+            "timestamp": 1780625959828
+        }
+    ],
+    "eventTimestamp": 1780625959826,
+    "event": {
+        "request": {
+            "url": "https://yewon-rules.pages.dev/",
+            "method": "GET",
+            "headers": {
+                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                "accept-encoding": "gzip, br",
+                "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+                "cache-control": "max-age=0",
+                "cf-connecting-ip": "220.66.32.1",
+                "cf-ipcountry": "KR",
+                "cf-ray": "a06bb118df4b322a",
+                "cf-visitor": "{\"scheme\":\"https\"}",
+                "connection": "Keep-Alive",
+                "host": "yewon-rules.pages.dev",
+                "priority": "u=0, i",
+                "sec-ch-ua": "\"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not/A)Brand\";v=\"99\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "document",
+                "sec-fetch-mode": "navigate",
+                "sec-fetch-site": "none",
+                "sec-fetch-user": "?1",
+                "upgrade-insecure-requests": "1",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+                "x-forwarded-proto": "https",
+                "x-real-ip": "220.66.32.1"
+            },
+            "cf": {
+                "httpProtocol": "HTTP/3",
+                "clientAcceptEncoding": "gzip, deflate, br",
+                "requestPriority": "",
+                "edgeRequestKeepAliveStatus": 1,
+                "requestHeaderNames": {},
+                "clientTcpRtt": 0,
+                "clientQuicRtt": 3,
+                "colo": "ICN",
+                "asn": 3786,
+                "asOrganization": "Yewon Arts University",
+                "country": "KR",
+                "isEUCountry": false,
+                "city": "Seoul",
+                "continent": "AS",
+                "region": "Seoul",
+                "regionCode": "11",
+                "timezone": "Asia/Seoul",
+                "longitude": "126.9784",
+                "latitude": "37.566",
+                "postalCode": "03141",
+                "tlsVersion": "TLSv1.3",
+                "tlsCipher": "AEAD-AES128-GCM-SHA256",
+                "tlsClientRandom": "YoFmRPX1lUJyi2blACGghf8nGMDpNiRvwEbtbJai+To=",
+                "tlsClientCiphersSha1": "3HTt3+R/6BL3zeALJDSq0pR1yOQ=",
+                "tlsClientExtensionsSha1": "tL/PPUW9ecx8cHdPyBOjviEezqs=",
+                "tlsClientExtensionsSha1Le": "Phz9xaknF9q6sQU67Muj307ywMc=",
+                "tlsExportedAuthenticator": {
+                    "clientHandshake": "56a572246230232b821011b3756a6095db7092308ab589115d082a23a0f45f84",
+                    "serverHandshake": "463513ddcff9fd36359e9c2a63afb7eb0a9af35d03ae0158721434b7f35b60d6",
+                    "clientFinished": "4fdea51b17564b2efa38f713dce36c14a78b421bfcc61a4cda97bf074439e8f7",
+                    "serverFinished": "81da1b8199150366e6c8c8ee7170408799933f673965c0566942ed2560e801ab"
+                },
+                "tlsClientHelloLength": "1748",
+                "tlsClientAuth": {
+                    "certPresented": "0",
+                    "certVerified": "NONE",
+                    "certRevoked": "0",
+                    "certIssuerDN": "",
+                    "certSubjectDN": "",
+                    "certIssuerDNRFC2253": "",
+                    "certSubjectDNRFC2253": "",
+                    "certIssuerDNLegacy": "",
+                    "certSubjectDNLegacy": "",
+                    "certSerial": "",
+                    "certIssuerSerial": "",
+                    "certSKI": "",
+                    "certIssuerSKI": "",
+                    "certFingerprintSHA1": "",
+                    "certFingerprintSHA256": "",
+                    "certNotBefore": "",
+                    "certNotAfter": "",
+                    "certRFC9440": "",
+                    "certRFC9440TooLarge": false,
+                    "certChainRFC9440": "",
+                    "certChainRFC9440TooLarge": false
+                },
+                "verifiedBotCategory": "",
+                "edgeL4": {
+                    "deliveryRate": 366983
+                },
+                "pagesHostName": "yewon-rules.pages.dev",
+                "botManagement": {
+                    "corporateProxy": false,
+                    "verifiedBot": false,
+                    "jsDetection": {
+                        "passed": false
+                    },
+                    "staticResource": false,
+                    "detectionIds": {},
+                    "score": 99
+                }
+            }
+        },
+        "response": {
+            "status": 500
+        }
+    }
+}
+{
+    "wallTime": 2,
+    "cpuTime": 2,
+    "truncated": false,
+    "executionModel": "stateless",
+    "outcome": "ok",
+    "scriptVersion": {
+        "id": "e2754d04-4fee-457c-822a-7599548ce995"
+    },
+    "scriptName": "pages-worker--14412277-production",
+    "diagnosticsChannelEvents": [],
+    "exceptions": [],
+    "logs": [
+        {
+            "message": [
+                "⨯",
+                "TypeError: components.ComponentMod.handler is not a function"
+            ],
+            "level": "error",
+            "timestamp": 1780625959858
+        }
+    ],
+    "eventTimestamp": 1780625959858,
+    "event": {
+        "request": {
+            "url": "https://yewon-rules.pages.dev/favicon.ico",
+            "method": "GET",
+            "headers": {
+                "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                "accept-encoding": "gzip, br",
+                "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+                "cf-connecting-ip": "220.66.32.1",
+                "cf-ipcountry": "KR",
+                "cf-ray": "a06bb1191f6b322a",
+                "cf-visitor": "{\"scheme\":\"https\"}",
+                "connection": "Keep-Alive",
+                "host": "yewon-rules.pages.dev",
+                "priority": "u=1, i",
+                "referer": "https://yewon-rules.pages.dev/",
+                "sec-ch-ua": "\"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not/A)Brand\";v=\"99\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "image",
+                "sec-fetch-mode": "no-cors",
+                "sec-fetch-site": "same-origin",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+                "x-forwarded-proto": "https",
+                "x-real-ip": "220.66.32.1"
+            },
+            "cf": {
+                "httpProtocol": "HTTP/3",
+                "clientAcceptEncoding": "gzip, deflate, br",
+                "requestPriority": "",
+                "edgeRequestKeepAliveStatus": 1,
+                "requestHeaderNames": {},
+                "clientTcpRtt": 0,
+                "clientQuicRtt": 3,
+                "colo": "ICN",
+                "asn": 3786,
+                "asOrganization": "Yewon Arts University",
+                "country": "KR",
+                "isEUCountry": false,
+                "city": "Seoul",
+                "continent": "AS",
+                "region": "Seoul",
+                "regionCode": "11",
+                "timezone": "Asia/Seoul",
+                "longitude": "126.9784",
+                "latitude": "37.566",
+                "postalCode": "03141",
+                "tlsVersion": "TLSv1.3",
+                "tlsCipher": "AEAD-AES128-GCM-SHA256",
+                "tlsClientRandom": "YoFmRPX1lUJyi2blACGghf8nGMDpNiRvwEbtbJai+To=",
+                "tlsClientCiphersSha1": "3HTt3+R/6BL3zeALJDSq0pR1yOQ=",
+                "tlsClientExtensionsSha1": "tL/PPUW9ecx8cHdPyBOjviEezqs=",
+                "tlsClientExtensionsSha1Le": "Phz9xaknF9q6sQU67Muj307ywMc=",
+                "tlsExportedAuthenticator": {
+                    "clientHandshake": "56a572246230232b821011b3756a6095db7092308ab589115d082a23a0f45f84",
+                    "serverHandshake": "463513ddcff9fd36359e9c2a63afb7eb0a9af35d03ae0158721434b7f35b60d6",
+                    "clientFinished": "4fdea51b17564b2efa38f713dce36c14a78b421bfcc61a4cda97bf074439e8f7",
+                    "serverFinished": "81da1b8199150366e6c8c8ee7170408799933f673965c0566942ed2560e801ab"
+                },
+                "tlsClientHelloLength": "1748",
+                "tlsClientAuth": {
+                    "certPresented": "0",
+                    "certVerified": "NONE",
+                    "certRevoked": "0",
+                    "certIssuerDN": "",
+                    "certSubjectDN": "",
+                    "certIssuerDNRFC2253": "",
+                    "certSubjectDNRFC2253": "",
+                    "certIssuerDNLegacy": "",
+                    "certSubjectDNLegacy": "",
+                    "certSerial": "",
+                    "certIssuerSerial": "",
+                    "certSKI": "",
+                    "certIssuerSKI": "",
+                    "certFingerprintSHA1": "",
+                    "certFingerprintSHA256": "",
+                    "certNotBefore": "",
+                    "certNotAfter": "",
+                    "certRFC9440": "",
+                    "certRFC9440TooLarge": false,
+                    "certChainRFC9440": "",
+                    "certChainRFC9440TooLarge": false
+                },
+                "verifiedBotCategory": "",
+                "edgeL4": {
+                    "deliveryRate": 366983
+                },
+                "pagesHostName": "yewon-rules.pages.dev",
+                "botManagement": {
+                    "corporateProxy": false,
+                    "verifiedBot": false,
+                    "jsDetection": {
+                        "passed": false
+                    },
+                    "staticResource": false,
+                    "detectionIds": {},
+                    "score": 99
+                }
+            }
+        },
+        "response": {
+            "status": 500
+        }
+    }
+}
+{
+    "wallTime": 3,
+    "cpuTime": 2,
+    "truncated": false,
+    "executionModel": "stateless",
+    "outcome": "ok",
+    "scriptVersion": {
+        "id": "e2754d04-4fee-457c-822a-7599548ce995"
+    },
+    "scriptName": "pages-worker--14412277-production",
+    "diagnosticsChannelEvents": [],
+    "exceptions": [],
+    "logs": [
+        {
+            "message": [
+                "⨯",
+                "TypeError: components.ComponentMod.handler is not a function"
+            ],
+            "level": "error",
+            "timestamp": 1780625964204
+        }
+    ],
+    "eventTimestamp": 1780625964204,
+    "event": {
+        "request": {
+            "url": "https://yewon-rules.pages.dev/",
+            "method": "GET",
+            "headers": {
+                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                "accept-encoding": "gzip, br",
+                "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+                "cf-connecting-ip": "220.66.32.1",
+                "cf-ipcountry": "KR",
+                "cf-ray": "a06bb1343822322a",
+                "cf-visitor": "{\"scheme\":\"https\"}",
+                "connection": "Keep-Alive",
+                "host": "yewon-rules.pages.dev",
+                "priority": "u=0, i",
+                "sec-ch-ua": "\"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not/A)Brand\";v=\"99\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "document",
+                "sec-fetch-mode": "navigate",
+                "sec-fetch-site": "none",
+                "sec-fetch-user": "?1",
+                "upgrade-insecure-requests": "1",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+                "x-forwarded-proto": "https",
+                "x-real-ip": "220.66.32.1"
+            },
+            "cf": {
+                "httpProtocol": "HTTP/3",
+                "clientAcceptEncoding": "gzip, deflate, br",
+                "requestPriority": "",
+                "edgeRequestKeepAliveStatus": 1,
+                "requestHeaderNames": {},
+                "clientTcpRtt": 0,
+                "clientQuicRtt": 3,
+                "colo": "ICN",
+                "asn": 3786,
+                "asOrganization": "Yewon Arts University",
+                "country": "KR",
+                "isEUCountry": false,
+                "city": "Seoul",
+                "continent": "AS",
+                "region": "Seoul",
+                "regionCode": "11",
+                "timezone": "Asia/Seoul",
+                "longitude": "126.9784",
+                "latitude": "37.566",
+                "postalCode": "03141",
+                "tlsVersion": "TLSv1.3",
+                "tlsCipher": "AEAD-AES128-GCM-SHA256",
+                "tlsClientRandom": "YoFmRPX1lUJyi2blACGghf8nGMDpNiRvwEbtbJai+To=",
+                "tlsClientCiphersSha1": "3HTt3+R/6BL3zeALJDSq0pR1yOQ=",
+                "tlsClientExtensionsSha1": "tL/PPUW9ecx8cHdPyBOjviEezqs=",
+                "tlsClientExtensionsSha1Le": "Phz9xaknF9q6sQU67Muj307ywMc=",
+                "tlsExportedAuthenticator": {
+                    "clientHandshake": "56a572246230232b821011b3756a6095db7092308ab589115d082a23a0f45f84",
+                    "serverHandshake": "463513ddcff9fd36359e9c2a63afb7eb0a9af35d03ae0158721434b7f35b60d6",
+                    "clientFinished": "4fdea51b17564b2efa38f713dce36c14a78b421bfcc61a4cda97bf074439e8f7",
+                    "serverFinished": "81da1b8199150366e6c8c8ee7170408799933f673965c0566942ed2560e801ab"
+                },
+                "tlsClientHelloLength": "1748",
+                "tlsClientAuth": {
+                    "certPresented": "0",
+                    "certVerified": "NONE",
+                    "certRevoked": "0",
+                    "certIssuerDN": "",
+                    "certSubjectDN": "",
+                    "certIssuerDNRFC2253": "",
+                    "certSubjectDNRFC2253": "",
+                    "certIssuerDNLegacy": "",
+                    "certSubjectDNLegacy": "",
+                    "certSerial": "",
+                    "certIssuerSerial": "",
+                    "certSKI": "",
+                    "certIssuerSKI": "",
+                    "certFingerprintSHA1": "",
+                    "certFingerprintSHA256": "",
+                    "certNotBefore": "",
+                    "certNotAfter": "",
+                    "certRFC9440": "",
+                    "certRFC9440TooLarge": false,
+                    "certChainRFC9440": "",
+                    "certChainRFC9440TooLarge": false
+                },
+                "verifiedBotCategory": "",
+                "edgeL4": {
+                    "deliveryRate": 366983
+                },
+                "pagesHostName": "yewon-rules.pages.dev",
+                "botManagement": {
+                    "corporateProxy": false,
+                    "verifiedBot": false,
+                    "jsDetection": {
+                        "passed": false
+                    },
+                    "staticResource": false,
+                    "detectionIds": {},
+                    "score": 99
+                }
+            }
+        },
+        "response": {
+            "status": 500
+        }
+    }
+}
+{
+    "wallTime": 2,
+    "cpuTime": 2,
+    "truncated": false,
+    "executionModel": "stateless",
+    "outcome": "ok",
+    "scriptVersion": {
+        "id": "e2754d04-4fee-457c-822a-7599548ce995"
+    },
+    "scriptName": "pages-worker--14412277-production",
+    "diagnosticsChannelEvents": [],
+    "exceptions": [],
+    "logs": [
+        {
+            "message": [
+                "⨯",
+                "TypeError: components.ComponentMod.handler is not a function"
+            ],
+            "level": "error",
+            "timestamp": 1780625964235
+        }
+    ],
+    "eventTimestamp": 1780625964235,
+    "event": {
+        "request": {
+            "url": "https://yewon-rules.pages.dev/favicon.ico",
+            "method": "GET",
+            "headers": {
+                "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                "accept-encoding": "gzip, br",
+                "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+                "cf-connecting-ip": "220.66.32.1",
+                "cf-ipcountry": "KR",
+                "cf-ray": "a06bb1347833322a",
+                "cf-visitor": "{\"scheme\":\"https\"}",
+                "connection": "Keep-Alive",
+                "host": "yewon-rules.pages.dev",
+                "priority": "u=1, i",
+                "referer": "https://yewon-rules.pages.dev/",
+                "sec-ch-ua": "\"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not/A)Brand\";v=\"99\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "image",
+                "sec-fetch-mode": "no-cors",
+                "sec-fetch-site": "same-origin",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+                "x-forwarded-proto": "https",
+                "x-real-ip": "220.66.32.1"
+            },
+            "cf": {
+                "httpProtocol": "HTTP/3",
+                "clientAcceptEncoding": "gzip, deflate, br",
+                "requestPriority": "",
+                "edgeRequestKeepAliveStatus": 1,
+                "requestHeaderNames": {},
+                "clientTcpRtt": 0,
+                "clientQuicRtt": 3,
+                "colo": "ICN",
+                "asn": 3786,
+                "asOrganization": "Yewon Arts University",
+                "country": "KR",
+                "isEUCountry": false,
+                "city": "Seoul",
+                "continent": "AS",
+                "region": "Seoul",
+                "regionCode": "11",
+                "timezone": "Asia/Seoul",
+                "longitude": "126.9784",
+                "latitude": "37.566",
+                "postalCode": "03141",
+                "tlsVersion": "TLSv1.3",
+                "tlsCipher": "AEAD-AES128-GCM-SHA256",
+                "tlsClientRandom": "YoFmRPX1lUJyi2blACGghf8nGMDpNiRvwEbtbJai+To=",
+                "tlsClientCiphersSha1": "3HTt3+R/6BL3zeALJDSq0pR1yOQ=",
+                "tlsClientExtensionsSha1": "tL/PPUW9ecx8cHdPyBOjviEezqs=",
+                "tlsClientExtensionsSha1Le": "Phz9xaknF9q6sQU67Muj307ywMc=",
+                "tlsExportedAuthenticator": {
+                    "clientHandshake": "56a572246230232b821011b3756a6095db7092308ab589115d082a23a0f45f84",
+                    "serverHandshake": "463513ddcff9fd36359e9c2a63afb7eb0a9af35d03ae0158721434b7f35b60d6",
+                    "clientFinished": "4fdea51b17564b2efa38f713dce36c14a78b421bfcc61a4cda97bf074439e8f7",
+                    "serverFinished": "81da1b8199150366e6c8c8ee7170408799933f673965c0566942ed2560e801ab"
+                },
+                "tlsClientHelloLength": "1748",
+                "tlsClientAuth": {
+                    "certPresented": "0",
+                    "certVerified": "NONE",
+                    "certRevoked": "0",
+                    "certIssuerDN": "",
+                    "certSubjectDN": "",
+                    "certIssuerDNRFC2253": "",
+                    "certSubjectDNRFC2253": "",
+                    "certIssuerDNLegacy": "",
+                    "certSubjectDNLegacy": "",
+                    "certSerial": "",
+                    "certIssuerSerial": "",
+                    "certSKI": "",
+                    "certIssuerSKI": "",
+                    "certFingerprintSHA1": "",
+                    "certFingerprintSHA256": "",
+                    "certNotBefore": "",
+                    "certNotAfter": "",
+                    "certRFC9440": "",
+                    "certRFC9440TooLarge": false,
+                    "certChainRFC9440": "",
+                    "certChainRFC9440TooLarge": false
+                },
+                "verifiedBotCategory": "",
+                "edgeL4": {
+                    "deliveryRate": 366983
+                },
+                "pagesHostName": "yewon-rules.pages.dev",
+                "botManagement": {
+                    "corporateProxy": false,
+                    "verifiedBot": false,
+                    "jsDetection": {
+                        "passed": false
+                    },
+                    "staticResource": false,
+                    "detectionIds": {},
+                    "score": 99
+                }
+            }
+        },
+        "response": {
+            "status": 500
+        }
+    }
+}
+{
+    "wallTime": 4,
+    "cpuTime": 3,
+    "truncated": false,
+    "executionModel": "stateless",
+    "outcome": "ok",
+    "scriptVersion": {
+        "id": "e2754d04-4fee-457c-822a-7599548ce995"
+    },
+    "scriptName": "pages-worker--14412277-production",
+    "diagnosticsChannelEvents": [],
+    "exceptions": [],
+    "logs": [
+        {
+            "message": [
+                "⨯",
+                "TypeError: components.ComponentMod.handler is not a function"
+            ],
+            "level": "error",
+            "timestamp": 1780625978065
+        }
+    ],
+    "eventTimestamp": 1780625978065,
+    "event": {
+        "request": {
+            "url": "https://yewon-rules.pages.dev/?_rsc=MB54gAX280Bv495Z",
+            "method": "GET",
+            "headers": {
+                "accept": "*/*",
+                "accept-encoding": "gzip, br",
+                "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+                "cf-connecting-ip": "220.66.32.1",
+                "cf-ipcountry": "KR",
+                "cf-ray": "a06bb18ad909322a",
+                "cf-visitor": "{\"scheme\":\"https\"}",
+                "connection": "Keep-Alive",
+                "host": "yewon-rules.pages.dev",
+                "next-router-state-tree": "%5B%22%22%2C%7B%22children%22%3A%5B%22admin%22%2C%7B%22children%22%3A%5B%22login%22%2C%7B%22children%22%3A%5B%22__PAGE__%22%2C%7B%7D%2Cnull%2Cnull%2C0%5D%7D%2Cnull%2Cnull%2C0%5D%7D%2Cnull%2Cnull%2C0%5D%7D%2Cnull%2Cnull%2C16%5D",
+                "next-url": "/admin/login",
+                "priority": "u=1, i",
+                "referer": "https://yewon-rules.pages.dev/admin/login",
+                "rsc": "1",
+                "sec-ch-ua": "\"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not/A)Brand\";v=\"99\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+                "x-forwarded-proto": "https",
+                "x-real-ip": "220.66.32.1"
+            },
+            "cf": {
+                "httpProtocol": "HTTP/3",
+                "clientAcceptEncoding": "gzip, deflate, br",
+                "requestPriority": "",
+                "edgeRequestKeepAliveStatus": 1,
+                "requestHeaderNames": {},
+                "clientTcpRtt": 0,
+                "clientQuicRtt": 3,
+                "colo": "ICN",
+                "asn": 3786,
+                "asOrganization": "Yewon Arts University",
+                "country": "KR",
+                "isEUCountry": false,
+                "city": "Seoul",
+                "continent": "AS",
+                "region": "Seoul",
+                "regionCode": "11",
+                "timezone": "Asia/Seoul",
+                "longitude": "126.9784",
+                "latitude": "37.566",
+                "postalCode": "03141",
+                "tlsVersion": "TLSv1.3",
+                "tlsCipher": "AEAD-AES128-GCM-SHA256",
+                "tlsClientRandom": "YoFmRPX1lUJyi2blACGghf8nGMDpNiRvwEbtbJai+To=",
+                "tlsClientCiphersSha1": "3HTt3+R/6BL3zeALJDSq0pR1yOQ=",
+                "tlsClientExtensionsSha1": "tL/PPUW9ecx8cHdPyBOjviEezqs=",
+                "tlsClientExtensionsSha1Le": "Phz9xaknF9q6sQU67Muj307ywMc=",
+                "tlsExportedAuthenticator": {
+                    "clientHandshake": "56a572246230232b821011b3756a6095db7092308ab589115d082a23a0f45f84",
+                    "serverHandshake": "463513ddcff9fd36359e9c2a63afb7eb0a9af35d03ae0158721434b7f35b60d6",
+                    "clientFinished": "4fdea51b17564b2efa38f713dce36c14a78b421bfcc61a4cda97bf074439e8f7",
+                    "serverFinished": "81da1b8199150366e6c8c8ee7170408799933f673965c0566942ed2560e801ab"
+                },
+                "tlsClientHelloLength": "1748",
+                "tlsClientAuth": {
+                    "certPresented": "0",
+                    "certVerified": "NONE",
+                    "certRevoked": "0",
+                    "certIssuerDN": "",
+                    "certSubjectDN": "",
+                    "certIssuerDNRFC2253": "",
+                    "certSubjectDNRFC2253": "",
+                    "certIssuerDNLegacy": "",
+                    "certSubjectDNLegacy": "",
+                    "certSerial": "",
+                    "certIssuerSerial": "",
+                    "certSKI": "",
+                    "certIssuerSKI": "",
+                    "certFingerprintSHA1": "",
+                    "certFingerprintSHA256": "",
+                    "certNotBefore": "",
+                    "certNotAfter": "",
+                    "certRFC9440": "",
+                    "certRFC9440TooLarge": false,
+                    "certChainRFC9440": "",
+                    "certChainRFC9440TooLarge": false
+                },
+                "verifiedBotCategory": "",
+                "edgeL4": {
+                    "deliveryRate": 366983
+                },
+                "pagesHostName": "yewon-rules.pages.dev",
+                "botManagement": {
+                    "corporateProxy": false,
+                    "verifiedBot": false,
+                    "jsDetection": {
+                        "passed": false
+                    },
+                    "staticResource": false,
+                    "detectionIds": {},
+                    "score": 99
+                }
+            }
+        },
+        "response": {
+            "status": 500
+        }
+    }
+}
+{
+    "wallTime": 2,
+    "cpuTime": 2,
+    "truncated": false,
+    "executionModel": "stateless",
+    "outcome": "ok",
+    "scriptVersion": {
+        "id": "e2754d04-4fee-457c-822a-7599548ce995"
+    },
+    "scriptName": "pages-worker--14412277-production",
+    "diagnosticsChannelEvents": [],
+    "exceptions": [],
+    "logs": [
+        {
+            "message": [
+                "⨯",
+                "TypeError: components.ComponentMod.handler is not a function"
+            ],
+            "level": "error",
+            "timestamp": 1780625978091
+        }
+    ],
+    "eventTimestamp": 1780625978091,
+    "event": {
+        "request": {
+            "url": "https://yewon-rules.pages.dev/",
+            "method": "GET",
+            "headers": {
+                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                "accept-encoding": "gzip, br",
+                "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+                "cf-connecting-ip": "220.66.32.1",
+                "cf-ipcountry": "KR",
+                "cf-ray": "a06bb18b091e322a",
+                "cf-visitor": "{\"scheme\":\"https\"}",
+                "connection": "Keep-Alive",
+                "host": "yewon-rules.pages.dev",
+                "priority": "u=0, i",
+                "referer": "https://yewon-rules.pages.dev/admin/login",
+                "sec-ch-ua": "\"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not/A)Brand\";v=\"99\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "document",
+                "sec-fetch-mode": "navigate",
+                "sec-fetch-site": "same-origin",
+                "sec-fetch-user": "?1",
+                "upgrade-insecure-requests": "1",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+                "x-forwarded-proto": "https",
+                "x-real-ip": "220.66.32.1"
+            },
+            "cf": {
+                "httpProtocol": "HTTP/3",
+                "clientAcceptEncoding": "gzip, deflate, br",
+                "requestPriority": "",
+                "edgeRequestKeepAliveStatus": 1,
+                "requestHeaderNames": {},
+                "clientTcpRtt": 0,
+                "clientQuicRtt": 3,
+                "colo": "ICN",
+                "asn": 3786,
+                "asOrganization": "Yewon Arts University",
+                "country": "KR",
+                "isEUCountry": false,
+                "city": "Seoul",
+                "continent": "AS",
+                "region": "Seoul",
+                "regionCode": "11",
+                "timezone": "Asia/Seoul",
+                "longitude": "126.9784",
+                "latitude": "37.566",
+                "postalCode": "03141",
+                "tlsVersion": "TLSv1.3",
+                "tlsCipher": "AEAD-AES128-GCM-SHA256",
+                "tlsClientRandom": "YoFmRPX1lUJyi2blACGghf8nGMDpNiRvwEbtbJai+To=",
+                "tlsClientCiphersSha1": "3HTt3+R/6BL3zeALJDSq0pR1yOQ=",
+                "tlsClientExtensionsSha1": "tL/PPUW9ecx8cHdPyBOjviEezqs=",
+                "tlsClientExtensionsSha1Le": "Phz9xaknF9q6sQU67Muj307ywMc=",
+                "tlsExportedAuthenticator": {
+                    "clientHandshake": "56a572246230232b821011b3756a6095db7092308ab589115d082a23a0f45f84",
+                    "serverHandshake": "463513ddcff9fd36359e9c2a63afb7eb0a9af35d03ae0158721434b7f35b60d6",
+                    "clientFinished": "4fdea51b17564b2efa38f713dce36c14a78b421bfcc61a4cda97bf074439e8f7",
+                    "serverFinished": "81da1b8199150366e6c8c8ee7170408799933f673965c0566942ed2560e801ab"
+                },
+                "tlsClientHelloLength": "1748",
+                "tlsClientAuth": {
+                    "certPresented": "0",
+                    "certVerified": "NONE",
+                    "certRevoked": "0",
+                    "certIssuerDN": "",
+                    "certSubjectDN": "",
+                    "certIssuerDNRFC2253": "",
+                    "certSubjectDNRFC2253": "",
+                    "certIssuerDNLegacy": "",
+                    "certSubjectDNLegacy": "",
+                    "certSerial": "",
+                    "certIssuerSerial": "",
+                    "certSKI": "",
+                    "certIssuerSKI": "",
+                    "certFingerprintSHA1": "",
+                    "certFingerprintSHA256": "",
+                    "certNotBefore": "",
+                    "certNotAfter": "",
+                    "certRFC9440": "",
+                    "certRFC9440TooLarge": false,
+                    "certChainRFC9440": "",
+                    "certChainRFC9440TooLarge": false
+                },
+                "verifiedBotCategory": "",
+                "edgeL4": {
+                    "deliveryRate": 366983
+                },
+                "pagesHostName": "yewon-rules.pages.dev",
+                "botManagement": {
+                    "corporateProxy": false,
+                    "verifiedBot": false,
+                    "jsDetection": {
+                        "passed": false
+                    },
+                    "staticResource": false,
+                    "detectionIds": {},
+                    "score": 99
+                }
+            }
+        },
+        "response": {
+            "status": 500
+        }
+    }
+}
+{
+    "wallTime": 2,
+    "cpuTime": 2,
+    "truncated": false,
+    "executionModel": "stateless",
+    "outcome": "ok",
+    "scriptVersion": {
+        "id": "e2754d04-4fee-457c-822a-7599548ce995"
+    },
+    "scriptName": "pages-worker--14412277-production",
+    "diagnosticsChannelEvents": [],
+    "exceptions": [],
+    "logs": [
+        {
+            "message": [
+                "⨯",
+                "TypeError: components.ComponentMod.handler is not a function"
+            ],
+            "level": "error",
+            "timestamp": 1780625978124
+        }
+    ],
+    "eventTimestamp": 1780625978124,
+    "event": {
+        "request": {
+            "url": "https://yewon-rules.pages.dev/favicon.ico",
+            "method": "GET",
+            "headers": {
+                "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                "accept-encoding": "gzip, br",
+                "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+                "cf-connecting-ip": "220.66.32.1",
+                "cf-ipcountry": "KR",
+                "cf-ray": "a06bb18b393f322a",
+                "cf-visitor": "{\"scheme\":\"https\"}",
+                "connection": "Keep-Alive",
+                "host": "yewon-rules.pages.dev",
+                "priority": "u=1, i",
+                "referer": "https://yewon-rules.pages.dev/",
+                "sec-ch-ua": "\"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not/A)Brand\";v=\"99\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "image",
+                "sec-fetch-mode": "no-cors",
+                "sec-fetch-site": "same-origin",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+                "x-forwarded-proto": "https",
+                "x-real-ip": "220.66.32.1"
+            },
+            "cf": {
+                "httpProtocol": "HTTP/3",
+                "clientAcceptEncoding": "gzip, deflate, br",
+                "requestPriority": "",
+                "edgeRequestKeepAliveStatus": 1,
+                "requestHeaderNames": {},
+                "clientTcpRtt": 0,
+                "clientQuicRtt": 3,
+                "colo": "ICN",
+                "asn": 3786,
+                "asOrganization": "Yewon Arts University",
+                "country": "KR",
+                "isEUCountry": false,
+                "city": "Seoul",
+                "continent": "AS",
+                "region": "Seoul",
+                "regionCode": "11",
+                "timezone": "Asia/Seoul",
+                "longitude": "126.9784",
+                "latitude": "37.566",
+                "postalCode": "03141",
+                "tlsVersion": "TLSv1.3",
+                "tlsCipher": "AEAD-AES128-GCM-SHA256",
+                "tlsClientRandom": "YoFmRPX1lUJyi2blACGghf8nGMDpNiRvwEbtbJai+To=",
+                "tlsClientCiphersSha1": "3HTt3+R/6BL3zeALJDSq0pR1yOQ=",
+                "tlsClientExtensionsSha1": "tL/PPUW9ecx8cHdPyBOjviEezqs=",
+                "tlsClientExtensionsSha1Le": "Phz9xaknF9q6sQU67Muj307ywMc=",
+                "tlsExportedAuthenticator": {
+                    "clientHandshake": "56a572246230232b821011b3756a6095db7092308ab589115d082a23a0f45f84",
+                    "serverHandshake": "463513ddcff9fd36359e9c2a63afb7eb0a9af35d03ae0158721434b7f35b60d6",
+                    "clientFinished": "4fdea51b17564b2efa38f713dce36c14a78b421bfcc61a4cda97bf074439e8f7",
+                    "serverFinished": "81da1b8199150366e6c8c8ee7170408799933f673965c0566942ed2560e801ab"
+                },
+                "tlsClientHelloLength": "1748",
+                "tlsClientAuth": {
+                    "certPresented": "0",
+                    "certVerified": "NONE",
+                    "certRevoked": "0",
+                    "certIssuerDN": "",
+                    "certSubjectDN": "",
+                    "certIssuerDNRFC2253": "",
+                    "certSubjectDNRFC2253": "",
+                    "certIssuerDNLegacy": "",
+                    "certSubjectDNLegacy": "",
+                    "certSerial": "",
+                    "certIssuerSerial": "",
+                    "certSKI": "",
+                    "certIssuerSKI": "",
+                    "certFingerprintSHA1": "",
+                    "certFingerprintSHA256": "",
+                    "certNotBefore": "",
+                    "certNotAfter": "",
+                    "certRFC9440": "",
+                    "certRFC9440TooLarge": false,
+                    "certChainRFC9440": "",
+                    "certChainRFC9440TooLarge": false
+                },
+                "verifiedBotCategory": "",
+                "edgeL4": {
+                    "deliveryRate": 366983
+                },
+                "pagesHostName": "yewon-rules.pages.dev",
+                "botManagement": {
+                    "corporateProxy": false,
+                    "verifiedBot": false,
+                    "jsDetection": {
+                        "passed": false
+                    },
+                    "staticResource": false,
+                    "detectionIds": {},
+                    "score": 99
+                }
+            }
+        },
+        "response": {
+            "status": 500
+        }
+    }
+}
+{
+    "wallTime": 70,
+    "cpuTime": 68,
+    "truncated": false,
+    "executionModel": "stateless",
+    "outcome": "ok",
+    "scriptVersion": {
+        "id": "e2754d04-4fee-457c-822a-7599548ce995"
+    },
+    "scriptName": "pages-worker--14412277-production",
+    "diagnosticsChannelEvents": [],
+    "exceptions": [],
+    "logs": [
+        {
+            "message": [
+                "⨯",
+                "Error: Failed to load external module next/dist/compiled/next-server/app-page-turbo.runtime.prod.js: TypeError: Cannot read properties of undefined (reading 'require')"
+            ],
+            "level": "error",
+            "timestamp": 1780626397412
+        }
+    ],
+    "eventTimestamp": 1780626397217,
+    "event": {
+        "request": {
+            "url": "https://yewon-rules.pages.dev/",
+            "method": "GET",
+            "headers": {
+                "accept-encoding": "gzip, br",
+                "cf-connecting-ip": "2a06:98c0:3600::103",
+                "cf-ipcountry": "US",
+                "cf-ray": "a06bbbc685f3eb25",
+                "cf-visitor": "{\"scheme\":\"https\"}",
+                "cf-worker": "cfone.cfdata.org",
+                "connection": "Keep-Alive",
+                "host": "yewon-rules.pages.dev",
+                "x-forwarded-proto": "https",
+                "x-real-ip": "2a06:98c0:3600::103"
+            },
+            "cf": {
+                "requestHeaderNames": {},
+                "httpProtocol": "HTTP/1.1",
+                "tlsCipher": "",
+                "verifiedBotCategory": "",
+                "continent": "NA",
+                "asn": 13335,
+                "clientAcceptEncoding": "identity",
+                "tlsClientExtensionsSha1": "",
+                "isEUCountry": false,
+                "longitude": "-121.89496",
+                "tlsClientCiphersSha1": "",
+                "tlsClientHelloLength": "",
+                "tlsClientAuth": {
+                    "certIssuerDNLegacy": "",
+                    "certIssuerSKI": "",
+                    "certSubjectDNRFC2253": "",
+                    "certSubjectDNLegacy": "",
+                    "certFingerprintSHA256": "",
+                    "certNotBefore": "",
+                    "certSKI": "",
+                    "certSerial": "",
+                    "certIssuerDN": "",
+                    "certVerified": "NONE",
+                    "certNotAfter": "",
+                    "certSubjectDN": "",
+                    "certPresented": "0",
+                    "certRevoked": "0",
+                    "certIssuerSerial": "",
+                    "certIssuerDNRFC2253": "",
+                    "certFingerprintSHA1": ""
+                },
+                "region": "California",
+                "tlsVersion": "",
+                "colo": "SJC",
+                "timezone": "America/Los_Angeles",
+                "latitude": "37.33939",
+                "postalCode": "95025",
+                "edgeRequestKeepAliveStatus": 1,
+                "requestPriority": "",
+                "city": "San Jose",
+                "country": "US",
+                "tlsClientRandom": "",
+                "regionCode": "CA",
+                "asOrganization": "Cloudflare, Inc.",
+                "metroCode": "807",
+                "tlsClientExtensionsSha1Le": "",
+                "pagesHostName": "yewon-rules.pages.dev",
+                "botManagement": {
+                    "corporateProxy": false,
+                    "verifiedBot": false,
+                    "jsDetection": {
+                        "passed": false
+                    },
+                    "staticResource": false,
+                    "detectionIds": {},
+                    "score": 99
+                }
+            }
+        },
+        "response": {
+            "status": 500
+        }
+    }
+}
