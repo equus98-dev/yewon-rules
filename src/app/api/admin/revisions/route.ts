@@ -81,6 +81,6 @@ export async function POST(request: Request) {
     if (client) {
       try { client.release(); } catch (e) { console.error("Release error:", e); }
     }
-    try { await pool.end(); } catch (e) { console.error("Pool end error:", e); }
+    try { if (pool) await pool.end(); } catch (e) { console.error("Pool end error:", e); }
   }
 }

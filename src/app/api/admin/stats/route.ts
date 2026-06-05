@@ -5,8 +5,9 @@ import { NextResponse } from "next/server";
 import { createPool } from "@/lib/db";
 
 export async function GET(request: Request) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const rRules = await pool.query('SELECT COUNT(*) as count FROM "Rule"');
     const rCategories = await pool.query('SELECT COUNT(*) as count FROM "Category"');
     const rDepartments = await pool.query('SELECT COUNT(*) as count FROM "Department"');
@@ -57,6 +58,6 @@ export async function GET(request: Request) {
     console.error("[Admin Stats API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error", debugInfo: { status: "ERROR" } }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }

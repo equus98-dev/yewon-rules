@@ -15,13 +15,14 @@ export async function GET(request: Request) {
     console.error("[Notice GET API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    if (pool) await pool.end();
+    if (pool) if (pool) await pool.end();
   }
 }
 
 export async function POST(request: Request) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const { title, content, dept, date } = await request.json();
     if (!title || !content || !dept || !date) {
       return NextResponse.json({ error: "필수 입력 항목(제목, 내용, 부서, 일자)이 누락되었습니다." }, { status: 400 });
@@ -36,13 +37,14 @@ export async function POST(request: Request) {
     console.error("[Notice POST API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    if (pool) await pool.end();
+    if (pool) if (pool) await pool.end();
   }
 }
 
 export async function PUT(request: Request) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const { id, title, content, dept, date } = await request.json();
     if (!id || !title || !content || !dept || !date) {
       return NextResponse.json({ error: "필수 수정 항목이 누락되었습니다." }, { status: 400 });
@@ -57,13 +59,14 @@ export async function PUT(request: Request) {
     console.error("[Notice PUT API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    if (pool) await pool.end();
+    if (pool) if (pool) await pool.end();
   }
 }
 
 export async function DELETE(request: Request) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "삭제 대상 공지사항 ID가 필요합니다." }, { status: 400 });
@@ -74,6 +77,6 @@ export async function DELETE(request: Request) {
     console.error("[Notice DELETE API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    if (pool) await pool.end();
+    if (pool) if (pool) await pool.end();
   }
 }

@@ -5,8 +5,9 @@ import { NextResponse } from "next/server";
 import { createPool } from "@/lib/db";
 
 export async function GET(request: Request) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") || "field";
 
@@ -178,6 +179,6 @@ export async function GET(request: Request) {
     console.error("[Categories API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }

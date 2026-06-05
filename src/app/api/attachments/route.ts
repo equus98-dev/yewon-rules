@@ -5,8 +5,9 @@ import { NextResponse } from "next/server";
 import { createPool } from "@/lib/db";
 
 export async function GET() {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const res = await pool.query(`
       SELECT 
         a.id,
@@ -26,6 +27,6 @@ export async function GET() {
     console.error("[Attachments GET Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }

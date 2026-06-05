@@ -8,8 +8,9 @@ export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const { id } = params;
     const body = await request.json();
     const { contentText, contentJson } = body;
@@ -47,7 +48,7 @@ export async function PATCH(
     console.error("[Admin Article API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }
 
@@ -55,8 +56,9 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const { id } = params;
     
     // 단순오타수정 연혁 조회 (note 필드에 저장된 텍스트 파싱)
@@ -79,6 +81,6 @@ export async function GET(
     console.error("[Admin Article History API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }

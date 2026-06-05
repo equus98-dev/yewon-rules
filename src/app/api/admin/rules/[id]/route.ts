@@ -6,8 +6,9 @@ export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const { id } = params;
     const body = await request.json();
     const { contentHtml, revisionId } = body;
@@ -50,6 +51,6 @@ export async function PATCH(
     console.error("[Admin Rule API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }

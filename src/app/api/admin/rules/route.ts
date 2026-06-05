@@ -18,8 +18,9 @@ function getInitialSound(text: string): string {
 }
 
 export async function GET(request: Request) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const res = await pool.query(`
       SELECT r.id, r.title, r."ruleNumber", r."initialSound", r.status, r."categoryId",
         c.name AS "categoryName", r."departmentId", d.name AS "departmentName",
@@ -41,7 +42,7 @@ export async function GET(request: Request) {
     console.error("[Admin Rules GET Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }
 
@@ -102,13 +103,14 @@ export async function POST(request: Request) {
     if (client) {
       try { client.release(); } catch (e) { console.error("Release error:", e); }
     }
-    try { await pool.end(); } catch (e) { console.error("Pool end error:", e); }
+    try { if (pool) await pool.end(); } catch (e) { console.error("Pool end error:", e); }
   }
 }
 
 export async function PUT(request: Request) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "Missing rule ID" }, { status: 400 });
@@ -131,7 +133,7 @@ export async function PUT(request: Request) {
     console.error("[Admin Rules PUT Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }
 
@@ -162,6 +164,6 @@ export async function DELETE(request: Request) {
     if (client) {
       try { client.release(); } catch (e) { console.error("Release error:", e); }
     }
-    try { await pool.end(); } catch (e) { console.error("Pool end error:", e); }
+    try { if (pool) await pool.end(); } catch (e) { console.error("Pool end error:", e); }
   }
 }

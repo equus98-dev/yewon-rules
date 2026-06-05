@@ -5,8 +5,9 @@ import { NextResponse } from "next/server";
 import { createPool } from "@/lib/db";
 
 export async function GET(request: Request) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const { searchParams } = new URL(request.url);
     const ruleId = searchParams.get("ruleId");
 
@@ -27,13 +28,14 @@ export async function GET(request: Request) {
     console.error("[Admin Files API GET Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }
 
 export async function POST(request: Request) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const { getRequestContext } = await import("@cloudflare/next-on-pages");
     const ctx = getRequestContext();
     const env = ctx?.env as any;
@@ -87,6 +89,6 @@ export async function POST(request: Request) {
     console.error("[Admin Files API POST Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }

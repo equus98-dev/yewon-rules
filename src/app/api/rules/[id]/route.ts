@@ -8,8 +8,9 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const pool = createPool();
+  let pool;
   try {
+    pool = createPool();
     const { id } = params;
     const { searchParams } = new URL(request.url);
     const versionParam = searchParams.get("version");
@@ -131,6 +132,6 @@ export async function GET(
     console.error("[Rule API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   } finally {
-    await pool.end();
+    if (pool) await pool.end();
   }
 }
