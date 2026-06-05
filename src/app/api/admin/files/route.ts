@@ -36,8 +36,8 @@ export async function POST(request: Request) {
   let pool;
   try {
     pool = createPool();
-    const { getRequestContext } = await import("@cloudflare/next-on-pages");
-    const ctx = getRequestContext();
+    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+    const ctx = getCloudflareContext();
     const env = ctx?.env as any;
     
     if (!env || !env.STORAGE) {

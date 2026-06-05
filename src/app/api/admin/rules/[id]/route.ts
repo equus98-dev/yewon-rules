@@ -1,15 +1,14 @@
-export const runtime = "edge";
 import { NextResponse } from "next/server";
 import { createPool } from "@/lib/db";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string    }> }
 ) {
   let pool;
   try {
     pool = createPool();
-    const { id } = params;
+    const { id  } = await params;
     const body = await request.json();
     const { contentHtml, revisionId } = body;
 

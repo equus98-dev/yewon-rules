@@ -1,4 +1,3 @@
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
@@ -6,12 +5,12 @@ import { createPool } from "@/lib/db";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string    }> }
 ) {
   let pool;
   try {
     pool = createPool();
-    const { id } = params;
+    const { id  } = await params;
     const body = await request.json();
     const { contentText, contentJson } = body;
 
@@ -54,12 +53,12 @@ export async function PATCH(
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string    }> }
 ) {
   let pool;
   try {
     pool = createPool();
-    const { id } = params;
+    const { id  } = await params;
     
     // 단순오타수정 연혁 조회 (note 필드에 저장된 텍스트 파싱)
     const historyRes = await pool.query(

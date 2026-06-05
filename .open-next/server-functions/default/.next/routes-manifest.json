@@ -173,6 +173,12 @@
       "namedRegex": "^/api/ping(?:/)?$"
     },
     {
+      "page": "/api/ping-db",
+      "regex": "^/api/ping\\-db(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/ping\\-db(?:/)?$"
+    },
+    {
       "page": "/api/rules/search",
       "regex": "^/api/rules/search(?:/)?$",
       "routeKeys": {},

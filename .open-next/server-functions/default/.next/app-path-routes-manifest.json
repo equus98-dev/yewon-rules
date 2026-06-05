@@ -19,6 +19,7 @@
   "/api/download/route": "/api/download",
   "/api/files/[key]/route": "/api/files/[key]",
   "/api/notices/route": "/api/notices",
+  "/api/ping-db/route": "/api/ping-db",
   "/api/ping/route": "/api/ping",
   "/api/rules/[id]/route": "/api/rules/[id]",
   "/api/rules/search/route": "/api/rules/search",

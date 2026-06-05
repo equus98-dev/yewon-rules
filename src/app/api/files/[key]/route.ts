@@ -1,15 +1,14 @@
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { key: string } }
+  { params }: { params: Promise<{ key: string    }> }
 ) {
   try {
-    const { getRequestContext } = await import("@cloudflare/next-on-pages");
-    const ctx = getRequestContext();
+    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+    const ctx = getCloudflareContext();
     const env = ctx?.env as any;
 
     if (!env || !env.STORAGE) {

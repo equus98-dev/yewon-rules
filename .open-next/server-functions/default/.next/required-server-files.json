@@ -11,7 +11,7 @@
     "cleanDistDir": true,
     "assetPrefix": "",
     "cacheMaxMemorySize": 52428800,
-    "configOrigin": "next.config.ts",
+    "configOrigin": "next.config.mjs",
     "useFileSystemPublicRoutes": true,
     "generateEtags": true,
     "pageExtensions": [
@@ -303,7 +303,7 @@
     },
     "htmlLimitedBots": "[\\w-]+-Google|Google-[\\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight",
     "bundlePagesRouterDependencies": false,
-    "configFileName": "next.config.ts",
+    "configFileName": "next.config.mjs",
     "turbopack": {
       "root": "F:\\예원예술대학교_규정관리시스템"
     },
@@ -312,6 +312,7 @@
   "appDir": "F:\\예원예술대학교_규정관리시스템",
   "relativeAppDir": "",
   "files": [
+    ".next\\package.json",
     ".next\\routes-manifest.json",
     ".next\\server\\pages-manifest.json",
     ".next\\build-manifest.json",

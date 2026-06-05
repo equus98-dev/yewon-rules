@@ -1,13 +1,9 @@
 name = "yewon-rules"
-compatibility_date = "2024-03-20"
+compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".vercel/output/static"
+pages_build_output_dir = ".open-next/worker"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "yewon-rules-db"
-database_id = "f448ab63-128a-4e09-a1e1-02095e73d92e"
-
-[[r2_buckets]]
-binding = "STORAGE"
-bucket_name = "yewon-rules-storage"
+database_id = "51dbf27a-5db6-444f-bc6a-4d3752e8218d" # Found in previous wrangler.jsonc

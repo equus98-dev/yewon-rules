@@ -1,12 +1,11 @@
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { getRequestContext } from "@cloudflare/next-on-pages";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export async function GET() {
   try {
-    const ctx = getRequestContext();
+    const ctx = getCloudflareContext();
     const env = ctx?.env as any;
     
     if (!env) {

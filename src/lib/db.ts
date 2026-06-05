@@ -1,7 +1,7 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export function getD1() {
-  const ctx = getRequestContext();
+  const ctx = getCloudflareContext();
   const env = ctx?.env as any;
   if (!env || !env.DB) {
     const keys = env ? Object.keys(env).join(', ') : 'env is undefined';

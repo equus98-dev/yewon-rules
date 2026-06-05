@@ -1,0 +1,19 @@
+module.exports=[18622,(e,t,r)=>{t.exports=e.x("next/dist/compiled/next-server/app-page-turbo.runtime.prod.js",()=>require("next/dist/compiled/next-server/app-page-turbo.runtime.prod.js"))},56704,(e,t,r)=>{t.exports=e.x("next/dist/server/app-render/work-async-storage.external.js",()=>require("next/dist/server/app-render/work-async-storage.external.js"))},32319,(e,t,r)=>{t.exports=e.x("next/dist/server/app-render/work-unit-async-storage.external.js",()=>require("next/dist/server/app-render/work-unit-async-storage.external.js"))},24725,(e,t,r)=>{t.exports=e.x("next/dist/server/app-render/after-task-async-storage.external.js",()=>require("next/dist/server/app-render/after-task-async-storage.external.js"))},70406,(e,t,r)=>{t.exports=e.x("next/dist/compiled/@opentelemetry/api",()=>require("next/dist/compiled/@opentelemetry/api"))},93695,(e,t,r)=>{t.exports=e.x("next/dist/shared/lib/no-fallback-error.external.js",()=>require("next/dist/shared/lib/no-fallback-error.external.js"))},83272,e=>{"use strict";let t={get url(){return`file://${e.P("node_modules/@opennextjs/cloudflare/dist/api/cloudflare-context.js")}`}},r=Symbol.for("__cloudflare-context__");function n(){return globalThis[r]}async function o(){let e=n();if(e)return e;{let e=await s();return i(e),e}}async function a(e){if(!globalThis.AsyncLocalStorage)return;e?.environment&&process.env.NEXT_DEV_WRANGLER_ENV&&console.warn(`'initOpenNextCloudflareForDev' has been called with an environment option while NEXT_DEV_WRANGLER_ENV is set. NEXT_DEV_WRANGLER_ENV will be ignored and the environment will be set to: '${e.environment}'`);let t=await s(e);i(t),await l(t)}function i(e){globalThis[r]=e}async function l(e){let n=(await import(`${"__module".replaceAll("_","")}`)).default.createRequire(t.url)("vm"),o=n.runInContext.bind(n);n.runInContext=(t,n,a)=>(n[r]??=e,o(t,n,a))}async function s(e){let{getPlatformProxy:t}=await import(`${"__wrangler".replaceAll("_","")}`),r=e?.environment??process.env.NEXT_DEV_WRANGLER_ENV,{env:n,cf:o,ctx:a}=await t({...e,envFiles:[],environment:r});return{env:n,cf:o,ctx:a}}let u=`
+
+ERROR: \`getCloudflareContext\` has been called without having called \`initOpenNextCloudflareForDev\` from the Next.js config file.
+You should update your Next.js config file as shown below:
+
+   \`\`\`
+   // next.config.mjs
+
+   import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+   initOpenNextCloudflareForDev();
+
+   const nextConfig = { ... };
+   export default nextConfig;
+   \`\`\`
+
+`;e.s(["getCloudflareContext",0,function(e={async:!1}){return e.async?o():function(){let e,t=n();if(t)return t;if(e=globalThis,e.__NEXT_DATA__?.nextExport===!0)throw Error("  - make sure that the call is not at the top level and that the route is not static\n  - call `getCloudflareContext({async: true})` to use the `async` mode\n  - avoid calling `getCloudflareContext` in the route\n");throw Error(u)}()},"initOpenNextCloudflareForDev",0,a])},43793,e=>{"use strict";var t=e.i(83272);class r{db;constructor(e){this.db=e}convertSql(e){let t=e.replace(/\$(\d+)/g,"?$1");return(t=t.replace(/NOW\(\)/gi,"CURRENT_TIMESTAMP")).replace(/ILIKE/gi,"LIKE")}async query(e,t=[]){let r=e.trim().toUpperCase();if("BEGIN"===r||"COMMIT"===r||"ROLLBACK"===r)return{rows:[],rowCount:0};let n=t.map(e=>e instanceof Date?e.toISOString():e),o=this.db.prepare(this.convertSql(e)).bind(...n),{results:a}=await o.all();return{rows:a||[],rowCount:a?.length||0}}async connect(){return{query:this.query.bind(this),release:()=>{}}}async end(){}}e.s(["createPool",0,function(){return new r(function(){let e=(0,t.getCloudflareContext)(),r=e?.env;if(!r||!r.DB){let e=r?Object.keys(r).join(", "):"env is undefined";throw Error(`D1 Database binding 'DB' not found in edge environment. Available bindings: ${e}`)}return r.DB}())}])}];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__0drn8kt._.js.map
