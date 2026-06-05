@@ -2,8 +2,3 @@ name = "yewon-rules"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".open-next"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "yewon-rules-db"
-database_id = "51dbf27a-5db6-444f-bc6a-4d3752e8218d" # Found in previous wrangler.jsonc
