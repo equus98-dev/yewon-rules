@@ -61,7 +61,7 @@ function EditorContent() {
     async function loadRules() {
       try {
         const res = await fetch("/api/admin/rules");
-        const data = await res.json();
+        const data = (await res.json()) as any[];
         const sortedData = data.sort((a: any, b: any) => {
           const aParts = (a.ruleNumber || "").split('-').map(Number);
           const bParts = (b.ruleNumber || "").split('-').map(Number);
@@ -98,7 +98,7 @@ function EditorContent() {
           const text = await res.text();
           throw new Error(`서버 에러: ${text}`);
         }
-        const data = await res.json();
+        const data = (await res.json()) as any;
         setRuleDetail(data);
 
         const rev = data.currentRevision;
@@ -247,7 +247,7 @@ function EditorContent() {
       let data;
       const textResponse = await res.text();
       try {
-        data = JSON.parse(textResponse);
+        data = JSON.parse(textResponse) as any;
       } catch (e) {
         throw new Error(`Server returned non-JSON response: ${textResponse}`);
       }
