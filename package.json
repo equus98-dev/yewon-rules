@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
-    "pages:build": "npx @opennextjs/cloudflare build --noMinify",
+    "pages:build": "node patch-opennext.js && npx @opennextjs/cloudflare build && node rename-worker.js",
     "start": "next start",
     "lint": "eslint",
     "seed:rules": "npx tsx prisma/seed-all-rules.ts",
