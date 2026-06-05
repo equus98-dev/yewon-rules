@@ -1,6 +1,8 @@
 import EditClient from "./EditClient";
 
-export default async function RuleEditPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export const runtime = "edge";
+
+export default function RuleEditPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   return <EditClient id={id} />;
 }

@@ -1,3 +1,4 @@
+export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
@@ -5,11 +6,11 @@ import { createPool } from "@/lib/db";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   const pool = createPool();
   try {
-    const { id } = await params;
+    const { id } = params;
     const { searchParams } = new URL(request.url);
     const versionParam = searchParams.get("version");
 

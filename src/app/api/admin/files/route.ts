@@ -1,3 +1,4 @@
+export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
@@ -33,14 +34,16 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const pool = createPool();
   try {
-    const env = process.env as any;
+    const { getRequestContext } = await import("@cloudflare/next-on-pages");
+    const ctx = getRequestContext();
+    const env = ctx?.env as any;
+    
     if (!env || !env.STORAGE) {
       return NextResponse.json(
         { error: "Cloudflare R2 스토리지 바인딩(STORAGE)을 찾을 수 없습니다." },
         { status: 500 }
       );
     }
-    const r2 = env.STORAGE;
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
