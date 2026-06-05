@@ -1,3 +1,5 @@
+import { createRequire } from "node:module";
+globalThis.require = createRequire("file:///worker.js");
 //@ts-expect-error: Will be resolved by wrangler build
 import { handleCdnCgiImageRequest, handleImageRequest } from "./cloudflare/images.js";
 //@ts-expect-error: Will be resolved by wrangler build

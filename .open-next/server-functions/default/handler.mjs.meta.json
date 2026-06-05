@@ -3688,12 +3688,12 @@
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/api/admin/stats/route_client-reference-manifest.js": {
+    ".open-next/server-functions/default/.next/server/app/api/admin/rules/route_client-reference-manifest.js": {
       "bytes": 320,
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/api/admin/rules/route_client-reference-manifest.js": {
+    ".open-next/server-functions/default/.next/server/app/api/admin/stats/route_client-reference-manifest.js": {
       "bytes": 320,
       "imports": [],
       "format": "cjs"
@@ -3713,12 +3713,12 @@
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/api/notices/route_client-reference-manifest.js": {
+    ".open-next/server-functions/default/.next/server/app/api/ping-db/route_client-reference-manifest.js": {
       "bytes": 316,
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/api/ping-db/route_client-reference-manifest.js": {
+    ".open-next/server-functions/default/.next/server/app/api/notices/route_client-reference-manifest.js": {
       "bytes": 316,
       "imports": [],
       "format": "cjs"
@@ -3782,14 +3782,14 @@
           "original": "F:\\예원예술대학교_규정관리시스템\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\files\\[key]\\route_client-reference-manifest.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/api/admin/stats/route_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "F:\\예원예술대학교_규정관리시스템\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\stats\\route_client-reference-manifest.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/api/admin/rules/route_client-reference-manifest.js",
           "kind": "require-call",
           "original": "F:\\예원예술대학교_규정관리시스템\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\rules\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/stats/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "F:\\예원예술대학교_규정관리시스템\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\stats\\route_client-reference-manifest.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/api/categories/route_client-reference-manifest.js",
@@ -3807,14 +3807,14 @@
           "original": "F:\\예원예술대학교_규정관리시스템\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\download\\route_client-reference-manifest.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/api/notices/route_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "F:\\예원예술대학교_규정관리시스템\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\notices\\route_client-reference-manifest.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/api/ping-db/route_client-reference-manifest.js",
           "kind": "require-call",
           "original": "F:\\예원예술대학교_규정관리시스템\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\ping-db\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/notices/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "F:\\예원예술대학교_규정관리시스템\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\notices\\route_client-reference-manifest.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/api/ping/route_client-reference-manifest.js",
@@ -7138,10 +7138,10 @@
         ".open-next/server-functions/default/.next/server/app/api/files/[key]/route_client-reference-manifest.js": {
           "bytesInOutput": 472
         },
-        ".open-next/server-functions/default/.next/server/app/api/admin/stats/route_client-reference-manifest.js": {
+        ".open-next/server-functions/default/.next/server/app/api/admin/rules/route_client-reference-manifest.js": {
           "bytesInOutput": 472
         },
-        ".open-next/server-functions/default/.next/server/app/api/admin/rules/route_client-reference-manifest.js": {
+        ".open-next/server-functions/default/.next/server/app/api/admin/stats/route_client-reference-manifest.js": {
           "bytesInOutput": 472
         },
         ".open-next/server-functions/default/.next/server/app/api/categories/route_client-reference-manifest.js": {
@@ -7153,10 +7153,10 @@
         ".open-next/server-functions/default/.next/server/app/api/download/route_client-reference-manifest.js": {
           "bytesInOutput": 467
         },
-        ".open-next/server-functions/default/.next/server/app/api/notices/route_client-reference-manifest.js": {
+        ".open-next/server-functions/default/.next/server/app/api/ping-db/route_client-reference-manifest.js": {
           "bytesInOutput": 465
         },
-        ".open-next/server-functions/default/.next/server/app/api/ping-db/route_client-reference-manifest.js": {
+        ".open-next/server-functions/default/.next/server/app/api/notices/route_client-reference-manifest.js": {
           "bytesInOutput": 465
         },
         ".open-next/server-functions/default/.next/server/app/api/ping/route_client-reference-manifest.js": {
