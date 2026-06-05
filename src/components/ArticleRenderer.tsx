@@ -16,6 +16,7 @@ interface ArticleRendererProps {
   articleNumber: number;
   title: string;
   contentJson: any; // Prisma JsonValue
+  contentText?: string;
   contentHtml?: string | null;
   hideHistory?: boolean;
   hasHtmlAttachments?: boolean;
@@ -28,6 +29,7 @@ export default function ArticleRenderer({
   title = "",
   articleNumber,
   contentJson,
+  contentText,
   contentHtml,
   hideHistory = false,
   hasHtmlAttachments = true,
@@ -75,6 +77,9 @@ export default function ArticleRenderer({
   try {
     let parsed = contentJson;
     if (typeof contentJson === "string") {
+      if (contentJson.includes("[object Object]")) {
+        throw new Error("Invalid contentJson");
+      }
       parsed = JSON.parse(contentJson);
     }
     
@@ -88,11 +93,15 @@ export default function ArticleRenderer({
       }
     }
   } catch (e) {
-    console.error("Failed to parse contentJson:", e);
+    console.error("Failed to parse contentJson, falling back to contentText");
   }
 
-  if (!Array.isArray(items)) {
-    items = [];
+  if (!Array.isArray(items) || items.length === 0) {
+    if (contentText) {
+      items = [{ type: "text", num: "", text: contentText }];
+    } else {
+      items = [];
+    }
   }
 
   let textAttachments: ContentItem[] = [];

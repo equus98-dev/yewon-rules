@@ -71,9 +71,24 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     if (!currentRevision || !currentRevision.articles) return [];
     let toc: any[] = [];
     currentRevision.articles.forEach((a: any) => {
-      try {
-        let items = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
-        if (!Array.isArray(items)) return;
+        let items: any[] = [];
+        try {
+          if (typeof a.contentJson === "string" && a.contentJson.includes("[object Object]")) {
+            throw new Error("Invalid contentJson string");
+          }
+          items = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
+        } catch (e) {
+          // Fallback parsing error
+        }
+        
+        if (!Array.isArray(items)) {
+          if (a.articleNumber < 8000 && a.title) {
+            const titleMatch = a.title.match(/^제\d+조(?:의\d+)?/);
+            const articleNumStr = titleMatch ? titleMatch[0] : a.title;
+            toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: articleNumStr });
+          }
+          return;
+        }
 
         // 부칙 (8000번대)인 경우 하위 조항을 TOC에 개별적으로 넣지 않고 '부칙' 하나만 추가
         if (a.articleNumber >= 8000 && a.articleNumber < 9000) {
@@ -126,9 +141,6 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             toc.push({ type: "subsection", id: `toc-${subsectionText.replace(new RegExp("\\s", "g"), '-')}`, text: subsectionText });
           }
         });
-      } catch (e) {
-        console.error("TOC parsing error", e);
-      }
     });
     
     // Add attachments from articles to TOC
@@ -345,6 +357,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       articleNumber={a.articleNumber}
                       title={a.title}
                       contentJson={a.contentJson}
+                      contentText={a.contentText}
                       contentHtml={a.contentHtml}
                       hideHistory={hideHistory}
                       hasHtmlAttachments={hasHtmlAttachments}
