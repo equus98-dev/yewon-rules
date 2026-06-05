@@ -9,8 +9,8 @@ export async function GET(
   { params }: { params: Promise<{ key: string    }> }
 ) {
   try {
-    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
-    const ctx = getCloudflareContext();
+    const { getRequestContext } = await import("@cloudflare/next-on-pages");
+    const ctx = getRequestContext();
     const env = ctx?.env as any;
 
     if (!env || !env.STORAGE) {
