@@ -983,8 +983,8 @@ export default function Home() {
                 <div className="bg-gradient-to-b from-[#0c3161] via-[#092244] to-[#04101e] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col">
                   
                   {/* 하단 학교 배경이미지 */}
-                  <div className="absolute left-0 right-0 bottom-0 top-1/2 z-0">
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#092244] to-transparent z-10" />
+                  <div className="absolute left-0 right-0 bottom-0 top-[30%] z-0">
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#092244]/60 to-transparent z-10" />
                     <Image
                       src="/yewon.jpg"
                       alt="예원예술대학교 전경"
@@ -1174,10 +1174,10 @@ export default function Home() {
                 </div>
 
                 {/* [파트 2] 오른쪽 영역: 최근 제·개정 규정 및 최근 공지사항 수직 배치 */}
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col h-full gap-6 min-h-0 overflow-hidden">
                   
                   {/* 2-1) 최근 제·개정 규정 게시판 */}
-                  <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px] overflow-hidden" elevation={0}>
+                  <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden" elevation={0}>
                     <div className="bg-[#5c0000] px-5 py-3.5 flex items-center justify-between shrink-0">
                       <h3 className="text-base font-extrabold text-white flex items-center gap-2 tracking-tight">
                         <GavelIcon className="text-red-200" fontSize="small" />
@@ -1230,7 +1230,7 @@ export default function Home() {
                   </Paper>
 
                   {/* 2-2) 최근 공지사항 게시판 */}
-                  <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-[350px] overflow-hidden" elevation={0}>
+                  <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden" elevation={0}>
                     <div className="bg-[#092244] px-5 py-3.5 flex items-center justify-between shrink-0">
                       <h3 className="text-base font-extrabold text-white flex items-center gap-2 tracking-tight">
                         <CampaignIcon className="text-amber-400" fontSize="small" />
