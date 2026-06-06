@@ -975,10 +975,9 @@ export default function Home() {
             </div>
             </>
           ) : (
-            
             /* CASE B: 대형 중앙 검색창이 있는 메인 대시보드 레이아웃 */
-            <div className="flex-1 overflow-y-auto p-6 md:p-8 scrollbar">
-              <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6 min-h-[750px]">
+            <div className="flex-1 flex flex-col overflow-hidden bg-slate-50">
+              <div className="flex-1 max-w-[1400px] w-full mx-auto grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6 p-6 md:p-8 min-h-0">
                 
                 {/* [파트 1] 왼쪽 대형 검색 폼 (상단: 폼, 하단: 건물사진) */}
                 <div className="bg-gradient-to-b from-[#0c3161] via-[#092244] to-[#04101e] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col">
@@ -991,7 +990,7 @@ export default function Home() {
                       alt="예원예술대학교 전경"
                       fill
                       priority
-                      className="object-cover object-bottom opacity-60 mix-blend-luminosity"
+                      className="object-cover object-bottom opacity-90"
                     />
                   </div>
 
@@ -1282,13 +1281,26 @@ export default function Home() {
                   </Paper>
 
                 </div>
-                
-                {/* [파트 3] 풋터 영역 */}
-                <footer className="text-center text-sm font-medium text-slate-500 py-6 border-t border-slate-200 mt-12">
-                  <p>Copyright &copy; 2026 예원예술대학교. All Rights Reserved.</p>
-                </footer>
-
               </div>
+              {/* [파트 3] 풋터 영역 */}
+              <footer className="bg-[#2c2c2c] text-left text-[13px] text-[#aaaaaa] py-6 px-8 shrink-0 w-full z-10 flex flex-col md:flex-row gap-6 items-center md:items-start justify-between">
+                <div className="flex flex-col gap-4 w-full max-w-[1400px] mx-auto">
+                  <div>
+                    <Image
+                      src="/UI.png"
+                      alt="예원예술대학교 로고"
+                      width={183}
+                      height={40}
+                      className="h-8 w-auto object-contain brightness-0 invert opacity-80"
+                    />
+                  </div>
+                  <div className="leading-relaxed flex flex-col gap-1 tracking-tight">
+                    <p>경기드림캠퍼스 11429 경기도 양주시 은현면 예원대학로 56 TEL: 031-869-0526 FAX: 031-859-8114</p>
+                    <p>전북희망캠퍼스 55913 전북특별자치도 임실군 신평면 창인로 117 TEL: 063-640-7114 FAX: 063-640-7773</p>
+                    <p className="mt-1 text-[#888888]">Copyright &copy; 2014-2026. YEWON ARTS UNIVERSITY. All Rights Reserved.</p>
+                  </div>
+                </div>
+              </footer>
             </div>
           )}
         </main>
