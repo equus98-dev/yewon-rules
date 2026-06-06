@@ -217,7 +217,7 @@ export default function ArticleRenderer({
       .replace(/(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/g, '\n$1 ')
       .replace(/(^|\s)([가-하]\.)\s+/g, '$1\n$2 ')
       .replace(/(제\d+조의?\d*\([^)]+\))/g, '\n\n$1')
-      .replace(/(제\d+장\s+[^\s]+)/g, '\n\n$1');
+      .replace(/(제\d+(?:장|절|관)\s+[^\s]+)/g, '\n\n$1');
 
     const lines = formatted.split('\n').map(l => l.trim()).filter(l => l);
 
@@ -302,6 +302,8 @@ export default function ArticleRenderer({
              }
           } else if (/^제\d+장/.test(trimmed)) {
              lineClass += " mt-8 text-[18px] font-black text-center text-[#000080] block";
+          } else if (/^제\d+(?:절|관)/.test(trimmed)) {
+             lineClass += " mt-6 text-[16px] font-bold text-center text-[#000080] block";
           } else {
              if (idx === 0 && isArticleBody) {
                 isInline = true;

@@ -153,7 +153,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
            if (titleMatch) {
               const titleNum = titleMatch[1];
               if (!toc.some(t => t.id === `toc-${titleNum}`)) {
-                 toc.push({ type: "article", id: `toc-${titleNum}`, text: titleNum });
+                 toc.push({ type: "article", id: `toc-${titleNum}`, text: titleStr });
               }
            }
         }
@@ -162,12 +162,14 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           if (!item) return;
           
           if (typeof item === 'string') {
-            const regex = /(제\d+조의?\d*)\([^)]+\)/g;
+            const regex = /(제\d+조의?\d*\([^)]+\))/g;
             let match;
             while ((match = regex.exec(item)) !== null) {
-              const articleNum = match[1];
+              const fullTitle = match[1];
+              const articleNumMatch = fullTitle.match(/^(제\d+조의?\d*)/);
+              const articleNum = articleNumMatch ? articleNumMatch[1] : fullTitle;
               if (!toc.some(t => t.id === `toc-${articleNum}`)) {
-                toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
+                toc.push({ type: "article", id: `toc-${articleNum}`, text: fullTitle });
               }
             }
             return;
