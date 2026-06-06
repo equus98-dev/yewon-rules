@@ -88,25 +88,27 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           }
           
           if (textToScan) {
-            const regex = /(제\d+조의?\d*)\([^)]+\)/g;
+            const regex = /(제\d+조의?\d*\([^)]+\))/g;
             let match;
             let foundArticle = false;
             while ((match = regex.exec(textToScan)) !== null) {
-              const articleNum = match[1];
+              const fullTitle = match[1];
+              const articleNumMatch = fullTitle.match(/^(제\d+조의?\d*)/);
+              const articleNum = articleNumMatch ? articleNumMatch[1] : fullTitle;
               if (!toc.some(t => t.id === `toc-${articleNum}`)) {
-                toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
+                toc.push({ type: "article", id: `toc-${articleNum}`, text: fullTitle });
                 foundArticle = true;
               }
             }
             if (!foundArticle && a.articleNumber < 8000 && a.title) {
-              const titleMatch = a.title.match(/^제\d+조(?:의\d+)?/);
-              const articleNumStr = titleMatch ? titleMatch[0] : a.title;
-              toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: articleNumStr });
+              const expectedTitleStart = `제${a.articleNumber}조`;
+              const titleStr = /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title.trim()})`;
+              toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: titleStr });
             }
           } else if (a.articleNumber < 8000 && a.title) {
-            const titleMatch = a.title.match(/^제\d+조(?:의\d+)?/);
-            const articleNumStr = titleMatch ? titleMatch[0] : a.title;
-            toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: articleNumStr });
+            const expectedTitleStart = `제${a.articleNumber}조`;
+            const titleStr = /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title.trim()})`;
+            toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: titleStr });
           }
           return;
         }
@@ -192,13 +194,16 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
               toc.push({ type: "subsection", id: `toc-${subsectionText.replace(new RegExp("\\s", "g"), '-')}`, text: subsectionText });
             }
             // Extract glued articles: "제N조(제목)"
-            const regex = /(제\d+조의?\d*)\([^)]+\)/g;
+            const regex = /(제\d+조의?\d*\([^)]+\))/g;
             let match;
             while ((match = regex.exec(safeText)) !== null) {
-              const articleNum = match[1];
+              const fullTitle = match[1];
+              const articleNumMatch = fullTitle.match(/^(제\d+조의?\d*)/);
+              const articleNum = articleNumMatch ? articleNumMatch[1] : fullTitle;
+              
               // Avoid duplicates (if multiple same articles referenced)
               if (!toc.some(t => t.id === `toc-${articleNum}`)) {
-                toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
+                toc.push({ type: "article", id: `toc-${articleNum}`, text: fullTitle });
               }
             }
           }

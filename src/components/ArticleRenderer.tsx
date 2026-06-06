@@ -192,7 +192,7 @@ export default function ArticleRenderer({
 
   // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
   const formatGluedText = (text: string, isArticleBody: boolean = false) => {
-    if (text.length < 50 || /<table|<tr|<td|<th/i.test(text)) {
+    if ((text.length < 50 && !/^\s*제\d+(?:조|장|관|절)/.test(text)) || /<table|<tr|<td|<th/i.test(text)) {
         if (!hideHistory && (text.includes("제정") || text.includes("개정") || text.includes("시행")) && /^\s*[\[〔]/.test(text)) {
              return <span className="text-[14px] text-blue-600 font-medium">[{text.replace(/[\[\]〔〕]/g, '')}]</span>;
         }
