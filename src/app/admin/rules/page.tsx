@@ -52,11 +52,11 @@ export default function AdminRulesManagement() {
           fetch("/api/categories?type=dept"),
         ]);
         
-        const rulesData = await rulesRes.json();
+        const rulesData = (await rulesRes.json()) as any;
         setRules(rulesData);
 
         // 카테고리 트리에서 1뎁스/2뎁스 리스트 평탄화
-        const catsData = await catsRes.json();
+        const catsData = (await catsRes.json()) as any;
         const flatCats: any[] = [];
         function flattenCats(nodes: any[]) {
           nodes.forEach((n) => {
@@ -70,7 +70,7 @@ export default function AdminRulesManagement() {
         setCategories(flatCats);
 
         // 부서 목록 가공
-        const deptsData = await deptsRes.json();
+        const deptsData = (await deptsRes.json()) as any;
         const deptList = deptsData.map((d: any) => ({
           id: d.id.replace("dept-", ""),
           name: d.name,

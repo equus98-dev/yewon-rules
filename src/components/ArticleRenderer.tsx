@@ -383,7 +383,7 @@ export default function ArticleRenderer({
                         setIsEditing(true);
                         if (articleId) {
                           fetch(`/api/admin/articles/${articleId}`)
-                            .then(res => res.json())
+                            .then(res => res.json() as any)
                             .then(data => {
                               if (data.history) setEditHistory(data.history);
                             })

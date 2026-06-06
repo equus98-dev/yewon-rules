@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   let client;
   try {
     client = await pool.connect();
-    const body = await request.json();
+    const body = (await request.json()) as any;
     const { ruleId, versionName, revisionType, enactmentDate, effectiveDate, announcementNumber, description, articles } = body;
 
     if (!ruleId || !versionName || !revisionType || !enactmentDate || !effectiveDate) {

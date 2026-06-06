@@ -13,7 +13,7 @@ export async function PATCH(
   try {
     pool = createPool();
     const { id  } = await params;
-    const body = await request.json();
+    const body = (await request.json()) as any;
     const { contentText, contentJson } = body;
 
     if (!contentText) {

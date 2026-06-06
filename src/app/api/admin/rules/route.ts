@@ -52,7 +52,7 @@ export async function POST(request: Request) {
   let client;
   try {
     client = await pool.connect();
-    const body = await request.json();
+    const body = (await request.json()) as any;
     const { title, ruleNumber, categoryId, departmentId, enactmentDate, announcementNumber, fileUrl, articles } = body;
     if (!title || !ruleNumber || !categoryId || !departmentId || !enactmentDate) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -115,7 +115,7 @@ export async function PUT(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "Missing rule ID" }, { status: 400 });
-    const body = await request.json();
+    const body = (await request.json()) as any;
     const { status, title, categoryId, departmentId } = body;
     const updates: string[] = [];
     const values: any[] = [];

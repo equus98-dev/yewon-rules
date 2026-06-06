@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   let pool;
   try {
     pool = createPool();
-    const { title, content, dept, date } = await request.json();
+    const { title, content, dept, date } = (await request.json()) as any;
     if (!title || !content || !dept || !date) {
       return NextResponse.json({ error: "필수 입력 항목(제목, 내용, 부서, 일자)이 누락되었습니다." }, { status: 400 });
     }
@@ -46,7 +46,7 @@ export async function PUT(request: Request) {
   let pool;
   try {
     pool = createPool();
-    const { id, title, content, dept, date } = await request.json();
+    const { id, title, content, dept, date } = (await request.json()) as any;
     if (!id || !title || !content || !dept || !date) {
       return NextResponse.json({ error: "필수 수정 항목이 누락되었습니다." }, { status: 400 });
     }
