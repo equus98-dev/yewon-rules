@@ -143,6 +143,17 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
            return;
         }
 
+        // DB Migration 중 본문에서 유실된 제1조 제목 강제 복구 (TOC용)
+        if (a.title && /^제\d+조/.test(a.title.trim())) {
+           const titleMatch = a.title.match(/^(제\d+조의?\d*)/);
+           if (titleMatch) {
+              const titleNum = titleMatch[1];
+              if (!toc.some(t => t.id === `toc-${titleNum}`)) {
+                 toc.push({ type: "article", id: `toc-${titleNum}`, text: titleNum });
+              }
+           }
+        }
+
         items.forEach((item: any) => {
           if (!item) return;
           
@@ -171,7 +182,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           } else if (item.type === "article") {
             const articleNum = typeof item.num === 'string' ? item.num : String(item.num || "");
             toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
-          } else if (item.type === "text") {
+          } else if (item.type === "text" || item.type === "paragraph" || item.type === "item" || item.type === "subitem") {
             const safeText = String(item.text || "");
             if (/^제\d+관/.test(safeText.trim())) {
               const subsectionText = safeText.trim();
