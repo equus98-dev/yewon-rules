@@ -206,6 +206,24 @@ export default function ArticleRenderer({
     });
   };
 
+  const getBadgeInfo = (text: string) => {
+    let historyDates: string[] = [];
+    const datesMatches = text.match(/\((?:삭제|개정|신설|전문개정|본조신설)\s*[^)]+\)/g);
+    if (datesMatches) {
+      datesMatches.forEach(match => {
+        const cleaned = match.replace(/[()]/g, '').trim();
+        historyDates.push(cleaned);
+      });
+    }
+    if (text.includes("<개정")) {
+      const match = text.match(/<개정(.*?)>/);
+      if (match) historyDates.push(`개정 ${match[1].trim()}`);
+    }
+    const badgeType = historyDates.some(h => h.includes("개정")) ? "개" : "연";
+    const badgeColor = badgeType === "개" ? "bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100" : "bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100";
+    return { historyDates, badgeType, badgeColor };
+  };
+
   // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
   const formatGluedText = (text: string, isArticleBody: boolean = false) => {
     if ((text.length < 50 && !/^\s*제\d+(?:조|장|관|절)/.test(text)) || /<table|<tr|<td|<th/i.test(text)) {
@@ -296,8 +314,17 @@ export default function ArticleRenderer({
                  const articleTitle = match[2];
                  const body = match[3].trim();
                  const fullTitle = `${articleNum}(${articleTitle})`;
+                 const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
                  return (
                     <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
+                       {!hideHistory && (
+                         <button 
+                           onClick={() => setModalHistory(historyDates.length > 0 ? historyDates : ["개정 이력이 없습니다."])}
+                           className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
+                         >
+                           {badgeType}
+                         </button>
+                       )}
                        <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
                           <div className="w-full break-keep inline-block">
                              <span className="font-bold mr-1 text-[#000080]">{fullTitle}</span>
@@ -314,8 +341,17 @@ export default function ArticleRenderer({
              if (match) {
                  const titlePart = match[1];
                  const body = match[2].trim();
+                 const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
                  return (
                     <div key={`glued-${idx}`} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
+                       {!hideHistory && (
+                         <button 
+                           onClick={() => setModalHistory(historyDates.length > 0 ? historyDates : ["개정 이력이 없습니다."])}
+                           className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
+                         >
+                           {badgeType}
+                         </button>
+                       )}
                        <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
                           <div className="w-full break-keep inline-block">
                              <span className="font-bold mr-1 text-[#000080]">{titlePart}</span>
@@ -427,25 +463,10 @@ export default function ArticleRenderer({
           return (() => {
             let hasSeenBody = false;
             const articleItem = item;
-            let historyDates: string[] = [];
-            let badgeType = "연";
-            let badgeColor = "bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100";
             let parsedTitle = "";
             
             const safeText = String(articleItem.text || "").trim();
-            const datesMatches = safeText.match(/\((?:삭제|개정|신설|전문개정|본조신설)\s*[^)]+\)/g);
-            if (datesMatches) {
-              datesMatches.forEach(match => {
-                const cleaned = match.replace(/[()]/g, '').trim();
-                historyDates.push(cleaned);
-              });
-            }
-            if (safeText.includes("<개정")) {
-              const match = safeText.match(/<개정(.*?)>/);
-              if (match) historyDates.push(`개정 ${match[1].trim()}`);
-            }
-            badgeType = historyDates.some(h => h.includes("개정")) ? "개" : "연";
-            badgeColor = badgeType === "개" ? "bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100" : "bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100";
+            const { historyDates, badgeType, badgeColor } = getBadgeInfo(safeText);
             
             if (safeText.startsWith("(") && !/^\((삭제|개정|신설|전문개정|본조신설)/.test(safeText)) {
               const match = safeText.match(/^(\([^)]+\))(.*)/);
