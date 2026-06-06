@@ -104,6 +104,15 @@ export default function ArticleRenderer({
     }
   }
 
+  // Handle glued documents where the title contains the first article but content doesn't
+  const hasArticleItem = items.some(i => i && i.type === "article");
+  if (!hasArticleItem && title && /^제\d+조/.test(title.trim())) {
+    const firstText = items.length > 0 ? String(items[0].text || "").trim() : "";
+    if (!firstText.startsWith(title.trim())) {
+      items.unshift({ type: "text", num: "", text: title });
+    }
+  }
+
   let textAttachments: ContentItem[] = [];
 
   const attachmentStartIndex = items.findIndex((item) => {
@@ -173,6 +182,9 @@ export default function ArticleRenderer({
   // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
   const formatGluedText = (text: string, isArticleBody: boolean = false) => {
     if (text.length < 50 || /<table|<tr|<td|<th/i.test(text)) {
+        if (!hideHistory && (text.includes("제정") || text.includes("개정") || text.includes("시행")) && /^\s*[\[〔]/.test(text)) {
+             return <span className="text-[14px] text-blue-600 font-medium">[{text.replace(/[\[\]〔〕]/g, '')}]</span>;
+        }
         return <span className={isArticleBody ? "font-normal text-slate-800" : ""}>{renderTextWithHistory(text)}</span>;
     }
 
@@ -442,29 +454,12 @@ export default function ArticleRenderer({
             </div>
           );
         } else {
-          if (!hasSeenBody && articleNumber < 8000 && safeText.length < 100 && !safeText.includes('\n')) {
-            const isTitle = safeText.includes("학칙") || safeText.includes("규정") || safeText.includes("강령") || safeText.includes("내규") || safeText.includes("세칙") || safeText.includes("법령");
-            const isHistory = safeText.includes("제정") || safeText.includes("개정") || safeText.includes("시행");
-            
-            return (
-              <div key={index} className="text-center w-full my-2">
-                {isTitle ? (
-                  <h1 className="text-[24px] font-bold text-slate-800 my-6">{safeText}</h1>
-                ) : isHistory && !hideHistory ? (
-                  <p className="text-[14px] text-blue-600 font-medium my-1">[{safeText}]</p>
-                ) : !isHistory ? (
-                  <p className="text-[14.5px] text-slate-800 leading-[1.7]">{renderTextWithHistory(safeText)}</p>
-                ) : null}
-              </div>
-            );
-          } else {
-            const isAddendum = safeText.replace(/\s+/g, "").startsWith("부칙");
-            return (
-              <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full ${isAddendum ? 'mt-16 mb-4 font-bold text-[16px] text-left border-t-2 border-slate-300 pt-8' : 'pl-[1.25rem] my-1.5'}`}>
-                {formatGluedText(safeText, false)}
-              </div>
-            );
-          }
+          const isAddendum = safeText.replace(/\s+/g, "").startsWith("부칙");
+          return (
+            <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full ${isAddendum ? 'mt-16 mb-4 font-bold text-[16px] text-left border-t-2 border-slate-300 pt-8' : 'pl-[1.25rem] my-1.5'}`}>
+              {formatGluedText(safeText, false)}
+            </div>
+          );
         }
       })}
 

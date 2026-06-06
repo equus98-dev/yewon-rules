@@ -71,7 +71,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     if (!currentRevision || !currentRevision.articles) return [];
     let toc: any[] = [];
     currentRevision.articles.forEach((a: any) => {
-        let items: any[] = [];
+        let items: any = [];
         try {
           if (typeof a.contentJson === "string" && a.contentJson.includes("[object Object]")) {
             throw new Error("Invalid contentJson string");
@@ -82,11 +82,16 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         }
         
         if (!Array.isArray(items)) {
-          if (a.contentText) {
+          let textToScan = a.contentText || "";
+          if (!textToScan && items && items.paragraphs && Array.isArray(items.paragraphs)) {
+             textToScan = items.paragraphs.join("\n");
+          }
+          
+          if (textToScan) {
             const regex = /(제\d+조의?\d*)\([^)]+\)/g;
             let match;
             let foundArticle = false;
-            while ((match = regex.exec(a.contentText)) !== null) {
+            while ((match = regex.exec(textToScan)) !== null) {
               const articleNum = match[1];
               if (!toc.some(t => t.id === `toc-${articleNum}`)) {
                 toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
@@ -139,7 +144,22 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         }
 
         items.forEach((item: any) => {
-          if (!item || typeof item !== 'object') return;
+          if (!item) return;
+          
+          if (typeof item === 'string') {
+            const regex = /(제\d+조의?\d*)\([^)]+\)/g;
+            let match;
+            while ((match = regex.exec(item)) !== null) {
+              const articleNum = match[1];
+              if (!toc.some(t => t.id === `toc-${articleNum}`)) {
+                toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
+              }
+            }
+            return;
+          }
+          
+          if (typeof item !== 'object') return;
+          
           if (item.type === "chapter") {
             const chapterText = typeof item.text === 'string' ? item.text : String(item.text || "");
             if (toc.length > 0 && toc[toc.length - 1].type === "chapter" && toc[toc.length - 1].text === chapterText) return;
