@@ -70,7 +70,20 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const tocItems = useMemo(() => {
     if (!currentRevision || !currentRevision.articles) return [];
     let toc: any[] = [];
+    let lastChapter = "";
+    let lastSection = "";
+    
     currentRevision.articles.forEach((a: any) => {
+        // Add chapter and section if they changed and exist
+        if (a.chapter && a.chapter !== lastChapter) {
+            toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: a.chapter });
+            lastChapter = a.chapter;
+        }
+        if (a.section && a.section !== lastSection) {
+            toc.push({ type: "section", id: `toc-${a.articleNumber}`, text: a.section });
+            lastSection = a.section;
+        }
+
         let items: any = [];
         try {
           if (typeof a.contentJson === "string" && a.contentJson.includes("[object Object]")) {

@@ -266,7 +266,15 @@ export default function Home() {
     setActiveCategoryName(categoryName);
     setLoadingCategory(true);
     try {
-      const res = await fetch(`/api/rules/search?categoryId=${categoryId}&query=`);
+      let url = `/api/rules/search?query=`;
+      if (categoryId.startsWith("abc-")) {
+        url += `&initialSound=${encodeURIComponent(categoryId.replace("abc-", ""))}`;
+      } else if (categoryId.startsWith("dept-")) {
+        url += `&departmentId=${encodeURIComponent(categoryId.replace("dept-", ""))}`;
+      } else {
+        url += `&categoryId=${encodeURIComponent(categoryId)}`;
+      }
+      const res = await fetch(url);
       const data = (await res.json()) as any;
       if (Array.isArray(data)) {
         setCategoryRules(data);
