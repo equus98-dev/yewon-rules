@@ -120,7 +120,20 @@ export default function ArticleRenderer({
     }
     
     if (!alreadyHasTitle) {
-      items.unshift({ type: "text", num: "", text: fullTitle });
+      let targetIndex = -1;
+      for (let i = 0; i < Math.min(items.length, 3); i++) {
+        const text = String(items[i]?.text || "").trim();
+        if (text && !/^[\[〔]?(?:시행|제정|개정)/.test(text) && !text.includes("담당부서")) {
+          targetIndex = i;
+          break;
+        }
+      }
+      
+      if (targetIndex !== -1 && items[targetIndex]) {
+        items[targetIndex].text = `${fullTitle} ${String(items[targetIndex].text || "").trim()}`;
+      } else {
+        items.unshift({ type: "text", num: "", text: fullTitle });
+      }
     }
   }
 
