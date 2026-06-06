@@ -249,13 +249,15 @@ export default function ArticleRenderer({
              }
              lineClass += " ml-4 block";
           } else if (/^제\d+조/.test(trimmed)) {
-             const match = trimmed.match(/^(제\d+조의?\d*\([^)]+\))(.*)/);
+             const match = trimmed.match(/^(제\d+조의?\d*)\(([^)]+)\)(.*)/);
              if (match) {
-                 const title = match[1];
-                 const body = match[2].trim();
+                 const articleNum = match[1];
+                 const articleTitle = match[2];
+                 const body = match[3].trim();
+                 const fullTitle = `${articleNum}(${articleTitle})`;
                  return (
-                    <div key={`glued-${idx}`} className="mt-4 text-[16px] block break-keep text-slate-800">
-                       <span className="font-bold mr-1 text-[#000080]">{title}</span>
+                    <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 text-[16px] block break-keep text-slate-800">
+                       <span className="font-bold mr-1 text-[#000080]">{fullTitle}</span>
                        <span className="font-normal text-slate-800">{renderTextWithHistory(body)}</span>
                     </div>
                  );
@@ -440,7 +442,7 @@ export default function ArticleRenderer({
             </div>
           );
         } else {
-          if (!hasSeenBody && articleNumber < 8000) {
+          if (!hasSeenBody && articleNumber < 8000 && safeText.length < 100 && !safeText.includes('\n')) {
             const isTitle = safeText.includes("학칙") || safeText.includes("규정") || safeText.includes("강령") || safeText.includes("내규") || safeText.includes("세칙") || safeText.includes("법령");
             const isHistory = safeText.includes("제정") || safeText.includes("개정") || safeText.includes("시행");
             

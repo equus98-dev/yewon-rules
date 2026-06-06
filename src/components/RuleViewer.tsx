@@ -82,7 +82,23 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         }
         
         if (!Array.isArray(items)) {
-          if (a.articleNumber < 8000 && a.title) {
+          if (a.contentText) {
+            const regex = /(제\d+조의?\d*)\([^)]+\)/g;
+            let match;
+            let foundArticle = false;
+            while ((match = regex.exec(a.contentText)) !== null) {
+              const articleNum = match[1];
+              if (!toc.some(t => t.id === `toc-${articleNum}`)) {
+                toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
+                foundArticle = true;
+              }
+            }
+            if (!foundArticle && a.articleNumber < 8000 && a.title) {
+              const titleMatch = a.title.match(/^제\d+조(?:의\d+)?/);
+              const articleNumStr = titleMatch ? titleMatch[0] : a.title;
+              toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: articleNumStr });
+            }
+          } else if (a.articleNumber < 8000 && a.title) {
             const titleMatch = a.title.match(/^제\d+조(?:의\d+)?/);
             const articleNumStr = titleMatch ? titleMatch[0] : a.title;
             toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: articleNumStr });
@@ -135,10 +151,23 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           } else if (item.type === "article") {
             const articleNum = typeof item.num === 'string' ? item.num : String(item.num || "");
             toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
-          } else if (item.type === "text" && /^제\d+관/.test(String(item.text || "").trim())) {
-            const subsectionText = String(item.text).trim();
-            if (toc.length > 0 && toc[toc.length - 1].type === "subsection" && toc[toc.length - 1].text === subsectionText) return;
-            toc.push({ type: "subsection", id: `toc-${subsectionText.replace(new RegExp("\\s", "g"), '-')}`, text: subsectionText });
+          } else if (item.type === "text") {
+            const safeText = String(item.text || "");
+            if (/^제\d+관/.test(safeText.trim())) {
+              const subsectionText = safeText.trim();
+              if (toc.length > 0 && toc[toc.length - 1].type === "subsection" && toc[toc.length - 1].text === subsectionText) return;
+              toc.push({ type: "subsection", id: `toc-${subsectionText.replace(new RegExp("\\s", "g"), '-')}`, text: subsectionText });
+            }
+            // Extract glued articles: "제N조(제목)"
+            const regex = /(제\d+조의?\d*)\([^)]+\)/g;
+            let match;
+            while ((match = regex.exec(safeText)) !== null) {
+              const articleNum = match[1];
+              // Avoid duplicates (if multiple same articles referenced)
+              if (!toc.some(t => t.id === `toc-${articleNum}`)) {
+                toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
+              }
+            }
           }
         });
     });
