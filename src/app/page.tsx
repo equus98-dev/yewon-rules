@@ -982,6 +982,19 @@ export default function Home() {
                 {/* [파트 1] 왼쪽 대형 검색 폼 (상단: 폼, 하단: 건물사진) */}
                 <div className="bg-gradient-to-b from-[#0c3161] via-[#092244] to-[#04101e] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col">
                   
+                  {/* 스프링 노트 바인딩 장식 (좌측) */}
+                  <div className="absolute left-0 top-0 bottom-0 w-12 z-30 flex flex-col items-center justify-evenly py-8 pointer-events-none bg-gradient-to-r from-black/20 to-transparent border-r border-white/5">
+                    {Array.from({ length: 16 }).map((_, i) => (
+                      <div key={i} className="relative w-full flex items-center justify-center h-5">
+                        {/* 펀칭 구멍 */}
+                        <div className="absolute left-6 w-3.5 h-3.5 rounded-full bg-[#020611] shadow-[inset_0_3px_5px_rgba(0,0,0,1)] border border-white/5"></div>
+                        {/* 쇠 스프링 */}
+                        <div className="absolute left-[-2px] w-9 h-[7px] bg-gradient-to-b from-[#999] via-[#fff] to-[#555] rounded-sm shadow-[2px_3px_5px_rgba(0,0,0,0.7)] border border-[#666] -rotate-[12deg]"></div>
+                      </div>
+                    ))}
+                  </div>
+
+                  
                   {/* 하단 학교 배경이미지 */}
                   <div className="absolute left-0 right-0 bottom-0 top-[30%] z-0">
                     <div className="absolute inset-0 bg-gradient-to-b from-[#092244]/60 to-transparent z-10" />
@@ -997,7 +1010,7 @@ export default function Home() {
                   {/* 배경 패턴 그래픽 데코레이션 */}
                   <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] z-1 pointer-events-none"></div>
                   
-                  <div className="relative z-10 w-full p-8 md:p-10 flex-shrink-0 flex flex-col items-start">
+                  <div className="relative z-10 w-full pl-16 pr-8 py-8 md:pl-20 md:pr-10 md:py-10 flex-shrink-0 flex flex-col items-start">
                     
                     {/* 타이틀 */}
                     <div className="flex items-center justify-start mb-5 select-none">
