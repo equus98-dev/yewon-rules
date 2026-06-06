@@ -24,6 +24,7 @@ export default function Home() {
   
   // 카테고리 뷰 관련 상태
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [activeNoticeId, setActiveNoticeId] = useState<string | null>(null);
   const [activeVerticalTab, setActiveVerticalTab] = useState<string>("규정");
   const [activeCategoryName, setActiveCategoryName] = useState<string | null>(null);
   const [categoryRules, setCategoryRules] = useState<any[]>([]);
@@ -251,6 +252,7 @@ export default function Home() {
     setEnactmentEnd("");
     setSidebarKey((prev) => prev + 1); // 사이드바 컴포넌트 세션 강제 초기화 트리거!
     setResultActiveTab("all"); // 결과 탭 '전체'로 초기화!
+    setActiveNoticeId(null);
   };
 
   // 인기 태그 바로 검색 기능
@@ -264,6 +266,7 @@ export default function Home() {
     setIsSearching(false);
     setActiveCategoryId(categoryId);
     setActiveCategoryName(categoryName);
+    setActiveNoticeId(null);
     setLoadingCategory(true);
     try {
       let url = `/api/rules/search?query=`;
@@ -421,17 +424,27 @@ export default function Home() {
                 setIsSearching(false); // 상세 보기 시 검색 결과 모드 해제
                 setActiveCategoryId(null);
                 setActiveVerticalTab("규정"); // 규정 선택 시 자동으로 규정 탭으로 이동
+                setActiveNoticeId(null);
               }}
               onSelectCategory={(categoryId, categoryName) => {
                 handleCategorySelect(categoryId, categoryName);
+                setActiveNoticeId(null);
               }}
               onTabChange={(tab) => {
                 setActiveVerticalTab(tab);
-                if (tab === "조직도") {
+                if (tab === "조직도" || tab === "공지사항") {
                   setActiveRuleId(null);
                   setActiveCategoryId(null);
                   setIsSearching(false);
+                  if (tab === "조직도") setActiveNoticeId(null);
                 }
+              }}
+              onSelectNotice={(noticeId) => {
+                setActiveNoticeId(noticeId);
+                setActiveVerticalTab("공지사항");
+                setActiveRuleId(null);
+                setActiveCategoryId(null);
+                setIsSearching(false);
               }}
             />
           </div>
@@ -476,6 +489,116 @@ export default function Home() {
                   alt="조직도" 
                   className="min-w-[1000px] w-full h-auto object-contain block mx-auto" 
                 />
+              </div>
+            </div>
+          ) : activeVerticalTab === "공지사항" ? (
+            <div className="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar">
+              <div className="max-w-6xl mx-auto">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-end justify-between border-b-[3px] border-[#1e3a8a] pb-4 select-none">
+                    <h2 className="text-[28px] font-black text-slate-900 tracking-tight flex items-center gap-2">
+                      공지사항
+                    </h2>
+                    <span className="text-[14px] text-slate-600 font-bold tracking-wider">
+                      HOME &gt; 공지사항
+                    </span>
+                  </div>
+
+                  {activeNoticeId ? (() => {
+                    const notice = notices.find((n: any) => n.id === activeNoticeId);
+                    if (!notice) return null;
+                    return (
+                      <div className="bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden flex flex-col min-h-[500px]">
+                        <div className="px-8 py-6 border-b border-slate-200">
+                          <h3 className="text-[22px] font-black text-slate-900 tracking-tight mb-2">
+                            {notice.title}
+                          </h3>
+                          <div className="flex items-center gap-6 text-[14px] font-bold text-slate-500 mt-2">
+                            <span>작성부서: <span className="text-slate-700">{notice.dept}</span></span>
+                            <span>작성일: <span className="text-slate-700">{notice.date}</span></span>
+                          </div>
+                        </div>
+                        <div className="p-8 text-[15px] text-slate-800 leading-relaxed font-medium whitespace-pre-wrap flex-1">
+                          {notice.content}
+                        </div>
+                        <div className="px-8 py-5 border-t border-slate-200 bg-slate-50 flex justify-end">
+                          <button
+                            onClick={() => setActiveNoticeId(null)}
+                            className="bg-white border border-slate-300 text-slate-700 font-bold px-6 py-2 hover:bg-slate-100 transition-colors shadow-sm cursor-pointer active:scale-95 text-[14px]"
+                          >
+                            목록
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })() : (
+                    <>
+                      <div className="flex items-center text-[15px] font-extrabold text-slate-700 select-none mb-3 mt-1">
+                        <span className="mr-3">전체: <span className="text-blue-700">{notices.length}</span>건</span>
+                        <span>페이지: 1/1</span>
+                      </div>
+
+                      <div className="bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden">
+                        {loadingNotices ? (
+                          <div className="flex flex-col items-center justify-center py-24 gap-4">
+                            <CircularProgress size={30} sx={{ color: "#0c3161" }} />
+                            <span className="text-slate-500 text-xs font-semibold">공지사항 로드 중...</span>
+                          </div>
+                        ) : (
+                          <table className="w-full text-sm border-collapse">
+                            <thead>
+                              <tr className="bg-slate-50 border-b-2 border-slate-200 text-slate-800 text-[16px] select-none">
+                                <th className="py-4 px-4 font-black w-24 text-center border-r border-slate-200">번호</th>
+                                <th className="py-4 px-4 font-black text-center">제목</th>
+                                <th className="py-4 px-4 font-black w-40 text-center border-l border-slate-200">작성부서</th>
+                                <th className="py-4 px-4 font-black w-40 text-center border-l border-slate-200">작성일</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {notices.length === 0 ? (
+                                <tr>
+                                  <td colSpan={4} className="py-20 text-center text-slate-400 text-[15px] font-bold">
+                                    등록된 공지사항이 없습니다.
+                                  </td>
+                                </tr>
+                              ) : (
+                                notices.map((notice, idx) => (
+                                  <tr key={notice.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                                    <td className="py-4 px-4 text-center text-slate-500 font-extrabold text-[16px]">
+                                      {notices.length - idx}
+                                    </td>
+                                    <td className="py-4 px-4">
+                                      <button
+                                        type="button"
+                                        onClick={() => setActiveNoticeId(notice.id)}
+                                        className="text-slate-800 font-medium hover:text-blue-800 cursor-pointer text-[15.5px] transition-colors text-left"
+                                      >
+                                        {notice.title}
+                                      </button>
+                                    </td>
+                                    <td className="py-4 px-4 text-center text-slate-600 font-medium text-[15px]">
+                                      {notice.dept}
+                                    </td>
+                                    <td className="py-4 px-4 text-center text-slate-600 font-medium text-[15px]">
+                                      {notice.date}
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        )}
+                        {!loadingNotices && notices.length > 0 && (
+                          <div className="flex items-center justify-center py-6 border-t border-slate-200 bg-white">
+                            <div className="flex gap-1.5">
+                              <button className="px-4 py-1.5 bg-[#0c3161] text-white text-[15px] font-black shadow-sm">1</button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           ) : activeRuleId ? (

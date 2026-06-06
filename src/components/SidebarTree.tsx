@@ -29,6 +29,7 @@ interface SidebarTreeProps {
   onSelectCategory?: (categoryId: string, categoryName: string) => void;
   onTabChange?: (tab: string) => void;
   activeRuleId?: string | null;
+  onSelectNotice?: (noticeId: string) => void;
 }
 
 const ClosedIcon = () => (
@@ -38,9 +39,9 @@ const OpenedIcon = () => (
   <span className="text-[10px] text-slate-500 font-bold select-none mr-0.5">▼</span>
 );
 
-export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCategory, onTabChange }: SidebarTreeProps) {
-  // 1단 세로 메뉴 탭 상태: "규정" | "최신 제·개정" | "서식" | "공지" | "조직도"
-  const [verticalTab, setVerticalTab] = useState<"규정" | "최신 제·개정" | "서식" | "공지" | "조직도">("규정");
+export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCategory, onTabChange, onSelectNotice }: SidebarTreeProps) {
+  // 1단 세로 메뉴 탭 상태: "규정" | "최신 제·개정" | "서식" | "공지사항" | "조직도"
+  const [verticalTab, setVerticalTab] = useState<"규정" | "최신 제·개정" | "서식" | "공지사항" | "조직도">("규정");
 
   // 조직도 모달 상태
   const [orgChartOpen, setOrgChartOpen] = useState(false);
@@ -176,7 +177,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
         setLoadingNotices(false);
       }
     }
-    if (verticalTab === "공지" && notices.length === 0) {
+    if (verticalTab === "공지사항" && notices.length === 0) {
       loadNotices();
     }
   }, [verticalTab, notices.length]);
@@ -269,7 +270,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
     { id: "규정" as const, label: "규정", icon: <MenuBookIcon sx={{ fontSize: 22 }} /> },
     { id: "최신 제·개정" as const, label: "최신 제·개정", icon: <HistoryIcon sx={{ fontSize: 22 }} /> },
     { id: "서식" as const, label: "서식", icon: <DescriptionIcon sx={{ fontSize: 22 }} /> },
-    { id: "공지" as const, label: "공지", icon: <CampaignIcon sx={{ fontSize: 22 }} /> },
+    { id: "공지사항" as const, label: "공지사항", icon: <CampaignIcon sx={{ fontSize: 22 }} /> },
     { id: "조직도" as const, label: "조직도", icon: <AccountTreeIcon sx={{ fontSize: 22 }} /> },
   ];
 
@@ -535,7 +536,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
         )}
 
         {/* 2-4) 공지사항 패널 */}
-        {verticalTab === "공지" && (
+        {verticalTab === "공지사항" && (
           <div className="flex-1 overflow-y-auto p-2.5 scrollbar flex flex-col gap-2 bg-slate-50/30">
             {loadingNotices ? (
               <div className="flex flex-col items-center justify-center h-48 gap-2">
@@ -551,7 +552,9 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
                 <div
                   key={notice.id}
                   onClick={() => {
-                    alert(`[공지사항 - ${notice.dept}]\n\n* 제목: ${notice.title}\n* 일자: ${notice.date}\n\n* 내용:\n${notice.content}`);
+                    if (onSelectNotice) {
+                      onSelectNotice(notice.id);
+                    }
                   }}
                   className="w-full p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-[#0c3161]/5 hover:border-blue-300 transition-all text-xs flex flex-col gap-1 shadow-sm cursor-pointer active:scale-98"
                 >
