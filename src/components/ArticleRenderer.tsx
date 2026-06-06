@@ -108,7 +108,10 @@ export default function ArticleRenderer({
   const hasArticleItem = items.some(i => i && i.type === "article");
   if (!hasArticleItem && title) {
     const expectedTitleStart = `제${articleNumber}조`;
-    const fullTitle = /^제\d+조/.test(title.trim()) ? title : `${expectedTitleStart}(${title})`;
+    let fullTitle = /^제\d+조/.test(title.trim()) ? title : `${expectedTitleStart}(${title})`;
+    if (articleNumber >= 8000 && articleNumber < 9000) {
+      fullTitle = title.trim();
+    }
     
     // Check if the first paragraph already contains the article number
     let alreadyHasTitle = false;
@@ -216,8 +219,10 @@ export default function ArticleRenderer({
       .replace(/(①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩|⑪|⑫|⑬|⑭|⑮)/g, '\n$1')
       .replace(/(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/g, '\n$1 ')
       .replace(/(^|\s)([가-하]\.)\s+/g, '$1\n$2 ')
+      .replace(/(제\d+조의?\d*\([^)]+\))\s*\n([①-⑮])/g, '$1 $2')
       .replace(/(제\d+조의?\d*\([^)]+\))/g, '\n\n$1')
-      .replace(/(제\d+(?:장|절|관)\s+[^\s]+)/g, '\n\n$1');
+      .replace(/(제\d+(?:장|절|관)\s+[^\s]+)/g, '\n\n$1')
+      .replace(/(^|\n)(부\s*칙)\s*(.*)/g, '\n\n$2 $3');
 
     const lines = formatted.split('\n').map(l => l.trim()).filter(l => l);
 
@@ -292,13 +297,35 @@ export default function ArticleRenderer({
                  const body = match[3].trim();
                  const fullTitle = `${articleNum}(${articleTitle})`;
                  return (
-                    <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 text-[16px] block break-keep text-slate-800">
-                       <span className="font-bold mr-1 text-[#000080]">{fullTitle}</span>
-                       <span className="font-normal text-slate-800">{renderTextWithHistory(body)}</span>
+                    <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
+                       <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
+                          <div className="w-full break-keep inline-block">
+                             <span className="font-bold mr-1 text-[#000080]">{fullTitle}</span>
+                             {body && <span className="font-normal text-slate-800">{renderTextWithHistory(body)}</span>}
+                          </div>
+                       </div>
                     </div>
                  );
              } else {
-                 lineClass += " mt-4 text-[16px] font-bold text-[#000080] block";
+                 lineClass += " mt-8 mb-2 text-[14.5px] font-bold text-[#000080] block";
+             }
+          } else if (/^부\s*칙/.test(trimmed)) {
+             const match = trimmed.match(/^(부\s*칙)\s*(.*)/);
+             if (match) {
+                 const titlePart = match[1];
+                 const body = match[2].trim();
+                 return (
+                    <div key={`glued-${idx}`} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
+                       <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
+                          <div className="w-full break-keep inline-block">
+                             <span className="font-bold mr-1 text-[#000080]">{titlePart}</span>
+                             {body && <span className="font-normal text-slate-800">{renderTextWithHistory(body)}</span>}
+                          </div>
+                       </div>
+                    </div>
+                 );
+             } else {
+                 lineClass += " mt-8 mb-2 text-[14.5px] font-bold text-[#000080] block";
              }
           } else if (/^제\d+장/.test(trimmed)) {
              lineClass += " mt-8 text-[18px] font-black text-center text-[#000080] block";
@@ -327,9 +354,23 @@ export default function ArticleRenderer({
     );
   };
 
+  let displayItems = [...items];
+  for (let i = 0; i < displayItems.length - 1; i++) {
+      const curr = displayItems[i];
+      const next = displayItems[i+1];
+      if (curr && curr.type === "article" && next && next.type === "paragraph") {
+          const currText = String(curr.text || "").trim();
+          if (currText === "" || /^\([^)]+\)$/.test(currText) || /^제\d+조의?\d*\([^)]+\)$/.test(currText)) {
+              displayItems[i] = { ...curr, text: (currText ? currText + " " : "") + String(next.text || "").trim() };
+              displayItems.splice(i+1, 1);
+              i--;
+          }
+      }
+  }
+
   return (
     <div id={id} className="mb-6 animate-fade-in rule-viewer-content font-['Pretendard']">
-      {items.map((item, index) => {
+      {displayItems.map((item, index) => {
         if (!item || typeof item !== 'object') return null;
 
         if (
