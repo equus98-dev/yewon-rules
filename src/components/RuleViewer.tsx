@@ -144,8 +144,10 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         }
 
         // DB Migration 중 본문에서 유실된 제1조 제목 강제 복구 (TOC용)
-        if (a.title && /^제\d+조/.test(a.title.trim())) {
-           const titleMatch = a.title.match(/^(제\d+조의?\d*)/);
+        if (a.title && a.articleNumber < 8000) {
+           const expectedTitleStart = `제${a.articleNumber}조`;
+           const titleStr = /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title.trim()})`;
+           const titleMatch = titleStr.match(/^(제\d+조의?\d*)/);
            if (titleMatch) {
               const titleNum = titleMatch[1];
               if (!toc.some(t => t.id === `toc-${titleNum}`)) {

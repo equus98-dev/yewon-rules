@@ -106,10 +106,21 @@ export default function ArticleRenderer({
 
   // Handle glued documents where the title contains the first article but content doesn't
   const hasArticleItem = items.some(i => i && i.type === "article");
-  if (!hasArticleItem && title && /^제\d+조/.test(title.trim())) {
-    const firstText = items.length > 0 ? String(items[0].text || "").trim() : "";
-    if (!firstText.startsWith(title.trim())) {
-      items.unshift({ type: "text", num: "", text: title });
+  if (!hasArticleItem && title) {
+    const expectedTitleStart = `제${articleNumber}조`;
+    const fullTitle = /^제\d+조/.test(title.trim()) ? title : `${expectedTitleStart}(${title})`;
+    
+    // Check if the first paragraph already contains the article number
+    let alreadyHasTitle = false;
+    for (let i = 0; i < Math.min(items.length, 3); i++) {
+        if (items[i] && String(items[i].text || "").trim().startsWith(expectedTitleStart)) {
+            alreadyHasTitle = true;
+            break;
+        }
+    }
+    
+    if (!alreadyHasTitle) {
+      items.unshift({ type: "text", num: "", text: fullTitle });
     }
   }
 
@@ -429,6 +440,15 @@ export default function ArticleRenderer({
             );
           })();
         } else if (item.type === "paragraph") {
+          const isGlued = /^제\d+조/.test(safeText.trim());
+          if (isGlued) {
+            return (
+              <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] w-full pl-[1.25rem] my-1.5">
+                <span className="font-normal mr-1">{safeNum}</span>
+                {formatGluedText(safeText, false)}
+              </div>
+            );
+          }
           return (
             <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] pr-4 break-keep w-full" style={{ paddingLeft: '20px', textIndent: '-20px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
