@@ -1282,30 +1282,42 @@ export default function Home() {
 
                 </div>
               </div>
-              {/* [파트 3] 풋터 영역 */}
-              <footer className="bg-[#2c2c2c] text-left text-[13px] text-[#aaaaaa] py-6 px-8 shrink-0 w-full z-10 flex flex-col md:flex-row gap-6 items-center md:items-start justify-between">
-                <div className="flex flex-col gap-4 w-full max-w-[1400px] mx-auto">
-                  <div>
-                    <Image
-                      src="/UI.png"
-                      alt="예원예술대학교 로고"
-                      width={183}
-                      height={40}
-                      className="h-8 w-auto object-contain brightness-0 invert opacity-80"
-                    />
-                  </div>
-                  <div className="leading-relaxed flex flex-col gap-1 tracking-tight">
-                    <p>경기드림캠퍼스 11429 경기도 양주시 은현면 예원대학로 56 TEL: 031-869-0526 FAX: 031-859-8114</p>
-                    <p>전북희망캠퍼스 55913 전북특별자치도 임실군 신평면 창인로 117 TEL: 063-640-7114 FAX: 063-640-7773</p>
-                    <p className="mt-1 text-[#888888]">Copyright &copy; 2014-2026. YEWON ARTS UNIVERSITY. All Rights Reserved.</p>
-                  </div>
-                </div>
-              </footer>
             </div>
           )}
         </main>
 
       </div>
+
+      {/* ==================== 3. 공통 풋터 영역 ==================== */}
+      <footer className="bg-[#2c2c2c] text-[#aaaaaa] py-4 px-8 shrink-0 w-full z-50 flex items-center justify-center border-t border-[#444] shadow-[0_-4px_10px_rgba(0,0,0,0.2)]">
+        <div className="flex flex-col xl:flex-row items-center xl:items-end gap-6 max-w-[1600px] w-full">
+          {/* 좌측 로고 영역 */}
+          <div className="shrink-0 flex items-center justify-center">
+            <Image
+              src="/UI.png"
+              alt="예원예술대학교 로고"
+              width={183}
+              height={40}
+              className="h-8 w-auto object-contain brightness-0 invert opacity-80"
+            />
+          </div>
+          
+          {/* 우측 주소 및 카피라이트 텍스트 영역 (가로형) */}
+          <div className="flex flex-wrap items-center justify-center xl:justify-start gap-x-4 gap-y-1.5 text-[12.5px] leading-snug tracking-tight text-center xl:text-left flex-1 pb-0.5">
+            <p>
+              <span className="font-bold text-[#ccc]">경기드림캠퍼스</span> 11429 경기도 양주시 은현면 예원대학로 56 <span className="text-[#888] ml-1">(TEL: 031-869-0526 / FAX: 031-859-8114)</span>
+            </p>
+            <div className="hidden xl:block w-[1px] h-3 bg-[#555]"></div>
+            <p>
+              <span className="font-bold text-[#ccc]">전북희망캠퍼스</span> 55913 전북특별자치도 임실군 신평면 창인로 117 <span className="text-[#888] ml-1">(TEL: 063-640-7114 / FAX: 063-640-7773)</span>
+            </p>
+            <div className="hidden xl:block w-[1px] h-3 bg-[#555]"></div>
+            <p className="text-[#777] font-medium w-full xl:w-auto mt-1 xl:mt-0">
+              Copyright &copy; 2014-2026. YEWON ARTS UNIVERSITY. All Rights Reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
 
       {/* 실시간 공지사항 상세 보기 모달 다이얼로그 (Tailwind CSS 글래스모피즘 테마) */}
       {noticeModalOpen && selectedNotice && (
