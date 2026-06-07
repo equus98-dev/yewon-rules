@@ -308,6 +308,9 @@ export default function Home() {
           <span className="text-blue-900 font-extrabold text-lg ml-2 border-l border-slate-300 pl-3.5 hidden sm:inline-block tracking-tight">
             규정관리시스템
           </span>
+          <span className="text-xs text-slate-400 font-bold tracking-wider hidden md:inline-block pt-1 ml-1">
+            Yewon Arts University Rule Management
+          </span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -390,10 +393,6 @@ export default function Home() {
               관리자 로그인
             </Button>
           )}
-
-          <span className="text-xs text-slate-400 font-medium hidden sm:inline">
-            Yewon Arts University Rule Management
-          </span>
         </div>
       </header>
 
