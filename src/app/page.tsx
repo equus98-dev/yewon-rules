@@ -440,9 +440,9 @@ export default function Home() {
                 {/* 우측 화살표 애니메이션 영역 (배경은 투명하여 뒷배경의 흰색이 보이게 함) */}
                 <div className="absolute right-0 top-0 bottom-0 w-[100px] flex items-center">
                   <div className="relative w-full h-full flex items-center">
-                    <div className="absolute top-0 bottom-0 left-[0px] w-[40px] bg-[#1e3a8a]/80 animate-arrow-seq delay-150" style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%, 20px 50%)' }}></div>
-                    <div className="absolute top-0 bottom-0 left-[20px] w-[40px] bg-[#3b82f6]/70 animate-arrow-seq delay-300" style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%, 20px 50%)' }}></div>
-                    <div className="absolute top-0 bottom-0 left-[40px] w-[40px] bg-[#bfdbfe]/80 animate-arrow-seq delay-450" style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%, 20px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[0px] w-[40px] bg-[#1e3a8a]/40 backdrop-blur-sm animate-arrow-seq delay-150" style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%, 20px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[20px] w-[40px] bg-[#3b82f6]/40 backdrop-blur-sm animate-arrow-seq delay-300" style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%, 20px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[40px] w-[40px] bg-[#bfdbfe]/40 backdrop-blur-sm animate-arrow-seq delay-450" style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%, 20px 50%)' }}></div>
                   </div>
                 </div>
               </button>

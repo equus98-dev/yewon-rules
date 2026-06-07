@@ -251,12 +251,10 @@
 
 @keyframes arrowSeq {
   0%, 100% {
-    opacity: 0.3;
-    transform: translateX(0);
+    opacity: 0.2;
   }
   40% {
     opacity: 1;
-    transform: translateX(4px);
   }
 }
 .animate-arrow-seq {
