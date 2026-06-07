@@ -421,7 +421,7 @@ export default function Home() {
                 {/* 좌측 다크 블루 배너 영역 */}
                 <div 
                   className="absolute inset-0 right-[130px] lg:right-[150px] bg-[#0f172a] group-hover:bg-[#1e293b] transition-colors flex items-center justify-end pr-8 lg:pr-12"
-                  style={{ clipPath: 'polygon(40px 0, 100% 0, calc(100% - 25px) 50%, 100% 100%, 0 100%)' }}
+                  style={{ clipPath: 'polygon(40px 0, calc(100% - 25px) 0, 100% 50%, calc(100% - 25px) 100%, 0 100%)' }}
                 >
                   <span className="text-[19px] lg:text-[22px] font-medium text-white tracking-wider relative z-10 mr-4">
                     규정관리시스템 입장하기
@@ -430,10 +430,10 @@ export default function Home() {
                 
                 {/* 우측 화살표 애니메이션 영역 (배경은 투명하여 뒷배경의 흰색이 보이게 함) */}
                 <div className="absolute right-0 top-0 bottom-0 w-[110px] lg:w-[130px] flex items-center">
-                  <div className="relative w-full h-full flex items-center animate-bounce-x">
-                    <div className="absolute top-0 bottom-0 left-[0px] w-[40px] lg:w-[45px] bg-[#1e3a8a]" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
-                    <div className="absolute top-0 bottom-0 left-[25px] lg:left-[30px] w-[40px] lg:w-[45px] bg-[#3b82f6]" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
-                    <div className="absolute top-0 bottom-0 left-[50px] lg:left-[60px] w-[40px] lg:w-[45px] bg-[#bfdbfe]" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
+                  <div className="relative w-full h-full flex items-center">
+                    <div className="absolute top-0 bottom-0 left-[0px] w-[40px] lg:w-[45px] bg-[#1e3a8a] animate-arrow-seq delay-150" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[25px] lg:left-[30px] w-[40px] lg:w-[45px] bg-[#3b82f6] animate-arrow-seq delay-300" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[50px] lg:left-[60px] w-[40px] lg:w-[45px] bg-[#bfdbfe] animate-arrow-seq delay-450" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
                   </div>
                 </div>
               </button>

@@ -248,3 +248,20 @@
 .animate-bounce-x {
   animation: bounceX 1s infinite ease-in-out;
 }
+
+@keyframes arrowSeq {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateX(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateX(4px);
+  }
+}
+.animate-arrow-seq {
+  animation: arrowSeq 1.2s infinite ease-in-out;
+}
+.delay-150 { animation-delay: 150ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-450 { animation-delay: 450ms; }
