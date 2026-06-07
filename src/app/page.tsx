@@ -419,18 +419,17 @@ export default function Home() {
                   style={{ clipPath: 'polygon(40px 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)' }}
                 >
                   {/* 배경 이미지 (좌측 이미지와 완벽히 이어지도록 좌표 계산) */}
-                  <div className="absolute bottom-0 right-[calc(35vw-80px)] w-[65vw] h-[100vh] z-0 pointer-events-none bg-[#0c3161]">
+                  <div className="absolute bottom-0 right-[calc(35vw-80px)] w-[65vw] h-[100vh] z-0 pointer-events-none">
                     <Image 
                       src="/yewon2.jpeg" 
                       alt="배경" 
                       fill 
-                      className="object-cover opacity-90 z-0"
+                      className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/90 via-[#0c3161]/40 to-transparent z-10" />
-                    <div className="absolute inset-0 bg-black/20 z-10" />
                   </div>
-                  {/* 우측 화살표와 자연스럽게 이어지는 파란색 그라데이션 오버레이 */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#1e3a8a]/80 z-0 pointer-events-none" />
+                  {/* 이미지가 선명하게 보이면서도 배너 색상에 어우러지는 오버레이 */}
+                  <div className="absolute inset-0 bg-[#0c3161]/40 mix-blend-multiply z-0 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#0c3161]/60 to-[#1e3a8a]/70 z-0 pointer-events-none" />
                   
                   <span className="text-[19px] lg:text-[22px] font-semibold text-white tracking-wider relative z-10 mr-2 font-sans drop-shadow-md">
                     규정관리시스템 입장하기
