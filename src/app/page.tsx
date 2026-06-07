@@ -329,72 +329,81 @@ export default function Home() {
       {/* ==================== 0. 인트로 애니메이션 오버레이 (Curtain Effect) ==================== */}
       {showIntro && (
         <div className={`fixed inset-0 z-[100] flex transition-opacity duration-1000 ease-in-out ${animateOut ? 'opacity-0 delay-300 pointer-events-none' : 'opacity-100'}`}>
-          {/* 바탕 (우측 영역 배경 역할): 아주 옅은 남색 계열 배경과 은은한 도트 패턴 */}
-          <div className="absolute inset-0 overflow-hidden bg-[#f2f5f9]">
-            {/* 도트 패턴 오버레이 (옅은 남색 톤) */}
-            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(12, 49, 97, 0.1) 1.5px, transparent 1.5px)', backgroundSize: '18px 18px' }} />
-          </div>
-
-          {/* 좌측: 전경 이미지 (세련된 사선 컷팅 디자인 - clip-path 사용) */}
-          <div 
-            className={`absolute left-0 top-0 h-full w-full lg:w-[65%] bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out z-10 ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}
-            style={{ clipPath: 'polygon(0 0, 80% 0, 100% 100%, 0 100%)' }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/90 via-[#0c3161]/20 to-transparent z-10" />
-
-            {/* 떨어지는 나뭇잎 애니메이션 연출 */}
-            <FallingLeaves />
-
+          {/* 바탕: 전체 화면을 채우는 전경 이미지 */}
+          <div className="absolute inset-0">
             <Image 
               src="/yewon2.jpeg" 
               alt="예원예술대학교 전경" 
               fill 
               priority 
-              className="object-cover opacity-80 z-0"
+              className="object-cover"
             />
-            <div className="absolute bottom-16 left-12 z-20 text-white select-none">
-              <h2 className="text-4xl lg:text-5xl font-black mb-3 drop-shadow-2xl tracking-tight">Yewon Arts University</h2>
-              <p className="text-xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
-            </div>
+          </div>
 
-            {/* 모바일용 입장 버튼 */}
-            <div className="lg:hidden absolute bottom-40 left-12 z-30">
-              <button 
-                onClick={handleEnterSystem} 
-                className="pointer-events-auto bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-xl font-black text-[14px] shadow-xl hover:bg-white/30 transition-all active:scale-95 flex items-center justify-center gap-2"
-              >
-                시스템 입장하기 <ArrowForwardIosIcon sx={{fontSize:14}} />
-              </button>
-            </div>
+          {/* 좌측 어두운 그라데이션 (텍스트 가독성을 위해) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/80 via-transparent to-transparent z-10" />
+
+          {/* 떨어지는 나뭇잎 애니메이션 연출 */}
+          <div className="absolute inset-0 z-10">
+            <FallingLeaves />
+          </div>
+
+          {/* 중앙 사선 연두색 투명 오버레이 */}
+          <div 
+            className="absolute inset-0 bg-teal-800/40 backdrop-blur-[2px] mix-blend-multiply z-10"
+            style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 40% 100%)' }}
+          />
+
+          {/* 우측 사선 흰색(옅은 남색) 도트 패턴 영역 */}
+          <div 
+            className="absolute inset-0 bg-[#f2f5f9] z-20 shadow-[-20px_0_40px_-10px_rgba(0,0,0,0.2)]"
+            style={{ clipPath: 'polygon(45% 0, 100% 0, 100% 100%, 65% 100%)' }}
+          >
+            {/* 도트 패턴 오버레이 (옅은 남색 톤) */}
+            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(12, 49, 97, 0.1) 1.5px, transparent 1.5px)', backgroundSize: '18px 18px' }} />
+          </div>
+
+          {/* 좌측: 타이틀 텍스트 */}
+          <div className="absolute bottom-16 left-8 xl:left-12 z-30 text-white select-none">
+            <h2 className="text-4xl lg:text-5xl font-black mb-3 drop-shadow-2xl tracking-tight">Yewon Arts University</h2>
+            <p className="text-xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
+          </div>
+
+          {/* 모바일용 입장 버튼 */}
+          <div className="lg:hidden absolute bottom-40 left-8 z-30">
+            <button 
+              onClick={handleEnterSystem} 
+              className="pointer-events-auto bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-xl font-black text-[14px] shadow-xl hover:bg-white/30 transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              시스템 입장하기 <ArrowForwardIosIcon sx={{fontSize:14}} />
+            </button>
           </div>
           
-          {/* 우측: 타이틀 및 프리미엄 입장 버튼 */}
-          <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] xl:w-[45%] flex-col justify-center items-center z-20 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
-            
-            {/* 우측 상단 배치 로고 (밝은 배경이므로 배경 패널 제거) */}
-            <div className="absolute top-10 right-8 xl:right-12">
-              <Image
-                src="/UI.png"
-                alt="예원예술대학교 로고"
-                width={200}
-                height={45}
-                className="object-contain w-[180px] xl:w-[220px]"
-              />
-            </div>
-            
-            {/* 프리미엄 입장 버튼 (밝은 배경에 맞게 짙은 남색 버튼으로 복구하되 광택 효과 유지) */}
+          {/* 우측 상단 로고 */}
+          <div className="absolute top-10 right-8 xl:right-12 z-30 hidden lg:block">
+            <Image
+              src="/UI.png"
+              alt="예원예술대학교 로고"
+              width={200}
+              height={45}
+              className="object-contain w-[180px] xl:w-[220px]"
+            />
+          </div>
+          
+          {/* 하단 투명 유리(Glassmorphism) 느낌을 살린 다크 네온 입장 버튼 */}
+          <div className="absolute bottom-16 right-8 xl:right-12 z-30 hidden lg:block">
             <button 
               onClick={handleEnterSystem}
-              className="pointer-events-auto group relative flex items-center justify-center gap-5 px-10 py-4 bg-[#0c3161] text-white rounded-xl transition-all duration-500 ease-out shadow-[0_15px_40px_-10px_rgba(12,49,97,0.4)] hover:shadow-[0_20px_50px_-10px_rgba(12,49,97,0.6)] hover:-translate-y-1 active:scale-95 cursor-pointer overflow-hidden border border-[#092244]"
+              className="pointer-events-auto group relative flex items-center justify-center gap-5 px-10 py-4 bg-[#081b33] backdrop-blur-md text-white rounded-xl transition-all duration-500 ease-out shadow-[0_15px_40px_-10px_rgba(8,27,51,0.6)] hover:shadow-[0_20px_50px_-10px_rgba(8,27,51,0.8)] hover:-translate-y-1 active:scale-95 cursor-pointer overflow-hidden border border-[#1e3a8a]/50 hover:border-blue-500/50"
             >
-              {/* Button inner shine */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+              {/* Button inner shine (투명 유리같은 반짝임 효과) */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
               
               <span className="text-[18px] font-extrabold tracking-widest text-white relative z-10 drop-shadow-sm">
                 규정관리시스템 입장
               </span>
               
-              <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 group-hover:bg-blue-600 transition-colors duration-300 shadow-sm">
+              <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 group-hover:bg-blue-600 transition-colors duration-300 shadow-sm border border-white/10">
                 <ArrowForwardIosIcon sx={{fontSize: 15}} className="ml-0.5 text-white" />
               </div>
             </button>
