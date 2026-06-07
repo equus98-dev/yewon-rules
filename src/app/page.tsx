@@ -321,6 +321,8 @@ export default function Home() {
             홈으로
           </Button>
 
+          <span className="text-slate-300 font-bold select-none text-sm">|</span>
+
           {/* 관리자 로그인 버튼 추가 */}
           {isAdmin ? (
             <div className="flex items-center gap-2">
@@ -382,18 +384,8 @@ export default function Home() {
             <Button
               component={Link}
               href="/admin"
-              variant="contained"
-              sx={{
-                bgcolor: "#0c3161",
-                "&:hover": { bgcolor: "#092244" },
-                borderRadius: "8px",
-                fontWeight: "bold",
-                fontSize: "0.775rem",
-                px: 2,
-                py: 0.5,
-                minHeight: "32px",
-              }}
-              className="font-bold text-xs active:scale-95 transition-all text-white font-sans"
+              variant="text"
+              className="font-bold text-sm text-slate-700 hover:text-blue-900 active:scale-95 transition-all font-sans"
             >
               관리자 로그인
             </Button>
