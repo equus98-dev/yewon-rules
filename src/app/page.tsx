@@ -415,8 +415,8 @@ export default function Home() {
               >
                 {/* 좌측 다크 블루 배너 영역 */}
                 <div 
-                  className="absolute inset-0 right-[100px] lg:right-[120px] bg-[#0f172a] group-hover:bg-[#1e293b] transition-colors flex items-center justify-end pr-8 lg:pr-10"
-                  style={{ clipPath: 'polygon(40px 0, calc(100% - 25px) 0, 100% 50%, calc(100% - 25px) 100%, 0 100%)' }}
+                  className="absolute inset-0 right-[80px] bg-gradient-to-r from-[#0c3161]/95 to-[#1e3a8a]/90 group-hover:to-[#3b82f6]/80 backdrop-blur-md transition-all flex items-center justify-end pr-8"
+                  style={{ clipPath: 'polygon(40px 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)' }}
                 >
                   <span className="text-[19px] lg:text-[22px] font-semibold text-white tracking-wider relative z-10 mr-2 font-sans">
                     규정관리시스템 입장하기
@@ -424,11 +424,11 @@ export default function Home() {
                 </div>
                 
                 {/* 우측 화살표 애니메이션 영역 (배경은 투명하여 뒷배경의 흰색이 보이게 함) */}
-                <div className="absolute right-0 top-0 bottom-0 w-[125px] lg:w-[145px] flex items-center">
+                <div className="absolute right-0 top-0 bottom-0 w-[100px] flex items-center">
                   <div className="relative w-full h-full flex items-center">
-                    <div className="absolute top-0 bottom-0 left-[0px] w-[40px] lg:w-[45px] bg-[#1e3a8a]/80 animate-arrow-seq delay-150" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
-                    <div className="absolute top-0 bottom-0 left-[25px] lg:left-[30px] w-[40px] lg:w-[45px] bg-[#3b82f6]/70 animate-arrow-seq delay-300" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
-                    <div className="absolute top-0 bottom-0 left-[50px] lg:left-[60px] w-[40px] lg:w-[45px] bg-[#bfdbfe]/80 animate-arrow-seq delay-450" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[0px] w-[40px] bg-[#1e3a8a]/80 animate-arrow-seq delay-150" style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%, 20px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[20px] w-[40px] bg-[#3b82f6]/70 animate-arrow-seq delay-300" style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%, 20px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[40px] w-[40px] bg-[#bfdbfe]/80 animate-arrow-seq delay-450" style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%, 20px 50%)' }}></div>
                   </div>
                 </div>
               </button>
