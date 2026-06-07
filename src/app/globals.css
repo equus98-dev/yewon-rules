@@ -1,9 +1,13 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* 폰트 기본값 셋업 */
+/* 폰트 기본값 셋업 (Tailwind v4 테마 오버라이드) */
+@theme {
+  --font-sans: "Pretendard", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
 :root {
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* 세련된 프리미엄 스크롤바 커스터마이징 */
