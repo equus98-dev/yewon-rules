@@ -329,8 +329,21 @@ export default function Home() {
       {/* ==================== 0. 인트로 애니메이션 오버레이 (Curtain Effect) ==================== */}
       {showIntro && (
         <div className={`fixed inset-0 z-[100] flex transition-opacity duration-1000 ease-in-out ${animateOut ? 'opacity-0 delay-300 pointer-events-none' : 'opacity-100'}`}>
-          {/* 바탕 화이트 (좌측 마스크와 우측 컨텐츠의 배경 역할) */}
-          <div className="absolute inset-0 bg-white" />
+          {/* 바탕 (우측 영역 배경 역할): yewon.jpg 이미지와 연두/청록빛 오버레이 및 도트 패턴 */}
+          <div className="absolute inset-0 overflow-hidden bg-teal-900">
+            <Image 
+              src="/yewon.jpg" 
+              alt="Background" 
+              fill 
+              priority
+              className="object-cover opacity-80 mix-blend-luminosity"
+            />
+            {/* 연두/청록빛 컬러 오버레이 */}
+            <div className="absolute inset-0 bg-teal-700/60 mix-blend-multiply" />
+            <div className="absolute inset-0 bg-teal-500/30" />
+            {/* 도트 패턴 오버레이 */}
+            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px)', backgroundSize: '14px 14px' }} />
+          </div>
 
           {/* 좌측: 전경 이미지 (세련된 사선 컷팅 디자인 - clip-path 사용) */}
           <div 
@@ -368,8 +381,8 @@ export default function Home() {
           {/* 우측: 타이틀 및 프리미엄 입장 버튼 */}
           <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] xl:w-[45%] flex-col justify-center items-center z-20 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
             
-            {/* 우측 상단 배치 로고 */}
-            <div className="absolute top-10 right-8 xl:right-12">
+            {/* 우측 상단 배치 로고 (어두운 배경에 맞게 UI_white.png로 변경하거나, 흰색 로고가 필요하지만 일단 UI.png 유지) */}
+            <div className="absolute top-10 right-8 xl:right-12 bg-white/80 p-2 rounded-xl backdrop-blur-sm shadow-sm">
               <Image
                 src="/UI.png"
                 alt="예원예술대학교 로고"
@@ -378,23 +391,20 @@ export default function Home() {
                 className="object-contain w-[180px] xl:w-[220px]"
               />
             </div>
-            <span className="text-xl xl:text-3xl font-black tracking-[0.1em] xl:tracking-[0.2em] uppercase select-none mb-10 xl:mb-12 text-transparent bg-clip-text bg-gradient-to-r from-[#0c3161] to-[#2563eb] drop-shadow-sm text-center px-4 leading-snug">
-              Rule Management System
-            </span>
-
-            {/* 프리미엄 입장 버튼 (다크 네온 엣지 스타일) */}
+            
+            {/* 프리미엄 입장 버튼 (다크 네온 엣지 스타일 -> 밝은 배경 대비용에서 어두운 배경 대비용으로) */}
             <button 
               onClick={handleEnterSystem}
-              className="pointer-events-auto group relative flex items-center justify-center gap-5 px-10 py-4 bg-[#081b33] text-white rounded-xl transition-all duration-500 ease-out shadow-[0_15px_40px_-10px_rgba(8,27,51,0.6)] hover:shadow-[0_20px_50px_-10px_rgba(8,27,51,0.8)] hover:-translate-y-1 active:scale-95 cursor-pointer overflow-hidden border border-blue-900/50"
+              className="pointer-events-auto group relative flex items-center justify-center gap-5 px-10 py-4 bg-white/10 backdrop-blur-md text-white rounded-xl transition-all duration-500 ease-out shadow-[0_15px_40px_-10px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] hover:-translate-y-1 active:scale-95 cursor-pointer overflow-hidden border border-white/30 hover:border-white/60 hover:bg-white/20"
             >
               {/* Button inner shine */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
               
-              <span className="text-[17px] font-extrabold tracking-widest text-white relative z-10">
+              <span className="text-[18px] font-extrabold tracking-widest text-white relative z-10 drop-shadow-md">
                 규정관리시스템 입장
               </span>
               
-              <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 group-hover:bg-blue-600 transition-colors duration-300">
+              <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-lg bg-white/20 group-hover:bg-white/40 transition-colors duration-300 shadow-sm">
                 <ArrowForwardIosIcon sx={{fontSize: 15}} className="ml-0.5 text-white" />
               </div>
             </button>
