@@ -418,13 +418,13 @@ export default function Home() {
                   className="absolute inset-0 right-[80px] bg-[#0c3161] group-hover:brightness-110 transition-all flex items-center justify-end pr-8 overflow-hidden"
                   style={{ clipPath: 'polygon(40px 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)' }}
                 >
-                  {/* 배경 이미지 (좌측 이미지와 완벽히 이어지도록 좌표 계산) */}
-                  <div className="absolute bottom-0 right-[calc(35vw-80px)] w-[65vw] h-[100vh] z-0 pointer-events-none">
+                  {/* 배너 영역 전체를 채우도록 하단 부분만 크롭하여 배경으로 사용 */}
+                  <div className="absolute inset-0 z-0 pointer-events-none">
                     <Image 
                       src="/yewon2.jpeg" 
                       alt="배경" 
                       fill 
-                      className="object-cover"
+                      className="object-cover object-[center_80%]"
                     />
                   </div>
                   {/* 이미지가 선명하게 보이면서도 배너 색상에 어우러지는 오버레이 */}
