@@ -267,11 +267,11 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
 
   // 1단 세로바 아이템 정보
   const verticalMenuItems = [
-    { id: "규정" as const, label: "규정", icon: <MenuBookIcon sx={{ fontSize: 22 }} /> },
-    { id: "최신 제·개정" as const, label: "최신 제·개정", icon: <HistoryIcon sx={{ fontSize: 22 }} /> },
-    { id: "서식" as const, label: "서식", icon: <DescriptionIcon sx={{ fontSize: 22 }} /> },
-    { id: "공지사항" as const, label: "공지사항", icon: <CampaignIcon sx={{ fontSize: 22 }} /> },
-    { id: "조직도" as const, label: "조직도", icon: <AccountTreeIcon sx={{ fontSize: 22 }} /> },
+    { id: "규정" as const, label: "규정", icon: <MenuBookIcon sx={{ fontSize: 26 }} /> },
+    { id: "최신 제·개정" as const, label: <React.Fragment>최신<br/>제개정</React.Fragment>, icon: <HistoryIcon sx={{ fontSize: 26 }} /> },
+    { id: "서식" as const, label: "서식", icon: <DescriptionIcon sx={{ fontSize: 26 }} /> },
+    { id: "공지사항" as const, label: "공지", icon: <CampaignIcon sx={{ fontSize: 26 }} /> },
+    { id: "조직도" as const, label: "조직도", icon: <AccountTreeIcon sx={{ fontSize: 26 }} /> },
   ];
 
   return (
@@ -288,14 +288,14 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
                 setVerticalTab(item.id);
                 if (onTabChange) onTabChange(item.id);
               }}
-              className={`w-14 h-14 flex flex-col items-center justify-center gap-1 rounded-xl cursor-pointer transition-all duration-200 active:scale-95 ${
+              className={`w-16 min-h-[64px] flex flex-col items-center justify-center gap-1.5 rounded-xl py-2 cursor-pointer transition-all duration-200 active:scale-95 ${
                 isActive
                   ? "bg-white text-[#0c3161] font-bold shadow-md"
                   : "text-blue-100 hover:bg-white/10 hover:text-white"
               }`}
             >
               {item.icon}
-              <span className="text-[11.5px] tracking-tight">{item.label}</span>
+              <span className="text-[13px] font-extrabold tracking-tight text-center leading-[1.15]">{item.label}</span>
             </button>
           );
         })}
