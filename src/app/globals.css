@@ -236,3 +236,15 @@
   0%, 100% { margin-left: 0; }
   50% { margin-left: 5vw; }
 }
+
+@keyframes bounceX {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+.animate-bounce-x {
+  animation: bounceX 1s infinite ease-in-out;
+}

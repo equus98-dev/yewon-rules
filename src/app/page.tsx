@@ -354,16 +354,17 @@ export default function Home() {
               className="object-cover opacity-90 z-0"
             />
             
-            {/* 연두색 은은한 삼각형 (이미지 경계와 겹치도록 좌측 영역 내부에 배치) */}
+            {/* 연두색 은은한 삼각형 (이미지 경계와 겹치도록 좌측 영역 내부에 배치) 약간 더 밝게 */}
             <div 
-              className="absolute inset-0 bg-[#2ee6d6]/30 backdrop-blur-[1px] mix-blend-multiply z-10 pointer-events-none hidden lg:block"
+              className="absolute inset-0 bg-[#2ee6d6]/50 backdrop-blur-[1px] mix-blend-multiply z-10 pointer-events-none hidden lg:block"
               style={{ clipPath: 'polygon(30% 0, 100% 0, 100% 100%)' }}
             />
 
-            {/* 하단 좌측 원래 텍스트 복구 */}
-            <div className="absolute bottom-16 left-12 z-20 text-white select-none">
-              <h2 className="text-4xl lg:text-5xl font-black mb-3 drop-shadow-2xl tracking-tight">Yewon Arts University</h2>
-              <p className="text-xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
+            {/* 하단 좌측 원래 텍스트 복구 (한 줄 배치) */}
+            <div className="absolute bottom-16 left-12 z-20 text-white select-none flex items-center gap-3 lg:gap-4">
+              <h2 className="text-3xl lg:text-4xl font-black drop-shadow-2xl tracking-tight">Yewon Arts University</h2>
+              <span className="text-2xl text-white/50 mb-1">|</span>
+              <p className="text-xl lg:text-2xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
             </div>
 
             {/* 모바일용 입장 버튼 */}
@@ -422,7 +423,7 @@ export default function Home() {
                   규정관리시스템 입장
                 </span>
                 
-                <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-lg bg-[#0c3161]/10 group-hover:bg-[#0c3161] transition-colors duration-300 shadow-sm border border-[#0c3161]/10">
+                <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-lg bg-[#0c3161]/10 group-hover:bg-[#0c3161] transition-colors duration-300 shadow-sm border border-[#0c3161]/10 animate-bounce-x">
                   <ArrowForwardIosIcon sx={{fontSize: 15}} className="ml-0.5 text-[#0c3161] group-hover:text-white transition-colors duration-300" />
                 </div>
               </button>
