@@ -1417,11 +1417,11 @@ export default function Home() {
           {/* 좌측 로고 영역 */}
           <div className="shrink-0 flex items-center justify-center">
             <Image
-              src="/UI.png"
+              src="/docs/UI_white.png"
               alt="예원예술대학교 로고"
               width={183}
               height={40}
-              className="h-8 w-auto object-contain brightness-0 invert opacity-80"
+              className="h-8 w-auto object-contain opacity-80"
             />
           </div>
           
