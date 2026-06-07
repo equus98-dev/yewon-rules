@@ -10,6 +10,7 @@ import CampaignIcon from "@mui/icons-material/Campaign";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArticleIcon from "@mui/icons-material/Article";
 import SidebarTree from "@/components/SidebarTree";
 import RuleViewer from "@/components/RuleViewer";
 import Link from "next/link";
