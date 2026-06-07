@@ -1215,36 +1215,37 @@ export default function Home() {
               <div className="max-w-[1400px] w-full mx-auto p-6 md:p-8 flex flex-col gap-8 min-h-0">
                 
                 {/* [파트 1] 상단 검색 배너 (전면 중앙 - 부드러운 배경색 및 우측 이미지) */}
-                <div className="bg-[#4a42b0] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
+                <div className="bg-[#009b9e] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
                   
-                  {/* 우측 끝 은은한 학교 배경 */}
+                  {/* 우측 끝 학교 배경 (규정목록 헤더와 동일한 블렌딩) */}
                   <div 
-                    className="absolute inset-y-0 right-0 w-[55%] z-0 pointer-events-none opacity-[0.25]"
-                    style={{ WebkitMaskImage: 'linear-gradient(to right, transparent 10%, black 90%)', maskImage: 'linear-gradient(to right, transparent 10%, black 90%)' }}
+                    className="absolute inset-y-0 right-0 w-[50%] z-0 pointer-events-none"
+                    style={{ WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 60%)', maskImage: 'linear-gradient(to right, transparent 0%, black 60%)' }}
                   >
                     <Image
                       src="/yewon2.jpeg"
                       alt="예원예술대학교 전경"
                       fill
-                      className="object-cover object-[center_30%] mix-blend-luminosity"
+                      className="object-cover object-[center_30%] opacity-50 mix-blend-multiply"
                     />
                   </div>
 
-                  {/* 배경 패턴 그래픽 데코레이션 (그라데이션 없이 단순 도트만 유지) */}
-                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] z-1 pointer-events-none"></div>
+                  {/* 배경 패턴 그래픽 데코레이션 (흰 도트 유지) */}
+                  <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] z-1 pointer-events-none"></div>
                   
-                  <div className="relative z-10 w-full p-8 md:px-12 md:py-10 flex flex-col justify-center">
+                  {/* 검색란을 왼쪽으로 줄여서 우측 배경이 잘 보이도록 조정 */}
+                  <div className="relative z-10 w-full lg:w-[85%] xl:w-[75%] p-8 md:px-12 md:py-10 flex flex-col justify-center">
                     
                     {/* 타이틀 (크기 축소 및 단정하게 조정) */}
                     <div className="flex items-center justify-start mb-6 select-none">
-                      <h2 className="text-[22px] font-bold text-white/90 tracking-wide">
+                      <h2 className="text-[22px] font-bold text-white/90 tracking-wide drop-shadow-md">
                         예원예술대학교 규정관리시스템
                       </h2>
                     </div>
 
                     <div className="flex flex-col xl:flex-row items-center gap-8 w-full">
                       {/* 검색 폼 영역 */}
-                      <div className="flex-1 flex flex-col xl:flex-row items-start xl:items-center w-full bg-[#000000]/10 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-inner gap-6">
+                      <div className="flex-1 flex flex-col xl:flex-row items-start xl:items-center w-full bg-[#000000]/15 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-inner gap-6">
                         
                         <div className="font-black text-2xl tracking-wider text-white/90 shrink-0">SEARCH</div>
 
