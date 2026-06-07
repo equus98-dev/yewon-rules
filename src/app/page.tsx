@@ -551,9 +551,9 @@ export default function Home() {
         {/* 우측 메인 영역 */}
         <main className="flex-1 h-full overflow-hidden bg-slate-100 flex flex-col relative pl-6">
           
-          {/* 사이드바 접기/펴기 고급 세로 결합식 핸들 버튼 (프리미엄 윈도우 UI - 남색 테마 상단 배치) */}
+          {/* 사이드바 접기/펴기 고급 세로 결합식 핸들 버튼 (프리미엄 윈도우 UI - 남색 테마 스크롤 따라다니는 중앙 배치) */}
           <div 
-            className="absolute top-[84px] z-30 transition-all duration-300 ease-in-out hidden lg:block"
+            className="absolute top-1/2 -translate-y-1/2 z-30 transition-all duration-300 ease-in-out hidden lg:block"
             style={{
               left: 0,
             }}
