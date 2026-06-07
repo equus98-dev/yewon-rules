@@ -313,50 +313,22 @@ export default function Home() {
           {/* 바탕 화이트 (좌측 마스크와 우측 컨텐츠의 배경 역할) */}
           <div className="absolute inset-0 bg-white" />
 
-          {/* 좌측: 전경 이미지 (확장 후 사각형 모자이크 블렌딩) */}
-          <div className={`absolute left-0 top-0 h-full w-full lg:w-[75%] bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out z-10 ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/80 via-transparent to-transparent z-10" />
+          {/* 좌측: 전경 이미지 (세련된 사선 컷팅 디자인 - clip-path 사용) */}
+          <div 
+            className={`absolute left-0 top-0 h-full w-full lg:w-[65%] bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out z-10 ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}
+            style={{ clipPath: 'polygon(0 0, 80% 0, 100% 100%, 0 100%)' }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/90 via-[#0c3161]/20 to-transparent z-10" />
             <Image 
               src="/yewon2.jpeg" 
               alt="예원예술대학교 전경" 
               fill 
               priority 
-              className="object-cover opacity-90 z-0"
+              className="object-cover opacity-80 z-0"
             />
             <div className="absolute bottom-16 left-12 z-20 text-white select-none">
-              <h2 className="text-4xl lg:text-5xl font-black mb-3 drop-shadow-lg tracking-tight">Yewon Arts University</h2>
+              <h2 className="text-4xl lg:text-5xl font-black mb-3 drop-shadow-2xl tracking-tight">Yewon Arts University</h2>
               <p className="text-xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
-            </div>
-
-            {/* 사각형 모자이크 페이드 오버레이 */}
-            <div className="hidden lg:flex absolute right-0 top-0 h-full w-[40%] flex-col z-20 pointer-events-none">
-              {Array.from({ length: 30 }).map((_, r) => (
-                <div key={r} className="flex-1 flex w-full">
-                  {Array.from({ length: 24 }).map((_, c) => {
-                    const normalizedC = c / 24; 
-                    const normalizedR = r / 30; 
-                    const base = normalizedC + (normalizedR * 0.3); 
-                    const noise = ((Math.sin(r * 12.9898 + c * 78.233) * 43758.5453) % 1) - 0.5;
-                    let opacity = (base * 1.5 - 0.2) + noise * 0.8;
-                    
-                    if (c >= 22) opacity = 1;
-                    
-                    if (opacity <= 0) opacity = 0;
-                    else if (opacity > 1) opacity = 1;
-                    
-                    const steppedOpacity = Math.round(opacity * 4) / 4;
-
-                    return (
-                      <div 
-                        key={c} 
-                        className="flex-1 h-full transition-opacity duration-300"
-                        style={{ backgroundColor: `rgba(255, 255, 255, ${steppedOpacity})` }} 
-                      />
-                    );
-                  })}
-                </div>
-              ))}
-              <div className="absolute right-[-1px] top-0 bottom-0 w-[4px] bg-white z-30" />
             </div>
 
             {/* 모바일용 입장 버튼 */}
@@ -370,7 +342,7 @@ export default function Home() {
             </div>
           </div>
           
-          {/* 우측: 로고 및 타이틀, 세련된 미니멀리즘 버튼 */}
+          {/* 우측: 로고 및 타이틀, 프리미엄 입장 버튼 */}
           <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] flex-col justify-center items-center z-20 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
             <Image
               src="/UI.png"
@@ -383,16 +355,20 @@ export default function Home() {
               Rule Management System
             </span>
 
-            {/* 데스크탑용 프리미엄 입장 버튼 (초현대적 미니멀리즘) */}
+            {/* 프리미엄 입장 버튼 (다크 네온 엣지 스타일) */}
             <button 
               onClick={handleEnterSystem}
-              className="pointer-events-auto group relative flex items-center gap-5 px-8 py-3.5 bg-white border border-slate-200 hover:border-[#0c3161] rounded-full transition-all duration-500 ease-out shadow-sm hover:shadow-[0_10px_40px_rgba(12,49,97,0.15)] active:scale-95 cursor-pointer"
+              className="pointer-events-auto group relative flex items-center justify-center gap-5 px-10 py-4 bg-[#081b33] text-white rounded-full transition-all duration-500 ease-out shadow-[0_15px_40px_-10px_rgba(8,27,51,0.6)] hover:shadow-[0_20px_50px_-10px_rgba(8,27,51,0.8)] hover:-translate-y-1 active:scale-95 cursor-pointer overflow-hidden border border-blue-900/50"
             >
-              <span className="text-[16px] font-extrabold tracking-wide text-slate-700 group-hover:text-[#0c3161] transition-colors duration-500">
+              {/* Button inner shine */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+              
+              <span className="text-[17px] font-extrabold tracking-widest text-white relative z-10">
                 규정관리시스템 입장
               </span>
-              <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 border border-slate-100 group-hover:bg-[#0c3161] group-hover:border-[#0c3161] transition-all duration-500">
-                <ArrowForwardIosIcon className="text-slate-400 group-hover:text-white transition-colors duration-500 text-[14px] ml-0.5" />
+              
+              <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-full bg-white/10 group-hover:bg-blue-600 transition-colors duration-300">
+                <ArrowForwardIosIcon sx={{fontSize: 15}} className="ml-0.5 text-white" />
               </div>
             </button>
           </div>
