@@ -410,21 +410,29 @@ export default function Home() {
               </div>
             </div>
             
-            {/* 우측 하단 투명 유리막 버튼 */}
-            <div className="absolute bottom-16 right-8 xl:right-12">
+            {/* 우측 하단 배너 버튼 (첨부 이미지 스타일) */}
+            <div className="absolute bottom-0 right-0 w-[55vw] lg:w-[50vw] xl:w-[45vw] h-[80px] lg:h-[90px] flex justify-end z-30">
               <button 
                 onClick={handleEnterSystem}
-                className="pointer-events-auto group relative flex items-center justify-center gap-5 px-10 py-4 bg-white/30 backdrop-blur-md text-[#0c3161] rounded-xl transition-all duration-500 ease-out shadow-[0_10px_30px_-10px_rgba(12,49,97,0.15)] hover:shadow-[0_15px_40px_-10px_rgba(12,49,97,0.25)] hover:-translate-y-1 active:scale-95 cursor-pointer overflow-hidden border border-[#0c3161]/20 hover:border-[#0c3161]/40"
+                className="pointer-events-auto group relative w-full h-full flex items-center justify-between overflow-hidden cursor-pointer"
               >
-                {/* Button inner shine */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+                {/* 좌측 다크 블루 배너 영역 */}
+                <div 
+                  className="absolute inset-0 right-[130px] lg:right-[150px] bg-[#0f172a] group-hover:bg-[#1e293b] transition-colors flex items-center justify-end pr-8 lg:pr-12"
+                  style={{ clipPath: 'polygon(40px 0, 100% 0, calc(100% - 25px) 50%, 100% 100%, 0 100%)' }}
+                >
+                  <span className="text-[19px] lg:text-[22px] font-medium text-[#fde047] tracking-wider relative z-10 mr-4">
+                    규정관리시스템 입장하기
+                  </span>
+                </div>
                 
-                <span className="text-[18px] font-extrabold tracking-widest text-[#0c3161] relative z-10 drop-shadow-sm">
-                  규정관리시스템 입장
-                </span>
-                
-                <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-lg bg-[#0c3161]/10 group-hover:bg-[#0c3161] transition-colors duration-300 shadow-sm border border-[#0c3161]/10 animate-bounce-x">
-                  <ArrowForwardIosIcon sx={{fontSize: 15}} className="ml-0.5 text-[#0c3161] group-hover:text-white transition-colors duration-300" />
+                {/* 우측 화살표 애니메이션 영역 (배경은 투명하여 뒷배경의 흰색이 보이게 함) */}
+                <div className="absolute right-0 top-0 bottom-0 w-[140px] lg:w-[160px] flex items-center">
+                  <div className="relative w-full h-full flex items-center animate-bounce-x">
+                    <div className="absolute top-0 bottom-0 left-[0px] w-[40px] lg:w-[45px] bg-[#1e3a8a]" style={{ clipPath: 'polygon(0 0, 100% 0, calc(100% - 20px) 50%, 100% 100%, 0 100%, 20px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[35px] lg:left-[40px] w-[40px] lg:w-[45px] bg-[#3b82f6]" style={{ clipPath: 'polygon(0 0, 100% 0, calc(100% - 20px) 50%, 100% 100%, 0 100%, 20px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[70px] lg:left-[80px] w-[40px] lg:w-[45px] bg-[#bfdbfe]" style={{ clipPath: 'polygon(0 0, 100% 0, calc(100% - 20px) 50%, 100% 100%, 0 100%, 20px 50%)' }}></div>
+                  </div>
                 </div>
               </button>
             </div>
