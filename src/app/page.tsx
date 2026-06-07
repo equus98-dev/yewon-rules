@@ -60,21 +60,12 @@ export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
   const [animateOut, setAnimateOut] = useState(false);
 
-  useEffect(() => {
-    // 1.2초 대기 후 양쪽으로 열리는 애니메이션 시작
-    const t1 = setTimeout(() => {
-      setAnimateOut(true);
-    }, 1200);
-    // 애니메이션이 완전히 끝난 후 DOM 제거
-    const t2 = setTimeout(() => {
+  const handleEnterSystem = () => {
+    setAnimateOut(true);
+    setTimeout(() => {
       setShowIntro(false);
-    }, 2400); 
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  }, []);
+    }, 1200);
+  };
 
   useEffect(() => {
     let timerId: NodeJS.Timeout;
@@ -318,7 +309,7 @@ export default function Home() {
       
       {/* ==================== 0. 인트로 애니메이션 오버레이 (Curtain Effect) ==================== */}
       {showIntro && (
-        <div className={`fixed inset-0 z-[100] flex bg-white pointer-events-none transition-opacity duration-1000 ease-in-out ${animateOut ? 'opacity-0 delay-300' : 'opacity-100'}`}>
+        <div className={`fixed inset-0 z-[100] flex bg-white transition-opacity duration-1000 ease-in-out ${animateOut ? 'opacity-0 delay-300 pointer-events-none' : 'opacity-100'}`}>
           {/* 좌측: 전경 이미지 */}
           <div className={`w-full lg:w-1/2 h-full relative bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}>
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/80 via-transparent to-transparent z-10" />
@@ -333,6 +324,16 @@ export default function Home() {
               <h2 className="text-4xl lg:text-5xl font-black mb-3 drop-shadow-lg tracking-tight">Yewon Arts University</h2>
               <p className="text-xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
             </div>
+
+            {/* 모바일용 입장 버튼 */}
+            <div className="lg:hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-full px-8 flex justify-center">
+              <button 
+                onClick={handleEnterSystem} 
+                className="bg-white text-[#0c3161] px-8 py-4 rounded-2xl font-black text-[15px] shadow-2xl shadow-black/40 hover:scale-105 transition-transform active:scale-95 flex items-center justify-center gap-2 w-full max-w-sm"
+              >
+                시스템 입장하기 <ArrowForwardIosIcon sx={{fontSize:16}} />
+              </button>
+            </div>
           </div>
           
           {/* 우측: 로고 및 타이틀 (모바일에서는 숨김) */}
@@ -344,9 +345,18 @@ export default function Home() {
               height={58}
               className="object-contain mb-8"
             />
-            <span className="text-xl text-[#0c3161] font-black tracking-[0.2em] uppercase select-none">
+            <span className="text-xl text-[#0c3161] font-black tracking-[0.2em] uppercase select-none mb-12">
               Rule Management System
             </span>
+
+            {/* 데스크탑용 입장 버튼 */}
+            <button 
+              onClick={handleEnterSystem}
+              className="group bg-[#0c3161] hover:bg-[#092244] text-white px-10 py-4 rounded-2xl font-black text-[17px] shadow-lg shadow-[#0c3161]/20 hover:shadow-[#0c3161]/40 transition-all active:scale-95 flex items-center gap-3 cursor-pointer"
+            >
+              규정관리시스템 입장 
+              <ArrowForwardIosIcon className="transition-transform group-hover:translate-x-1.5" sx={{fontSize: 18}} />
+            </button>
           </div>
         </div>
       )}
