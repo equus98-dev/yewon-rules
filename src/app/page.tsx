@@ -1326,7 +1326,7 @@ export default function Home() {
                   
                   {/* 2-1) 규정 공지 게시판 (왼쪽) */}
                   <Paper className="border border-slate-200 rounded-xl shadow-sm flex flex-col flex-1 min-h-[300px] overflow-hidden" elevation={0}>
-                    <div className="px-6 py-4 flex items-center justify-between shrink-0 border-b border-slate-200 bg-white">
+                    <div className="px-6 py-4 flex items-center justify-between shrink-0 border-b border-slate-200 bg-[#f0f8f8]">
                       <h3 className="text-lg font-extrabold text-slate-800 flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-full bg-[#fdf5e6] flex items-center justify-center border border-[#ffe0b2]">
                            <CampaignIcon className="text-orange-500" fontSize="small" />
@@ -1369,7 +1369,7 @@ export default function Home() {
 
                   {/* 2-2) 최신 제·개정 규정 게시판 (오른쪽) */}
                   <Paper className="border border-slate-200 rounded-xl shadow-sm flex flex-col flex-1 min-h-[300px] overflow-hidden" elevation={0}>
-                    <div className="px-6 py-4 flex items-center justify-between shrink-0 border-b border-slate-200 bg-white">
+                    <div className="px-6 py-4 flex items-center justify-between shrink-0 border-b border-slate-200 bg-[#f0f8f8]">
                       <h3 className="text-lg font-extrabold text-slate-800 flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-full bg-[#e3f2fd] flex items-center justify-center border border-[#bbdefb]">
                            <ArticleIcon className="text-blue-600" fontSize="small" />
