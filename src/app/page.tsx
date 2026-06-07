@@ -14,6 +14,7 @@ import ArticleIcon from "@mui/icons-material/Article";
 import SidebarTree from "@/components/SidebarTree";
 import RuleViewer from "@/components/RuleViewer";
 import Link from "next/link";
+import FallingLeaves from "@/components/FallingLeaves";
 
 const HalftoneCircle = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -337,6 +338,9 @@ export default function Home() {
             style={{ clipPath: 'polygon(0 0, 80% 0, 100% 100%, 0 100%)' }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/90 via-[#0c3161]/20 to-transparent z-10" />
+
+            {/* 떨어지는 나뭇잎 애니메이션 연출 */}
+            <FallingLeaves />
 
             <Image 
               src="/yewon2.jpeg" 
