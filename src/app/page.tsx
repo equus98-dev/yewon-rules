@@ -335,6 +335,12 @@ export default function Home() {
             <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(12, 49, 97, 0.1) 1.5px, transparent 1.5px)', backgroundSize: '18px 18px' }} />
           </div>
 
+          {/* 중앙 사선 연두색 은은한 삼각형 (우측 영역 위에 배치, 하단은 이미지 경계 끝부분 65% 와 만남) */}
+          <div 
+            className="absolute inset-0 bg-teal-500/20 backdrop-blur-[2px] z-[5] pointer-events-none hidden lg:block"
+            style={{ clipPath: 'polygon(70% 0, 100% 0, 65% 100%)' }}
+          />
+
           {/* 좌측: 전경 이미지 (세련된 사선 컷팅 디자인 - clip-path 사용) */}
           <div 
             className={`absolute left-0 top-0 h-full w-full lg:w-[65%] bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out z-10 ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}
@@ -1268,9 +1274,9 @@ export default function Home() {
 
                     <div className="flex flex-col 2xl:flex-row items-start 2xl:items-center gap-6 2xl:gap-8 w-full">
                       {/* 검색 폼 영역 (배경보다 연하게 - 화이트 투명도 사용) */}
-                      <div className="flex-1 flex flex-col xl:flex-row items-start xl:items-center w-full bg-white/15 backdrop-blur-md p-5 xl:p-6 rounded-2xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] gap-4 xl:gap-6">
+                      <div className="flex-1 flex flex-col w-full bg-white/15 backdrop-blur-md p-5 xl:p-6 rounded-2xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] gap-3 xl:gap-4">
                         
-                        <div className="font-black text-xl xl:text-2xl tracking-wider text-white/90 shrink-0 mt-1 xl:mt-0 drop-shadow-sm">SEARCH</div>
+                        <div className="font-black text-xl xl:text-2xl tracking-wider text-white/90 drop-shadow-sm">SEARCH</div>
 
                         <div className="flex-1 w-full flex flex-col gap-3 xl:gap-4">
                           {/* 1열: 검색영역 & 검색옵션 */}
