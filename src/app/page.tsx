@@ -309,9 +309,18 @@ export default function Home() {
       
       {/* ==================== 0. 인트로 애니메이션 오버레이 (Curtain Effect) ==================== */}
       {showIntro && (
-        <div className={`fixed inset-0 z-[100] flex bg-white transition-opacity duration-1000 ease-in-out ${animateOut ? 'opacity-0 delay-300 pointer-events-none' : 'opacity-100'}`}>
-          {/* 좌측: 전경 이미지 */}
-          <div className={`w-full lg:w-1/2 h-full relative bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}>
+        <div className={`fixed inset-0 z-[100] flex transition-opacity duration-1000 ease-in-out ${animateOut ? 'opacity-0 delay-300 pointer-events-none' : 'opacity-100'}`}>
+          {/* 바탕 화이트 (좌측 마스크와 우측 컨텐츠의 배경 역할) */}
+          <div className="absolute inset-0 bg-white" />
+
+          {/* 좌측: 전경 이미지 (사선 모자이크 마스크) */}
+          <div 
+            className={`absolute left-0 top-0 h-full w-full lg:w-[65%] bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out z-10 ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}
+            style={{ 
+              WebkitMaskImage: 'linear-gradient(75deg, black 40%, transparent 100%)', 
+              maskImage: 'linear-gradient(75deg, black 40%, transparent 100%)' 
+            }}
+          >
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/80 via-transparent to-transparent z-10" />
             <Image 
               src="/yewon2.jpeg" 
@@ -326,18 +335,18 @@ export default function Home() {
             </div>
 
             {/* 모바일용 입장 버튼 */}
-            <div className="lg:hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-full px-8 flex justify-center">
+            <div className="lg:hidden absolute bottom-40 left-12 z-30">
               <button 
                 onClick={handleEnterSystem} 
-                className="bg-white text-[#0c3161] px-8 py-4 rounded-2xl font-black text-[15px] shadow-2xl shadow-black/40 hover:scale-105 transition-transform active:scale-95 flex items-center justify-center gap-2 w-full max-w-sm"
+                className="pointer-events-auto bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-full font-black text-[14px] shadow-xl hover:bg-white/30 transition-all active:scale-95 flex items-center justify-center gap-2"
               >
-                시스템 입장하기 <ArrowForwardIosIcon sx={{fontSize:16}} />
+                시스템 입장하기 <ArrowForwardIosIcon sx={{fontSize:14}} />
               </button>
             </div>
           </div>
           
-          {/* 우측: 로고 및 타이틀 (모바일에서는 숨김) */}
-          <div className={`hidden lg:flex w-1/2 h-full flex-col justify-center items-center bg-white transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
+          {/* 우측: 로고 및 타이틀, 세련된 입장 버튼 */}
+          <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] flex-col justify-center items-center z-20 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
             <Image
               src="/UI.png"
               alt="예원예술대학교 로고"
@@ -349,13 +358,16 @@ export default function Home() {
               Rule Management System
             </span>
 
-            {/* 데스크탑용 입장 버튼 */}
+            {/* 데스크탑용 프리미엄 입장 버튼 */}
             <button 
               onClick={handleEnterSystem}
-              className="group bg-[#0c3161] hover:bg-[#092244] text-white px-10 py-4 rounded-2xl font-black text-[17px] shadow-lg shadow-[#0c3161]/20 hover:shadow-[#0c3161]/40 transition-all active:scale-95 flex items-center gap-3 cursor-pointer"
+              className="pointer-events-auto group relative flex items-center gap-4 bg-gradient-to-r from-[#0a2540] to-[#1a4478] text-white pl-8 pr-2 py-2 rounded-full font-black text-[16px] shadow-xl shadow-[#0c3161]/20 hover:shadow-2xl hover:shadow-[#0c3161]/40 hover:-translate-y-0.5 transition-all duration-300 active:scale-95 cursor-pointer overflow-hidden border border-slate-700/50"
             >
-              규정관리시스템 입장 
-              <ArrowForwardIosIcon className="transition-transform group-hover:translate-x-1.5" sx={{fontSize: 18}} />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+              <span className="tracking-wide text-white/95 z-10 relative">규정관리시스템 입장</span>
+              <div className="bg-white text-[#0c3161] w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12 z-10 relative">
+                <ArrowForwardIosIcon sx={{fontSize: 15}} className="ml-0.5" />
+              </div>
             </button>
           </div>
         </div>
