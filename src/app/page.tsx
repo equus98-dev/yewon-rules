@@ -333,10 +333,10 @@ export default function Home() {
           
           {/* Halftone 데코레이션 배경 (전체 배경, 우측에 더 잘 보임) */}
           <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
-            <HalftoneCircle className="absolute -top-32 -right-32 w-[600px] h-[600px] text-blue-600 opacity-[0.08]" />
-            <HalftoneCircle className="absolute top-[40%] right-[30%] w-[350px] h-[350px] text-indigo-500 opacity-[0.05]" />
-            <HalftoneCircle className="absolute -bottom-24 right-24 w-[450px] h-[450px] text-blue-700 opacity-[0.06]" />
-            <HalftoneCircle className="absolute bottom-[20%] right-[-10%] w-[300px] h-[300px] text-sky-500 opacity-[0.1]" />
+            <HalftoneCircle className="absolute -top-32 -right-32 w-[600px] h-[600px] text-blue-500 opacity-[0.2]" />
+            <HalftoneCircle className="absolute top-[40%] right-[30%] w-[350px] h-[350px] text-indigo-400 opacity-[0.12]" />
+            <HalftoneCircle className="absolute -bottom-24 right-24 w-[450px] h-[450px] text-blue-700 opacity-[0.3]" />
+            <HalftoneCircle className="absolute bottom-[20%] right-[-10%] w-[300px] h-[300px] text-sky-500 opacity-[0.25]" />
           </div>
 
           {/* 좌측: 전경 이미지 (세련된 사선 컷팅 디자인 - clip-path 사용) */}
@@ -348,8 +348,8 @@ export default function Home() {
             
             {/* 좌측 이미지 위 Halftone 패턴 데코레이션 (어두운 배경 위) */}
             <div className="absolute inset-0 z-10 pointer-events-none">
-              <HalftoneCircle className="absolute -top-16 -left-16 w-[450px] h-[450px] text-white opacity-[0.12]" />
-              <HalftoneCircle className="absolute bottom-40 left-[40%] w-[300px] h-[300px] text-white opacity-[0.08]" />
+              <HalftoneCircle className="absolute -top-16 -left-16 w-[450px] h-[450px] text-white opacity-[0.25]" />
+              <HalftoneCircle className="absolute bottom-40 left-[40%] w-[300px] h-[300px] text-white opacity-[0.15]" />
             </div>
 
             <Image 
@@ -375,15 +375,19 @@ export default function Home() {
             </div>
           </div>
           
-          {/* 우측: 로고 및 타이틀, 프리미엄 입장 버튼 */}
+          {/* 우측: 타이틀 및 프리미엄 입장 버튼 */}
           <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] flex-col justify-center items-center z-20 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
-            <Image
-              src="/UI.png"
-              alt="예원예술대학교 로고"
-              width={260}
-              height={58}
-              className="object-contain mb-8"
-            />
+            
+            {/* 우측 상단 배치 로고 */}
+            <div className="absolute top-10 right-12">
+              <Image
+                src="/UI.png"
+                alt="예원예술대학교 로고"
+                width={220}
+                height={50}
+                className="object-contain"
+              />
+            </div>
             <span className="text-xl text-[#0c3161] font-black tracking-[0.2em] uppercase select-none mb-12">
               Rule Management System
             </span>
