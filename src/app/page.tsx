@@ -340,7 +340,8 @@ export default function Home() {
             className={`absolute left-0 top-0 h-full w-full lg:w-[65%] bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out z-10 ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}
             style={{ clipPath: 'polygon(0 0, 80% 0, 100% 100%, 0 100%)' }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/90 via-[#0c3161]/20 to-transparent z-10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/90 via-[#0c3161]/40 to-transparent z-10" />
+            <div className="absolute inset-0 bg-black/20 z-10" /> {/* 텍스트 가독성을 위한 약간의 어두운 오버레이 */}
 
             {/* 떨어지는 나뭇잎 애니메이션 연출 */}
             <FallingLeaves />
@@ -350,15 +351,41 @@ export default function Home() {
               alt="예원예술대학교 전경" 
               fill 
               priority 
-              className="object-cover opacity-80 z-0"
+              className="object-cover opacity-90 z-0"
             />
-            <div className="absolute bottom-16 left-12 z-20 text-white select-none">
-              <h2 className="text-4xl lg:text-5xl font-black mb-3 drop-shadow-2xl tracking-tight">Yewon Arts University</h2>
-              <p className="text-xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
+            
+            {/* 중앙 홍보 문구 */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-20 text-white select-none px-8 text-center -mt-10 lg:-mt-20">
+              <h1 className="text-6xl lg:text-8xl font-black italic tracking-widest text-[#2ee6d6] drop-shadow-xl mb-4 lg:mb-6">
+                YES, WE CAN!
+              </h1>
+              <h2 className="text-3xl lg:text-5xl font-bold tracking-tight drop-shadow-lg mb-8 lg:mb-12">
+                꿈을 현실로 우리는 예원인 예원예술대학교
+              </h2>
+              <div className="flex flex-col items-center gap-2 lg:gap-3">
+                <p className="text-xl lg:text-3xl font-bold text-white/90 drop-shadow-md">
+                  잠재된 젊음의 패기, 도전의 꿈
+                </p>
+                <p className="text-sm lg:text-lg font-medium text-white/80 drop-shadow">
+                  문화예술 인재 양성의 요람인 예원예술대학교에서 마음껏 펼쳐보십시오
+                </p>
+              </div>
+            </div>
+
+            {/* 하단 좌측 로고 및 시스템명 */}
+            <div className="absolute bottom-12 lg:bottom-16 left-8 lg:left-12 z-20 select-none">
+              <Image 
+                src="/UI_white.png" 
+                alt="Yewon Arts University" 
+                width={260} 
+                height={65} 
+                className="object-contain opacity-95 drop-shadow-lg mb-2" 
+              />
+              <p className="text-xl font-bold text-blue-100 drop-shadow-md ml-1 tracking-wide">규정관리시스템</p>
             </div>
 
             {/* 모바일용 입장 버튼 */}
-            <div className="lg:hidden absolute bottom-40 left-12 z-30">
+            <div className="lg:hidden absolute bottom-40 left-8 z-30">
               <button 
                 onClick={handleEnterSystem} 
                 className="pointer-events-auto bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-xl font-black text-[14px] shadow-xl hover:bg-white/30 transition-all active:scale-95 flex items-center justify-center gap-2"
@@ -369,7 +396,7 @@ export default function Home() {
           </div>
           
           {/* 우측: 타이틀 및 프리미엄 입장 버튼 */}
-          <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] xl:w-[45%] flex-col justify-center items-center z-20 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
+          <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] xl:w-[45%] flex-col justify-end items-center pb-16 z-20 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
             
             {/* 우측 상단 배치 로고 (밝은 배경이므로 배경 패널 제거) */}
             <div className="absolute top-10 right-8 xl:right-12">
@@ -382,22 +409,24 @@ export default function Home() {
               />
             </div>
             
-            {/* 프리미엄 입장 버튼 (밝은 배경에 맞게 짙은 남색 버튼으로 복구하되 광택 효과 유지) */}
-            <button 
-              onClick={handleEnterSystem}
-              className="pointer-events-auto group relative flex items-center justify-center gap-5 px-10 py-4 bg-[#0c3161] text-white rounded-xl transition-all duration-500 ease-out shadow-[0_15px_40px_-10px_rgba(12,49,97,0.4)] hover:shadow-[0_20px_50px_-10px_rgba(12,49,97,0.6)] hover:-translate-y-1 active:scale-95 cursor-pointer overflow-hidden border border-[#092244]"
-            >
-              {/* Button inner shine */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
-              
-              <span className="text-[18px] font-extrabold tracking-widest text-white relative z-10 drop-shadow-sm">
-                규정관리시스템 입장
-              </span>
-              
-              <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 group-hover:bg-blue-600 transition-colors duration-300 shadow-sm">
-                <ArrowForwardIosIcon sx={{fontSize: 15}} className="ml-0.5 text-white" />
-              </div>
-            </button>
+            {/* 우측 하단 투명 유리막 버튼 (밝은 배경에 맞게 다크 텍스트 및 투명 효과 적용) */}
+            <div className="absolute bottom-16 right-8 xl:right-12">
+              <button 
+                onClick={handleEnterSystem}
+                className="pointer-events-auto group relative flex items-center justify-center gap-5 px-10 py-4 bg-white/30 backdrop-blur-md text-[#0c3161] rounded-xl transition-all duration-500 ease-out shadow-[0_10px_30px_-10px_rgba(12,49,97,0.15)] hover:shadow-[0_15px_40px_-10px_rgba(12,49,97,0.25)] hover:-translate-y-1 active:scale-95 cursor-pointer overflow-hidden border border-[#0c3161]/20 hover:border-[#0c3161]/40"
+              >
+                {/* Button inner shine */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+                
+                <span className="text-[18px] font-extrabold tracking-widest text-[#0c3161] relative z-10 drop-shadow-sm">
+                  규정관리시스템 입장
+                </span>
+                
+                <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-lg bg-[#0c3161]/10 group-hover:bg-[#0c3161] transition-colors duration-300 shadow-sm border border-[#0c3161]/10">
+                  <ArrowForwardIosIcon sx={{fontSize: 15}} className="ml-0.5 text-[#0c3161] group-hover:text-white transition-colors duration-300" />
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       )}
