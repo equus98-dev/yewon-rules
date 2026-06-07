@@ -330,14 +330,6 @@ export default function Home() {
         <div className={`fixed inset-0 z-[100] flex transition-opacity duration-1000 ease-in-out ${animateOut ? 'opacity-0 delay-300 pointer-events-none' : 'opacity-100'}`}>
           {/* 바탕 화이트 (좌측 마스크와 우측 컨텐츠의 배경 역할) */}
           <div className="absolute inset-0 bg-white" />
-          
-          {/* Halftone 데코레이션 배경 (전체 배경, 우측에 더 잘 보임) */}
-          <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
-            <HalftoneCircle className="absolute -top-32 -right-32 w-[600px] h-[600px] text-blue-500 opacity-[0.2]" />
-            <HalftoneCircle className="absolute top-[40%] right-[30%] w-[350px] h-[350px] text-indigo-400 opacity-[0.12]" />
-            <HalftoneCircle className="absolute -bottom-24 right-24 w-[450px] h-[450px] text-blue-700 opacity-[0.3]" />
-            <HalftoneCircle className="absolute bottom-[20%] right-[-10%] w-[300px] h-[300px] text-sky-500 opacity-[0.25]" />
-          </div>
 
           {/* 좌측: 전경 이미지 (세련된 사선 컷팅 디자인 - clip-path 사용) */}
           <div 
@@ -345,12 +337,6 @@ export default function Home() {
             style={{ clipPath: 'polygon(0 0, 80% 0, 100% 100%, 0 100%)' }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/90 via-[#0c3161]/20 to-transparent z-10" />
-            
-            {/* 좌측 이미지 위 Halftone 패턴 데코레이션 (어두운 배경 위) */}
-            <div className="absolute inset-0 z-10 pointer-events-none">
-              <HalftoneCircle className="absolute -top-16 -left-16 w-[450px] h-[450px] text-white opacity-[0.25]" />
-              <HalftoneCircle className="absolute bottom-40 left-[40%] w-[300px] h-[300px] text-white opacity-[0.15]" />
-            </div>
 
             <Image 
               src="/yewon2.jpeg" 
@@ -368,7 +354,7 @@ export default function Home() {
             <div className="lg:hidden absolute bottom-40 left-12 z-30">
               <button 
                 onClick={handleEnterSystem} 
-                className="pointer-events-auto bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-full font-black text-[14px] shadow-xl hover:bg-white/30 transition-all active:scale-95 flex items-center justify-center gap-2"
+                className="pointer-events-auto bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-xl font-black text-[14px] shadow-xl hover:bg-white/30 transition-all active:scale-95 flex items-center justify-center gap-2"
               >
                 시스템 입장하기 <ArrowForwardIosIcon sx={{fontSize:14}} />
               </button>
@@ -388,14 +374,14 @@ export default function Home() {
                 className="object-contain"
               />
             </div>
-            <span className="text-xl text-[#0c3161] font-black tracking-[0.2em] uppercase select-none mb-12">
+            <span className="text-2xl xl:text-3xl font-black tracking-[0.2em] uppercase select-none mb-12 text-transparent bg-clip-text bg-gradient-to-r from-[#0c3161] to-[#2563eb] drop-shadow-sm text-center px-4">
               Rule Management System
             </span>
 
             {/* 프리미엄 입장 버튼 (다크 네온 엣지 스타일) */}
             <button 
               onClick={handleEnterSystem}
-              className="pointer-events-auto group relative flex items-center justify-center gap-5 px-10 py-4 bg-[#081b33] text-white rounded-full transition-all duration-500 ease-out shadow-[0_15px_40px_-10px_rgba(8,27,51,0.6)] hover:shadow-[0_20px_50px_-10px_rgba(8,27,51,0.8)] hover:-translate-y-1 active:scale-95 cursor-pointer overflow-hidden border border-blue-900/50"
+              className="pointer-events-auto group relative flex items-center justify-center gap-5 px-10 py-4 bg-[#081b33] text-white rounded-xl transition-all duration-500 ease-out shadow-[0_15px_40px_-10px_rgba(8,27,51,0.6)] hover:shadow-[0_20px_50px_-10px_rgba(8,27,51,0.8)] hover:-translate-y-1 active:scale-95 cursor-pointer overflow-hidden border border-blue-900/50"
             >
               {/* Button inner shine */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
@@ -404,7 +390,7 @@ export default function Home() {
                 규정관리시스템 입장
               </span>
               
-              <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-full bg-white/10 group-hover:bg-blue-600 transition-colors duration-300">
+              <div className="relative z-10 flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 group-hover:bg-blue-600 transition-colors duration-300">
                 <ArrowForwardIosIcon sx={{fontSize: 15}} className="ml-0.5 text-white" />
               </div>
             </button>
