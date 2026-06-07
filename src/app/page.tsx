@@ -1237,7 +1237,7 @@ export default function Home() {
                       </h2>
                     </div>
 
-                    <div className="flex flex-col xl:flex-row items-start xl:items-center gap-6 xl:gap-8 w-full">
+                    <div className="flex flex-col 2xl:flex-row items-start 2xl:items-center gap-6 2xl:gap-8 w-full">
                       {/* 검색 폼 영역 (배경보다 연하게 - 화이트 투명도 사용) */}
                       <div className="flex-1 flex flex-col xl:flex-row items-start xl:items-center w-full bg-white/15 backdrop-blur-md p-5 xl:p-6 rounded-2xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] gap-4 xl:gap-6">
                         
@@ -1245,7 +1245,7 @@ export default function Home() {
 
                         <div className="flex-1 w-full flex flex-col gap-3 xl:gap-4">
                           {/* 1열: 검색영역 & 검색옵션 */}
-                          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3 lg:gap-8">
+                          <div className="flex flex-col xl:flex-row items-start xl:items-center gap-3 xl:gap-8">
                             {/* 검색영역 */}
                             <div className="flex items-center gap-3">
                               <label className="font-extrabold text-white/80 text-[13px] lg:text-[14px] w-[60px] shrink-0">검색영역</label>
@@ -1262,8 +1262,8 @@ export default function Home() {
                             </div>
                             
                             {/* 검색옵션 */}
-                            <div className="flex items-center gap-3 flex-wrap">
-                              <label className="font-extrabold text-white/80 text-[13px] lg:text-[14px] w-[60px] lg:w-auto shrink-0">검색옵션</label>
+                            <div className="flex items-center gap-3 flex-wrap mt-2 xl:mt-0">
+                              <label className="font-extrabold text-white/80 text-[13px] lg:text-[14px] w-[60px] xl:w-auto shrink-0">검색옵션</label>
                               <div className="flex items-center gap-3 lg:gap-4 flex-wrap">
                                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-white text-[13px] lg:text-[14px] whitespace-nowrap">
                                   <input type="checkbox" checked={optionAll} onChange={(e) => handleToggleAll(e.target.checked)} className="w-4 h-4 rounded cursor-pointer accent-white" />
@@ -1286,7 +1286,7 @@ export default function Home() {
                           </div>
 
                           {/* 2열: 개정기간 */}
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
                             <label className="font-extrabold text-white/80 text-[13px] lg:text-[14px] w-[60px] shrink-0">개정기간</label>
                             <div className="flex flex-wrap items-center gap-2">
                               <div className="flex items-center gap-2">
@@ -1294,7 +1294,7 @@ export default function Home() {
                                 <span className="text-white/70">-</span>
                                 <input type="date" value={enactmentEnd} onChange={(e) => setEnactmentEnd(e.target.value)} className="bg-white text-slate-800 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold text-xs lg:text-sm h-8 w-[120px] lg:w-[130px]" />
                               </div>
-                              <div className="flex items-center gap-1 mt-1 sm:mt-0 ml-0 sm:ml-2">
+                              <div className="flex items-center gap-1 mt-1 md:mt-0 ml-0 md:ml-2">
                                 <button type="button" onClick={() => handleQuickDate("1w")} className="bg-white text-[#009b9e] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm whitespace-nowrap">1주</button>
                                 <button type="button" onClick={() => handleQuickDate("1m")} className="bg-white text-[#009b9e] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm whitespace-nowrap">1달</button>
                                 <button type="button" onClick={() => handleQuickDate("1y")} className="bg-white text-[#009b9e] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm whitespace-nowrap">1년</button>
@@ -1314,11 +1314,11 @@ export default function Home() {
                       </div>
 
                       {/* 오른쪽 퀵 버튼 영역 */}
-                      <div className="flex flex-row xl:flex-col gap-3 shrink-0 w-full xl:w-auto">
-                        <button onClick={() => handleTagClick("학칙")} className="flex-1 xl:flex-none bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-2 px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl shadow-lg border border-slate-100 transition-transform hover:-translate-y-0.5 active:translate-y-0 min-w-[140px] lg:min-w-[160px] font-extrabold text-[14px] lg:text-[15px] whitespace-nowrap">
+                      <div className="flex flex-row 2xl:flex-col gap-3 shrink-0 w-full 2xl:w-auto mt-2 2xl:mt-0">
+                        <button onClick={() => handleTagClick("학칙")} className="flex-1 2xl:flex-none bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-2 px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl shadow-lg border border-slate-100 transition-transform hover:-translate-y-0.5 active:translate-y-0 min-w-[140px] lg:min-w-[160px] font-extrabold text-[14px] lg:text-[15px] whitespace-nowrap">
                           <span className="text-teal-500 text-lg leading-none">🔍</span> 가나다검색
                         </button>
-                        <button onClick={() => handleQuickDate("1m")} className="flex-1 xl:flex-none bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-2 px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl shadow-lg border border-slate-100 transition-transform hover:-translate-y-0.5 active:translate-y-0 min-w-[140px] lg:min-w-[160px] font-extrabold text-[14px] lg:text-[15px] whitespace-nowrap">
+                        <button onClick={() => handleQuickDate("1m")} className="flex-1 2xl:flex-none bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-2 px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl shadow-lg border border-slate-100 transition-transform hover:-translate-y-0.5 active:translate-y-0 min-w-[140px] lg:min-w-[160px] font-extrabold text-[14px] lg:text-[15px] whitespace-nowrap">
                           <span className="text-blue-400 text-lg leading-none">📅</span> 개정일검색
                         </button>
                       </div>
