@@ -335,12 +335,6 @@ export default function Home() {
             <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(12, 49, 97, 0.1) 1.5px, transparent 1.5px)', backgroundSize: '18px 18px' }} />
           </div>
 
-          {/* 중앙 사선 연두색 은은한 삼각형 (우측 영역 위에 배치, 하단은 이미지 경계 끝부분 65% 와 만남) */}
-          <div 
-            className="absolute inset-0 bg-teal-500/20 backdrop-blur-[2px] z-[5] pointer-events-none hidden lg:block"
-            style={{ clipPath: 'polygon(70% 0, 100% 0, 65% 100%)' }}
-          />
-
           {/* 좌측: 전경 이미지 (세련된 사선 컷팅 디자인 - clip-path 사용) */}
           <div 
             className={`absolute left-0 top-0 h-full w-full lg:w-[65%] bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out z-10 ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}
@@ -360,38 +354,20 @@ export default function Home() {
               className="object-cover opacity-90 z-0"
             />
             
-            {/* 중앙 홍보 문구 */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-20 text-white select-none px-8 text-center -mt-10 lg:-mt-20">
-              <h1 className="text-6xl lg:text-8xl font-black italic tracking-widest text-[#2ee6d6] drop-shadow-xl mb-4 lg:mb-6">
-                YES, WE CAN!
-              </h1>
-              <h2 className="text-3xl lg:text-5xl font-bold tracking-tight drop-shadow-lg mb-8 lg:mb-12">
-                꿈을 현실로 우리는 예원인 예원예술대학교
-              </h2>
-              <div className="flex flex-col items-center gap-2 lg:gap-3">
-                <p className="text-xl lg:text-3xl font-bold text-white/90 drop-shadow-md">
-                  잠재된 젊음의 패기, 도전의 꿈
-                </p>
-                <p className="text-sm lg:text-lg font-medium text-white/80 drop-shadow">
-                  문화예술 인재 양성의 요람인 예원예술대학교에서 마음껏 펼쳐보십시오
-                </p>
-              </div>
-            </div>
+            {/* 연두색 은은한 삼각형 (이미지 경계와 겹치도록 좌측 영역 내부에 배치) */}
+            <div 
+              className="absolute inset-0 bg-[#2ee6d6]/30 backdrop-blur-[1px] mix-blend-multiply z-10 pointer-events-none hidden lg:block"
+              style={{ clipPath: 'polygon(30% 0, 100% 0, 100% 100%)' }}
+            />
 
-            {/* 하단 좌측 로고 및 시스템명 */}
-            <div className="absolute bottom-12 lg:bottom-16 left-8 lg:left-12 z-20 select-none">
-              <Image 
-                src="/UI_white.png" 
-                alt="Yewon Arts University" 
-                width={260} 
-                height={65} 
-                className="object-contain opacity-95 drop-shadow-lg mb-2" 
-              />
-              <p className="text-xl font-bold text-blue-100 drop-shadow-md ml-1 tracking-wide">규정관리시스템</p>
+            {/* 하단 좌측 원래 텍스트 복구 */}
+            <div className="absolute bottom-16 left-12 z-20 text-white select-none">
+              <h2 className="text-4xl lg:text-5xl font-black mb-3 drop-shadow-2xl tracking-tight">Yewon Arts University</h2>
+              <p className="text-xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
             </div>
 
             {/* 모바일용 입장 버튼 */}
-            <div className="lg:hidden absolute bottom-40 left-8 z-30">
+            <div className="lg:hidden absolute bottom-40 left-12 z-30">
               <button 
                 onClick={handleEnterSystem} 
                 className="pointer-events-auto bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-xl font-black text-[14px] shadow-xl hover:bg-white/30 transition-all active:scale-95 flex items-center justify-center gap-2"
@@ -402,9 +378,9 @@ export default function Home() {
           </div>
           
           {/* 우측: 타이틀 및 프리미엄 입장 버튼 */}
-          <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] xl:w-[45%] flex-col justify-end items-center pb-16 z-20 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
+          <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] xl:w-[45%] flex-col justify-center items-center pb-16 z-20 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
             
-            {/* 우측 상단 배치 로고 (밝은 배경이므로 배경 패널 제거) */}
+            {/* 우측 상단 배치 로고 */}
             <div className="absolute top-10 right-8 xl:right-12">
               <Image
                 src="/UI.png"
@@ -414,8 +390,26 @@ export default function Home() {
                 className="object-contain w-[180px] xl:w-[220px]"
               />
             </div>
+
+            {/* 중앙 홍보 문구 (우측 흰색 부분으로 이동) */}
+            <div className="flex flex-col items-center justify-center z-20 text-[#0c3161] select-none px-6 xl:px-12 text-center w-full">
+              <h1 className="text-5xl xl:text-6xl 2xl:text-7xl font-black italic tracking-widest text-teal-500 drop-shadow-sm mb-4 xl:mb-6">
+                YES, WE CAN!
+              </h1>
+              <h2 className="text-2xl xl:text-3xl 2xl:text-4xl font-extrabold tracking-tight mb-8 xl:mb-10 text-slate-800">
+                꿈을 현실로 우리는 예원인 예원예술대학교
+              </h2>
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-lg xl:text-xl 2xl:text-2xl font-bold text-slate-700">
+                  잠재된 젊음의 패기, 도전의 꿈
+                </p>
+                <p className="text-sm xl:text-base 2xl:text-lg font-medium text-slate-600 mt-1">
+                  문화예술 인재 양성의 요람인 예원예술대학교에서 마음껏 펼쳐보십시오
+                </p>
+              </div>
+            </div>
             
-            {/* 우측 하단 투명 유리막 버튼 (밝은 배경에 맞게 다크 텍스트 및 투명 효과 적용) */}
+            {/* 우측 하단 투명 유리막 버튼 */}
             <div className="absolute bottom-16 right-8 xl:right-12">
               <button 
                 onClick={handleEnterSystem}
