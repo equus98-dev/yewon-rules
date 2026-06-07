@@ -15,6 +15,24 @@ import SidebarTree from "@/components/SidebarTree";
 import RuleViewer from "@/components/RuleViewer";
 import Link from "next/link";
 
+const HalftoneCircle = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="dotPattern" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+        <circle cx="5" cy="5" r="3.2" fill="currentColor" />
+      </pattern>
+      <radialGradient id="dotFade" cx="50%" cy="50%" r="50%">
+        <stop offset="30%" stopColor="white" stopOpacity="1" />
+        <stop offset="100%" stopColor="white" stopOpacity="0" />
+      </radialGradient>
+      <mask id="dotMask">
+        <circle cx="100" cy="100" r="100" fill="url(#dotFade)" />
+      </mask>
+    </defs>
+    <rect x="0" y="0" width="200" height="200" fill="url(#dotPattern)" mask="url(#dotMask)" />
+  </svg>
+);
+
 export default function Home() {
   const [activeRuleId, setActiveRuleId] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -312,6 +330,14 @@ export default function Home() {
         <div className={`fixed inset-0 z-[100] flex transition-opacity duration-1000 ease-in-out ${animateOut ? 'opacity-0 delay-300 pointer-events-none' : 'opacity-100'}`}>
           {/* 바탕 화이트 (좌측 마스크와 우측 컨텐츠의 배경 역할) */}
           <div className="absolute inset-0 bg-white" />
+          
+          {/* Halftone 데코레이션 배경 (전체 배경, 우측에 더 잘 보임) */}
+          <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
+            <HalftoneCircle className="absolute -top-32 -right-32 w-[600px] h-[600px] text-blue-600 opacity-[0.08]" />
+            <HalftoneCircle className="absolute top-[40%] right-[30%] w-[350px] h-[350px] text-indigo-500 opacity-[0.05]" />
+            <HalftoneCircle className="absolute -bottom-24 right-24 w-[450px] h-[450px] text-blue-700 opacity-[0.06]" />
+            <HalftoneCircle className="absolute bottom-[20%] right-[-10%] w-[300px] h-[300px] text-sky-500 opacity-[0.1]" />
+          </div>
 
           {/* 좌측: 전경 이미지 (세련된 사선 컷팅 디자인 - clip-path 사용) */}
           <div 
@@ -319,6 +345,13 @@ export default function Home() {
             style={{ clipPath: 'polygon(0 0, 80% 0, 100% 100%, 0 100%)' }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/90 via-[#0c3161]/20 to-transparent z-10" />
+            
+            {/* 좌측 이미지 위 Halftone 패턴 데코레이션 (어두운 배경 위) */}
+            <div className="absolute inset-0 z-10 pointer-events-none">
+              <HalftoneCircle className="absolute -top-16 -left-16 w-[450px] h-[450px] text-white opacity-[0.12]" />
+              <HalftoneCircle className="absolute bottom-40 left-[40%] w-[300px] h-[300px] text-white opacity-[0.08]" />
+            </div>
+
             <Image 
               src="/yewon2.jpeg" 
               alt="예원예술대학교 전경" 
