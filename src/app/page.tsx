@@ -1098,311 +1098,218 @@ export default function Home() {
             </>
           ) : (
             /* CASE B: 대형 중앙 검색창이 있는 메인 대시보드 레이아웃 */
-            <div className="flex-1 flex flex-col overflow-hidden bg-slate-50">
-              <div className="flex-1 max-w-[1400px] w-full mx-auto grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6 p-6 md:p-8 min-h-0">
+            <div className="flex-1 flex flex-col overflow-y-auto scrollbar bg-slate-50 relative">
+              <div className="max-w-[1400px] w-full mx-auto p-6 md:p-8 flex flex-col gap-8 min-h-0">
                 
-                {/* [파트 1] 왼쪽 대형 검색 폼 (상단: 폼, 하단: 건물사진) */}
-                <div className="bg-gradient-to-b from-[#0c3161] via-[#092244] to-[#04101e] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col">
+                {/* [파트 1] 상단 검색 배너 (전면 중앙) */}
+                <div className="bg-gradient-to-r from-[#6b62ad] to-[#403588] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[280px] justify-center">
                   
                   {/* 하단 학교 배경이미지 */}
-                  <div className="absolute left-0 right-0 bottom-0 top-[30%] z-0">
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#092244]/60 to-transparent z-10" />
+                  <div className="absolute inset-0 z-0">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#5a5099]/90 to-[#2c2266]/90 z-10" />
                     <Image
                       src="/yewon.jpg"
                       alt="예원예술대학교 전경"
                       fill
                       priority
-                      className="object-cover object-bottom opacity-90"
+                      className="object-cover opacity-30 mix-blend-overlay"
                     />
                   </div>
 
                   {/* 배경 패턴 그래픽 데코레이션 */}
-                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] z-1 pointer-events-none"></div>
+                  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] z-1 pointer-events-none"></div>
                   
-                  <div className="relative z-10 w-full p-8 md:p-10 flex-shrink-0 flex flex-col items-start">
+                  <div className="relative z-10 w-full p-8 md:px-12 md:py-10 flex flex-col justify-center">
                     
                     {/* 타이틀 */}
-                    <div className="flex items-center justify-start mb-5 select-none">
-                      <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight flex items-center">
-                        <span className="text-[#fbf2d5] font-black">예원예술대학교</span>
-                        <span className="text-white/20 font-light mx-2.5 text-xl md:text-2xl select-none">|</span>
-                        <span>규정관리시스템</span>
+                    <div className="flex items-center justify-start mb-8 select-none">
+                      <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">
+                        예원예술대학교 규정관리시스템
                       </h2>
                     </div>
 
-                    {/* NSU 스타일 고급 상세 검색 폼 (배경을 투명화하여 뒷배경의 학교 전경이 보임) */}
-                    <div className="w-full text-left text-sm text-slate-200 space-y-4 bg-[#071e3d]/25 backdrop-blur-lg p-6 rounded-2xl border border-white/5 shadow-2xl">
-                      
-                      {/* 1. 검색구분 */}
-                      <div className="grid grid-cols-1 sm:grid-cols-[100px_1fr] items-center gap-2 sm:gap-4">
-                        <label className="font-extrabold text-white flex items-center gap-1.5 text-[13px] sm:text-[15px]">
-                          <span className="text-blue-400">•</span> 검색구분
-                        </label>
-                        <div className="flex items-center gap-6">
-                          <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-slate-200 hover:text-white text-[13px] sm:text-[14.5px]">
-                            <input
-                              type="radio"
-                              name="scope"
-                              checked={scope === "current"}
-                              onChange={() => setScope("current")}
-                              className="w-4 h-4 text-blue-600 bg-white/10 border-slate-300 focus:ring-blue-500 cursor-pointer"
-                            />
-                            현행
-                          </label>
-                          <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-slate-200 hover:text-white text-[13px] sm:text-[14.5px]">
-                            <input
-                              type="radio"
-                              name="scope"
-                              checked={scope === "history"}
-                              onChange={() => setScope("history")}
-                              className="w-4 h-4 text-blue-600 bg-white/10 border-slate-300 focus:ring-blue-500 cursor-pointer"
-                            />
-                            연혁
-                          </label>
-                        </div>
-                      </div>
+                    <div className="flex flex-col xl:flex-row items-center gap-8 w-full">
+                      {/* 검색 폼 영역 */}
+                      <div className="flex-1 flex flex-col xl:flex-row items-start xl:items-center w-full bg-[#000000]/10 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-inner gap-6">
+                        
+                        <div className="font-black text-2xl tracking-wider text-white/90 shrink-0">SEARCH</div>
 
-                      {/* 2. 검색옵션 */}
-                      <div className="grid grid-cols-1 sm:grid-cols-[100px_1fr] items-center gap-2 sm:gap-4">
-                        <label className="font-extrabold text-white flex items-center gap-1.5 text-[13px] sm:text-[15px]">
-                          <span className="text-blue-400">•</span> 검색옵션
-                        </label>
-                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                          <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-slate-200 hover:text-white text-[13px] sm:text-[14.5px]">
-                            <input
-                              type="checkbox"
-                              checked={optionAll}
-                              onChange={(e) => handleToggleAll(e.target.checked)}
-                              className="w-4 h-4 text-blue-600 rounded bg-white/10 border-slate-300 focus:ring-blue-500 cursor-pointer"
-                            />
-                            전체
-                          </label>
-                          <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-slate-200 hover:text-white text-[13px] sm:text-[14.5px]">
-                            <input
-                              type="checkbox"
-                              checked={optionTitle}
-                              onChange={(e) => handleToggleOption("title", e.target.checked)}
-                              className="w-4 h-4 text-blue-600 rounded bg-white/10 border-slate-300 focus:ring-blue-500 cursor-pointer"
-                            />
-                            제목
-                          </label>
-                          <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-slate-200 hover:text-white text-[13px] sm:text-[14.5px]">
-                            <input
-                              type="checkbox"
-                              checked={optionBody}
-                              onChange={(e) => handleToggleOption("body", e.target.checked)}
-                              className="w-4 h-4 text-blue-600 rounded bg-white/10 border-slate-300 focus:ring-blue-500 cursor-pointer"
-                            />
-                            본문
-                          </label>
-                          <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-slate-200 hover:text-white text-[13px] sm:text-[14.5px]">
-                            <input
-                              type="checkbox"
-                              checked={optionAttachment}
-                              onChange={(e) => handleToggleOption("attachment", e.target.checked)}
-                              className="w-4 h-4 text-blue-600 rounded bg-white/10 border-slate-300 focus:ring-blue-500 cursor-pointer"
-                            />
-                            서식
-                          </label>
-                        </div>
-                      </div>
-
-                      {/* 3. 제·개정기간 */}
-                      <div className="grid grid-cols-1 sm:grid-cols-[100px_1fr] items-center gap-2 sm:gap-4">
-                        <label className="font-extrabold text-white flex items-center gap-1.5 text-[13px] sm:text-[15px]">
-                          <span className="text-blue-400">•</span> 제·개정기간
-                        </label>
-                        <div className="flex flex-wrap items-center gap-2.5">
-                          <input
-                            type="date"
-                            value={enactmentStart}
-                            onChange={(e) => setEnactmentStart(e.target.value)}
-                            className="bg-white text-slate-800 rounded px-2.5 py-1 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-black text-sm h-[32px] w-[145px]"
-                          />
-                          <span className="text-white select-none">~</span>
-                          <input
-                            type="date"
-                            value={enactmentEnd}
-                            onChange={(e) => setEnactmentEnd(e.target.value)}
-                            className="bg-white text-slate-800 rounded px-2.5 py-1 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-black text-sm h-[32px] w-[145px]"
-                          />
-                          <div className="flex items-center gap-1 ml-1">
-                            <button
-                              type="button"
-                              onClick={() => handleQuickDate("1w")}
-                              className="bg-[#142c4b]/80 hover:bg-[#1a385f] text-blue-300 hover:text-white font-extrabold text-xs px-2.5 py-1.5 rounded transition-all cursor-pointer select-none active:scale-95 border border-white/5"
-                            >
-                              1주
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleQuickDate("1m")}
-                              className="bg-[#142c4b]/80 hover:bg-[#1a385f] text-blue-300 hover:text-white font-extrabold text-xs px-2.5 py-1.5 rounded transition-all cursor-pointer select-none active:scale-95 border border-white/5"
-                            >
-                              1달
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleQuickDate("1y")}
-                              className="bg-[#142c4b]/80 hover:bg-[#1a385f] text-blue-300 hover:text-white font-extrabold text-xs px-2.5 py-1.5 rounded transition-all cursor-pointer select-none active:scale-95 border border-white/5"
-                            >
-                              1년
-                            </button>
+                        <div className="flex-1 w-full flex flex-col gap-3">
+                          {/* 1열: 검색영역 & 검색옵션 */}
+                          <div className="flex flex-wrap items-center gap-y-2 gap-x-8">
+                            {/* 검색영역 */}
+                            <div className="flex items-center gap-3">
+                              <label className="font-extrabold text-white/80 text-[14px]">검색영역</label>
+                              <div className="flex items-center gap-4">
+                                <label className="flex items-center gap-1.5 cursor-pointer font-bold text-white text-[14px]">
+                                  <input type="radio" name="scope" checked={scope === "current"} onChange={() => setScope("current")} className="w-4 h-4 cursor-pointer accent-white" />
+                                  현행
+                                </label>
+                                <label className="flex items-center gap-1.5 cursor-pointer font-bold text-white text-[14px]">
+                                  <input type="radio" name="scope" checked={scope === "history"} onChange={() => setScope("history")} className="w-4 h-4 cursor-pointer accent-white" />
+                                  연혁
+                                </label>
+                              </div>
+                            </div>
+                            
+                            {/* 검색옵션 */}
+                            <div className="flex items-center gap-3">
+                              <label className="font-extrabold text-white/80 text-[14px]">검색옵션</label>
+                              <div className="flex items-center gap-4 flex-wrap">
+                                <label className="flex items-center gap-1.5 cursor-pointer font-bold text-white text-[14px]">
+                                  <input type="checkbox" checked={optionAll} onChange={(e) => handleToggleAll(e.target.checked)} className="w-4 h-4 rounded cursor-pointer accent-white" />
+                                  전체
+                                </label>
+                                <label className="flex items-center gap-1.5 cursor-pointer font-bold text-white text-[14px]">
+                                  <input type="checkbox" checked={optionTitle} onChange={(e) => handleToggleOption("title", e.target.checked)} className="w-4 h-4 rounded cursor-pointer accent-white" />
+                                  제목
+                                </label>
+                                <label className="flex items-center gap-1.5 cursor-pointer font-bold text-white text-[14px]">
+                                  <input type="checkbox" checked={optionBody} onChange={(e) => handleToggleOption("body", e.target.checked)} className="w-4 h-4 rounded cursor-pointer accent-white" />
+                                  본문
+                                </label>
+                                <label className="flex items-center gap-1.5 cursor-pointer font-bold text-white text-[14px]">
+                                  <input type="checkbox" checked={optionAttachment} onChange={(e) => handleToggleOption("attachment", e.target.checked)} className="w-4 h-4 rounded cursor-pointer accent-white" />
+                                  별표/별지
+                                </label>
+                              </div>
+                            </div>
                           </div>
+
+                          {/* 2열: 개정기간 */}
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <label className="font-extrabold text-white/80 text-[14px] w-[55px]">개정기간</label>
+                            <div className="flex items-center gap-2">
+                              <input type="date" value={enactmentStart} onChange={(e) => setEnactmentStart(e.target.value)} className="bg-white text-slate-800 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold text-sm h-8 w-[130px]" />
+                              <span className="text-white/70">-</span>
+                              <input type="date" value={enactmentEnd} onChange={(e) => setEnactmentEnd(e.target.value)} className="bg-white text-slate-800 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold text-sm h-8 w-[130px]" />
+                            </div>
+                            <div className="flex items-center gap-1 ml-2">
+                              <button type="button" onClick={() => handleQuickDate("1w")} className="bg-white text-[#5a5099] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm">1주</button>
+                              <button type="button" onClick={() => handleQuickDate("1m")} className="bg-white text-[#5a5099] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm">1달</button>
+                              <button type="button" onClick={() => handleQuickDate("1y")} className="bg-white text-[#5a5099] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm">1년</button>
+                            </div>
+                          </div>
+
+                          {/* 3열: 검색어 */}
+                          <form onSubmit={handleSearch} className="flex items-center gap-3 w-full">
+                            <label className="font-extrabold text-white/80 text-[14px] w-[55px]">검색어</label>
+                            <div className="flex flex-1 items-center shadow-md">
+                              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="flex-1 bg-white text-slate-800 rounded-l px-4 py-2 focus:outline-none font-bold text-sm h-10 w-full" />
+                              <button type="submit" className="bg-[#fbcc14] hover:bg-[#eab308] text-slate-800 font-black text-[15px] px-8 h-10 rounded-r transition-colors whitespace-nowrap">검색</button>
+                            </div>
+                          </form>
                         </div>
                       </div>
 
-                      {/* 4. 검색어 */}
-                      <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-[100px_1fr] items-center gap-2 sm:gap-4 pt-1">
-                        <label className="font-extrabold text-white flex items-center gap-1.5 text-[13px] sm:text-[15px]">
-                          <span className="text-blue-400">•</span> 검색어
-                        </label>
-                        <div className="flex w-full items-center">
-                          <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="규정명, 본문 내용, 공포번호, 서식명 등을 입력하세요..."
-                            className="flex-1 bg-white text-slate-800 rounded-l-lg px-4 py-2 border-y border-l border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-extrabold text-sm sm:text-base h-11"
-                          />
-                          <button
-                            type="submit"
-                            className="bg-amber-500 hover:bg-amber-600 text-white font-black text-sm sm:text-base px-4 sm:px-6 h-11 rounded-r-lg border-y border-r border-amber-500 transition-all cursor-pointer active:scale-95 shrink-0 whitespace-nowrap"
-                          >
-                            검색
-                          </button>
-                        </div>
-                      </form>
-
-                      {/* 하단 가나다별 검색 & 제개정일별 검색 링크 */}
-                      <div className="flex justify-end gap-4 text-xs sm:text-sm font-bold text-blue-300 pt-1 border-t border-white/5 mt-2">
-                        <button
-                          onClick={() => handleTagClick("학칙")}
-                          className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer select-none"
-                        >
-                          🔤 가나다별 검색
+                      {/* 오른쪽 퀵 버튼 영역 */}
+                      <div className="flex flex-row xl:flex-col gap-3 shrink-0">
+                        <button onClick={() => handleTagClick("학칙")} className="bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-2 px-6 py-3 rounded-xl shadow-lg border border-slate-100 transition-transform hover:-translate-y-0.5 active:translate-y-0 min-w-[160px] font-extrabold text-[15px]">
+                          <span className="text-blue-500 text-lg leading-none">🔍</span> 가나다검색
                         </button>
-                        <span className="text-white/20">|</span>
-                        <button
-                          onClick={() => handleQuickDate("1m")}
-                          className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer select-none"
-                        >
-                          📅 제개정일별 검색
+                        <button onClick={() => handleQuickDate("1m")} className="bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-2 px-6 py-3 rounded-xl shadow-lg border border-slate-100 transition-transform hover:-translate-y-0.5 active:translate-y-0 min-w-[160px] font-extrabold text-[15px]">
+                          <span className="text-blue-400 text-lg leading-none">📅</span> 개정일검색
                         </button>
                       </div>
-
                     </div>
+
                   </div>
                 </div>
 
-                {/* [파트 2] 오른쪽 영역: 최근 제·개정 규정 및 최근 공지사항 수직 배치 */}
-                <div className="flex flex-col h-full gap-6 min-h-0 overflow-hidden">
+                {/* [파트 2] 하단 2단 게시판 영역 */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 min-h-[400px]">
                   
-                  {/* 2-1) 최근 제·개정 규정 게시판 */}
-                  <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden" elevation={0}>
-                    <div className="bg-[#5c0000] px-5 py-3.5 flex items-center justify-between shrink-0">
-                      <h3 className="text-base font-extrabold text-white flex items-center gap-2 tracking-tight">
-                        <GavelIcon className="text-red-200" fontSize="small" />
-                        최근 제·개정 규정
+                  {/* 2-1) 규정 공지 게시판 (왼쪽) */}
+                  <Paper className="border border-slate-200 rounded-xl shadow-sm flex flex-col flex-1 min-h-[300px] overflow-hidden" elevation={0}>
+                    <div className="px-6 py-4 flex items-center justify-between shrink-0 border-b border-slate-200 bg-white">
+                      <h3 className="text-lg font-extrabold text-slate-800 flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-[#fdf5e6] flex items-center justify-center border border-[#ffe0b2]">
+                           <CampaignIcon className="text-orange-500" fontSize="small" />
+                        </div>
+                        규정 공지
                       </h3>
-                      <span className="text-[11px] text-[#5c0000] font-black bg-red-50 px-2.5 py-0.5 rounded shadow-sm">
-                        실시간 반영
-                      </span>
+                      <IconButton size="small" onClick={() => window.location.reload()} sx={{ bgcolor: "#f1f5f9", "&:hover": { bgcolor: "#e2e8f0" } }}>
+                        <span className="text-slate-400 font-bold text-lg leading-none w-5 h-5 flex items-center justify-center">+</span>
+                      </IconButton>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-3.5 p-5 bg-white scrollbar">
-                      {loadingRecent ? (
-                        <div className="flex justify-center items-center h-full">
-                          <CircularProgress size={30} />
+                    <div className="flex-1 overflow-y-auto p-2 bg-white scrollbar">
+                      {loadingNotices ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-3">
+                          <CircularProgress size={20} sx={{ color: "#0c3161" }} />
                         </div>
-                      ) : recentRules.length === 0 ? (
-                        <div className="text-center py-16 text-slate-400 text-sm">
-                          최근 등록된 제·개정 규정이 없습니다.
-                        </div>
+                      ) : notices.length === 0 ? (
+                        <div className="text-center py-20 text-slate-400 text-sm font-bold">등록된 공지사항이 아직 없습니다.</div>
                       ) : (
-                        recentRules.map((rule) => {
-                          const isAbolished = rule.status === "ABOLISHED";
-                          return (
-                            <div
-                              key={rule.id}
-                              onClick={() => setActiveRuleId(rule.id)}
-                              className="flex items-center justify-between p-3.5 border border-slate-100 rounded-xl hover:bg-slate-50/80 cursor-pointer transition-colors group"
-                            >
-                              <div className="min-w-0 flex-1 pr-4">
-                                <h4 className={`text-[15px] font-extrabold text-slate-800 truncate group-hover:text-red-900 transition-colors ${isAbolished ? "line-through text-slate-400" : ""}`}>
-                                  {rule.title}
-                                </h4>
-                                <p className="text-[13.5px] font-semibold text-slate-500 mt-1.5">
-                                  {rule.ruleNumber} | {rule.categoryName} | {rule.departmentName}
-                                </p>
-                              </div>
-                              <div className="text-right shrink-0">
-                                <span className="text-[14px] font-bold text-red-700 block">
-                                  {rule.latestVersionName}
+                        <ul className="flex flex-col">
+                          {notices.map((notice: any) => (
+                            <li key={notice.id} className="group">
+                              <div onClick={() => { setSelectedNotice(notice); setNoticeModalOpen(true); }} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors">
+                                <span className={`shrink-0 px-2 py-0.5 rounded text-[11.5px] font-extrabold ${notice.title.includes("개정") ? "bg-[#81c784] text-white" : "bg-[#ffd54f] text-slate-800"}`}>
+                                  {notice.title.includes("개정") ? "개정알림" : "의견수렴"}
                                 </span>
-                                <span className="text-[12px] font-semibold text-slate-400 block mt-1">
-                                  {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString() : "-"}
+                                <span className="flex-1 text-[14.5px] font-bold text-slate-700 truncate group-hover:text-blue-700 transition-colors">
+                                  [{notice.title.includes("개정") ? "규정개정" : "의견수렴"}] {notice.title}
+                                </span>
+                                <span className="shrink-0 text-[13px] text-slate-500 font-bold font-mono">
+                                  {notice.date.replace(/-/g, '.')}
                                 </span>
                               </div>
-                            </div>
-                          );
-                        })
+                            </li>
+                          ))}
+                        </ul>
                       )}
                     </div>
                   </Paper>
 
-                  {/* 2-2) 최근 공지사항 게시판 */}
-                  <Paper className="border border-slate-200 rounded-2xl shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden" elevation={0}>
-                    <div className="bg-[#092244] px-5 py-3.5 flex items-center justify-between shrink-0">
-                      <h3 className="text-base font-extrabold text-white flex items-center gap-2 tracking-tight">
-                        <CampaignIcon className="text-amber-400" fontSize="small" />
-                        최근 공지사항
+                  {/* 2-2) 최신 제·개정 규정 게시판 (오른쪽) */}
+                  <Paper className="border border-slate-200 rounded-xl shadow-sm flex flex-col flex-1 min-h-[300px] overflow-hidden" elevation={0}>
+                    <div className="px-6 py-4 flex items-center justify-between shrink-0 border-b border-slate-200 bg-white">
+                      <h3 className="text-lg font-extrabold text-slate-800 flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-[#e3f2fd] flex items-center justify-center border border-[#bbdefb]">
+                           <ArticleIcon className="text-blue-600" fontSize="small" />
+                        </div>
+                        최신 제·개정
                       </h3>
-                      <IconButton size="small" onClick={() => window.location.reload()} sx={{ color: "rgba(255,255,255,0.7)", "&:hover": { color: "white" } }}>
-                        <RefreshIcon fontSize="small" />
+                      <IconButton size="small" onClick={() => window.location.reload()} sx={{ bgcolor: "#f1f5f9", "&:hover": { bgcolor: "#e2e8f0" } }}>
+                        <span className="text-slate-400 font-bold text-lg leading-none w-5 h-5 flex items-center justify-center">+</span>
                       </IconButton>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-3.5 p-5 bg-white scrollbar">
-                      {loadingNotices ? (
-                        <div className="flex flex-col items-center justify-center py-20 gap-3">
-                          <CircularProgress size={20} sx={{ color: "#0c3161" }} />
-                          <span className="text-slate-400 text-[10px] font-bold">공지사항 인입 중...</span>
+                    <div className="flex-1 overflow-y-auto p-2 bg-white scrollbar">
+                      {loadingRecent ? (
+                        <div className="flex justify-center items-center h-full">
+                          <CircularProgress size={20} />
                         </div>
-                      ) : notices.length === 0 ? (
-                        <div className="text-center py-24 text-slate-400 text-xs font-bold">
-                          등록된 공지사항이 아직 없습니다.
-                        </div>
+                      ) : recentRules.length === 0 ? (
+                        <div className="text-center py-20 text-slate-400 text-sm font-bold">최근 등록된 제·개정 규정이 없습니다.</div>
                       ) : (
-                        notices.map((notice: any) => (
-                          <div
-                            key={notice.id}
-                            onClick={() => {
-                              setSelectedNotice(notice);
-                              setNoticeModalOpen(true);
-                            }}
-                            className="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-[#0c3161]/5 cursor-pointer transition-all active:scale-98 group"
-                          >
-                            <div className="min-w-0 flex-1 pr-4 text-left">
-                              <h4 className="text-[15px] font-extrabold text-slate-800 truncate group-hover:text-blue-900 transition-colors">
-                                {notice.title}
-                              </h4>
-                              <p className="text-[15px] font-semibold text-slate-500 mt-1.5">
-                                작성부서: {notice.dept}
-                              </p>
-                            </div>
-                            <div className="text-right shrink-0 self-end">
-                              <span className="text-[15px] text-slate-400 font-bold">
-                                {notice.date}
-                              </span>
-                            </div>
-                          </div>
-                        ))
+                        <ul className="flex flex-col">
+                          {recentRules.map((rule) => {
+                            const isAbolished = rule.status === "ABOLISHED";
+                            return (
+                              <li key={rule.id} className="group">
+                                <div onClick={() => setActiveRuleId(rule.id)} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors">
+                                  <span className={`shrink-0 px-2 py-0.5 rounded text-[11.5px] font-extrabold ${isAbolished ? "bg-red-400 text-white" : "bg-[#81c784] text-white"}`}>
+                                    {rule.latestVersionName}
+                                  </span>
+                                  <span className={`flex-1 text-[14.5px] font-bold text-slate-700 truncate group-hover:text-blue-700 transition-colors ${isAbolished ? "line-through text-slate-400" : ""}`}>
+                                    {rule.title}
+                                  </span>
+                                  <span className="shrink-0 text-[13px] text-slate-500 font-bold font-mono">
+                                    {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString().replace(/\. /g, '.').replace(/\.$/, '') : "-"}
+                                  </span>
+                                </div>
+                              </li>
+                            );
+                          })}
+                        </ul>
                       )}
                     </div>
                   </Paper>
 
                 </div>
+
               </div>
             </div>
           )}
