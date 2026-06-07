@@ -1236,9 +1236,9 @@ export default function Home() {
                   {/* 검색란을 왼쪽으로 줄여서 우측 배경이 잘 보이도록 조정 */}
                   <div className="relative z-10 w-full lg:w-[85%] xl:w-[75%] p-8 md:px-12 md:py-10 flex flex-col justify-center">
                     
-                    {/* 타이틀 (크기 축소 및 단정하게 조정) */}
-                    <div className="flex items-center justify-start mb-6 select-none">
-                      <h2 className="text-[22px] font-bold text-white/90 tracking-wide drop-shadow-md">
+                    {/* 타이틀 (크기 및 간격 조정) */}
+                    <div className="flex items-center justify-start mb-8 lg:mb-10 select-none">
+                      <h2 className="text-[28px] lg:text-[34px] font-black text-white/95 tracking-wide drop-shadow-md">
                         예원예술대학교 규정관리시스템
                       </h2>
                     </div>
