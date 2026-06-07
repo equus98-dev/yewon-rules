@@ -415,10 +415,24 @@ export default function Home() {
               >
                 {/* 좌측 다크 블루 배너 영역 */}
                 <div 
-                  className="absolute inset-0 right-[80px] bg-gradient-to-r from-[#0c3161]/95 to-[#1e3a8a]/90 group-hover:to-[#3b82f6]/80 backdrop-blur-md transition-all flex items-center justify-end pr-8"
+                  className="absolute inset-0 right-[80px] bg-[#0c3161] group-hover:brightness-110 transition-all flex items-center justify-end pr-8 overflow-hidden"
                   style={{ clipPath: 'polygon(40px 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%)' }}
                 >
-                  <span className="text-[19px] lg:text-[22px] font-semibold text-white tracking-wider relative z-10 mr-2 font-sans">
+                  {/* 배경 이미지 (좌측 이미지와 완벽히 이어지도록 좌표 계산) */}
+                  <div className="absolute bottom-0 right-[calc(35vw-80px)] w-[65vw] h-[100vh] z-0 pointer-events-none bg-[#0c3161]">
+                    <Image 
+                      src="/yewon2.jpeg" 
+                      alt="배경" 
+                      fill 
+                      className="object-cover opacity-90 z-0"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/90 via-[#0c3161]/40 to-transparent z-10" />
+                    <div className="absolute inset-0 bg-black/20 z-10" />
+                  </div>
+                  {/* 우측 화살표와 자연스럽게 이어지는 파란색 그라데이션 오버레이 */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#1e3a8a]/80 z-0 pointer-events-none" />
+                  
+                  <span className="text-[19px] lg:text-[22px] font-semibold text-white tracking-wider relative z-10 mr-2 font-sans drop-shadow-md">
                     규정관리시스템 입장하기
                   </span>
                 </div>
