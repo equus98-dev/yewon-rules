@@ -1109,7 +1109,7 @@ export default function Home() {
                   <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-gradient-to-r from-[#5a5099]/90 to-[#2c2266]/90 z-10" />
                     <Image
-                      src="/yewon.jpg"
+                      src="/yewon2.jpeg"
                       alt="예원예술대학교 전경"
                       fill
                       priority

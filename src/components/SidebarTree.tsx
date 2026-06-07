@@ -305,8 +305,14 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
       <div className="flex-1 h-full flex flex-col overflow-hidden bg-white">
         
         {/* 이너 패널 헤더 */}
-        <div className={`h-14 border-b border-slate-200 flex items-center justify-center px-4 shrink-0 select-none ${verticalTab === '규정' ? 'bg-[#009b9e] text-white' : 'bg-slate-50 text-slate-800'}`}>
-          <h2 className="text-[18px] font-black tracking-tight text-center">
+        <div className={`h-14 border-b border-slate-200 flex items-center justify-center px-4 shrink-0 select-none relative overflow-hidden ${verticalTab === '규정' ? 'text-white' : 'bg-slate-50 text-slate-800'}`}>
+          {verticalTab === '규정' && (
+            <>
+              <div className="absolute inset-0 bg-[#009b9e]/90 mix-blend-multiply z-10" />
+              <img src="/yewon2.jpeg" alt="background" className="absolute inset-0 w-full h-full object-cover opacity-50 z-0" />
+            </>
+          )}
+          <h2 className="text-[18px] font-black tracking-tight text-center relative z-20 drop-shadow-md">
             {verticalTab === "규정" ? "규정목록" : verticalTab}
           </h2>
         </div>
