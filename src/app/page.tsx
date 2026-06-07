@@ -786,7 +786,7 @@ export default function Home() {
                     />
                     <button
                       type="submit"
-                      className="bg-[#009b9e] hover:bg-[#008082] text-white text-xs font-black px-4.5 h-[28px] rounded-r cursor-pointer active:scale-95 transition-all"
+                      className="bg-[#009b9e] hover:bg-[#008082] text-white text-xs font-black px-4 h-[28px] rounded-r cursor-pointer active:scale-95 transition-all shrink-0 whitespace-nowrap"
                     >
                       검색
                     </button>
@@ -1276,7 +1276,7 @@ export default function Home() {
                           />
                           <button
                             type="submit"
-                            className="bg-amber-500 hover:bg-amber-600 text-white font-black text-sm sm:text-base px-6 h-11 rounded-r-lg border-y border-r border-amber-500 transition-all cursor-pointer active:scale-95"
+                            className="bg-amber-500 hover:bg-amber-600 text-white font-black text-sm sm:text-base px-4 sm:px-6 h-11 rounded-r-lg border-y border-r border-amber-500 transition-all cursor-pointer active:scale-95 shrink-0 whitespace-nowrap"
                           >
                             검색
                           </button>
