@@ -1181,9 +1181,22 @@ export default function Home() {
             <div className="flex-1 flex flex-col overflow-y-auto scrollbar bg-slate-50 relative">
               <div className="max-w-[1400px] w-full mx-auto p-6 md:p-8 flex flex-col gap-8 min-h-0">
                 
-                {/* [파트 1] 상단 검색 배너 (전면 중앙 - 솔리드 배경 적용) */}
-                <div className="bg-[#322d7a] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
+                {/* [파트 1] 상단 검색 배너 (전면 중앙 - 부드러운 배경색 및 우측 이미지) */}
+                <div className="bg-[#4a42b0] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
                   
+                  {/* 우측 끝 은은한 학교 배경 */}
+                  <div 
+                    className="absolute inset-y-0 right-0 w-[55%] z-0 pointer-events-none opacity-[0.25]"
+                    style={{ WebkitMaskImage: 'linear-gradient(to right, transparent 10%, black 90%)', maskImage: 'linear-gradient(to right, transparent 10%, black 90%)' }}
+                  >
+                    <Image
+                      src="/yewon2.jpeg"
+                      alt="예원예술대학교 전경"
+                      fill
+                      className="object-cover object-[center_30%] mix-blend-luminosity"
+                    />
+                  </div>
+
                   {/* 배경 패턴 그래픽 데코레이션 (그라데이션 없이 단순 도트만 유지) */}
                   <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] z-1 pointer-events-none"></div>
                   
