@@ -56,6 +56,26 @@ export default function Home() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [sessionTimeLeft, setSessionTimeLeft] = useState<number>(1800);
 
+  // 메인 화면 인트로 애니메이션 상태
+  const [showIntro, setShowIntro] = useState(true);
+  const [animateOut, setAnimateOut] = useState(false);
+
+  useEffect(() => {
+    // 1.2초 대기 후 양쪽으로 열리는 애니메이션 시작
+    const t1 = setTimeout(() => {
+      setAnimateOut(true);
+    }, 1200);
+    // 애니메이션이 완전히 끝난 후 DOM 제거
+    const t2 = setTimeout(() => {
+      setShowIntro(false);
+    }, 2400); 
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
+
   useEffect(() => {
     let timerId: NodeJS.Timeout;
 
@@ -294,8 +314,43 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden text-slate-800">
+    <div className="h-screen w-full flex flex-col overflow-hidden bg-slate-50 relative font-sans text-slate-800">
       
+      {/* ==================== 0. 인트로 애니메이션 오버레이 (Curtain Effect) ==================== */}
+      {showIntro && (
+        <div className={`fixed inset-0 z-[100] flex bg-white pointer-events-none transition-opacity duration-1000 ease-in-out ${animateOut ? 'opacity-0 delay-300' : 'opacity-100'}`}>
+          {/* 좌측: 전경 이미지 */}
+          <div className={`w-full lg:w-1/2 h-full relative bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/80 via-transparent to-transparent z-10" />
+            <Image 
+              src="/yewon2.jpeg" 
+              alt="예원예술대학교 전경" 
+              fill 
+              priority 
+              className="object-cover opacity-90 z-0"
+            />
+            <div className="absolute bottom-16 left-12 z-20 text-white select-none">
+              <h2 className="text-4xl lg:text-5xl font-black mb-3 drop-shadow-lg tracking-tight">Yewon Arts University</h2>
+              <p className="text-xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
+            </div>
+          </div>
+          
+          {/* 우측: 로고 및 타이틀 (모바일에서는 숨김) */}
+          <div className={`hidden lg:flex w-1/2 h-full flex-col justify-center items-center bg-white transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
+            <Image
+              src="/UI.png"
+              alt="예원예술대학교 로고"
+              width={260}
+              height={58}
+              className="object-contain mb-8"
+            />
+            <span className="text-xl text-[#0c3161] font-black tracking-[0.2em] uppercase select-none">
+              Rule Management System
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* ==================== 1. GNB 글로벌 네비게이션 헤더 ==================== */}
       <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 z-25 shrink-0 shadow-sm">
         <div className="flex items-center gap-3 cursor-pointer" onClick={handleGoHome}>
