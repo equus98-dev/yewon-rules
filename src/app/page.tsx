@@ -337,7 +337,7 @@ export default function Home() {
 
           {/* 좌측: 전경 이미지 (세련된 사선 컷팅 디자인 - clip-path 사용) */}
           <div 
-            className={`absolute left-0 top-0 h-full w-full lg:w-[65%] bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out z-10 ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}
+            className={`absolute left-0 top-0 h-full w-full lg:w-[65%] bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out z-20 ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}
             style={{ clipPath: 'polygon(0 0, 80% 0, 100% 100%, 0 100%)' }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/90 via-[#0c3161]/40 to-transparent z-10" />
@@ -362,7 +362,9 @@ export default function Home() {
 
             {/* 하단 좌측 원래 텍스트 복구 (한 줄 배치) */}
             <div className="absolute bottom-16 left-12 z-20 text-white select-none flex items-center gap-3 lg:gap-4">
-              <h2 className="text-3xl lg:text-4xl font-black drop-shadow-2xl tracking-tight">Yewon Arts University</h2>
+              <h2 className="text-3xl lg:text-4xl font-black drop-shadow-2xl tracking-tight">
+                <span className="text-[#93c5fd]">Y</span>ewon <span className="text-[#fde047]">A</span>rts <span className="text-[#ef4444]">U</span>niversity
+              </h2>
               <span className="text-2xl text-white/50 mb-1">|</span>
               <p className="text-xl lg:text-2xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
             </div>
@@ -379,7 +381,7 @@ export default function Home() {
           </div>
           
           {/* 우측: 타이틀 및 프리미엄 입장 버튼 */}
-          <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] xl:w-[45%] flex-col justify-center items-center pb-16 z-20 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
+          <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] xl:w-[45%] flex-col justify-center items-center pb-16 z-10 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
             
             {/* 우측 상단 배치 로고 */}
             <div className="absolute top-10 right-8 xl:right-12">
@@ -421,17 +423,17 @@ export default function Home() {
                   className="absolute inset-0 right-[130px] lg:right-[150px] bg-[#0f172a] group-hover:bg-[#1e293b] transition-colors flex items-center justify-end pr-8 lg:pr-12"
                   style={{ clipPath: 'polygon(40px 0, 100% 0, calc(100% - 25px) 50%, 100% 100%, 0 100%)' }}
                 >
-                  <span className="text-[19px] lg:text-[22px] font-medium text-[#fde047] tracking-wider relative z-10 mr-4">
+                  <span className="text-[19px] lg:text-[22px] font-medium text-white tracking-wider relative z-10 mr-4">
                     규정관리시스템 입장하기
                   </span>
                 </div>
                 
                 {/* 우측 화살표 애니메이션 영역 (배경은 투명하여 뒷배경의 흰색이 보이게 함) */}
-                <div className="absolute right-0 top-0 bottom-0 w-[140px] lg:w-[160px] flex items-center">
+                <div className="absolute right-0 top-0 bottom-0 w-[110px] lg:w-[130px] flex items-center">
                   <div className="relative w-full h-full flex items-center animate-bounce-x">
-                    <div className="absolute top-0 bottom-0 left-[0px] w-[40px] lg:w-[45px] bg-[#1e3a8a]" style={{ clipPath: 'polygon(0 0, 100% 0, calc(100% - 20px) 50%, 100% 100%, 0 100%, 20px 50%)' }}></div>
-                    <div className="absolute top-0 bottom-0 left-[35px] lg:left-[40px] w-[40px] lg:w-[45px] bg-[#3b82f6]" style={{ clipPath: 'polygon(0 0, 100% 0, calc(100% - 20px) 50%, 100% 100%, 0 100%, 20px 50%)' }}></div>
-                    <div className="absolute top-0 bottom-0 left-[70px] lg:left-[80px] w-[40px] lg:w-[45px] bg-[#bfdbfe]" style={{ clipPath: 'polygon(0 0, 100% 0, calc(100% - 20px) 50%, 100% 100%, 0 100%, 20px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[0px] w-[40px] lg:w-[45px] bg-[#1e3a8a]" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[25px] lg:left-[30px] w-[40px] lg:w-[45px] bg-[#3b82f6]" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[50px] lg:left-[60px] w-[40px] lg:w-[45px] bg-[#bfdbfe]" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
                   </div>
                 </div>
               </button>
