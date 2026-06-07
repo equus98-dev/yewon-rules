@@ -1248,10 +1248,10 @@ export default function Home() {
                     </div>
 
                     <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-8 w-full">
-                      {/* 검색 폼 영역 */}
-                      <div className="flex-1 flex flex-col lg:flex-row items-start lg:items-center w-full bg-[#000000]/15 backdrop-blur-md p-5 lg:p-6 rounded-2xl border border-white/10 shadow-inner gap-4 lg:gap-6">
+                      {/* 검색 폼 영역 (배경보다 연하게 - 화이트 투명도 사용) */}
+                      <div className="flex-1 flex flex-col lg:flex-row items-start lg:items-center w-full bg-white/15 backdrop-blur-md p-5 lg:p-6 rounded-2xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] gap-4 lg:gap-6">
                         
-                        <div className="font-black text-xl lg:text-2xl tracking-wider text-white/90 shrink-0 mt-1 lg:mt-0">SEARCH</div>
+                        <div className="font-black text-xl lg:text-2xl tracking-wider text-white/90 shrink-0 mt-1 lg:mt-0 drop-shadow-sm">SEARCH</div>
 
                         <div className="flex-1 w-full flex flex-col gap-3 lg:gap-4">
                           {/* 1열: 검색영역 & 검색옵션 */}
