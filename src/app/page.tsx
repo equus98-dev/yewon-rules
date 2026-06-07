@@ -1181,29 +1181,17 @@ export default function Home() {
             <div className="flex-1 flex flex-col overflow-y-auto scrollbar bg-slate-50 relative">
               <div className="max-w-[1400px] w-full mx-auto p-6 md:p-8 flex flex-col gap-8 min-h-0">
                 
-                {/* [파트 1] 상단 검색 배너 (전면 중앙) */}
-                <div className="bg-gradient-to-r from-[#6b62ad] to-[#403588] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[280px] justify-center">
+                {/* [파트 1] 상단 검색 배너 (전면 중앙 - 솔리드 배경 적용) */}
+                <div className="bg-[#322d7a] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
                   
-                  {/* 하단 학교 배경이미지 */}
-                  <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#5a5099]/90 to-[#2c2266]/90 z-10" />
-                    <Image
-                      src="/yewon2.jpeg"
-                      alt="예원예술대학교 전경"
-                      fill
-                      priority
-                      className="object-cover opacity-30 mix-blend-overlay"
-                    />
-                  </div>
-
-                  {/* 배경 패턴 그래픽 데코레이션 */}
-                  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] z-1 pointer-events-none"></div>
+                  {/* 배경 패턴 그래픽 데코레이션 (그라데이션 없이 단순 도트만 유지) */}
+                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] z-1 pointer-events-none"></div>
                   
                   <div className="relative z-10 w-full p-8 md:px-12 md:py-10 flex flex-col justify-center">
                     
-                    {/* 타이틀 */}
-                    <div className="flex items-center justify-start mb-8 select-none">
-                      <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">
+                    {/* 타이틀 (크기 축소 및 단정하게 조정) */}
+                    <div className="flex items-center justify-start mb-6 select-none">
+                      <h2 className="text-[22px] font-bold text-white/90 tracking-wide">
                         예원예술대학교 규정관리시스템
                       </h2>
                     </div>
