@@ -1,34 +1,34 @@
 "use client";
 import { useEffect, useState } from 'react';
 
-// 현실적인 단풍/나뭇잎 색상 팔레트 (다크/라이트/베인 색상)
+// 학교 전경 우측의 실제 나무(느티나무/벚나무류)와 유사한 자연스럽고 차분한 색상
 const LEAF_TYPES = [
-  { id: 1, c1: '#4CAF50', c2: '#2E7D32', c3: '#1B5E20', vein: '#A5D6A7' }, // 녹색 잎
-  { id: 2, c1: '#81C784', c2: '#388E3C', c3: '#1B5E20', vein: '#C8E6C9' }, // 밝은 녹색
-  { id: 3, c1: '#FFB300', c2: '#F57F17', c3: '#E65100', vein: '#FFE082' }, // 은행 노랑
-  { id: 4, c1: '#FF7043', c2: '#E64A19', c3: '#BF360C', vein: '#FFCCBC' }, // 단풍 오렌지
-  { id: 5, c1: '#D4E157', c2: '#AFB42B', c3: '#827717', vein: '#F0F4C3' }, // 연두색 잎
+  { id: 1, c1: '#4a5d23', c2: '#384d16' }, // 짙은 올리브 그린
+  { id: 2, c1: '#5a6b31', c2: '#4a5d23' }, // 중간 올리브 그린
+  { id: 3, c1: '#6b7a3a', c2: '#5a6b31' }, // 약간 밝은 녹색
+  { id: 4, c1: '#7c8a45', c2: '#6b7a3a' }, // 살짝 노란빛이 도는 녹색
+  { id: 5, c1: '#8a8845', c2: '#737134' }, // 초가을 느낌의 탁한 황록색
 ];
 
 export default function FallingLeaves() {
   const [leaves, setLeaves] = useState<any[]>([]);
 
   useEffect(() => {
-    // 클라이언트 사이드에서만 생성 (hydration 에러 방지)
-    const newLeaves = Array.from({ length: 18 }).map((_, i) => {
+    // 갯수를 줄여서 산만함을 없앰 (18개 -> 8개)
+    const newLeaves = Array.from({ length: 8 }).map((_, i) => {
       const leafType = LEAF_TYPES[Math.floor(Math.random() * LEAF_TYPES.length)];
       return {
         id: i,
-        left: `${Math.random() * 100}%`,
-        animationDuration: `${Math.random() * 10 + 8}s`, // 8~18초
-        animationDelay: `${Math.random() * 12}s`,
-        size: `${Math.random() * 25 + 18}px`, // 18~43px (크기를 키워서 디테일이 보이게)
+        left: `${Math.random() * 90 + 5}%`,
+        animationDuration: `${Math.random() * 12 + 10}s`, // 10~22초 (더 천천히 떨어짐)
+        animationDelay: `${Math.random() * 15}s`,
+        size: `${Math.random() * 12 + 12}px`, // 12~24px (사진 스케일에 맞게 크기 축소)
         type: leafType,
-        opacity: Math.random() * 0.3 + 0.6, // 0.6 ~ 0.9 투명도 (너무 투명하면 디테일이 안 보임)
-        swayDuration: `${Math.random() * 2 + 2.5}s`,
-        rotationDuration: `${Math.random() * 10 + 5}s`,
+        opacity: Math.random() * 0.4 + 0.4, // 0.4 ~ 0.8 투명도로 배경과 융화
+        swayDuration: `${Math.random() * 3 + 3}s`, // 더 부드럽게 흔들림
         // 좌우 반전 랜덤
-        scaleX: Math.random() > 0.5 ? 1 : -1
+        scaleX: Math.random() > 0.5 ? 1 : -1,
+        rotationStart: Math.random() * 360
       };
     });
     setLeaves(newLeaves);
@@ -55,50 +55,35 @@ export default function FallingLeaves() {
               width: '100%',
               height: '100%',
               animation: `fallingLeafSway ${leaf.swayDuration} ease-in-out infinite alternate`,
+              transform: `rotate(${leaf.rotationStart}deg)`,
             }}
           >
-            {/* 고품질 리얼리스틱 벡터 나뭇잎 */}
+            {/* 만화 느낌을 뺀, 단순하고 유기적인 나뭇잎 실루엣 (우측 나무 잎사귀 형태) */}
             <svg 
               viewBox="0 0 100 100" 
-              className="w-full h-full drop-shadow-md" 
+              className="w-full h-full drop-shadow-sm blur-[0.5px]" 
               preserveAspectRatio="xMidYMid meet"
               style={{ transform: `scaleX(${leaf.scaleX})` }}
             >
               <defs>
-                <linearGradient id={`leafGrad-${leaf.id}`} x1="10%" y1="0%" x2="90%" y2="100%">
+                <linearGradient id={`leafGrad-${leaf.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor={leaf.type.c1} />
-                  <stop offset="50%" stopColor={leaf.type.c2} />
-                  <stop offset="100%" stopColor={leaf.type.c3} />
+                  <stop offset="100%" stopColor={leaf.type.c2} />
                 </linearGradient>
-                <filter id={`shadow-${leaf.id}`} x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="2" dy="4" stdDeviation="3" floodOpacity="0.4" />
-                </filter>
               </defs>
               
-              {/* 나뭇잎 기본 형태 (자연스러운 굴곡) */}
+              {/* 잔잔한 잎사귀 모양 (인맥/반사광 제거하여 실루엣 위주로 자연스럽게) */}
               <path 
-                d="M 50 2 C 70 10 95 35 90 70 C 85 90 65 98 50 98 C 35 98 15 90 10 70 C 5 35 30 10 50 2 Z" 
+                d="M 50 5 C 80 25 85 55 50 95 C 15 55 20 25 50 5 Z" 
                 fill={`url(#leafGrad-${leaf.id})`} 
-                filter={`url(#shadow-${leaf.id})`}
               />
-              
-              {/* 나뭇잎 줄기 (Stem) */}
-              <path d="M 50 90 Q 52 105 45 110" stroke="#3e2723" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-              
-              {/* 중앙 인맥 (Central Vein) */}
-              <path d="M 50 2 Q 45 50 50 95" stroke={leaf.type.vein} strokeWidth="1.5" fill="none" opacity="0.6" />
-              
-              {/* 측면 인맥 (Side Veins) */}
-              <path d="M 50 25 Q 65 20 80 35" stroke={leaf.type.vein} strokeWidth="1" fill="none" opacity="0.5" />
-              <path d="M 50 45 Q 70 45 85 60" stroke={leaf.type.vein} strokeWidth="1" fill="none" opacity="0.5" />
-              <path d="M 50 65 Q 65 70 75 80" stroke={leaf.type.vein} strokeWidth="1" fill="none" opacity="0.5" />
-              
-              <path d="M 50 25 Q 35 20 20 35" stroke={leaf.type.vein} strokeWidth="1" fill="none" opacity="0.5" />
-              <path d="M 50 45 Q 30 45 15 60" stroke={leaf.type.vein} strokeWidth="1" fill="none" opacity="0.5" />
-              <path d="M 50 65 Q 35 70 25 80" stroke={leaf.type.vein} strokeWidth="1" fill="none" opacity="0.5" />
-              
-              {/* 빛 반사 하이라이트 (Glossy reflection) */}
-              <path d="M 45 10 C 25 25 15 50 20 70 C 15 50 25 20 45 10 Z" fill="#ffffff" opacity="0.15" />
+              <path 
+                d="M 50 93 Q 53 98 48 100" 
+                stroke={leaf.type.c2} 
+                strokeWidth="3" 
+                fill="none" 
+                strokeLinecap="round" 
+              />
             </svg>
           </div>
         </div>
