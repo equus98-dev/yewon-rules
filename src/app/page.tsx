@@ -1343,15 +1343,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* 오른쪽 퀵 버튼 영역 */}
-                      <div className="flex flex-row 2xl:flex-col gap-3 shrink-0 w-full 2xl:w-auto mt-2 2xl:mt-0">
-                        <button onClick={() => handleTagClick("학칙")} className="flex-1 2xl:flex-none bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-2 px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl shadow-lg border border-slate-100 transition-transform hover:-translate-y-0.5 active:translate-y-0 min-w-[140px] lg:min-w-[160px] font-extrabold text-[14px] lg:text-[15px] whitespace-nowrap">
-                          <span className="text-teal-500 text-lg leading-none">🔍</span> 가나다검색
-                        </button>
-                        <button onClick={() => handleQuickDate("1m")} className="flex-1 2xl:flex-none bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-2 px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl shadow-lg border border-slate-100 transition-transform hover:-translate-y-0.5 active:translate-y-0 min-w-[140px] lg:min-w-[160px] font-extrabold text-[14px] lg:text-[15px] whitespace-nowrap">
-                          <span className="text-blue-400 text-lg leading-none">📅</span> 개정일검색
-                        </button>
-                      </div>
+                      {/* 오른쪽 퀵 버튼 영역 삭제됨 */}
                     </div>
 
                   </div>
@@ -1362,7 +1354,7 @@ export default function Home() {
                   
                   {/* 2-1) 규정 공지 게시판 (왼쪽) */}
                   <Paper className="border border-slate-200 rounded-xl shadow-sm flex flex-col flex-1 min-h-[300px] overflow-hidden" elevation={0}>
-                    <div className="px-6 py-4 flex items-center justify-between shrink-0 border-b border-slate-200 bg-[#f0f8f8]">
+                    <div className="px-6 py-4 flex items-center justify-between shrink-0 border-b border-slate-200 bg-slate-100">
                       <h3 className="text-lg font-extrabold text-slate-800 flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-full bg-[#fdf5e6] flex items-center justify-center border border-[#ffe0b2]">
                            <CampaignIcon className="text-orange-500" fontSize="small" />
@@ -1405,7 +1397,7 @@ export default function Home() {
 
                   {/* 2-2) 최신 제·개정 규정 게시판 (오른쪽) */}
                   <Paper className="border border-slate-200 rounded-xl shadow-sm flex flex-col flex-1 min-h-[300px] overflow-hidden" elevation={0}>
-                    <div className="px-6 py-4 flex items-center justify-between shrink-0 border-b border-slate-200 bg-[#f0f8f8]">
+                    <div className="px-6 py-4 flex items-center justify-between shrink-0 border-b border-slate-200 bg-slate-100">
                       <h3 className="text-lg font-extrabold text-slate-800 flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-full bg-[#e3f2fd] flex items-center justify-center border border-[#bbdefb]">
                            <ArticleIcon className="text-blue-600" fontSize="small" />
@@ -1464,7 +1456,7 @@ export default function Home() {
           {/* 좌측 로고 영역 */}
           <div className="shrink-0 flex items-center justify-center">
             <Image
-              src="/docs/UI_white.png"
+              src="/UI_white.png"
               alt="예원예술대학교 로고"
               width={183}
               height={40}
