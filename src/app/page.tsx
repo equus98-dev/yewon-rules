@@ -360,12 +360,16 @@ export default function Home() {
               style={{ clipPath: 'polygon(30% 0, 100% 0, 100% 100%)' }}
             />
 
-            {/* 하단 좌측 원래 텍스트 복구 (한 줄 배치) */}
-            <div className="absolute bottom-16 left-12 z-20 text-white select-none flex items-center gap-3 lg:gap-4">
-              <h2 className="text-3xl lg:text-4xl font-black drop-shadow-2xl tracking-tight">
-                <span className="text-[#93c5fd]">Y</span>ewon <span className="text-[#fde047]">A</span>rts <span className="text-[#ef4444]">U</span>niversity
-              </h2>
-              <span className="text-2xl text-white/50 mb-1">|</span>
+            {/* 하단 좌측 영문 학교명을 흰색 로고 이미지로 대체 */}
+            <div className="absolute bottom-16 left-12 z-20 text-white select-none flex items-center gap-4 lg:gap-5">
+              <Image 
+                src="/UI_white.png" 
+                alt="예원예술대학교 로고" 
+                width={180} 
+                height={40} 
+                className="object-contain w-[150px] lg:w-[180px] drop-shadow-lg" 
+              />
+              <span className="text-2xl text-white/50 mb-1 font-light">|</span>
               <p className="text-xl lg:text-2xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
             </div>
 
@@ -383,19 +387,10 @@ export default function Home() {
           {/* 우측: 타이틀 및 프리미엄 입장 버튼 */}
           <div className={`absolute right-0 top-0 h-full hidden lg:flex w-[45%] xl:w-[45%] flex-col justify-center items-center pb-16 z-10 transition-transform duration-1000 ease-in-out ${animateOut ? 'translate-x-full' : 'translate-x-0'}`}>
             
-            {/* 우측 상단 배치 로고 */}
-            <div className="absolute top-10 right-8 xl:right-12">
-              <Image
-                src="/UI.png"
-                alt="예원예술대학교 로고"
-                width={200}
-                height={45}
-                className="object-contain w-[180px] xl:w-[220px]"
-              />
-            </div>
+            {/* 우측 상단 배치 로고 삭제됨 */}
 
             {/* 중앙 홍보 문구 (우측 흰색 부분으로 이동) */}
-            <div className="flex flex-col items-center justify-center z-20 text-[#0c3161] select-none px-6 xl:px-12 text-center w-full">
+            <div className="flex flex-col items-center justify-center z-20 text-[#0c3161] select-none px-6 xl:px-12 text-center w-full -mt-24">
               <h1 className="text-5xl xl:text-6xl 2xl:text-7xl font-black italic tracking-widest text-teal-500 drop-shadow-sm mb-4 xl:mb-6">
                 YES, WE CAN!
               </h1>
@@ -420,20 +415,20 @@ export default function Home() {
               >
                 {/* 좌측 다크 블루 배너 영역 */}
                 <div 
-                  className="absolute inset-0 right-[130px] lg:right-[150px] bg-[#0f172a] group-hover:bg-[#1e293b] transition-colors flex items-center justify-end pr-8 lg:pr-12"
+                  className="absolute inset-0 right-[100px] lg:right-[120px] bg-[#0f172a] group-hover:bg-[#1e293b] transition-colors flex items-center justify-end pr-8 lg:pr-10"
                   style={{ clipPath: 'polygon(40px 0, calc(100% - 25px) 0, 100% 50%, calc(100% - 25px) 100%, 0 100%)' }}
                 >
-                  <span className="text-[19px] lg:text-[22px] font-medium text-white tracking-wider relative z-10 mr-4">
+                  <span className="text-[19px] lg:text-[22px] font-semibold text-white tracking-wider relative z-10 mr-2 font-sans">
                     규정관리시스템 입장하기
                   </span>
                 </div>
                 
                 {/* 우측 화살표 애니메이션 영역 (배경은 투명하여 뒷배경의 흰색이 보이게 함) */}
-                <div className="absolute right-0 top-0 bottom-0 w-[110px] lg:w-[130px] flex items-center">
+                <div className="absolute right-0 top-0 bottom-0 w-[125px] lg:w-[145px] flex items-center">
                   <div className="relative w-full h-full flex items-center">
-                    <div className="absolute top-0 bottom-0 left-[0px] w-[40px] lg:w-[45px] bg-[#1e3a8a] animate-arrow-seq delay-150" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
-                    <div className="absolute top-0 bottom-0 left-[25px] lg:left-[30px] w-[40px] lg:w-[45px] bg-[#3b82f6] animate-arrow-seq delay-300" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
-                    <div className="absolute top-0 bottom-0 left-[50px] lg:left-[60px] w-[40px] lg:w-[45px] bg-[#bfdbfe] animate-arrow-seq delay-450" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[0px] w-[40px] lg:w-[45px] bg-[#1e3a8a]/80 animate-arrow-seq delay-150" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[25px] lg:left-[30px] w-[40px] lg:w-[45px] bg-[#3b82f6]/70 animate-arrow-seq delay-300" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
+                    <div className="absolute top-0 bottom-0 left-[50px] lg:left-[60px] w-[40px] lg:w-[45px] bg-[#bfdbfe]/80 animate-arrow-seq delay-450" style={{ clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%)' }}></div>
                   </div>
                 </div>
               </button>
