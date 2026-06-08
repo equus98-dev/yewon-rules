@@ -109,22 +109,86 @@ export async function GET(request: Request) {
     }
 
     if (type === "dept") {
-      const rDepts = await pool.query('SELECT id, name, "sortOrder" FROM "Department" ORDER BY "sortOrder" ASC');
+      const rDepts = await pool.query('SELECT id, name, code, "sortOrder" FROM "Department" ORDER BY "sortOrder" ASC');
       const rRules = await pool.query('SELECT id, title, "ruleNumber", status, "departmentId" FROM "Rule" ORDER BY title ASC');
 
-      const treeData = rDepts.rows.map((dept) => ({
-        id: `dept-${dept.id}`,
-        name: dept.name,
-        type: "folder",
-        children: rRules.rows
-          .filter((rule) => rule.departmentId === dept.id)
-          .map((rule) => ({
-            id: rule.id,
-            name: `${rule.title} (${rule.ruleNumber})`,
-            type: "file",
-            status: rule.status,
-          })),
-      }));
+      // 부서 계층 구조 정의 (code 기준 부모-자식 관계)
+      const PARENT_CODES: Record<string, string> = {
+        SECRETARY: "PRESIDENT",
+        AUDIT: "PRESIDENT",
+        HUMANRIGHTS: "PRESIDENT",
+        LIFELONG: "ATTACHED_ORG",
+        DORMITORY: "ATTACHED_INST",
+        LIBRARY: "ATTACHED_INST",
+      };
+
+      // code -> dept 맵
+      const codeMap = new Map<string, any>();
+      rDepts.rows.forEach((dept) => {
+        if (dept.code) codeMap.set(dept.code, dept);
+      });
+
+      // 트리 노드 생성
+      const nodeMap = new Map<string, any>();
+      rDepts.rows.forEach((dept) => {
+        nodeMap.set(dept.id, {
+          id: `dept-${dept.id}`,
+          name: dept.name,
+          code: dept.code,
+          type: "folder",
+          children: rRules.rows
+            .filter((rule) => rule.departmentId === dept.id)
+            .map((rule) => ({
+              id: rule.id,
+              name: `${rule.title} (${rule.ruleNumber})`,
+              type: "file",
+              status: rule.status,
+            })),
+          subDepts: [] as any[],
+        });
+      });
+
+      // 자식 부서를 부모에 연결
+      rDepts.rows.forEach((dept) => {
+        if (dept.code && PARENT_CODES[dept.code]) {
+          const parentCode = PARENT_CODES[dept.code];
+          const parentDept = codeMap.get(parentCode);
+          if (parentDept) {
+            const parentNode = nodeMap.get(parentDept.id);
+            const childNode = nodeMap.get(dept.id);
+            if (parentNode && childNode) {
+              parentNode.subDepts.push(childNode);
+            }
+          }
+        }
+      });
+
+      // 최상위 부서만 반환 (자식 부서는 부모 안에 포함)
+      const childCodes = new Set(Object.keys(PARENT_CODES));
+      const treeData = rDepts.rows
+        .filter((dept) => !dept.code || !childCodes.has(dept.code))
+        .map((dept) => {
+          const node = nodeMap.get(dept.id);
+          if (!node) return null;
+          // subDepts를 children 앞에 배치
+          const allChildren = [
+            ...node.subDepts.map((sub: any) => ({
+              id: sub.id,
+              name: sub.name,
+              type: "folder",
+              isSubDept: true,
+              children: sub.children,
+            })),
+            ...node.children,
+          ];
+          return {
+            id: node.id,
+            name: node.name,
+            type: "folder",
+            children: allChildren,
+          };
+        })
+        .filter(Boolean);
 
       return NextResponse.json(treeData);
     }

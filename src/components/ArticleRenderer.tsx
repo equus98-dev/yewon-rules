@@ -258,7 +258,12 @@ export default function ArticleRenderer({
     }
 
     let formatted = text
-      .replace(/(①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩|⑪|⑫|⑬|⑭|⑮)/g, '\n$1')
+      .replace(/([①-⑮])/g, (match, p1, offset, string) => {
+        const before = string.slice(0, offset);
+        if (/(?:제|\(|,|및|또는|와|과|이나|나)\s*$/.test(before)) return match;
+        if (offset === 0 || before.endsWith('\n')) return match;
+        return '\n' + match;
+      })
       .replace(/(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/g, '\n$1 ')
       .replace(/(^|\s)([가-하]\.)\s+/g, '$1\n$2 ')
       .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])\s*\n([①-⑮])/g, '$1 $2')
@@ -490,6 +495,7 @@ export default function ArticleRenderer({
             let parsedTitle = "";
             
             const safeText = String(articleItem.text || "").trim();
+            const isAddendum = /^부\s*칙/.test(safeText) || safeText.replace(/\s+/g, "").startsWith("부칙");
             const { historyDates, badgeType, badgeColor } = getBadgeInfo(safeText);
             
             if (safeText.startsWith("(") && !/^\((삭제|개정|신설|전문개정|본조신설)/.test(safeText)) {
@@ -549,6 +555,7 @@ export default function ArticleRenderer({
               </div>
             );
           })();
+
         } else if (item.type === "paragraph") {
           const isGlued = /^제\d+조/.test(safeText.trim()) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(safeText) || /(?<!^|\s)[①-⑮]/.test(safeText);
           if (isGlued) {

@@ -1,19 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import useRouter from "next/navigation";
+import React, { useState, useEffect, useRef } from "react";
 import {
   CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
-  Button,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
@@ -21,7 +14,30 @@ import EditIcon from "@mui/icons-material/Edit";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
+import BusinessIcon from "@mui/icons-material/Business";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 import { useRouter as useNextRouter } from "next/navigation";
+
+// 부서 계층 구조 정의 (셀렉트 드롭다운 옵션 그룹화용)
+const DEPT_HIERARCHY = [
+  { label: "총장직속", isGroup: true },
+  { label: "── 비서실", code: "SECRETARY" },
+  { label: "── 감사실", code: "AUDIT" },
+  { label: "── 인권센터", code: "HUMANRIGHTS" },
+  { label: "법인사무국", isGroup: false, code: "LEGAL" },
+  { label: "교학지원처", isGroup: false, code: "ACADEMIC" },
+  { label: "기획조정처", isGroup: false, code: "PLANNING" },
+  { label: "행정지원처", isGroup: false, code: "ADMIN" },
+  { label: "대학원", isGroup: false, code: "GRADUATE" },
+  { label: "산학협력단", isGroup: false, code: "INDUSTRY" },
+  { label: "국제교류협력단", isGroup: false, code: "INTERNATIONAL" },
+  { label: "부설기관", isGroup: true },
+  { label: "── 평생교육원", code: "LIFELONG" },
+  { label: "부속기관", isGroup: true },
+  { label: "── 학생생활관", code: "DORMITORY" },
+  { label: "── 정보도서관", code: "LIBRARY" },
+];
 
 export default function AdminRulesManagement() {
   const router = useNextRouter();
@@ -30,7 +46,7 @@ export default function AdminRulesManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
-  
+
   // 신규 규정 등록 모달 상태
   const [openCreate, setOpenCreate] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -42,6 +58,11 @@ export default function AdminRulesManagement() {
   const [newFileUrl, setNewFileUrl] = useState("");
   const [creating, setCreating] = useState(false);
 
+  // 인라인 담당부서 편집 상태
+  const [editingDeptRuleId, setEditingDeptRuleId] = useState<string | null>(null);
+  const [editingDeptValue, setEditingDeptValue] = useState<string>("");
+  const [savingDept, setSavingDept] = useState(false);
+
   // 데이터 로드
   useEffect(() => {
     async function loadData() {
@@ -51,7 +72,7 @@ export default function AdminRulesManagement() {
           fetch("/api/categories?type=field"),
           fetch("/api/categories?type=dept"),
         ]);
-        
+
         const rulesData = (await rulesRes.json()) as any;
         setRules(rulesData);
 
@@ -69,14 +90,31 @@ export default function AdminRulesManagement() {
         flattenCats(catsData);
         setCategories(flatCats);
 
-        // 부서 목록 가공
+        // 부서 목록 가공 (dept- 접두어 제거)
         const deptsData = (await deptsRes.json()) as any;
-        const deptList = deptsData.map((d: any) => ({
-          id: d.id.replace("dept-", ""),
-          name: d.name,
-        }));
-        setDepartments(deptList);
-
+        const flatDepts: any[] = [];
+        function flattenDepts(nodes: any[]) {
+          nodes.forEach((n) => {
+            // dept-로 시작하는 폴더 노드만 수집
+            if (n.type === "folder") {
+              flatDepts.push({
+                id: n.id.replace("dept-", ""),
+                name: n.name,
+              });
+              // 하위 부서 폴더(isSubDept) 도 수집
+              if (Array.isArray(n.children)) {
+                n.children.filter((c: any) => c.type === "folder").forEach((sub: any) => {
+                  flatDepts.push({
+                    id: sub.id.replace("dept-", ""),
+                    name: sub.name,
+                  });
+                });
+              }
+            }
+          });
+        }
+        flattenDepts(deptsData);
+        setDepartments(flatDepts);
       } catch (e) {
         console.error("Failed to load admin rules data:", e);
       } finally {
@@ -93,7 +131,7 @@ export default function AdminRulesManagement() {
       currentStatus === "EFFECTIVE"
         ? "이 규정을 폐지(ABOLISHED) 처리하시겠습니까? 사용자 화면에 취소선이 표시됩니다."
         : "이 규정을 현행(EFFECTIVE) 상태로 복구하시겠습니까?";
-        
+
     if (!confirm(confirmMessage)) return;
 
     try {
@@ -136,7 +174,55 @@ export default function AdminRulesManagement() {
     }
   };
 
-  // 신규 규정(제정) 등록 등록 버튼
+  // 담당부서 인라인 편집 시작
+  const handleStartEditDept = (ruleId: string, currentDeptId: string) => {
+    setEditingDeptRuleId(ruleId);
+    setEditingDeptValue(currentDeptId);
+  };
+
+  // 담당부서 인라인 편집 취소
+  const handleCancelEditDept = () => {
+    setEditingDeptRuleId(null);
+    setEditingDeptValue("");
+  };
+
+  // 담당부서 저장
+  const handleSaveDept = async (ruleId: string) => {
+    if (!editingDeptValue) {
+      alert("부서를 선택하십시오.");
+      return;
+    }
+    setSavingDept(true);
+    try {
+      const res = await fetch(`/api/admin/rules?id=${ruleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ departmentId: editingDeptValue }),
+      });
+      if (res.ok) {
+        const selectedDept = departments.find((d) => d.id === editingDeptValue);
+        setRules((prev) =>
+          prev.map((r) =>
+            r.id === ruleId
+              ? { ...r, departmentId: editingDeptValue, departmentName: selectedDept?.name || r.departmentName }
+              : r
+          )
+        );
+        setEditingDeptRuleId(null);
+        setEditingDeptValue("");
+      } else {
+        const data = (await res.json()) as any;
+        alert(`담당부서 변경 실패: ${data.error || "알 수 없는 에러"}`);
+      }
+    } catch (e) {
+      console.error(e);
+      alert("네트워크 오류 발생");
+    } finally {
+      setSavingDept(false);
+    }
+  };
+
+  // 신규 규정(제정) 등록 버튼
   const handleCreateRule = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle || !newRuleNum || !newCatId || !newDeptId || !newEnactmentDate) {
@@ -193,10 +279,10 @@ export default function AdminRulesManagement() {
 
   return (
     <div className="h-full flex flex-col bg-slate-50 text-slate-800">
-      
+
       {/* 1. 상단 액션 툴바 */}
       <div className="bg-white border-b border-slate-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 select-none shadow-sm">
-        
+
         {/* 검색 영역 */}
         <div className="relative w-full sm:w-80">
           <input
@@ -229,7 +315,12 @@ export default function AdminRulesManagement() {
                 <th className="py-4 px-4 font-black w-14 text-center">번호</th>
                 <th className="py-4 px-4 font-black">규정명 / 분류</th>
                 <th className="py-4 px-4 font-black w-24 text-center">규정번호</th>
-                <th className="py-4 px-4 font-black w-24 text-center">소관부서</th>
+                <th className="py-4 px-4 font-black w-44 text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <BusinessIcon sx={{ fontSize: 13 }} />
+                    소관부서
+                  </div>
+                </th>
                 <th className="py-4 px-4 font-black w-20 text-center">제·개정일</th>
                 <th className="py-4 px-4 font-black w-20 text-center">상태</th>
                 <th className="py-4 px-4 font-black w-48 text-center">작업</th>
@@ -245,10 +336,12 @@ export default function AdminRulesManagement() {
               ) : (
                 filteredRules.map((rule, idx) => {
                   const isAbolished = rule.status === "ABOLISHED";
+                  const isEditingThisRow = editingDeptRuleId === rule.id;
+
                   return (
                     <tr
                       key={rule.id}
-                      className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors"
+                      className={`border-b border-slate-100 hover:bg-slate-50/50 transition-colors ${isEditingThisRow ? "bg-blue-50/30" : ""}`}
                     >
                       <td className="py-3 px-4 text-center text-slate-400 font-bold select-none">{idx + 1}</td>
                       <td className="py-3 px-4">
@@ -262,11 +355,55 @@ export default function AdminRulesManagement() {
                         </div>
                       </td>
                       <td className="py-3 px-4 text-center text-slate-700 font-bold">{rule.ruleNumber}</td>
+
+                      {/* 소관부서 셀 - 인라인 편집 */}
                       <td className="py-3 px-4 text-center select-none">
-                        <span className="bg-slate-100 text-slate-650 px-2 py-0.5 rounded text-sm font-black border border-slate-200">
-                          {rule.departmentName}
-                        </span>
+                        {isEditingThisRow ? (
+                          <div className="flex items-center gap-1 justify-center">
+                            <select
+                              autoFocus
+                              value={editingDeptValue}
+                              onChange={(e) => setEditingDeptValue(e.target.value)}
+                              className="bg-white border border-blue-300 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-400 cursor-pointer max-w-[130px]"
+                              disabled={savingDept}
+                            >
+                              <option value="" disabled>부서 선택</option>
+                              {departments.map((d) => (
+                                <option key={d.id} value={d.id}>{d.name}</option>
+                              ))}
+                            </select>
+                            <button
+                              type="button"
+                              onClick={() => handleSaveDept(rule.id)}
+                              disabled={savingDept}
+                              className="bg-blue-600 hover:bg-blue-700 text-white p-1 rounded cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+                              title="저장"
+                            >
+                              {savingDept ? <CircularProgress size={10} sx={{ color: "white" }} /> : <CheckIcon sx={{ fontSize: 12 }} />}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleCancelEditDept}
+                              disabled={savingDept}
+                              className="bg-slate-200 hover:bg-slate-300 text-slate-600 p-1 rounded cursor-pointer transition-all active:scale-95"
+                              title="취소"
+                            >
+                              <CloseIcon sx={{ fontSize: 12 }} />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleStartEditDept(rule.id, rule.departmentId)}
+                            className="group flex items-center gap-1 justify-center mx-auto bg-slate-100 hover:bg-blue-50 text-slate-650 hover:text-blue-700 px-2 py-0.5 rounded border border-slate-200 hover:border-blue-200 text-sm font-black cursor-pointer transition-all active:scale-95"
+                            title="클릭하여 담당부서 변경"
+                          >
+                            <span>{rule.departmentName}</span>
+                            <EditIcon sx={{ fontSize: 10 }} className="text-slate-400 group-hover:text-blue-400 transition-colors shrink-0" />
+                          </button>
+                        )}
                       </td>
+
                       <td className="py-3 px-4 text-center text-slate-500 font-bold select-none">{rule.enactmentDate}</td>
                       <td className="py-3 px-4 text-center select-none">
                         {isAbolished ? (
@@ -280,7 +417,7 @@ export default function AdminRulesManagement() {
                         )}
                       </td>
                       <td className="py-3 px-4 text-center select-none flex items-center justify-center gap-1.5">
-                        
+
                         {/* 1) 조문 개정 (온라인 입안편집기로 진입) */}
                         <button
                           type="button"
@@ -290,7 +427,7 @@ export default function AdminRulesManagement() {
                           <EditIcon sx={{ fontSize: 11 }} />
                           조문 개정
                         </button>
- 
+
                         {/* 2) 폐지 / 복구 토글 */}
                         {isAbolished ? (
                           <button
@@ -311,7 +448,7 @@ export default function AdminRulesManagement() {
                             규정 폐지
                           </button>
                         )}
-                        
+
                         {/* 3) 규정 삭제 */}
                         <button
                           type="button"
@@ -330,7 +467,7 @@ export default function AdminRulesManagement() {
           </table>
         </div>
       </div>
- 
+
       {/* 3. 신규 제정 등록 모달 */}
       <Dialog
         open={openCreate}
@@ -339,9 +476,9 @@ export default function AdminRulesManagement() {
         fullWidth
         sx={{
           "& .MuiPaper-root": {
-            bgcolor: "#ffffff", 
+            bgcolor: "#ffffff",
             color: "#1e293b",
-            border: "1px solid #e2e8f0", 
+            border: "1px solid #e2e8f0",
             borderRadius: "16px",
             boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
           },
@@ -353,7 +490,7 @@ export default function AdminRulesManagement() {
         </DialogTitle>
         <form onSubmit={handleCreateRule}>
           <DialogContent className="space-y-4 pt-5 pb-6">
-            
+
             {/* 규정명 */}
             <div className="space-y-1">
               <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">규정명 (필수)</label>
@@ -366,8 +503,8 @@ export default function AdminRulesManagement() {
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
               />
             </div>
- 
-            {/* 규정 분류 코드 & 규정번호 */}
+
+            {/* 규정번호 & 제정일자 */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">규정번호 (필수)</label>
@@ -380,7 +517,7 @@ export default function AdminRulesManagement() {
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
                 />
               </div>
- 
+
               {/* 제정 공포일 */}
               <div className="space-y-1">
                 <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">제정일자 (필수)</label>
@@ -393,7 +530,7 @@ export default function AdminRulesManagement() {
                 />
               </div>
             </div>
- 
+
             {/* 분류 카테고리 & 소관 부서 */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1 flex flex-col">
@@ -410,7 +547,7 @@ export default function AdminRulesManagement() {
                   ))}
                 </select>
               </div>
- 
+
               <div className="space-y-1 flex flex-col">
                 <label className="text-sm text-slate-500 font-bold uppercase tracking-wider mb-1 pl-1">소관 부서 (필수)</label>
                 <select
@@ -420,14 +557,48 @@ export default function AdminRulesManagement() {
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] cursor-pointer"
                 >
                   <option value="" disabled>부서 선택</option>
-                  {departments.map((d) => (
-                    <option key={d.id} value={d.id} className="text-slate-850">{d.name}</option>
+                  {/* 계층 구조 셀렉트 */}
+                  <optgroup label="─ 총장직속">
+                    {departments.filter(d => ["비서실","감사실","인권센터"].includes(d.name)).map((d) => (
+                      <option key={d.id} value={d.id}>{d.name}</option>
+                    ))}
+                  </optgroup>
+                  {departments.filter(d => d.name === "법인사무국").map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
                   ))}
+                  {departments.filter(d => d.name === "교학지원처").map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                  {departments.filter(d => d.name === "기획조정처").map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                  {departments.filter(d => d.name === "행정지원처").map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                  {departments.filter(d => d.name === "대학원").map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                  {departments.filter(d => d.name === "산학협력단").map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                  {departments.filter(d => d.name === "국제교류협력단").map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                  <optgroup label="─ 부설기관">
+                    {departments.filter(d => d.name === "평생교육원").map((d) => (
+                      <option key={d.id} value={d.id}>{d.name}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="─ 부속기관">
+                    {departments.filter(d => ["학생생활관","정보도서관"].includes(d.name)).map((d) => (
+                      <option key={d.id} value={d.id}>{d.name}</option>
+                    ))}
+                  </optgroup>
                 </select>
               </div>
             </div>
- 
-            {/* 공포번호 & 원본 다운로드 한글/PDF URL */}
+
+            {/* 공포번호 & 다운로드 URL */}
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-1">
                 <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">공포 기호/번호</label>
@@ -439,7 +610,7 @@ export default function AdminRulesManagement() {
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
                 />
               </div>
- 
+
               <div className="space-y-1">
                 <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">관련 서식 다운로드 링크 (한글/PDF URL)</label>
                 <input
@@ -451,7 +622,7 @@ export default function AdminRulesManagement() {
                 />
               </div>
             </div>
- 
+
           </DialogContent>
           <DialogActions className="border-t border-slate-100 px-6 py-4 flex gap-2 justify-end">
             <button
@@ -471,7 +642,7 @@ export default function AdminRulesManagement() {
           </DialogActions>
         </form>
       </Dialog>
- 
+
     </div>
   );
 }
