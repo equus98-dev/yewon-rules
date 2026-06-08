@@ -150,7 +150,10 @@ export async function GET(request: Request) {
       attachmentMatches = r.rows;
     }
 
-    return NextResponse.json({ isGrouped: true, titleMatches, bodyMatches, attachmentMatches });
+    const responseData = { isGrouped: true, titleMatches, bodyMatches, attachmentMatches };
+    // HWP 특수문자 깨짐(󰂛) 방지를 위해 응답 전 일괄 중간 점(·)으로 치환
+    const cleanData = JSON.parse(JSON.stringify(responseData).replace(/󰂛/g, '·'));
+    return NextResponse.json(cleanData);
   } catch (error: any) {
     console.error("[Search API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });

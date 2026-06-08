@@ -114,7 +114,7 @@ export async function GET(
 
     const targetRevision = revisions.find((r) => r.id === targetRevisionId);
 
-    return NextResponse.json({
+    const responseData = {
       id: ruleRow.id,
       title: ruleRow.title,
       ruleNumber: ruleRow.ruleNumber,
@@ -128,7 +128,12 @@ export async function GET(
         articles: articlesRes.rows,
         comparisons,
       },
-    });
+    };
+
+    // HWP 등에서 변환 시 깨진 특수기호(󰂛)를 중간 점(·)으로 일괄 치환
+    const cleanData = JSON.parse(JSON.stringify(responseData).replace(/󰂛/g, '·'));
+
+    return NextResponse.json(cleanData);
   } catch (error: any) {
     console.error("[Rule API Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
