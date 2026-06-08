@@ -754,21 +754,22 @@ export default function Home() {
             </div>
           ) : activeCategoryId ? (
             /* 카테고리(분야/부서/폴더) 뷰 표시 */
-            <div className="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar">
-              <div className="max-w-6xl mx-auto">
-                <div className="flex flex-col gap-4">
-                  {/* 카테고리 뷰 헤더 타이틀 */}
-                  <div className="flex items-end justify-between border-b-[3px] border-[#1e3a8a] pb-4 select-none">
-                    <h2 className="text-[28px] font-black text-slate-900 tracking-tight flex items-center gap-2">
-                      {activeCategoryName}
-                    </h2>
-                    <span className="text-[14px] text-slate-600 font-bold tracking-wider">
-                      HOME &gt; 전자규정집 &gt; {activeCategoryName}
-                    </span>
-                  </div>
+            <div className="flex-1 overflow-y-auto bg-slate-50 scrollbar flex flex-col relative">
+              {/* 카테고리 뷰 헤더 타이틀 (상단 꽉 찬 배경) */}
+              <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-8 py-5 shrink-0 flex items-center justify-between z-10 shadow-sm relative select-none">
+                <h2 className="text-2xl font-black text-[#007073] tracking-tight ml-2">
+                  {activeCategoryName}
+                </h2>
+                <div className="text-[14px] text-slate-500 font-medium tracking-wider">
+                  HOME &gt; 전자규정집 &gt; <span className="font-bold text-slate-700">{activeCategoryName}</span>
+                </div>
+              </div>
 
-                  {/* 건수 및 페이지 표시 */}
-                  <div className="flex items-center text-[15px] font-extrabold text-slate-700 select-none mb-3 mt-1">
+              <div className="flex-1 p-8">
+                <div className="max-w-6xl mx-auto">
+                  <div className="flex flex-col gap-4">
+                    {/* 건수 및 페이지 표시 */}
+                    <div className="flex items-center text-[15px] font-extrabold text-slate-700 select-none mb-3">
                     <span className="mr-3">전체: <span className="text-blue-700">{categoryRules.length}</span>건</span>
                     <span>페이지: 1/1</span>
                   </div>
@@ -853,6 +854,7 @@ export default function Home() {
                     )}
                   </div>
                 </div>
+              </div>
               </div>
             </div>
           ) : isSearching ? (
