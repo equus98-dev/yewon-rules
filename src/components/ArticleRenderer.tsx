@@ -226,8 +226,31 @@ export default function ArticleRenderer({
   };
 
   // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
-  const formatGluedText = (text: string, isArticleBody: boolean = false) => {
-    if ((text.length < 50 && !/^\s*제\d+(?:조|장|관|절)/.test(text)) || /<table|<tr|<td|<th/i.test(text)) {
+  const formatGluedText = (text: string, isArticleBody: boolean = false): React.ReactNode => {
+    if (/<table/i.test(text)) {
+      const parts = text.split(/(<table[\s\S]*?<\/table>)/i);
+      if (parts.length > 1) {
+        return (
+          <>
+            {parts.map((part, idx) => {
+              if (/<table/i.test(part)) {
+                return (
+                  <div key={`table-part-${idx}`} className="html-table-wrapper block w-full overflow-x-auto my-4" dangerouslySetInnerHTML={{ __html: part }} />
+                );
+              }
+              if (!part.trim()) return null;
+              return <React.Fragment key={`text-part-${idx}`}>{formatGluedText(part, isArticleBody)}</React.Fragment>;
+            })}
+          </>
+        );
+      }
+    }
+
+    if (/<tr|<td|<th/i.test(text)) {
+       return <div className="html-table-wrapper block w-full overflow-x-auto" dangerouslySetInnerHTML={{ __html: text }} />;
+    }
+
+    if (text.length < 50 && !/^\s*제\d+(?:조|장|관|절)/.test(text)) {
         if (!hideHistory && (text.includes("제정") || text.includes("개정") || text.includes("시행")) && /^\s*[\[〔]/.test(text)) {
              return <span className="text-[14px] text-blue-600 font-medium">[{text.replace(/[\[\]〔〕]/g, '')}]</span>;
         }
