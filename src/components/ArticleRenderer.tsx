@@ -175,7 +175,7 @@ export default function ArticleRenderer({
       .replace(/&nbsp;/g, " ")
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'")
-      .replace(/설치(?:\s*|󰂛?)운영(?:\s*|󰂛?)폐지/g, '설치·운영·폐지');
+      .replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지');
 
     if (hideHistory) {
       // 연혁 숨기기
