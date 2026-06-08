@@ -74,9 +74,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     let lastSection = "";
     
     currentRevision.articles.forEach((a: any) => {
-        // Add chapter and section if they changed and exist
         if (a.chapter && a.chapter !== lastChapter) {
-            toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: a.chapter });
+            const cleanChapter = a.chapter.replace(/설치(?:\s*|󰂛?)운영(?:\s*|󰂛?)폐지/g, '설치·운영·폐지');
+            toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: cleanChapter });
             lastChapter = a.chapter;
         }
         if (a.section && a.section !== lastSection) {
@@ -191,7 +191,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           if (typeof item !== 'object') return;
           
           if (item.type === "chapter") {
-            const chapterText = typeof item.text === 'string' ? item.text : String(item.text || "");
+            const chapterText = typeof item.text === 'string' ? item.text.replace(/설치(?:\s*|󰂛?)운영(?:\s*|󰂛?)폐지/g, '설치·운영·폐지') : String(item.text || "");
             if (toc.length > 0 && toc[toc.length - 1].type === "chapter" && toc[toc.length - 1].text === chapterText) return;
             toc.push({ type: "chapter", id: `toc-${chapterText.replace(new RegExp("\\s", "g"), '-')}`, text: chapterText });
           } else if (item.type === "section") {

@@ -174,7 +174,8 @@ export default function ArticleRenderer({
       .replace(/&amp;/g, "&")
       .replace(/&nbsp;/g, " ")
       .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'");
+      .replace(/&#39;/g, "'")
+      .replace(/설치(?:\s*|󰂛?)운영(?:\s*|󰂛?)폐지/g, '설치·운영·폐지');
 
     if (hideHistory) {
       // 연혁 숨기기
@@ -237,8 +238,8 @@ export default function ArticleRenderer({
       .replace(/(①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩|⑪|⑫|⑬|⑭|⑮)/g, '\n$1')
       .replace(/(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/g, '\n$1 ')
       .replace(/(^|\s)([가-하]\.)\s+/g, '$1\n$2 ')
-      .replace(/(제\d+조의?\d*\([^)]+\))\s*\n([①-⑮])/g, '$1 $2')
-      .replace(/(제\d+조의?\d*\([^)]+\))/g, '\n\n$1')
+      .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])\s*\n([①-⑮])/g, '$1 $2')
+      .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])/g, '\n\n$1')
       .replace(/(제\d+(?:장|절|관)\s+[^\s]+)/g, '\n\n$1')
       .replace(/(^|\n)(부\s*칙)\s*(.*)/g, '\n\n$2 $3');
 
@@ -308,7 +309,7 @@ export default function ArticleRenderer({
              }
              lineClass += " ml-4 block";
           } else if (/^제\d+조/.test(trimmed)) {
-             const match = trimmed.match(/^(제\d+조의?\d*)\(([^)]+)\)(.*)/);
+             const match = trimmed.match(/^(제\d+조의?\d*)\s*[\[〔(（]([^\]〕)）]+)[\]〕)）](.*)/);
              if (match) {
                  const articleNum = match[1];
                  const articleTitle = match[2];
@@ -517,7 +518,7 @@ export default function ArticleRenderer({
             );
           })();
         } else if (item.type === "paragraph") {
-          const isGlued = /^제\d+조/.test(safeText.trim());
+          const isGlued = /^제\d+조/.test(safeText.trim()) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(safeText) || /(?<!^|\s)[①-⑮]/.test(safeText);
           if (isGlued) {
             return (
               <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] w-full pl-[1.25rem] my-1.5">
