@@ -19,25 +19,38 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { useRouter as useNextRouter } from "next/navigation";
 
-// 부서 계층 구조 정의 (셀렉트 드롭다운 옵션 그룹화용)
-const DEPT_HIERARCHY = [
-  { label: "총장직속", isGroup: true },
-  { label: "── 비서실", code: "SECRETARY" },
-  { label: "── 감사실", code: "AUDIT" },
-  { label: "── 인권센터", code: "HUMANRIGHTS" },
-  { label: "법인사무국", isGroup: false, code: "LEGAL" },
-  { label: "교학지원처", isGroup: false, code: "ACADEMIC" },
-  { label: "기획조정처", isGroup: false, code: "PLANNING" },
-  { label: "행정지원처", isGroup: false, code: "ADMIN" },
-  { label: "대학원", isGroup: false, code: "GRADUATE" },
-  { label: "산학협력단", isGroup: false, code: "INDUSTRY" },
-  { label: "국제교류협력단", isGroup: false, code: "INTERNATIONAL" },
-  { label: "부설기관", isGroup: true },
-  { label: "── 평생교육원", code: "LIFELONG" },
-  { label: "부속기관", isGroup: true },
-  { label: "── 학생생활관", code: "DORMITORY" },
-  { label: "── 정보도서관", code: "LIBRARY" },
-];
+// 선택 불가 그룹 부서명 (구분자 역할만 함)
+const GROUP_DEPT_NAMES = new Set(["총장직속", "부설기관", "부속기관"]);
+
+// 부서 셀렉트 렌더링용 헬퍼 - optgroup 구조로 출력
+function DeptSelectOptions({ departments }: { departments: any[] }) {
+  // 선택 가능한 부서만 필터
+  const selectable = departments.filter((d) => !GROUP_DEPT_NAMES.has(d.name));
+
+  // 그룹별 분류
+  const 총장직속하위 = selectable.filter((d) => ["비서실", "감사실", "인권센터"].includes(d.name));
+  const 부설기관하위 = selectable.filter((d) => ["평생교육원"].includes(d.name));
+  const 부속기관하위 = selectable.filter((d) => ["학생생활관", "정보도서관"].includes(d.name));
+  const 독립부서 = selectable.filter((d) =>
+    ![...총장직속하위, ...부설기관하위, ...부속기관하위].some((x) => x.id === d.id)
+  );
+
+  return (
+    <>
+      <option value="" disabled>부서 선택</option>
+      <optgroup label="◆ 총장직속">
+        {총장직속하위.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+      </optgroup>
+      {독립부서.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+      <optgroup label="◆ 부설기관">
+        {부설기관하위.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+      </optgroup>
+      <optgroup label="◆ 부속기관">
+        {부속기관하위.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+      </optgroup>
+    </>
+  );
+}
 
 export default function AdminRulesManagement() {
   const router = useNextRouter();
@@ -90,18 +103,17 @@ export default function AdminRulesManagement() {
         flattenCats(catsData);
         setCategories(flatCats);
 
-        // 부서 목록 가공 (dept- 접두어 제거)
+        // 부서 목록 가공 (dept- 접두어 제거, 그룹 부서 포함하여 저장)
         const deptsData = (await deptsRes.json()) as any;
         const flatDepts: any[] = [];
         function flattenDepts(nodes: any[]) {
           nodes.forEach((n) => {
-            // dept-로 시작하는 폴더 노드만 수집
             if (n.type === "folder") {
               flatDepts.push({
                 id: n.id.replace("dept-", ""),
                 name: n.name,
               });
-              // 하위 부서 폴더(isSubDept) 도 수집
+              // 하위 부서 폴더도 수집
               if (Array.isArray(n.children)) {
                 n.children.filter((c: any) => c.type === "folder").forEach((sub: any) => {
                   flatDepts.push({
@@ -364,13 +376,10 @@ export default function AdminRulesManagement() {
                               autoFocus
                               value={editingDeptValue}
                               onChange={(e) => setEditingDeptValue(e.target.value)}
-                              className="bg-white border border-blue-300 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-400 cursor-pointer max-w-[130px]"
+                              className="bg-white border border-blue-300 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-400 cursor-pointer max-w-[150px]"
                               disabled={savingDept}
                             >
-                              <option value="" disabled>부서 선택</option>
-                              {departments.map((d) => (
-                                <option key={d.id} value={d.id}>{d.name}</option>
-                              ))}
+                              <DeptSelectOptions departments={departments} />
                             </select>
                             <button
                               type="button"
@@ -556,44 +565,7 @@ export default function AdminRulesManagement() {
                   onChange={(e) => setNewDeptId(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] cursor-pointer"
                 >
-                  <option value="" disabled>부서 선택</option>
-                  {/* 계층 구조 셀렉트 */}
-                  <optgroup label="─ 총장직속">
-                    {departments.filter(d => ["비서실","감사실","인권센터"].includes(d.name)).map((d) => (
-                      <option key={d.id} value={d.id}>{d.name}</option>
-                    ))}
-                  </optgroup>
-                  {departments.filter(d => d.name === "법인사무국").map((d) => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
-                  ))}
-                  {departments.filter(d => d.name === "교학지원처").map((d) => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
-                  ))}
-                  {departments.filter(d => d.name === "기획조정처").map((d) => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
-                  ))}
-                  {departments.filter(d => d.name === "행정지원처").map((d) => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
-                  ))}
-                  {departments.filter(d => d.name === "대학원").map((d) => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
-                  ))}
-                  {departments.filter(d => d.name === "산학협력단").map((d) => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
-                  ))}
-                  {departments.filter(d => d.name === "국제교류협력단").map((d) => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
-                  ))}
-                  <optgroup label="─ 부설기관">
-                    {departments.filter(d => d.name === "평생교육원").map((d) => (
-                      <option key={d.id} value={d.id}>{d.name}</option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="─ 부속기관">
-                    {departments.filter(d => ["학생생활관","정보도서관"].includes(d.name)).map((d) => (
-                      <option key={d.id} value={d.id}>{d.name}</option>
-                    ))}
-                  </optgroup>
+                  <DeptSelectOptions departments={departments} />
                 </select>
               </div>
             </div>
