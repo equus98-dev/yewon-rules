@@ -523,7 +523,7 @@ export default function ArticleRenderer({
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                   </button>
                 )}
-                {!hideHistory && (
+                {!hideHistory && !isAddendum && (
                   <button 
                     onClick={() => setModalHistory(historyDates.length > 0 ? historyDates : ["개정 이력이 없습니다."])}
                     className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
@@ -533,8 +533,17 @@ export default function ArticleRenderer({
                 )}
                 <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
                   <div id={`toc-${safeNum}`} className="w-full break-keep inline-block">
-                    <span className="font-bold mr-1 text-[#000080]">{safeNum}{parsedTitle}</span>
-                    {safeText.replace(parsedTitle, "").trim() && <span className="font-normal">{renderTextWithHistory(safeText.replace(parsedTitle, "").trim())}</span>}
+                    {isAddendum ? (
+                      <>
+                        <span className="font-bold mr-1 text-[#000080]">부칙</span>
+                        <span className="font-normal">{renderTextWithHistory(safeText.replace(/^부\s*칙\s*/, ''))}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-bold mr-1 text-[#000080]">{safeNum}{parsedTitle}</span>
+                        {safeText.replace(parsedTitle, "").trim() && <span className="font-normal">{renderTextWithHistory(safeText.replace(parsedTitle, "").trim())}</span>}
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
