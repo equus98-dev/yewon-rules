@@ -168,6 +168,14 @@
   text-align: center !important;
 }
 
+/* 1-1. 테이블 첫 번째 행(헤더)에 배경 음영 (th 미사용 테이블 대응) */
+.html-table-wrapper tr:first-child td {
+  background-color: #f1f5f9 !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  text-align: center !important;
+}
+
 /* 2. 왼쪽 구분열 (첫 번째 열) 음영 처리 */
 .html-table-wrapper tr td:first-child {
   background-color: #f8fafc !important;

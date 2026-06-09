@@ -267,7 +267,7 @@ export default function ArticleRenderer({
       .replace(/(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/g, '\n$1 ')
       .replace(/(^|\s)([가-하]\.)\s+/g, '$1\n$2 ')
       .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])\s*\n([①-⑮])/g, '$1 $2')
-      .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])/g, '\n\n$1')
+      .replace(/((?<![『「])제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])/g, '\n\n$1')
       .replace(/(제\d+(?:장|절|관)\s+[^\s]+)/g, '\n\n$1')
       .replace(/(^|\n)(부\s*칙)\s*(.*)/g, '\n\n$2 $3');
 
@@ -336,7 +336,7 @@ export default function ArticleRenderer({
                );
              }
              lineClass += " ml-4 block";
-          } else if (/^제\d+조/.test(trimmed)) {
+          } else if (/^제\d+조/.test(trimmed) && !/[『「]$/.test(trimmed.slice(0, trimmed.search(/제\d+조/)))) {
              const match = trimmed.match(/^(제\d+조의?\d*)\s*[\[〔(（]([^\]〕)）]+)[\]〕)）](.*)/);
              if (match) {
                  const articleNum = match[1];
@@ -541,8 +541,16 @@ export default function ArticleRenderer({
                   <div id={`toc-${safeNum}`} className="w-full break-keep inline-block">
                     {isAddendum ? (
                       <>
-                        <span className="font-bold mr-1 text-[#000080]">부칙</span>
-                        <span className="font-normal">{renderTextWithHistory(safeText.replace(/^부\s*칙\s*/, ''))}</span>
+                        {(() => {
+                          const addendumBody = safeText.replace(/^부\s*칙\s*/, '');
+                          const dateMatch = addendumBody.match(/^\(?([\d.\s]+)\.?\)?\s*/);
+                          return (
+                            <>
+                              <span className="font-bold mr-1 text-[#000080]">부칙</span>
+                              <span className="font-normal">{renderTextWithHistory(addendumBody)}</span>
+                            </>
+                          );
+                        })()}
                       </>
                     ) : (
                       <>
@@ -592,8 +600,22 @@ export default function ArticleRenderer({
           );
         } else {
           const isAddendum = safeText.replace(/\s+/g, "").startsWith("부칙");
+          if (isAddendum) {
+            // 부칙을 article 타입처럼 렌더링 (부칙 중복 방지, 연 아이콘 제거)
+            const addendumBody = safeText.replace(/^부\s*칙\s*/, '').trim();
+            return (
+              <div key={index} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
+                <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
+                  <div className="w-full break-keep inline-block">
+                    <span className="font-bold mr-1 text-[#000080]">부칙</span>
+                    {addendumBody && <span className="font-normal">{renderTextWithHistory(addendumBody)}</span>}
+                  </div>
+                </div>
+              </div>
+            );
+          }
           return (
-            <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full ${isAddendum ? 'mt-16 mb-4 font-bold text-[16px] text-left border-t-2 border-slate-300 pt-8' : 'pl-[1.25rem] my-1.5'}`}>
+            <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full pl-[1.25rem] my-1.5`}>
               {formatGluedText(safeText, false)}
             </div>
           );
