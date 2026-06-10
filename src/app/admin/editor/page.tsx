@@ -243,6 +243,12 @@ function EditorContent() {
       return;
     }
 
+    const hasModifications = draftArticles.some(art => art.isModified || art.isNew || art.isDeleted);
+    if (!hasModifications) {
+      alert("수정된 조항이 없습니다. 변경 사항을 작성한 후 배포해 주십시오.");
+      return;
+    }
+
     if (!confirm(`${versionName} 최종 결제를 완료하고 클라우드 데이터베이스에 실시간 배포하시겠습니까?`)) {
       return;
     }
@@ -256,16 +262,23 @@ function EditorContent() {
         .filter((art) => !art.isDeleted)
         .map((art, idx) => {
           let updatedContentText = art.contentText.trim();
+          let finalContentJson = art.contentJson;
+          let finalContentHtml = art.contentHtml;
+
           if (art.isNew) {
             const tag = ` <신설 ${formattedDate}>`;
             if (!updatedContentText.includes(tag)) {
               updatedContentText += tag;
             }
+            finalContentJson = { paragraphs: [updatedContentText.split(") ").slice(1).join(") ") || updatedContentText] };
+            finalContentHtml = null;
           } else if (art.isModified) {
             const tag = ` <개정 ${formattedDate}>`;
             if (!updatedContentText.includes(tag)) {
               updatedContentText += tag;
             }
+            finalContentJson = { paragraphs: [updatedContentText.split(") ").slice(1).join(") ") || updatedContentText] };
+            finalContentHtml = null;
           }
 
           return {
@@ -274,7 +287,8 @@ function EditorContent() {
             articleNumber: art.articleNumber,
             title: art.title,
             contentText: updatedContentText,
-            contentJson: { paragraphs: [updatedContentText.split(") ").slice(1).join(") ") || updatedContentText] },
+            contentJson: finalContentJson,
+            contentHtml: finalContentHtml,
             sortOrder: idx + 1,
           };
         });
