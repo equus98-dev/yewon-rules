@@ -437,21 +437,18 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           </ul>
         </div>
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative scroll-smooth">
-          {/* TOC Toggle Tab */}
-          <div 
-            className="fixed top-1/2 -translate-y-1/2 z-30 transition-all duration-300"
-            style={{ left: isTocOpen ? "404px" : "84px" }} /* 84px is sidebar width, 320px is toc width */
+        {/* TOC Toggle Tab - Attached to the right edge of TOC */}
+        <div className="relative z-30 flex items-center h-full w-0">
+          <button
+            onClick={() => setIsTocOpen(!isTocOpen)}
+            className="absolute -left-px w-6 h-16 bg-[#007073] hover:bg-[#005a5c] text-white flex items-center justify-center rounded-r-xl shadow-md cursor-pointer transition-colors border border-l-0 border-[#005a5c]"
+            title={isTocOpen ? "목차 닫기" : "목차 열기"}
           >
-            <button
-              onClick={() => setIsTocOpen(!isTocOpen)}
-              className="w-6 h-16 bg-[#0c3161] hover:bg-[#092244] text-white flex items-center justify-center rounded-r-xl shadow-md cursor-pointer transition-colors border border-l-0 border-[#092244]"
-              title={isTocOpen ? "목차 닫기" : "목차 열기"}
-            >
-              {isTocOpen ? <KeyboardArrowLeftIcon fontSize="small" /> : <KeyboardArrowRightIcon fontSize="small" />}
-            </button>
-          </div>
+            {isTocOpen ? <KeyboardArrowLeftIcon fontSize="small" /> : <KeyboardArrowRightIcon fontSize="small" />}
+          </button>
+        </div>
 
+        <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative scroll-smooth">
           <div className="max-w-4xl mx-auto mt-4 relative">
             {/* 규정 제목 */}
             <h2 className="text-[26px] font-black text-center text-[#007073] mb-8 tracking-tight break-keep">{title}</h2>
