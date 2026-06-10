@@ -69,6 +69,17 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const [hideHistory, setHideHistory] = useState(false);
   const [expandedAttachments, setExpandedAttachments] = useState<Record<string, boolean>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
+  const tocScrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScrollTop = () => {
+    scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    tocScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleScrollBottom = () => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current?.scrollHeight || 99999, behavior: "smooth" });
+    tocScrollRef.current?.scrollTo({ top: tocScrollRef.current?.scrollHeight || 99999, behavior: "smooth" });
+  };
 
   const currentRevision = ruleData?.currentRevision;
 
@@ -386,7 +397,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       {/* 3. 2단 분할 본문 영역 */}
       <div className="flex-1 flex overflow-hidden">
         {/* 좌측 목차 (TOC) */}
-        <div className="w-[320px] bg-white border-r border-slate-200 overflow-y-auto scrollbar shrink-0 flex flex-col">
+        <div ref={tocScrollRef} className="w-[320px] bg-white border-r border-slate-200 overflow-y-auto scrollbar shrink-0 flex flex-col relative scroll-smooth">
           <div className="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 sticky top-0 z-10">
             <HistoryIcon className="text-blue-700" sx={{ fontSize: 16 }} />
             <span className="font-bold text-sm text-slate-800">목차 ({tocItems.filter(i => i.type === 'article').length})</span>
@@ -468,7 +479,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
                 {/* Attachments Section */}
                 {attachments && attachments.length > 0 && (
-                  <div className="mt-16 w-full space-y-4">
+                  <div id="toc-attachments" className="mt-16 w-full space-y-4">
                     {/* Group attachments by base name */}
                     {Object.values(
                       attachments.reduce((acc: any, file: any) => {
@@ -501,7 +512,26 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                               <span className="text-slate-500 flex items-center justify-center">
                                 {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
                               </span>
-                              <span className="font-bold text-slate-800 text-[15px]">{group.baseName}</span>
+                              {(() => {
+                                const match = group.baseName.match(/^\[(전문|별표|별지)\]\s*(.*)$/);
+                                if (match) {
+                                  const type = match[1];
+                                  const text = match[2];
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <span className={`px-2 py-0.5 rounded text-[12px] font-black border ${
+                                        type === '전문' ? 'bg-[#0c3161] text-white border-[#0c3161]' :
+                                        type === '별표' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                        'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                      }`}>
+                                        [{type}]
+                                      </span>
+                                      <span className="font-bold text-slate-800 text-[15px]">{text}</span>
+                                    </div>
+                                  );
+                                }
+                                return <span className="font-bold text-slate-800 text-[15px]">{group.baseName}</span>;
+                              })()}
                               <div className="flex items-center gap-1.5 ml-3" onClick={(e) => e.stopPropagation()}>
                                 {hwpFile && (
                                   <a href={hwpFile.fileUrl.startsWith('http') ? `${hwpFile.fileUrl}?download=${encodeURIComponent(hwpFile.title)}` : hwpFile.fileUrl} download={hwpFile.title} target="_blank" className="bg-blue-50 border border-blue-200 text-blue-700 px-1.5 py-0.5 rounded text-[11px] font-black flex items-center gap-0.5 hover:bg-blue-100 transition-colors" title="HWP 다운로드">
@@ -548,20 +578,25 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             ) : (
               <div className="text-center py-20 text-slate-400">조항 내용이 없습니다.</div>
             )}
+
             
-            {/* 맨위로 가기 버튼 */}
-            <button 
-              onClick={() => {
-                if (scrollRef.current) {
-                  scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-              }}
-              className="fixed bottom-8 right-10 z-50 bg-white border border-slate-200 text-slate-500 shadow hover:shadow-md hover:text-[#0c3161] hover:border-blue-200 p-2.5 rounded-full transition-all group flex items-center justify-center cursor-pointer"
-              title="맨위로 이동"
-            >
-              <KeyboardArrowUpIcon />
-            </button>
-            
+            {/* Scroll Buttons */}
+            <div className="fixed bottom-10 right-10 flex flex-col gap-3 z-50">
+              <button
+                onClick={handleScrollTop}
+                className="w-12 h-12 rounded-full bg-[#009b9e] text-white shadow-xl flex items-center justify-center hover:bg-[#008285] transition-all hover:-translate-y-1 active:scale-95"
+                title="맨 위로 한 번에 이동"
+              >
+                <KeyboardArrowUpIcon fontSize="large" />
+              </button>
+              <button
+                onClick={handleScrollBottom}
+                className="w-12 h-12 rounded-full bg-[#009b9e] text-white shadow-xl flex items-center justify-center hover:bg-[#008285] transition-all hover:translate-y-1 active:scale-95"
+                title="맨 아래로 한 번에 이동"
+              >
+                <KeyboardArrowDownIcon fontSize="large" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
