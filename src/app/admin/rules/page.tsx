@@ -320,7 +320,7 @@ export default function AdminRulesManagement() {
 
       {/* 2. 메인 규정 테이블 영역 */}
       <div className="flex-1 overflow-auto p-8 scrollbar">
-        <div className="max-w-6xl mx-auto bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 select-none text-sm">

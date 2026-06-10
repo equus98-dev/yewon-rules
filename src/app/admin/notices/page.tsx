@@ -131,7 +131,7 @@ export default function AdminNotices() {
 
   return (
     <div className="h-full overflow-y-auto p-8 bg-slate-50 scrollbar text-slate-800">
-      <div className="max-w-6xl mx-auto space-y-8 pb-10">
+      <div className="w-full space-y-8 pb-10 px-2">
         
         {/* 상단 타이틀 및 퀵 런처 */}
         <div className="flex items-center justify-between border-b border-slate-200 pb-6 select-none">

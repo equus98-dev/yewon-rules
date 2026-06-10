@@ -75,7 +75,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="h-full overflow-y-auto p-8 bg-slate-50 scrollbar text-slate-800">
-      <div className="max-w-6xl mx-auto space-y-8 pb-10">
+      <div className="w-full space-y-8 pb-10 px-2">
         
         {/* 데이터베이스 오류 배너 */}
         {isDbError && (

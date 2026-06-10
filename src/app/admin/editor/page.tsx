@@ -270,7 +270,7 @@ function EditorContent() {
     return (
       <div className="h-full w-full flex flex-col items-center justify-center gap-4 bg-slate-50">
         <CircularProgress size={30} sx={{ color: "#0c3161" }} />
-        <span className="text-slate-550 text-xs font-semibold">입안편집기(DLMS) 엔진 초기화 중...</span>
+        <span className="text-slate-550 text-sm font-semibold">입안편집기(DLMS) 엔진 초기화 중...</span>
       </div>
     );
   }
@@ -284,11 +284,11 @@ function EditorContent() {
           <div className="flex items-center gap-3">
             <Link
               href="/admin/rules"
-              className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-650 hover:text-slate-900 transition-all cursor-pointer shadow-sm"
+              className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-650 hover:text-slate-900 transition-all cursor-pointer shadow-sm"
             >
-              <ArrowBackIcon sx={{ fontSize: 16 }} />
+              <ArrowBackIcon sx={{ fontSize: 20 }} />
             </Link>
-            <h1 className="text-md font-black text-slate-850 flex items-center gap-2">
+            <h1 className="text-lg font-black text-slate-850 flex items-center gap-2">
               <RuleIcon className="text-[#0c3161]" />
               실시간 온라인 입안편집기 (Web-DLMS)
             </h1>
@@ -299,23 +299,23 @@ function EditorContent() {
               type="button"
               onClick={handlePublishRevision}
               disabled={saving}
-              className="bg-[#0c3161] hover:bg-[#092244] text-white text-xs font-black px-4 py-2 rounded-xl shadow-lg shadow-[#0c3161]/10 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="bg-[#0c3161] hover:bg-[#092244] text-white text-sm font-black px-5 py-2.5 rounded-xl shadow-lg shadow-[#0c3161]/10 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
-              <SaveIcon sx={{ fontSize: 16 }} />
+              <SaveIcon sx={{ fontSize: 18 }} />
               {saving ? "실서버 배포 중..." : "최종 배포 저장"}
             </button>
           </div>
         </div>
 
         {/* 개정 메타데이터 정보 입력 폼 */}
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 bg-slate-50 p-4 border border-slate-200 rounded-2xl text-xs">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 bg-slate-50 p-5 border border-slate-200 rounded-2xl text-sm">
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] text-slate-550 font-bold tracking-wider pl-1">대상 규정 선택</label>
+            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">대상 규정 선택</label>
             <select
               value={selectedRuleId}
               onChange={(e) => setSelectedRuleId(e.target.value)}
-              className="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-800 font-extrabold focus:outline-none cursor-pointer"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none cursor-pointer text-sm"
             >
               {rules.map((r) => (
                 <option key={r.id} value={r.id} className="text-slate-800">
@@ -326,65 +326,65 @@ function EditorContent() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] text-slate-550 font-bold tracking-wider pl-1">개정 버전 기호</label>
+            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">개정 버전 기호</label>
             <input
               type="text"
               value={versionName}
               onChange={(e) => setVersionName(e.target.value)}
               placeholder="예: 제16차 일부개정"
-              className="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161]"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-sm"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] text-slate-550 font-bold tracking-wider pl-1">공포 기호/번호</label>
+            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">공포 기호/번호</label>
             <input
               type="text"
               value={announceNum}
               onChange={(e) => setAnnounceNum(e.target.value)}
               placeholder="예: 공포 제16호"
-              className="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161]"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-sm"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] text-slate-550 font-bold tracking-wider pl-1">공포 일자</label>
+            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">공포 일자</label>
             <input
               type="date"
               value={enactmentDate}
               onChange={(e) => setEnactmentDate(e.target.value)}
-              className="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161]"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-sm"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] text-slate-550 font-bold tracking-wider pl-1">시행 일자</label>
+            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">시행 일자</label>
             <input
               type="date"
               value={effectiveDate}
               onChange={(e) => setEffectiveDate(e.target.value)}
-              className="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161]"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-sm"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] text-slate-550 font-bold tracking-wider pl-1">개정 사유/설명</label>
+            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">개정 사유/설명</label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="개정 사유 입력..."
-              className="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161]"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-sm"
             />
           </div>
 
         </div>
 
         {/* 탭 바 컨트롤 */}
-        <div className="flex border-b border-slate-200 text-xs font-black select-none">
+        <div className="flex border-b border-slate-200 text-sm font-black select-none mt-2">
           <button
             onClick={() => setActiveTab("edit")}
-            className={`px-6 py-2.5 border-b-2 transition-all cursor-pointer ${
+            className={`px-6 py-3 border-b-2 transition-all cursor-pointer ${
               activeTab === "edit" ? "border-[#0c3161] text-[#0c3161] font-black" : "border-transparent text-slate-500 hover:text-[#0c3161]"
             }`}
           >
@@ -392,7 +392,7 @@ function EditorContent() {
           </button>
           <button
             onClick={() => setActiveTab("preview")}
-            className={`px-6 py-2.5 border-b-2 transition-all cursor-pointer ${
+            className={`px-6 py-3 border-b-2 transition-all cursor-pointer ${
               activeTab === "preview" ? "border-[#0c3161] text-[#0c3161] font-black" : "border-transparent text-slate-500 hover:text-[#0c3161]"
             }`}
           >
@@ -400,11 +400,11 @@ function EditorContent() {
           </button>
           <button
             onClick={() => setActiveTab("compare")}
-            className={`px-6 py-2.5 border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-6 py-3 border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
               activeTab === "compare" ? "border-[#0c3161] text-[#0c3161] font-black" : "border-transparent text-slate-500 hover:text-[#0c3161]"
             }`}
           >
-            <CompareArrowsIcon sx={{ fontSize: 16 }} />
+            <CompareArrowsIcon sx={{ fontSize: 18 }} />
             신구조문대비표 자동 생성 뷰
           </button>
         </div>
@@ -418,23 +418,23 @@ function EditorContent() {
           <div className="h-full w-full flex overflow-hidden">
             
             {/* 좌측: 현행 규정 뷰어 (참조용, Read Only) */}
-            <div className="w-[380px] bg-white border-r border-slate-200 p-6 flex flex-col overflow-hidden shrink-0 shadow-sm">
-              <h3 className="text-xs font-black text-slate-600 border-b border-slate-200 pb-2 mb-4 flex items-center gap-1.5 select-none font-sans">
-                <VisibilityIcon sx={{ fontSize: 16 }} />
+            <div className="w-[420px] bg-white border-r border-slate-200 p-6 flex flex-col overflow-hidden shrink-0 shadow-sm">
+              <h3 className="text-sm font-black text-slate-600 border-b border-slate-200 pb-3 mb-4 flex items-center gap-1.5 select-none font-sans">
+                <VisibilityIcon sx={{ fontSize: 18 }} />
                 [참조] 현행 규정 조문 뷰어
               </h3>
 
-              <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar text-[11px]">
+              <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar text-sm">
                 {originalArticles.length === 0 ? (
-                  <div className="text-center py-20 text-slate-450 font-bold select-none">
+                  <div className="text-center py-20 text-slate-450 font-bold select-none text-sm">
                     조회된 현행 규정이 없습니다.
                   </div>
                 ) : (
                   originalArticles.map((art) => (
-                    <div key={art.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 shadow-sm">
-                      <div className="text-[10px] text-slate-500 font-black">{art.chapter || "총칙"}</div>
-                      <div className="text-[#0c3161] font-black">{art.title}</div>
-                      <p className="text-slate-700 leading-relaxed font-bold mt-1.5 whitespace-pre-wrap">
+                    <div key={art.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 shadow-sm">
+                      <div className="text-xs text-slate-500 font-black">{art.chapter || "총칙"}</div>
+                      <div className="text-[#0c3161] font-black text-sm">{art.title}</div>
+                      <p className="text-slate-700 leading-relaxed font-bold mt-2 whitespace-pre-wrap text-[14px]">
                         {art.contentText}
                       </p>
                     </div>
@@ -445,17 +445,17 @@ function EditorContent() {
 
             {/* 우측: 개정안 작업창 (실시간 인터랙티브 에디터) */}
             <div className="flex-1 p-8 flex flex-col overflow-hidden bg-slate-50">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-6 shrink-0 select-none">
-                <h3 className="text-xs font-black text-slate-850 flex items-center gap-2">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-6 shrink-0 select-none">
+                <h3 className="text-sm font-black text-slate-850 flex items-center gap-2">
                   <span className="text-[#0c3161]">■</span> 개정안 뼈대 작업 영역
                 </h3>
 
                 <button
                   type="button"
                   onClick={handleAddArticle}
-                  className="bg-white hover:bg-slate-50 text-slate-750 hover:text-slate-900 text-[10px] font-black px-3 py-1.5 rounded-lg border border-slate-200 active:scale-95 transition-all flex items-center gap-1 cursor-pointer shadow-sm"
+                  className="bg-white hover:bg-slate-50 text-slate-750 hover:text-slate-900 text-sm font-black px-4 py-2 rounded-lg border border-slate-200 active:scale-95 transition-all flex items-center gap-1 cursor-pointer shadow-sm"
                 >
-                  <AddIcon sx={{ fontSize: 12 }} />
+                  <AddIcon sx={{ fontSize: 16 }} />
                   조항 신설 (+추가)
                 </button>
               </div>
@@ -484,15 +484,15 @@ function EditorContent() {
                   return (
                     <div
                       key={idx}
-                      className={`p-5 rounded-2xl border ${borderClass} transition-all space-y-4`}
+                      className={`p-6 rounded-2xl border ${borderClass} transition-all space-y-4`}
                     >
                       <div className="flex items-center justify-between gap-4 select-none">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-black bg-slate-100 text-slate-650 px-2 py-0.5 rounded border border-slate-200">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-black bg-slate-100 text-slate-650 px-3 py-1 rounded border border-slate-200">
                             {getArticleNumBadge(art.articleNumber, art.title)}
                           </span>
                           {tagText && (
-                            <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${tagBg}`}>
+                            <span className={`text-[11px] font-black px-2 py-1 rounded ${tagBg}`}>
                               {tagText}
                             </span>
                           )}
@@ -503,40 +503,40 @@ function EditorContent() {
                           <button
                             type="button"
                             onClick={() => handleToggleDeleteArticle(idx)}
-                            className={`p-1.5 rounded-lg border transition-all cursor-pointer active:scale-95 ${
+                            className={`p-2 rounded-lg border transition-all cursor-pointer active:scale-95 ${
                               art.isDeleted
                                 ? "bg-emerald-50 border-emerald-200 text-emerald-700"
                                 : "bg-rose-50 border border-rose-200 text-rose-650 hover:bg-rose-100"
                             }`}
                             title={art.isDeleted ? "삭제 취소" : "삭제"}
                           >
-                            <DeleteIcon sx={{ fontSize: 13 }} />
+                            <DeleteIcon sx={{ fontSize: 18 }} />
                           </button>
                         </div>
                       </div>
 
                       {/* 입력 영역 */}
                       {!art.isDeleted && (
-                        <div className="grid grid-cols-1 md:grid-cols-[160px_1fr] gap-4 text-xs">
-                          <div className="space-y-1.5">
-                            <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider pl-1">조 조항 제목</label>
+                        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-5 text-sm">
+                          <div className="space-y-2">
+                            <label className="text-xs text-slate-500 font-bold uppercase tracking-wider pl-1">조 조항 제목</label>
                             <input
                               type="text"
                               value={art.title}
                               onChange={(e) => handleArticleTitleChange(idx, e.target.value)}
                               placeholder="예: 목적"
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-sm"
                             />
                           </div>
 
-                          <div className="space-y-1.5">
-                            <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider pl-1">조문 본문 전문</label>
+                          <div className="space-y-2">
+                            <label className="text-xs text-slate-500 font-bold uppercase tracking-wider pl-1">조문 본문 전문</label>
                             <textarea
-                              rows={2}
+                              rows={3}
                               value={art.contentText}
                               onChange={(e) => handleArticleTextChange(idx, e.target.value)}
                               placeholder="예: 제1조 (목적) 이 규정은 학교의..."
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] leading-relaxed resize-none"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] leading-relaxed resize-none text-sm"
                             />
                           </div>
                         </div>
@@ -553,40 +553,40 @@ function EditorContent() {
 
         {/* 2-2) [개정원문 실시간 프리뷰] 탭 */}
         {activeTab === "preview" && (
-          <div className="h-full overflow-y-auto p-8 scrollbar bg-slate-50">
-            <div className="max-w-4xl mx-auto bg-white text-slate-800 p-8 md:p-12 rounded-2xl shadow-sm border border-slate-200 select-none">
+          <div className="h-full overflow-y-auto p-10 scrollbar bg-slate-50">
+            <div className="max-w-4xl mx-auto bg-white text-slate-800 p-10 md:p-16 rounded-2xl shadow-sm border border-slate-200 select-none">
               
               {/* 개정원문 기안지 스타일 UI */}
-              <div className="text-center space-y-1 mb-8">
-                <div className="text-xs text-slate-400 font-bold">【 {versionName} 공포안 】</div>
-                <h2 className="text-2xl font-black text-slate-900">
+              <div className="text-center space-y-2 mb-10">
+                <div className="text-sm text-slate-400 font-bold">【 {versionName} 공포안 】</div>
+                <h2 className="text-3xl font-black text-slate-900">
                   {ruleDetail?.title || "선택된 규정"} 일부개정규정안
                 </h2>
               </div>
 
-              <div className="text-sm leading-relaxed space-y-6 text-slate-700 font-medium">
+              <div className="text-base leading-relaxed space-y-8 text-slate-700 font-medium">
                 <p>
                   {ruleDetail?.title || "선택한 규정"} 일부를 다음과 같이 개정한다.
                 </p>
 
                 {/* 개정된 내용 조항들 프리뷰 루프 */}
-                <div className="space-y-6 pl-4 border-l-2 border-slate-200">
+                <div className="space-y-8 pl-5 border-l-4 border-slate-200">
                   {draftArticles.map((art, idx) => {
                     if (art.isDeleted) {
                       return (
-                        <div key={idx} className="text-slate-400 italic">
+                        <div key={idx} className="text-slate-400 italic text-sm">
                           {getArticleLabel(art.articleNumber, art.title)}은 **삭제**합니다.
                         </div>
                       );
                     }
                     return (
-                      <div key={idx} className="space-y-1">
-                        <div className="font-extrabold text-slate-900">
+                      <div key={idx} className="space-y-2">
+                        <div className="font-extrabold text-slate-900 text-base">
                           {getArticleLabel(art.articleNumber, art.title)}
-                          {art.isNew && <span className="ml-2 text-emerald-600 text-xs font-bold">[신설]</span>}
-                          {art.isModified && <span className="ml-2 text-amber-600 text-xs font-bold">[개정]</span>}
+                          {art.isNew && <span className="ml-2 text-emerald-600 text-sm font-bold">[신설]</span>}
+                          {art.isModified && <span className="ml-2 text-amber-600 text-sm font-bold">[개정]</span>}
                         </div>
-                        <p className="bg-slate-50 p-3 rounded-lg border border-slate-100 whitespace-pre-wrap font-mono text-xs text-slate-805">
+                        <p className="bg-slate-50 p-4 rounded-xl border border-slate-100 whitespace-pre-wrap font-mono text-sm text-slate-800 leading-relaxed">
                           {art.contentText}
                         </p>
                       </div>
@@ -594,9 +594,9 @@ function EditorContent() {
                   })}
                 </div>
 
-                <div className="pt-6 border-t border-slate-200">
-                  <h4 className="font-bold text-slate-900">부 칙</h4>
-                  <p className="text-xs text-slate-605 mt-2">
+                <div className="pt-8 border-t border-slate-200 mt-10">
+                  <h4 className="font-bold text-slate-900 text-lg">부 칙</h4>
+                  <p className="text-sm text-slate-600 mt-3 font-medium">
                     이 규정은 공포한 날({enactmentDate})부터 시행한다.
                   </p>
                 </div>
@@ -608,27 +608,27 @@ function EditorContent() {
 
         {/* 2-3) [신구조문대비표 자동 생성 뷰] 탭 */}
         {activeTab === "compare" && (
-          <div className="h-full overflow-y-auto p-8 scrollbar bg-slate-50">
-            <div className="max-w-5xl mx-auto space-y-6 pb-10">
+          <div className="h-full overflow-y-auto p-10 scrollbar bg-slate-50">
+            <div className="max-w-6xl mx-auto space-y-6 pb-12">
               
-              <div className="flex items-center justify-between border-b border-slate-200 pb-3 select-none">
-                <h3 className="text-sm font-black text-slate-850 flex items-center gap-2">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4 select-none">
+                <h3 className="text-base font-black text-slate-850 flex items-center gap-2">
                   <CompareArrowsIcon className="text-[#0c3161]" />
                   실시간 신구조문대비표 (현행 vs 개정안 대비)
                 </h3>
-                <span className="text-[10px] text-slate-500 font-bold">
+                <span className="text-xs text-slate-500 font-bold">
                   * 조항 번호(articleNumber) 기준으로 자동 대조되어 생성되었습니다.
                 </span>
               </div>
 
               {/* 대비표 테이블 */}
               <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                <table className="w-full text-xs text-left border-collapse">
+                <table className="w-full text-sm text-left border-collapse">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 select-none font-black text-[11px]">
-                      <th className="py-4 px-5 border-r border-slate-200 w-[45%]">현 행 (개정 전)</th>
-                      <th className="py-4 px-5 border-r border-slate-200 w-[45%]">개 정 안 (개정 후)</th>
-                      <th className="py-4 px-5 w-[10%] text-center">비고 (개정종류)</th>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 select-none font-black text-[13px]">
+                      <th className="py-5 px-6 border-r border-slate-200 w-[45%]">현 행 (개정 전)</th>
+                      <th className="py-5 px-6 border-r border-slate-200 w-[45%]">개 정 안 (개정 후)</th>
+                      <th className="py-5 px-4 w-[10%] text-center">비고 (개정종류)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -644,7 +644,7 @@ function EditorContent() {
                       if (allNums.length === 0) {
                         return (
                           <tr>
-                            <td colSpan={3} className="py-20 text-center text-slate-450 font-bold">
+                            <td colSpan={3} className="py-20 text-center text-slate-450 font-bold text-sm">
                               대비할 조항 데이터가 없습니다.
                             </td>
                           </tr>
@@ -661,9 +661,9 @@ function EditorContent() {
                         if (hasNoChange) {
                           return (
                             <tr key={num} className="border-b border-slate-100 text-slate-400 select-none">
-                              <td className="py-3 px-5 border-r border-slate-150 italic">{getArticleLabel(num, oldArt.title)} - (생 략)</td>
-                              <td className="py-3 px-5 border-r border-slate-150 italic">{getArticleLabel(num, oldArt.title)} - (현행과 같음)</td>
-                              <td className="py-3 px-5 text-center text-slate-400 font-semibold">-</td>
+                              <td className="py-4 px-6 border-r border-slate-150 italic text-sm">{getArticleLabel(num, oldArt.title)} - (생 략)</td>
+                              <td className="py-4 px-6 border-r border-slate-150 italic text-sm">{getArticleLabel(num, oldArt.title)} - (현행과 같음)</td>
+                              <td className="py-4 px-4 text-center text-slate-400 font-semibold text-sm">-</td>
                             </tr>
                           );
                         }
@@ -672,49 +672,49 @@ function EditorContent() {
                           <tr key={num} className="border-b border-slate-200 hover:bg-slate-50/50 transition-colors">
                             
                             {/* 개정 전 */}
-                            <td className="py-4 px-5 border-r border-slate-200 text-slate-700 leading-relaxed align-top">
+                            <td className="py-5 px-6 border-r border-slate-200 text-slate-700 leading-relaxed align-top">
                               {oldArt ? (
-                                <div className="space-y-1">
-                                  <div className="font-black text-slate-500 font-sans">{getArticleLabel(oldArt.articleNumber, oldArt.title)}</div>
-                                  <p className="whitespace-pre-wrap mt-1.5 font-bold">{oldArt.contentText}</p>
+                                <div className="space-y-1.5">
+                                  <div className="font-black text-slate-500 font-sans text-sm">{getArticleLabel(oldArt.articleNumber, oldArt.title)}</div>
+                                  <p className="whitespace-pre-wrap mt-2 font-bold text-[14px]">{oldArt.contentText}</p>
                                 </div>
                               ) : (
-                                <span className="text-emerald-700 font-black italic bg-emerald-50 px-2 py-1 rounded border border-emerald-100 text-[10px]">
+                                <span className="text-emerald-700 font-black italic bg-emerald-50 px-3 py-1 rounded border border-emerald-100 text-xs">
                                   &lt; 본조 신설 &gt;
                                 </span>
                               )}
                             </td>
 
                             {/* 개정 후 */}
-                            <td className="py-4 px-5 border-r border-slate-200 text-slate-700 leading-relaxed align-top">
+                            <td className="py-5 px-6 border-r border-slate-200 text-slate-700 leading-relaxed align-top">
                               {draftArt && !draftArt.isDeleted ? (
-                                <div className="space-y-1">
-                                  <div className="font-black text-[#0c3161] font-sans">{getArticleLabel(draftArt.articleNumber, draftArt.title)}</div>
-                                  <p className="whitespace-pre-wrap mt-1.5 bg-amber-50 p-2.5 rounded border border-amber-100 text-slate-800 font-bold">
+                                <div className="space-y-1.5">
+                                  <div className="font-black text-[#0c3161] font-sans text-sm">{getArticleLabel(draftArt.articleNumber, draftArt.title)}</div>
+                                  <p className="whitespace-pre-wrap mt-2 bg-amber-50 p-3 rounded-lg border border-amber-100 text-slate-800 font-bold text-[14px]">
                                     {draftArt.contentText}
                                   </p>
                                 </div>
                               ) : (
-                                <span className="text-rose-705 font-black italic bg-rose-50 px-2 py-1 rounded border border-rose-100 text-[10px]">
+                                <span className="text-rose-705 font-black italic bg-rose-50 px-3 py-1 rounded border border-rose-100 text-xs">
                                   &lt; 조항 삭제 &gt;
                                 </span>
                               )}
                             </td>
 
                             {/* 비고 */}
-                            <td className="py-4 px-5 text-center align-middle select-none">
+                            <td className="py-5 px-4 text-center align-middle select-none">
                               {(!oldArt && draftArt) && (
-                                <span className="text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded font-black text-[9px]">
+                                <span className="text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-md font-black text-[11px]">
                                   신설
                                 </span>
                               )}
                               {(oldArt && draftArt && draftArt.isDeleted) && (
-                                <span className="text-rose-700 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded font-black text-[9px]">
+                                <span className="text-rose-700 bg-rose-50 border border-rose-100 px-3 py-1 rounded-md font-black text-[11px]">
                                   삭제
                                 </span>
                               )}
                               {(oldArt && draftArt && !draftArt.isDeleted && oldArt.contentText !== draftArt.contentText) && (
-                                <span className="text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded font-black text-[9px]">
+                                <span className="text-amber-700 bg-amber-50 border border-amber-100 px-3 py-1 rounded-md font-black text-[11px]">
                                   개정
                                 </span>
                               )}
@@ -743,7 +743,7 @@ export default function AdminEditor() {
     <Suspense fallback={
       <div className="h-full w-full flex flex-col items-center justify-center gap-4 bg-slate-50">
         <CircularProgress size={30} sx={{ color: "#0c3161" }} />
-        <span className="text-slate-500 text-xs font-semibold">입안편집기(DLMS) 엔진 초기화 중...</span>
+        <span className="text-slate-500 text-sm font-semibold">입안편집기(DLMS) 엔진 초기화 중...</span>
       </div>
     }>
       <EditorContent />
