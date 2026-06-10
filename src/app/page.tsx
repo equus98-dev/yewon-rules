@@ -1263,7 +1263,7 @@ export default function Home() {
                   
                   {/* 우측 끝 학교 배경 (규정목록 헤더와 동일한 블렌딩) */}
                   <div 
-                    className="absolute inset-y-0 right-0 w-[80%] z-0 pointer-events-none"
+                    className="absolute inset-y-0 right-0 w-[90%] z-0 pointer-events-none"
                     style={{ WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 50%)', maskImage: 'linear-gradient(to right, transparent 0%, black 50%)' }}
                   >
                     <Image

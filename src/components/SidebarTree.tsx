@@ -51,6 +51,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   // 최신 제·개정 탭 상태
   const [recentRules, setRecentRules] = useState<any[]>([]);
@@ -211,6 +212,26 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
   };
 
   const displayData = filterTree(treeData, searchTerm);
+
+  // 검색어 입력 시 폴더 자동 전개
+  useEffect(() => {
+    if (searchTerm.trim() !== "") {
+      const ids: string[] = [];
+      const extractIds = (nodes: TreeNode[]) => {
+        nodes.forEach((n) => {
+          if (n.type === "folder") {
+            ids.push(n.id);
+            if (n.children) extractIds(n.children);
+          }
+        });
+      };
+      extractIds(displayData);
+      setExpandedItems(ids);
+    } else {
+      // 검색어가 없으면 모두 접기
+      setExpandedItems([]);
+    }
+  }, [searchTerm, displayData]);
 
   // 재귀적 트리 아이템 렌더러
   const renderTreeItems = (nodes: TreeNode[]) => {
@@ -385,6 +406,8 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
               ) : (
                 <SimpleTreeView
                   selectedItems={activeRuleId || null}
+                  expandedItems={expandedItems}
+                  onExpandedItemsChange={(_e, itemIds) => setExpandedItems(itemIds as string[])}
                   slots={{
                     expandIcon: ClosedIcon,
                     collapseIcon: OpenedIcon,
