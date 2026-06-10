@@ -800,7 +800,7 @@ export default function Home() {
                                 <td className="py-4 px-4">
                                   <button
                                     type="button"
-                                    onClick={() => { setActiveRuleId(rule.id); setActiveVerticalTab(null); }}
+                                    onClick={() => { setActiveRuleId(rule.id); setActiveVerticalTab("규정"); }}
                                     className={`font-bold cursor-pointer text-[15.5px] transition-colors text-left ${isAbolished ? "text-slate-400 line-through group-hover:text-slate-500" : "text-slate-800 group-hover:text-blue-800"}`}
                                   >
                                     {rule.title}
