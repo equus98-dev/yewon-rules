@@ -1374,8 +1374,8 @@ export default function Home() {
                 </div>
 
                 {/* [파트 1.5] 관련 웹사이트 롤링 배너 */}
-                <div className="w-full mt-3 mb-4">
-                  <div className="flex bg-slate-100 border border-slate-200 rounded-lg overflow-hidden h-[45px] items-center px-4 relative">
+                <div className="w-full mt-1.5 mb-2">
+                  <div className="flex bg-slate-100 border border-slate-200 rounded-lg overflow-hidden h-[40px] items-center px-4 relative">
                     <ArrowBackIosIcon sx={{ fontSize: 14 }} className="text-slate-400 shrink-0 absolute left-3 z-10" />
                     <div className="flex-1 overflow-hidden relative h-full flex items-center mx-4" style={{ maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)' }}>
                       <div className="flex animate-marquee gap-12 md:gap-20 items-center w-max">
