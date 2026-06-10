@@ -192,6 +192,35 @@ export default function AdminLayout({
         </main>
       </div>
 
+      {/* 3. Session Extension Modal (10초 이하 남았을 때 표시) */}
+      {sessionTimeLeft <= 10 && sessionTimeLeft > 0 && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl flex flex-col items-center max-w-sm w-full mx-4 text-center">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-5 border-[4px] border-red-50">
+              <svg className="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <h2 className="text-xl font-black text-slate-800 mb-2 tracking-tight">자동 로그아웃 임박</h2>
+            <p className="text-sm text-slate-600 font-bold mb-6 leading-relaxed">
+              보안을 위해 <span className="text-red-600 font-black text-base">{sessionTimeLeft}초 후</span> 세션이 만료됩니다.<br/>로그인 시간을 연장하시겠습니까?
+            </p>
+            <div className="flex gap-3 w-full">
+              <button 
+                onClick={handleLogout}
+                className="flex-1 py-3 bg-slate-100 text-slate-700 font-black rounded-xl hover:bg-slate-200 transition-all cursor-pointer active:scale-95"
+              >
+                로그아웃
+              </button>
+              <button 
+                onClick={handleExtendSession}
+                className="flex-1 py-3 bg-[#0c3161] text-white font-black rounded-xl hover:bg-[#092244] transition-all shadow-lg shadow-[#0c3161]/30 cursor-pointer active:scale-95"
+              >
+                세션 연장하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

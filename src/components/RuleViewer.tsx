@@ -67,6 +67,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const [ruleData, setRuleData] = useState<any>(null);
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
   const [hideHistory, setHideHistory] = useState(false);
+  const [isTocOpen, setIsTocOpen] = useState(true);
   const [expandedAttachments, setExpandedAttachments] = useState<Record<string, boolean>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
   const tocScrollRef = useRef<HTMLDivElement>(null);
@@ -397,10 +398,19 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       {/* 3. 2단 분할 본문 영역 */}
       <div className="flex-1 flex overflow-hidden">
         {/* 좌측 목차 (TOC) */}
-        <div ref={tocScrollRef} className="w-[320px] bg-white border-r border-slate-200 overflow-y-auto scrollbar shrink-0 flex flex-col relative scroll-smooth">
-          <div className="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 sticky top-0 z-10">
-            <HistoryIcon className="text-blue-700" sx={{ fontSize: 16 }} />
-            <span className="font-bold text-sm text-slate-800">목차 ({tocItems.filter(i => i.type === 'article').length})</span>
+        <div ref={tocScrollRef} className={`bg-white border-r border-slate-200 overflow-y-auto scrollbar shrink-0 flex flex-col relative scroll-smooth transition-[width,margin] duration-300 ${isTocOpen ? "w-[320px] ml-0" : "w-0 overflow-hidden border-r-0"}`}>
+          <div className="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-2">
+              <HistoryIcon className="text-blue-700" sx={{ fontSize: 16 }} />
+              <span className="font-bold text-sm text-slate-800 break-keep">목차 ({tocItems.filter(i => i.type === 'article').length})</span>
+            </div>
+            <button
+              onClick={() => setIsTocOpen(false)}
+              className="text-[#1a999c] border border-[#1a999c] hover:bg-[#1a999c]/10 px-1.5 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors break-keep shrink-0 ml-1"
+              title="목차 닫기"
+            >
+              닫기
+            </button>
           </div>
           <ul className="p-3 space-y-1.5">
             {tocItems.map((item, idx) => {
@@ -434,6 +444,16 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
         {/* 우측 본문 */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative scroll-smooth">
+          {/* TOC 열기 플로팅 버튼 (목차가 닫혀있을 때만 보임) */}
+          {!isTocOpen && (
+            <button
+              onClick={() => setIsTocOpen(true)}
+              className="absolute top-4 left-4 z-20 text-[#1a999c] border border-[#1a999c] bg-white hover:bg-[#1a999c]/10 px-2 py-1 rounded shadow-sm text-xs font-bold cursor-pointer transition-colors flex items-center gap-1"
+            >
+              목차 열기
+            </button>
+          )}
+
           <div className="max-w-4xl mx-auto mt-4">
             {/* 규정 제목 */}
             <h2 className="text-[26px] font-black text-center text-[#007073] mb-8 tracking-tight break-keep">{title}</h2>
@@ -452,28 +472,51 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             {/* 조항 렌더링 */}
             {currentRevision?.articles && currentRevision.articles.length > 0 ? (
               <div className="pb-32">
-                {currentRevision.articles.map((a: any) => {
+                {currentRevision.articles.map((a: any, idx: number) => {
                   const hasHtmlAttachments = currentRevision?.articles?.some((art: any) => art.articleNumber >= 9000) || false;
                   
                   // 별지/별표 (9000번대) 조항은 더 이상 본문 하단에 HTML로 렌더링하지 않음 (첨부파일 컴포넌트로 대체)
                   if (a.articleNumber >= 9000) return null;
                   
+                  const prevA = currentRevision.articles[idx - 1];
+                  let chapterInJson = false;
+                  try {
+                    const parsed = typeof a.contentJson === 'string' ? JSON.parse(a.contentJson) : a.contentJson;
+                    if (Array.isArray(parsed) && parsed.some(i => i.type === 'chapter')) {
+                      chapterInJson = true;
+                    }
+                  } catch (e) {}
+
+                  const showChapter = a.chapter && (!prevA || prevA.chapter !== a.chapter) && !chapterInJson;
+                  const showSection = a.section && (!prevA || prevA.section !== a.section);
+
                   return (
-                    <ArticleRenderer
-                      key={a.id}
-                      id={`toc-${a.articleNumber}`}
-                      articleId={a.id}
-                      chapter={a.chapter}
-                      section={a.section}
-                      articleNumber={a.articleNumber}
-                      title={a.title}
-                      contentJson={a.contentJson}
-                      contentText={a.contentText}
-                      contentHtml={a.contentHtml}
-                      hideHistory={hideHistory}
-                      hasHtmlAttachments={hasHtmlAttachments}
-                      isAdmin={isAdmin}
-                    />
+                    <React.Fragment key={a.id}>
+                      {showChapter && (
+                        <div id={`toc-${a.chapter.trim().replace(/\s/g, '-')}`} className="text-center w-full mt-12 mb-6 pt-4 flex flex-col items-center gap-1.5">
+                          <span className="text-[20px] font-black text-[#000080] tracking-tight">{a.chapter}</span>
+                        </div>
+                      )}
+                      {showSection && (
+                        <div id={`toc-${a.section.trim().replace(/\s/g, '-')}`} className="text-center w-full mt-10 mb-4 flex flex-col items-center gap-1">
+                          <span className="text-[18px] font-bold text-[#000080]">{a.section}</span>
+                        </div>
+                      )}
+                      <ArticleRenderer
+                        id={`toc-${a.articleNumber}`}
+                        articleId={a.id}
+                        chapter={a.chapter}
+                        section={a.section}
+                        articleNumber={a.articleNumber}
+                        title={a.title}
+                        contentJson={a.contentJson}
+                        contentText={a.contentText}
+                        contentHtml={a.contentHtml}
+                        hideHistory={hideHistory}
+                        hasHtmlAttachments={hasHtmlAttachments}
+                        isAdmin={isAdmin}
+                      />
+                    </React.Fragment>
                   );
                 })}
 
