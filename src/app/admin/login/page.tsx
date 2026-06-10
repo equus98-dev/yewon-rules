@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
       if (username === "admin" && password === "yewon0555") {
         // 세션 인증 키 발급 (30분 유지시간 설정을 위해 현재 타임스탬프 저장)
         localStorage.setItem("yewon_admin_session", Date.now().toString());
-        router.push("/");
+        router.push("/admin");
       } else {
         setError("아이디 또는 비밀번호가 올바르지 않습니다.");
         setLoading(false);

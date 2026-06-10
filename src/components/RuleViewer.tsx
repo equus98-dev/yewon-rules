@@ -477,7 +477,15 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         acc[baseName].files.push(file);
                         return acc;
                       }, {})
-                    ).map((group: any, idx) => {
+                    )
+                    .sort((a: any, b: any) => {
+                      const aIsMain = a.baseName.includes("[전문]");
+                      const bIsMain = b.baseName.includes("[전문]");
+                      if (aIsMain && !bIsMain) return -1;
+                      if (!aIsMain && bIsMain) return 1;
+                      return a.baseName.localeCompare(b.baseName);
+                    })
+                    .map((group: any, idx) => {
                       const pdfFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf"));
                       const hwpFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp"));
                       const isExpanded = !!expandedAttachments[group.baseName];

@@ -20,6 +20,7 @@ export default function AdminLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [authorized, setAuthorized] = useState<boolean | null>(null);
+  const [sessionTimeLeft, setSessionTimeLeft] = useState<number>(1800);
 
   useEffect(() => {
     // 로그인 페이지는 인증 검사 생략
@@ -28,23 +29,44 @@ export default function AdminLayout({
       return;
     }
 
-    // 클라이언트 사이드 인증 체크 (타임스탬프 30분 검증)
-    const session = localStorage.getItem("yewon_admin_session");
-    if (session && session !== "authorized") {
-      const time = parseInt(session, 10);
-      if (Date.now() - time < 30 * 60 * 1000) {
+    let timerId: NodeJS.Timeout;
+
+    const checkSession = () => {
+      const session = localStorage.getItem("yewon_admin_session");
+      if (session && session !== "authorized") {
+        const time = parseInt(session, 10);
+        const elapsed = Math.floor((Date.now() - time) / 1000);
+        const remaining = 1800 - elapsed;
+        if (remaining > 0) {
+          setAuthorized(true);
+          setSessionTimeLeft(remaining);
+        } else {
+          setAuthorized(false);
+          router.push("/admin/login");
+        }
+      } else if (session === "authorized") {
         setAuthorized(true);
+        setSessionTimeLeft(1800);
       } else {
         setAuthorized(false);
         router.push("/admin/login");
       }
-    } else if (session === "authorized") {
-      setAuthorized(true);
-    } else {
-      setAuthorized(false);
-      router.push("/admin/login");
-    }
+    };
+
+    checkSession();
+    timerId = setInterval(checkSession, 1000);
+    return () => clearInterval(timerId);
   }, [pathname, router]);
+
+  const handleExtendSession = () => {
+    localStorage.setItem("yewon_admin_session", Date.now().toString());
+    setSessionTimeLeft(1800);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("yewon_admin_session");
+    router.push("/admin/login");
+  };
 
   // 1. 로그인 페이지는 인증 검증 없이 즉시 전면 노출 (마운트 깜빡임 제로)
   if (pathname === "/admin/login") {
@@ -90,27 +112,57 @@ export default function AdminLayout({
   ];
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans text-slate-800">
+    <div className="flex flex-col h-screen bg-slate-50 overflow-hidden font-sans text-slate-800">
       
-      {/* 1. 고급 화이트/라이트 네이비 계열 관리자 사이드바 */}
-      <aside className="w-64 bg-white border-r border-slate-250 flex flex-col justify-between shrink-0 shadow-lg z-20">
-        
-        {/* 상단 헤더 */}
-        <div>
-          <div className="p-6 border-b border-slate-200 flex flex-col items-center justify-center gap-2 select-none">
-            <div className="flex items-center justify-center w-full">
-              <Image
-                src="/UI.png"
-                alt="로고"
-                width={183}
-                height={40}
-                className="h-10 w-auto object-contain"
-              />
+      {/* 1. 상단 사용자 통합 헤더 (디자인 일치화) */}
+      <header className="h-[72px] bg-[#0c3161] shadow-lg flex items-center justify-between px-6 shrink-0 text-white relative z-50 select-none">
+        <div className="flex items-center gap-4">
+          <Link href="/admin">
+            <div className="flex items-center cursor-pointer select-none drop-shadow-md">
+              <Image src="/UI.png" alt="Yewon Logo" width={220} height={48} className="brightness-0 invert object-contain" />
+              <div className="ml-3 border-l-2 border-white/30 pl-3 hidden md:block">
+                <span className="font-extrabold tracking-widest text-[15px] block opacity-90">규정관리시스템</span>
+                <span className="text-[10px] uppercase font-bold tracking-widest opacity-70">Admin Mode</span>
+              </div>
             </div>
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 mr-1 hidden sm:flex">
+              <span className="text-sm font-bold text-blue-100 select-none">
+                최고 관리자 님
+              </span>
+              <div className="flex items-center bg-blue-900/50 rounded-full px-2 py-0.5 border border-blue-800 shadow-inner">
+                <span className="text-[11px] font-black text-rose-300 mr-1.5 font-mono w-[34px] text-center">
+                  {Math.floor(sessionTimeLeft / 60)}:{String(sessionTimeLeft % 60).padStart(2, "0")}
+                </span>
+                <button
+                  onClick={handleExtendSession}
+                  className="text-[10px] font-bold bg-[#0c3161] text-blue-100 border border-blue-700 rounded px-1.5 py-0.5 hover:bg-blue-800 transition-colors cursor-pointer active:scale-95"
+                  title="세션 시간 30분으로 연장"
+                >
+                  연장
+                </button>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="text-xs font-bold text-white/80 hover:text-white border border-white/20 hover:border-white/50 bg-white/5 px-3 py-1.5 rounded-lg transition-all active:scale-95"
+            >
+              로그아웃
+            </button>
           </div>
- 
-          {/* 사이드바 메뉴 리스트 */}
-          <nav className="p-4 space-y-2 mt-4">
+        </div>
+      </header>
+
+      {/* 2. 하단 영역 (사이드바 + 메인 컨텐츠) */}
+      <div className="flex-1 flex overflow-hidden">
+        
+        {/* 사이드바 */}
+        <aside className="w-64 bg-white border-r border-slate-250 flex flex-col justify-between shrink-0 shadow-lg z-20">
+          <nav className="p-4 space-y-2 mt-2">
             {menuItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -129,53 +181,24 @@ export default function AdminLayout({
               );
             })}
           </nav>
-        </div>
- 
-        {/* 하단 푸터 - 사용자 서비스로 돌아가기 및 로그아웃 */}
-        <div className="p-4 border-t border-slate-200 space-y-2.5">
-          <button
-            type="button"
-            onClick={() => {
-              localStorage.removeItem("yewon_admin_session");
-              router.push("/admin/login");
-            }}
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-red-200 text-[13px] font-black text-red-600 hover:bg-red-50 transition-all active:scale-95 cursor-pointer"
-          >
-            로그아웃
-          </button>
-          <Link
-            href="/"
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-slate-200 text-[13px] font-black text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 cursor-pointer"
-          >
-            <ExitToAppIcon sx={{ fontSize: 18 }} />
-            사용자 웹 화면
-          </Link>
-        </div>
-      </aside>
- 
-      {/* 2. 우측 메인 콘텐츠 작업 영역 */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-slate-50">
-        
-        {/* 헤더 바 */}
-        <header className="h-16 border-b border-slate-250 bg-white px-8 flex items-center justify-between shrink-0 select-none">
-          <div className="text-sm text-slate-500 font-bold">
-            규정관리시스템 관리자 모드
+
+          <div className="p-4 border-t border-slate-200 space-y-2.5">
+            <Link
+              href="/"
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-slate-200 text-[13px] font-black text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95 cursor-pointer"
+            >
+              <ExitToAppIcon sx={{ fontSize: 18 }} />
+              사용자 웹 화면
+            </Link>
           </div>
-          
-          <div className="flex items-center gap-4 text-sm font-bold text-slate-700">
-            <span className="bg-[#0c3161]/10 text-[#0c3161] px-2.5 py-1 rounded border border-[#0c3161]/20 text-[11px] font-black">
-              System Admin
-            </span>
-            <span>최고 관리자 님</span>
-          </div>
-        </header>
- 
-        {/* 컨텐츠 컨테이너 */}
-        <main className="flex-1 overflow-hidden">
+        </aside>
+
+        {/* 메인 콘텐츠 작업 영역 */}
+        <main className="flex-1 overflow-hidden bg-slate-50">
           {children}
         </main>
       </div>
- 
+
     </div>
   );
 }
