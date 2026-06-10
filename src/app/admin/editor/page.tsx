@@ -249,18 +249,35 @@ function EditorContent() {
 
     setSaving(true);
     try {
+      const formattedDate = enactmentDate.replace(/-/g, '.');
+
       // 삭제된 항목은 필터링하여 저장할 조항 리스트 구성
       const articlesToSave = draftArticles
         .filter((art) => !art.isDeleted)
-        .map((art, idx) => ({
-          chapter: art.chapter,
-          section: art.section,
-          articleNumber: art.articleNumber,
-          title: art.title,
-          contentText: art.contentText,
-          contentJson: { paragraphs: [art.contentText.split(") ").slice(1).join(") ") || art.contentText] },
-          sortOrder: idx + 1,
-        }));
+        .map((art, idx) => {
+          let updatedContentText = art.contentText;
+          if (art.isNew) {
+            const tag = ` <신설 ${formattedDate}>`;
+            if (!updatedContentText.includes(tag)) {
+              updatedContentText += tag;
+            }
+          } else if (art.isModified) {
+            const tag = ` <개정 ${formattedDate}>`;
+            if (!updatedContentText.includes(tag)) {
+              updatedContentText += tag;
+            }
+          }
+
+          return {
+            chapter: art.chapter,
+            section: art.section,
+            articleNumber: art.articleNumber,
+            title: art.title,
+            contentText: updatedContentText,
+            contentJson: { paragraphs: [updatedContentText.split(") ").slice(1).join(") ") || updatedContentText] },
+            sortOrder: idx + 1,
+          };
+        });
 
       const res = await fetch("/api/admin/revisions", {
         method: "POST",
