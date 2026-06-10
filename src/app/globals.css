@@ -176,11 +176,7 @@
   text-align: center !important;
 }
 
-/* 2. 왼쪽 구분열 (첫 번째 열) 음영 처리 */
-.html-table-wrapper tr td:first-child {
-  background-color: #f3f4f6 !important;
-  font-weight: 600 !important;
-}
+/* 2. 왼쪽 구분열 (첫 번째 열) 음영 처리 (제거: rowspan시 문제 발생) */
 
 /* 조직도 전용 스타일 (인라인 스타일 우선, 그리드선 숨김) */
 .org-chart-wrapper {

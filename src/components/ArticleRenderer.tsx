@@ -264,8 +264,16 @@ export default function ArticleRenderer({
         if (offset === 0 || before.endsWith('\n')) return match;
         return '\n' + match;
       })
-      .replace(/(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/g, '\n$1 ')
-      .replace(/(^|\s)([가-하]\.)\s+/g, '$1\n$2 ')
+      .replace(/(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/g, (match, p1, offset, string) => {
+        const before = string.slice(0, offset);
+        if (offset === 0 || before.endsWith('\n')) return match;
+        return '\n' + p1 + ' ';
+      })
+      .replace(/(^|\s)([가-하]\.)[ \t]+/g, (match, p1, p2, offset, string) => {
+        const before = string.slice(0, offset + p1.length);
+        if (offset === 0 || before.endsWith('\n')) return match;
+        return p1 + '\n' + p2 + ' ';
+      })
       .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])\s*\n([①-⑮])/g, '$1 $2')
       .replace(/((?<![『「])제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])/g, '\n\n$1')
       .replace(/(제\d+(?:장|절|관)\s+[^\s]+)/g, '\n\n$1')

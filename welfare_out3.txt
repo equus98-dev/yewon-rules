@@ -1,0 +1,28 @@
+사회복지대학원:
+[
+  {
+    "id": "48c33951-c214-4bc3-867d-7762fe1e4b12",
+    "chapter": "제5장 학위논문제출 및 학위수여",
+    "section": null,
+    "articleNumber": 43,
+    "title": "논문제출자격",
+    "contentJson": "[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]",
+    "contentText": "제43조(논문제출자격) 학위신청 심사용 논문을 제출하고자 하는 자는 다음의 자격을 구비하여야 한다.\n1. 4학기 이상의 정규등록을 필하고 석사학위과정 이수에 소요되는 학점(연구과제포함)을 취득한 자 또는 취득예정자.\n2. 석사학위과정 총 이수성적의 평점평균이 3.0이상인 자.\n3. 논문계획서를 제출하고 1학기(6개월)이상 논문지도를 받은 자.\n4. 종합시험에 합격한 자.\n5. 재학연한이 경과하지 아니한 자.",
+    "contentHtml": null,
+    "sortOrder": 43
+  },
+  {
+    "id": "77a3d316-9e91-498f-98fa-bf36b101cf5e",
+    "chapter": "제7장 장학금",
+    "section": null,
+    "articleNumber": 78,
+    "title": "지급의 제한",
+    "contentJson": "[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]",
+    "contentText": "제78조(지급의 제한) 다음 각 호에 해당하는 자는 장학금을 지급하지 아니한다.\n1. 휴학자\n2. 학칙을 위반하거나 학사행정에 지장을 주는 자.\n3. 대학원장이 특별한 사유가 있어 지급할 수 없다고 판단한 자\n4. 기타 징계 처분을 받은 자.\n제8장 보칙",
+    "contentHtml": null,
+    "sortOrder": 78
+  }
+]
+
+일반대학원:
+[]
