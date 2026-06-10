@@ -11,6 +11,8 @@ import InfoIcon from "@mui/icons-material/Info";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import LaunchIcon from "@mui/icons-material/Launch";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import "react-quill/dist/quill.core.css";
@@ -399,18 +401,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       <div className="flex-1 flex overflow-hidden">
         {/* 좌측 목차 (TOC) */}
         <div ref={tocScrollRef} className={`bg-white border-r border-slate-200 overflow-y-auto scrollbar shrink-0 flex flex-col relative scroll-smooth transition-[width,margin] duration-300 ${isTocOpen ? "w-[320px] ml-0" : "w-0 overflow-hidden border-r-0"}`}>
-          <div className="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center justify-between sticky top-0 z-10">
+          <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-2">
               <HistoryIcon className="text-blue-700" sx={{ fontSize: 16 }} />
               <span className="font-bold text-sm text-slate-800 break-keep">목차 ({tocItems.filter(i => i.type === 'article').length})</span>
             </div>
-            <button
-              onClick={() => setIsTocOpen(false)}
-              className="text-[#1a999c] border border-[#1a999c] hover:bg-[#1a999c]/10 px-1.5 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors break-keep shrink-0 ml-1"
-              title="목차 닫기"
-            >
-              닫기
-            </button>
           </div>
           <ul className="p-3 space-y-1.5">
             {tocItems.map((item, idx) => {
@@ -442,19 +437,22 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           </ul>
         </div>
 
-        {/* 우측 본문 */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative scroll-smooth">
-          {/* TOC 열기 플로팅 버튼 (목차가 닫혀있을 때만 보임) */}
-          {!isTocOpen && (
+          {/* TOC Toggle Tab */}
+          <div 
+            className="fixed top-1/2 -translate-y-1/2 z-30 transition-all duration-300"
+            style={{ left: isTocOpen ? "404px" : "84px" }} /* 84px is sidebar width, 320px is toc width */
+          >
             <button
-              onClick={() => setIsTocOpen(true)}
-              className="absolute top-4 left-4 z-20 text-[#1a999c] border border-[#1a999c] bg-white hover:bg-[#1a999c]/10 px-2 py-1 rounded shadow-sm text-xs font-bold cursor-pointer transition-colors flex items-center gap-1"
+              onClick={() => setIsTocOpen(!isTocOpen)}
+              className="w-6 h-16 bg-[#0c3161] hover:bg-[#092244] text-white flex items-center justify-center rounded-r-xl shadow-md cursor-pointer transition-colors border border-l-0 border-[#092244]"
+              title={isTocOpen ? "목차 닫기" : "목차 열기"}
             >
-              목차 열기
+              {isTocOpen ? <KeyboardArrowLeftIcon fontSize="small" /> : <KeyboardArrowRightIcon fontSize="small" />}
             </button>
-          )}
+          </div>
 
-          <div className="max-w-4xl mx-auto mt-4">
+          <div className="max-w-4xl mx-auto mt-4 relative">
             {/* 규정 제목 */}
             <h2 className="text-[26px] font-black text-center text-[#007073] mb-8 tracking-tight break-keep">{title}</h2>
             
@@ -624,20 +622,20 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
             
             {/* Scroll Buttons */}
-            <div className="fixed bottom-10 right-10 flex flex-col gap-3 z-50">
+            <div className="fixed top-1/2 -translate-y-1/2 right-6 flex flex-col gap-2 z-50">
               <button
                 onClick={handleScrollTop}
-                className="w-12 h-12 rounded-full bg-[#009b9e] text-white shadow-xl flex items-center justify-center hover:bg-[#008285] transition-all hover:-translate-y-1 active:scale-95"
+                className="w-10 h-10 rounded-full bg-[#009b9e] text-white shadow-lg flex items-center justify-center hover:bg-[#008285] transition-all hover:-translate-y-1 active:scale-95 opacity-80 hover:opacity-100 cursor-pointer"
                 title="맨 위로 한 번에 이동"
               >
-                <KeyboardArrowUpIcon fontSize="large" />
+                <KeyboardArrowUpIcon fontSize="medium" />
               </button>
               <button
                 onClick={handleScrollBottom}
-                className="w-12 h-12 rounded-full bg-[#009b9e] text-white shadow-xl flex items-center justify-center hover:bg-[#008285] transition-all hover:translate-y-1 active:scale-95"
+                className="w-10 h-10 rounded-full bg-[#009b9e] text-white shadow-lg flex items-center justify-center hover:bg-[#008285] transition-all hover:translate-y-1 active:scale-95 opacity-80 hover:opacity-100 cursor-pointer"
                 title="맨 아래로 한 번에 이동"
               >
-                <KeyboardArrowDownIcon fontSize="large" />
+                <KeyboardArrowDownIcon fontSize="medium" />
               </button>
             </div>
           </div>

@@ -146,10 +146,11 @@ export default function AdminLayout({
       {/* 2. 하단 영역 (세로 좁은 메뉴바 + 메인 컨텐츠 꽉차게) */}
       <div className="flex-1 flex overflow-hidden">
         
-        {/* 사이드바 (Dark Navy, Narrow) */}
-        <aside className="w-[84px] bg-[#0c3161] border-r border-[#071f3f] flex flex-col justify-between shrink-0 shadow-[4px_0_12px_rgba(0,0,0,0.1)] z-20 relative">
-          {/* Subtle gradient on top of solid color */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+        {/* 사이드바 (Teal color with background image) */}
+        <aside className="w-[84px] bg-[#009b9e] border-r border-[#007073] flex flex-col justify-between shrink-0 shadow-[4px_0_12px_rgba(0,0,0,0.1)] z-20 relative overflow-hidden">
+          {/* Background image overlay */}
+          <div className="absolute inset-0 bg-[url('/yewon2.jpeg')] bg-cover bg-center opacity-30 mix-blend-multiply pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#009b9e]/50 to-[#007073]/90 pointer-events-none" />
           
           <nav className="p-2 space-y-1 mt-3 relative z-10">
             {menuItems.map((item) => {
@@ -160,8 +161,8 @@ export default function AdminLayout({
                   href={item.href}
                   className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all cursor-pointer select-none group ${
                     isActive
-                      ? "bg-white text-[#0c3161] shadow-md"
-                      : "text-blue-200 hover:bg-white/10 hover:text-white"
+                      ? "bg-white text-[#007073] shadow-md"
+                      : "text-blue-50 hover:bg-white/20 hover:text-white"
                   }`}
                 >
                   <div className={`${isActive ? "scale-110 drop-shadow-sm" : "opacity-85 group-hover:opacity-100 group-hover:scale-110 transition-all"}`}>
@@ -178,10 +179,10 @@ export default function AdminLayout({
           <div className="p-2 mb-3 relative z-10">
             <Link
               href="/"
-              className="flex flex-col items-center justify-center gap-1.5 w-full py-3 rounded-xl border border-white/10 bg-white/5 text-blue-100 hover:bg-white/15 hover:border-white/30 hover:text-white transition-all active:scale-95 cursor-pointer"
+              className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all cursor-pointer select-none border border-white/20 hover:bg-white/10 text-white group"
             >
-              <ExitToAppIcon sx={{ fontSize: 24 }} className="opacity-90" />
-              <span className="text-[10px] font-bold text-center leading-tight break-keep tracking-tight">사용자홈</span>
+              <ExitToAppIcon sx={{ fontSize: 24 }} className="opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" />
+              <span className="text-[11px] font-bold text-center tracking-tight leading-tight">사용자홈</span>
             </Link>
           </div>
         </aside>

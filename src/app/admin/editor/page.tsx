@@ -56,6 +56,9 @@ function EditorContent() {
   // 편집용 조항(Articles) 목록 상태
   const [draftArticles, setDraftArticles] = useState<any[]>([]);
 
+  // 신규 조항 추가 위치 지정용 체크 인덱스
+  const [checkedArticleIndex, setCheckedArticleIndex] = useState<number | null>(null);
+
   // 1. 규정 마스터 목록 로드
   useEffect(() => {
     async function loadRules() {
@@ -173,20 +176,28 @@ function EditorContent() {
     setDraftArticles((prev) => {
       const maxNum = prev.length > 0 ? Math.max(...prev.map((p) => p.articleNumber)) : 0;
       const nextNum = maxNum + 1;
-      return [
-        ...prev,
-        {
-          chapter: prev[prev.length - 1]?.chapter || "제1장 총칙",
-          articleNumber: nextNum,
-          title: "조항 제목",
-          contentText: `제${nextNum}조 (제목) `,
-          contentJson: { paragraphs: [""] },
-          sortOrder: nextNum,
-          isNew: true,
-          isDeleted: false,
-          isModified: false,
-        },
-      ];
+      const newArticle = {
+        chapter: "제1장 총칙",
+        articleNumber: nextNum,
+        title: "조항 제목",
+        contentText: `제${nextNum}조 (제목) `,
+        contentJson: { paragraphs: [""] },
+        sortOrder: nextNum,
+        isNew: true,
+        isDeleted: false,
+        isModified: false,
+      };
+
+      if (checkedArticleIndex !== null && checkedArticleIndex >= 0 && checkedArticleIndex < prev.length) {
+        newArticle.chapter = prev[checkedArticleIndex].chapter || "제1장 총칙";
+        const newArray = [...prev];
+        newArray.splice(checkedArticleIndex + 1, 0, newArticle);
+        setCheckedArticleIndex(null); // 추가 후 체크 해제
+        return newArray;
+      }
+
+      newArticle.chapter = prev[prev.length - 1]?.chapter || "제1장 총칙";
+      return [...prev, newArticle];
     });
   };
 
@@ -381,7 +392,7 @@ function EditorContent() {
         </div>
 
         {/* 탭 바 컨트롤 */}
-        <div className="flex border-b border-slate-200 text-sm font-black select-none mt-2">
+        <div className="flex border-b border-slate-200 text-[15px] font-black select-none mt-2">
           <button
             onClick={() => setActiveTab("edit")}
             className={`px-6 py-3 border-b-2 transition-all cursor-pointer ${
@@ -488,6 +499,13 @@ function EditorContent() {
                     >
                       <div className="flex items-center justify-between gap-4 select-none">
                         <div className="flex items-center gap-3">
+                          <input 
+                            type="checkbox"
+                            checked={checkedArticleIndex === idx}
+                            onChange={() => setCheckedArticleIndex(checkedArticleIndex === idx ? null : idx)}
+                            className="w-5 h-5 cursor-pointer accent-[#0c3161]"
+                            title="이 조항 아래에 신설하려면 체크하세요"
+                          />
                           <span className="text-xs font-black bg-slate-100 text-slate-650 px-3 py-1 rounded border border-slate-200">
                             {getArticleNumBadge(art.articleNumber, art.title)}
                           </span>
@@ -499,6 +517,22 @@ function EditorContent() {
                         </div>
 
                         <div className="flex items-center gap-2">
+                          {/* 개정(저장) 버튼 */}
+                          {!art.isDeleted && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                alert("해당 조문의 개정 내용이 임시 반영되었습니다. 최종 배포 시 함께 저장됩니다.");
+                                // 강제 수정 마킹
+                                setDraftArticles((prev) =>
+                                  prev.map((a, i) => (i === idx ? { ...a, isModified: true } : a))
+                                );
+                              }}
+                              className="bg-[#0c3161] border border-[#092244] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#092244] transition-all cursor-pointer active:scale-95 shadow-sm"
+                            >
+                              개정(저장)
+                            </button>
+                          )}
                           {/* 삭제 토글 버튼 */}
                           <button
                             type="button"

@@ -177,7 +177,7 @@ export default function AdminNotices() {
         ) : (
           <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
-              <table className="w-full text-[13.5px] text-left border-collapse">
+              <table className="w-full text-[15px] text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 select-none font-bold">
                     <th className="py-4 px-5 w-16 text-center font-black">번호</th>
@@ -195,16 +195,16 @@ export default function AdminNotices() {
                     >
                       <td className="py-4 px-5 text-center text-slate-500 font-bold select-none">{idx + 1}</td>
                       <td className="py-4 px-4 text-center">
-                        <span className="bg-amber-50 text-amber-800 border border-amber-100 px-2.5 py-1 rounded-md text-[11px] font-black select-none">
+                        <span className="bg-amber-50 text-amber-800 border border-amber-100 px-2.5 py-1 rounded-md text-[13px] font-black select-none">
                           {notice.dept}
                         </span>
                       </td>
                       <td className="py-4 px-4">
                         <div className="space-y-1.5">
-                          <h4 className="font-black text-slate-800 text-[14px] group-hover:text-blue-900 transition-colors leading-snug">
+                          <h4 className="font-black text-slate-800 text-[16px] group-hover:text-blue-900 transition-colors leading-snug">
                             {notice.title}
                           </h4>
-                          <p className="text-[12px] text-slate-450 font-bold max-w-xl truncate">
+                          <p className="text-[14px] text-slate-450 font-bold max-w-xl truncate">
                             {notice.content}
                           </p>
                         </div>

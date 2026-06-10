@@ -155,8 +155,8 @@ export default function AdminFilesManagement() {
                   <span className="font-black text-xs">{isPdf ? 'PDF' : 'HWP'}</span>
                 </div>
                 <div className="min-w-0">
-                  <h4 className="font-bold text-slate-800 text-sm truncate">{file.title}</h4>
-                  <p className="text-xs text-slate-500 mt-1 truncate">
+                  <h4 className="font-bold text-slate-800 text-[15px] truncate">{file.title}</h4>
+                  <p className="text-[13px] text-slate-500 mt-1 truncate">
                     {file.fileUrl.split("/").pop()}
                   </p>
                 </div>
