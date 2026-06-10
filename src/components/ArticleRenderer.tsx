@@ -55,7 +55,7 @@ export default function ArticleRenderer({
     setModalHistory([]); // open modal with loading state
     try {
       const res = await fetch(`/api/articles/${articleId}/history`);
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (data.history && data.history.length > 0) {
         setModalHistory(data.history);
       } else {
