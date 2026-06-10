@@ -74,6 +74,45 @@ export default function ArticleRenderer({
     const wrapperClass = isOrgChart ? "org-chart-wrapper" : "html-table-wrapper";
 
     let cleanHtml = contentHtml;
+
+    // HWP 파싱 중 HTML 자체에 장/절 제목이 중복 포함된 경우 이를 제거 (최대 5개 문단 확인)
+    if (chapter || section) {
+      for (let i = 0; i < 5; i++) {
+        const match = cleanHtml.match(/^(\s*<p[^>]*>.*?<\/p>\s*)/i);
+        if (match) {
+          const rawText = match[0].replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+          const pText = rawText.replace(/\s+/g, '').replace(/&nbsp;/g, '');
+          
+          if (pText === '') {
+            // 빈 문단이면 그냥 제거하고 다음 문단 확인
+            cleanHtml = cleanHtml.replace(match[0], '');
+            continue;
+          }
+          
+          let removed = false;
+          if (chapter) {
+            const chapText = chapter.replace(/\s+/g, '');
+            if (pText === chapText || (pText.includes(chapText) && pText.length < chapText.length + 5)) {
+              cleanHtml = cleanHtml.replace(match[0], '');
+              removed = true;
+            }
+          }
+          
+          if (!removed && section) {
+            const secText = section.replace(/\s+/g, '');
+            if (pText === secText || (pText.includes(secText) && pText.length < secText.length + 5)) {
+              cleanHtml = cleanHtml.replace(match[0], '');
+              removed = true;
+            }
+          }
+          
+          if (!removed) break;
+        } else {
+          break;
+        }
+      }
+    }
+
     if (articleNumber >= 9000) {
       // HWP 파싱 중 HTML 자체에 별지 제목이 중복 포함된 경우 이를 제거 (첫 번째 P 태그가 제목인 경우)
       const match = cleanHtml.match(/^(\s*<p[^>]*>.*?<\/p>\s*)/i);
