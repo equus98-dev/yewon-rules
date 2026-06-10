@@ -92,7 +92,7 @@ export default function AdminFilesManagement() {
     }
   };
 
-  const triggerUpload = (attachmentId: string) => {
+  const triggerUpload = (attachmentId: string | null) => {
     setTargetAttachmentId(attachmentId);
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -101,19 +101,21 @@ export default function AdminFilesManagement() {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !activeRule || !targetAttachmentId) return;
+    if (!file || !activeRule) return;
 
-    if (!file.name.toLowerCase().endsWith(".hwp")) {
-      alert("HWP 파일만 업로드할 수 있습니다.");
+    if (!file.name.toLowerCase().endsWith(".hwp") && !file.name.toLowerCase().endsWith(".pdf")) {
+      alert("HWP 또는 PDF 파일만 업로드할 수 있습니다.");
       return;
     }
 
-    setUploading(targetAttachmentId);
+    setUploading(targetAttachmentId || "new");
     
     const formData = new FormData();
     formData.append("file", file);
     formData.append("ruleId", activeRule.id);
-    formData.append("attachmentId", targetAttachmentId);
+    if (targetAttachmentId) {
+      formData.append("attachmentId", targetAttachmentId);
+    }
 
     try {
       const res = await fetch("/api/admin/files", {
@@ -124,7 +126,7 @@ export default function AdminFilesManagement() {
       const data = (await res.json()) as any;
       if (!res.ok) throw new Error(data.error || "업로드 실패");
       
-      alert("파일이 성공적으로 교체되었습니다.");
+      alert(targetAttachmentId ? "파일이 성공적으로 교체되었습니다." : "파일이 성공적으로 추가되었습니다.");
       loadAttachments(activeRule.id);
     } catch (error: any) {
       console.error("Upload error:", error);
@@ -133,6 +135,18 @@ export default function AdminFilesManagement() {
       setUploading(null);
       setTargetAttachmentId(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDelete = async (attachmentId: string) => {
+    if (!confirm("이 첨부파일을 삭제하시겠습니까?")) return;
+    try {
+      const res = await fetch(`/api/admin/files?id=${attachmentId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("삭제 실패");
+      alert("삭제되었습니다.");
+      if (activeRule) loadAttachments(activeRule.id);
+    } catch (error: any) {
+      alert(error.message || "삭제 중 오류가 발생했습니다.");
     }
   };
 
@@ -181,8 +195,17 @@ export default function AdminFilesManagement() {
               <div className="p-5 border-b border-slate-100 bg-[#0c3161]/5 flex items-center justify-between">
                 <div>
                   <h3 className="font-black text-lg text-[#0c3161]">{activeRule.name}</h3>
-                  <p className="text-xs text-slate-500 font-bold mt-1">첨부파일 목록 및 교체</p>
+                  <p className="text-xs text-slate-500 font-bold mt-1">첨부파일 목록 및 추가/교체</p>
                 </div>
+                <Button
+                  variant="contained"
+                  startIcon={<UploadFileIcon />}
+                  onClick={() => triggerUpload(null)}
+                  disabled={uploading === "new"}
+                  sx={{ bgcolor: "#0c3161", "&:hover": { bgcolor: "#092244" } }}
+                >
+                  새 파일 첨부
+                </Button>
               </div>
               <div className="flex-1 overflow-y-auto p-6 scrollbar bg-slate-50">
                 {loadingAttachments ? (
@@ -231,6 +254,12 @@ export default function AdminFilesManagement() {
                             )}
                             {uploading === file.id ? "업로드 중..." : "파일 교체"}
                           </button>
+                          <button
+                            onClick={() => handleDelete(file.id)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition-colors shadow-sm ml-1"
+                          >
+                            삭제
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -240,8 +269,8 @@ export default function AdminFilesManagement() {
                 <div className="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3">
                   <CheckCircleIcon sx={{ color: "#3b82f6", mt: 0.5 }} />
                   <div className="text-sm font-bold text-blue-900 leading-relaxed">
-                    <p className="mb-1">파일 교체 완료 시, 사용자 화면의 '서식' 메뉴에서도 즉시 교체된 새 파일로 다운로드가 가능해집니다.</p>
-                    <p className="text-blue-700/80">※ HWP 확장자 파일만 업로드가 가능합니다. 교체 전 [다운로드] 버튼을 통해 기존 양식을 꼭 확인해 주세요.</p>
+                    <p className="mb-1">파일 추가/교체 완료 시, 사용자 화면의 '서식' 메뉴 및 규정 본문 하단의 별지 뷰어에서 즉시 확인이 가능해집니다.</p>
+                    <p className="text-blue-700/80">※ HWP 및 PDF 확장자 파일만 업로드가 가능합니다. 파일명은 별지 제목(예: [별표] 위임전결권 구분표.pdf)으로 지정해 주세요.</p>
                   </div>
                 </div>
               </div>
@@ -260,7 +289,7 @@ export default function AdminFilesManagement() {
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept=".hwp"
+        accept=".hwp,.pdf"
         className="hidden"
       />
     </div>

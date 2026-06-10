@@ -9,7 +9,11 @@ import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import ArticleIcon from "@mui/icons-material/Article";
 import InfoIcon from "@mui/icons-material/Info";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import LaunchIcon from "@mui/icons-material/Launch";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import "react-quill/dist/quill.core.css";
 
 interface RuleViewerProps {
   ruleId: string;
@@ -63,6 +67,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const [ruleData, setRuleData] = useState<any>(null);
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
   const [hideHistory, setHideHistory] = useState(false);
+  const [expandedAttachments, setExpandedAttachments] = useState<Record<string, boolean>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const currentRevision = ruleData?.currentRevision;
@@ -449,6 +454,77 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                     />
                   );
                 })}
+
+                {/* Attachments Section */}
+                {attachments && attachments.length > 0 && (
+                  <div className="mt-16 w-full space-y-4">
+                    {/* Group attachments by base name */}
+                    {Object.values(
+                      attachments.reduce((acc: any, file: any) => {
+                        const baseName = file.title.replace(/\.[^/.]+$/, "");
+                        if (!acc[baseName]) acc[baseName] = { baseName, files: [] };
+                        acc[baseName].files.push(file);
+                        return acc;
+                      }, {})
+                    ).map((group: any, idx) => {
+                      const pdfFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf"));
+                      const hwpFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp"));
+                      const isExpanded = !!expandedAttachments[group.baseName];
+
+                      return (
+                        <div key={idx} className="border border-slate-300 rounded-lg overflow-hidden bg-white shadow-sm">
+                          {/* Accordion Header */}
+                          <div 
+                            className="bg-slate-50 hover:bg-slate-100 flex items-center justify-between px-4 py-3 cursor-pointer select-none border-b border-slate-200 transition-colors"
+                            onClick={() => setExpandedAttachments(prev => ({ ...prev, [group.baseName]: !isExpanded }))}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-slate-500 flex items-center justify-center">
+                                {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+                              </span>
+                              <span className="font-bold text-slate-800 text-[15px]">{group.baseName}</span>
+                              <div className="flex items-center gap-1.5 ml-3" onClick={(e) => e.stopPropagation()}>
+                                {hwpFile && (
+                                  <a href={hwpFile.fileUrl.startsWith('http') ? `${hwpFile.fileUrl}?download=${encodeURIComponent(hwpFile.title)}` : hwpFile.fileUrl} download={hwpFile.title} target="_blank" className="bg-blue-50 border border-blue-200 text-blue-700 px-1.5 py-0.5 rounded text-[11px] font-black flex items-center gap-0.5 hover:bg-blue-100 transition-colors" title="HWP 다운로드">
+                                    <ArticleIcon sx={{ fontSize: 14 }} /> HWP
+                                  </a>
+                                )}
+                                {pdfFile && (
+                                  <a href={pdfFile.fileUrl} download={pdfFile.title} target="_blank" className="bg-red-50 border border-red-200 text-red-700 px-1.5 py-0.5 rounded text-[11px] font-black flex items-center gap-0.5 hover:bg-red-100 transition-colors" title="PDF 다운로드">
+                                    <PictureAsPdfIcon sx={{ fontSize: 14 }} /> PDF
+                                  </a>
+                                )}
+                                {pdfFile && (
+                                  <a href={pdfFile.fileUrl} target="_blank" className="text-slate-400 hover:text-slate-600 transition-colors ml-1 flex items-center justify-center" title="새 창에서 열기">
+                                    <LaunchIcon sx={{ fontSize: 16 }} />
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Accordion Body (PDF Viewer) */}
+                          {isExpanded && (
+                            <div className="bg-slate-100 p-0 w-full" style={{ height: "800px" }}>
+                              {pdfFile ? (
+                                <iframe 
+                                  src={`${pdfFile.fileUrl}#toolbar=0`} 
+                                  className="w-full h-full border-none"
+                                  title={group.baseName}
+                                />
+                              ) : (
+                                <div className="flex items-center justify-center h-full text-slate-400 font-bold flex-col gap-2">
+                                  <ArticleIcon sx={{ fontSize: 48, color: "#cbd5e1" }} />
+                                  PDF 파일이 제공되지 않는 서식입니다. 상단에서 HWP 파일을 다운로드하세요.
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-20 text-slate-400">조항 내용이 없습니다.</div>

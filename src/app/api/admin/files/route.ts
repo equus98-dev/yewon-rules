@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     const ruleId = formData.get("ruleId") as string;
     const attachmentId = formData.get("attachmentId") as string;
 
-    if (!file || !ruleId || !attachmentId) {
+    if (!file || !ruleId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -74,13 +74,21 @@ export async function POST(request: Request) {
     // Public API URL 생성 (파일 다운로드용 라우트)
     const publicUrl = `/api/files/${uniqueFileName}`;
 
-    // 데이터베이스 업데이트
-    await pool.query(
-      `UPDATE "Attachment" 
-       SET "fileUrl" = $1, "fileSize" = $2, "fileType" = $3
-       WHERE id = $4`,
-      [publicUrl, file.size, ext?.toUpperCase() || 'HWP', attachmentId]
-    );
+    // 데이터베이스 업데이트 또는 추가
+    if (attachmentId) {
+      await pool.query(
+        `UPDATE "Attachment" 
+         SET "fileUrl" = $1, "fileSize" = $2, "fileType" = $3, title = $4
+         WHERE id = $5`,
+        [publicUrl, file.size, ext?.toUpperCase() || 'HWP', file.name, attachmentId]
+      );
+    } else {
+      await pool.query(
+        `INSERT INTO "Attachment" (id, "ruleId", title, "fileUrl", "fileSize", "fileType", "createdAt", "updatedAt")
+         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
+        [crypto.randomUUID(), ruleId, file.name, publicUrl, file.size, ext?.toUpperCase() || 'HWP']
+      );
+    }
 
     return NextResponse.json({ 
       success: true, 
@@ -88,6 +96,28 @@ export async function POST(request: Request) {
     });
   } catch (error: any) {
     console.error("[Admin Files API POST Error]:", error);
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
+  } finally {
+    if (pool) await pool.end();
+  }
+}
+
+export async function DELETE(request: Request) {
+  let pool;
+  try {
+    pool = createPool();
+    const { searchParams } = new URL(request.url);
+    const attachmentId = searchParams.get("id");
+
+    if (!attachmentId) {
+      return NextResponse.json({ error: "Missing attachmentId" }, { status: 400 });
+    }
+
+    await pool.query(`DELETE FROM "Attachment" WHERE id = $1`, [attachmentId]);
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("[Admin Files API DELETE Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
     if (pool) await pool.end();

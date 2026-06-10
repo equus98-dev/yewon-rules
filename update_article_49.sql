@@ -1,0 +1,1 @@
+UPDATE Article SET title = '선거방법', contentJson = '[{"type":"article","num":"제49조","text":"(선거방법) 본 회의 선거는 보통, 평등, 직접, 비밀선거로 한다."}]', contentText = '제49조(선거방법) 본 회의 선거는 보통, 평등, 직접, 비밀선거로 한다.' WHERE id = '4e56dcb4-a3ff-48df-9a1d-8390a91c741d';
