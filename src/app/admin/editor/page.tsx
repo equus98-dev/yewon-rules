@@ -255,7 +255,7 @@ function EditorContent() {
       const articlesToSave = draftArticles
         .filter((art) => !art.isDeleted)
         .map((art, idx) => {
-          let updatedContentText = art.contentText;
+          let updatedContentText = art.contentText.trim();
           if (art.isNew) {
             const tag = ` <신설 ${formattedDate}>`;
             if (!updatedContentText.includes(tag)) {
