@@ -614,8 +614,9 @@ export default function ArticleRenderer({
               </div>
             );
           }
+          const isGluedArticle = /^\s*제\d+(?:조|장|관|절)/.test(safeText);
           return (
-            <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full pl-[1.25rem] my-1.5`}>
+            <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full ${isGluedArticle ? '' : 'pl-[1.25rem]'} my-1.5`}>
               {formatGluedText(safeText, false)}
             </div>
           );

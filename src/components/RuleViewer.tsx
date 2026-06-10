@@ -200,7 +200,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             toc.push({ type: "section", id: `toc-${sectionText.replace(new RegExp("\\s", "g"), '-')}`, text: sectionText });
           } else if (item.type === "article") {
             const articleNum = typeof item.num === 'string' ? item.num : String(item.num || "");
-            toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
+            if (!toc.some(t => t.id === `toc-${articleNum}`)) {
+              toc.push({ type: "article", id: `toc-${articleNum}`, text: articleNum });
+            }
           } else if (item.type === "text" || item.type === "paragraph" || item.type === "item" || item.type === "subitem") {
             const safeText = String(item.text || "");
             if (/^제\d+관/.test(safeText.trim())) {
