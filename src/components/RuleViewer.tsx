@@ -272,10 +272,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       if (!ruleId) return;
       setLoading(true);
       try {
-        let url = `/api/rules/${ruleId}`;
-        if (selectedVersion !== null) {
-          url += `?version=${selectedVersion}`;
-        }
+        const url = selectedVersion !== null ? `/api/rules/${ruleId}?version=${encodeURIComponent(selectedVersion)}&t=${Date.now()}` : `/api/rules/${ruleId}?t=${Date.now()}`;
         const res = await fetch(url);
         const data = (await res.json()) as any;
         setRuleData(data);
