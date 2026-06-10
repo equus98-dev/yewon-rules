@@ -26,6 +26,8 @@ interface ArticleRendererProps {
 export default function ArticleRenderer({
   id,
   articleId,
+  chapter,
+  section,
   title = "",
   articleNumber,
   contentJson,
