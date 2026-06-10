@@ -166,7 +166,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                  textAttachments.forEach((item: any, i: number) => {
                     let safeText = String(item.text).trim();
                     safeText = safeText.replace(/^〔/, '[').replace(/〕$/, ']'); // TOC 표시용 괄호 정규화
-                    toc.push({ type: "attachment", id: `toc-text-attach-${a.articleNumber}-${i}`, text: safeText });
+                    const displayText = safeText.replace(/^(\[[^\]]+\]\s*|[\d-]+\s*)+/, "");
+                    toc.push({ type: "attachment", id: `toc-text-attach-${a.articleNumber}-${i}`, text: displayText });
                  });
               }
            }
@@ -258,7 +259,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       uploadedAttachments.forEach((a: any) => {
         const baseName = a.title.replace(/\.[^/.]+$/, "");
         if (!toc.some((t: any) => t.id === `toc-attach-${baseName}`)) {
-          toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: a.title });
+          const displayText = a.title.replace(/^(\[[^\]]+\]\s*|[\d-]+\s*)+/, "");
+          toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: displayText });
         }
       });
     }
@@ -553,7 +555,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                 const match = group.baseName.match(/^\[(전문|별표|별지)\]\s*(.*)$/);
                                 if (match) {
                                   const type = match[1];
-                                  const text = match[2];
+                                  const rawText = match[2];
+                                  const displayText = rawText.replace(/^(\[[^\]]+\]\s*|[\d-]+\s*)+/, "");
                                   return (
                                     <div className="flex items-center gap-2">
                                       <span className={`px-2 py-0.5 rounded text-[12px] font-black border ${
