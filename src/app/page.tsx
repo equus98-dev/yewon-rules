@@ -11,6 +11,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArticleIcon from "@mui/icons-material/Article";
+import LanguageIcon from "@mui/icons-material/Language";
 import SidebarTree from "@/components/SidebarTree";
 import RuleViewer from "@/components/RuleViewer";
 import Link from "next/link";
@@ -1369,6 +1370,60 @@ export default function Home() {
                       {/* 오른쪽 퀵 버튼 영역 삭제됨 */}
                     </div>
 
+                  </div>
+                </div>
+
+                {/* [파트 1.5] 관련 웹사이트 롤링 배너 */}
+                <div className="w-full max-w-7xl mx-auto px-6 xl:px-8 mt-6 mb-8">
+                  <div className="flex bg-white border border-slate-200 shadow-sm rounded-lg overflow-hidden h-[60px] items-center">
+                    <div className="w-[140px] md:w-[180px] bg-slate-50 border-r border-slate-200 h-full flex items-center justify-center shrink-0">
+                      <span className="font-extrabold text-[#0c3161] text-sm md:text-base flex items-center gap-2">
+                        <LanguageIcon fontSize="small" className="text-blue-600" />
+                        관련 사이트 안내
+                      </span>
+                    </div>
+                    <div className="flex-1 overflow-hidden relative h-full flex items-center" style={{ maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)' }}>
+                      <div className="flex animate-marquee gap-10 md:gap-16 items-center w-max px-4">
+                        {/* 원본 세트 */}
+                        <a href="https://www.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0">
+                           <Image src="/UI_logo.png" width={100} height={20} alt="예원예술대학교" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                        </a>
+                        <a href="https://library.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
+                          중앙도서관
+                        </a>
+                        <a href="https://sugang.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
+                          종합정보시스템
+                        </a>
+                        <a href="https://lms.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
+                          원격교육지원센터
+                        </a>
+                        <a href="https://www.academyinfo.go.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
+                          대학알리미
+                        </a>
+                        <a href="https://www.academyinfo.go.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
+                          정보공개
+                        </a>
+                        {/* 복제 세트 (무한 롤링용) */}
+                        <a href="https://www.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0">
+                           <Image src="/UI_logo.png" width={100} height={20} alt="예원예술대학교" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                        </a>
+                        <a href="https://library.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
+                          중앙도서관
+                        </a>
+                        <a href="https://sugang.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
+                          종합정보시스템
+                        </a>
+                        <a href="https://lms.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
+                          원격교육지원센터
+                        </a>
+                        <a href="https://www.academyinfo.go.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
+                          대학알리미
+                        </a>
+                        <a href="https://www.academyinfo.go.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
+                          정보공개
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
