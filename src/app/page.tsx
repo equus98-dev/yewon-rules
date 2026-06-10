@@ -638,17 +638,19 @@ export default function Home() {
               </div>
             </div>
           ) : activeVerticalTab === "공지사항" ? (
-            <div className="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar">
-              <div className="max-w-6xl mx-auto">
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-end justify-between border-b-[3px] border-[#1e3a8a] pb-4 select-none">
-                    <h2 className="text-[28px] font-black text-slate-900 tracking-tight flex items-center gap-2">
-                      공지사항
-                    </h2>
-                    <span className="text-[14px] text-slate-600 font-bold tracking-wider">
-                      HOME &gt; 공지사항
-                    </span>
-                  </div>
+            <div className="flex-1 overflow-y-auto bg-slate-50 scrollbar flex flex-col relative">
+              <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-8 py-5 shrink-0 flex items-center justify-between z-10 shadow-sm relative select-none">
+                <h2 className="text-2xl font-black text-[#007073] tracking-tight ml-2">
+                  공지사항
+                </h2>
+                <div className="text-[14px] text-slate-500 font-medium tracking-wider">
+                  HOME &gt; <span className="font-bold text-slate-700">공지사항</span>
+                </div>
+              </div>
+
+              <div className="flex-1 p-8">
+                <div className="max-w-6xl mx-auto">
+                  <div className="flex flex-col gap-4">
 
                   {activeNoticeId ? (() => {
                     const notice = notices.find((n: any) => n.id === activeNoticeId);
@@ -745,6 +747,7 @@ export default function Home() {
                     </>
                   )}
                 </div>
+              </div>
               </div>
             </div>
           ) : activeRuleId ? (
@@ -1381,7 +1384,7 @@ export default function Home() {
                         </div>
                         규정 공지
                       </h3>
-                      <IconButton size="small" onClick={() => window.location.reload()} sx={{ bgcolor: "#f1f5f9", "&:hover": { bgcolor: "#e2e8f0" } }}>
+                      <IconButton size="small" onClick={() => { setActiveVerticalTab("공지사항"); setActiveRuleId(null); setActiveCategoryId(null); setIsSearching(false); setActiveNoticeId(null); }} sx={{ bgcolor: "#f1f5f9", "&:hover": { bgcolor: "#e2e8f0" } }}>
                         <span className="text-slate-400 font-bold text-lg leading-none w-5 h-5 flex items-center justify-center">+</span>
                       </IconButton>
                     </div>
@@ -1397,7 +1400,7 @@ export default function Home() {
                         <ul className="flex flex-col">
                           {notices.map((notice: any) => (
                             <li key={notice.id} className="group">
-                              <div onClick={() => { setSelectedNotice(notice); setNoticeModalOpen(true); }} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors">
+                              <div onClick={() => { setActiveNoticeId(notice.id); setActiveVerticalTab("공지사항"); setActiveRuleId(null); setActiveCategoryId(null); setIsSearching(false); }} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors">
                                 <span className={`shrink-0 px-2 py-0.5 rounded text-[11.5px] font-extrabold ${notice.title.includes("개정") ? "bg-[#81c784] text-white" : "bg-[#ffd54f] text-slate-800"}`}>
                                   {notice.title.includes("개정") ? "개정알림" : "의견수렴"}
                                 </span>
