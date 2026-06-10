@@ -1374,56 +1374,46 @@ export default function Home() {
                 </div>
 
                 {/* [파트 1.5] 관련 웹사이트 롤링 배너 */}
-                <div className="w-full max-w-7xl mx-auto px-6 xl:px-8 mt-6 mb-8">
-                  <div className="flex bg-white border border-slate-200 shadow-sm rounded-lg overflow-hidden h-[60px] items-center">
-                    <div className="w-[140px] md:w-[180px] bg-slate-50 border-r border-slate-200 h-full flex items-center justify-center shrink-0">
-                      <span className="font-extrabold text-[#0c3161] text-sm md:text-base flex items-center gap-2">
-                        <LanguageIcon fontSize="small" className="text-blue-600" />
-                        관련 사이트 안내
-                      </span>
-                    </div>
-                    <div className="flex-1 overflow-hidden relative h-full flex items-center" style={{ maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)' }}>
-                      <div className="flex animate-marquee gap-10 md:gap-16 items-center w-max px-4">
+                <div className="w-full mt-3 mb-4">
+                  <div className="flex bg-slate-100 border border-slate-200 rounded-lg overflow-hidden h-[45px] items-center px-4 relative">
+                    <ArrowBackIosIcon sx={{ fontSize: 14 }} className="text-slate-400 shrink-0 absolute left-3 z-10" />
+                    <div className="flex-1 overflow-hidden relative h-full flex items-center mx-4" style={{ maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)' }}>
+                      <div className="flex animate-marquee gap-12 md:gap-20 items-center w-max">
                         {/* 원본 세트 */}
-                        <a href="https://www.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0">
-                           <Image src="/UI_logo.png" width={100} height={20} alt="예원예술대학교" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                        <a href="https://www.yewon.ac.kr/" target="_blank" className="shrink-0">
+                           <img src="/docs/UI.png" alt="예원예술대학교" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
-                        <a href="https://library.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
-                          중앙도서관
+                        <a href="https://www.law.go.kr/main.html" target="_blank" className="shrink-0">
+                           <img src="/docs/h_logo1.png" alt="국가법령정보센터" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
-                        <a href="https://sugang.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
-                          종합정보시스템
+                        <a href="https://www.moe.go.kr/main.do?s=moe" target="_blank" className="shrink-0">
+                           <img src="/docs/kyo.png" alt="교육부" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
-                        <a href="https://lms.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
-                          원격교육지원센터
+                        <a href="https://www.moleg.go.kr/index.es?sid=a1" target="_blank" className="shrink-0">
+                           <img src="/docs/rru.png" alt="법제처" className="object-contain h-5 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
-                        <a href="https://www.academyinfo.go.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
-                          대학알리미
-                        </a>
-                        <a href="https://www.academyinfo.go.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
-                          정보공개
+                        <a href="https://www.scourt.go.kr/scourt/index.html" target="_blank" className="shrink-0">
+                           <img src="/docs/logo333.png" alt="법원" className="object-contain h-7 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
                         {/* 복제 세트 (무한 롤링용) */}
-                        <a href="https://www.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0">
-                           <Image src="/UI_logo.png" width={100} height={20} alt="예원예술대학교" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                        <a href="https://www.yewon.ac.kr/" target="_blank" className="shrink-0">
+                           <img src="/docs/UI.png" alt="예원예술대학교" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
-                        <a href="https://library.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
-                          중앙도서관
+                        <a href="https://www.law.go.kr/main.html" target="_blank" className="shrink-0">
+                           <img src="/docs/h_logo1.png" alt="국가법령정보센터" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
-                        <a href="https://sugang.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
-                          종합정보시스템
+                        <a href="https://www.moe.go.kr/main.do?s=moe" target="_blank" className="shrink-0">
+                           <img src="/docs/kyo.png" alt="교육부" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
-                        <a href="https://lms.yewon.ac.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
-                          원격교육지원센터
+                        <a href="https://www.moleg.go.kr/index.es?sid=a1" target="_blank" className="shrink-0">
+                           <img src="/docs/rru.png" alt="법제처" className="object-contain h-5 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
-                        <a href="https://www.academyinfo.go.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
-                          대학알리미
-                        </a>
-                        <a href="https://www.academyinfo.go.kr/" target="_blank" className="font-bold text-slate-600 hover:text-[#0c3161] transition-colors flex items-center gap-2 shrink-0 text-[15px]">
-                          정보공개
+                        <a href="https://www.scourt.go.kr/scourt/index.html" target="_blank" className="shrink-0">
+                           <img src="/docs/logo333.png" alt="법원" className="object-contain h-7 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
                       </div>
                     </div>
+                    <ArrowForwardIosIcon sx={{ fontSize: 14 }} className="text-slate-400 shrink-0 absolute right-3 z-10" />
                   </div>
                 </div>
 
