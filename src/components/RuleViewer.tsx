@@ -566,7 +566,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                       }`}>
                                         {type}
                                       </span>
-                                      <span className="font-bold text-slate-800 text-[15px]">{text}</span>
+                                      <span className="font-bold text-slate-800 text-[15px]">{displayText}</span>
                                     </div>
                                   );
                                 }
