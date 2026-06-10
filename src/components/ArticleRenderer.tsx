@@ -642,8 +642,9 @@ export default function ArticleRenderer({
         } else if (item.type === "paragraph") {
           const isGlued = /^제\d+조/.test(safeText.trim()) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(safeText) || /(?<!^|\s)[①-⑮]/.test(safeText);
           if (isGlued) {
+            const isTopLevelArticle = /^제\d+조/.test(safeText.trim());
             return (
-              <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] w-full pl-[1.25rem] my-1.5">
+              <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'}`}>
                 <span className="font-normal mr-1">{safeNum}</span>
                 {formatGluedText(safeText, false)}
               </div>
