@@ -323,19 +323,19 @@ export default function AdminRulesManagement() {
         <div className="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 select-none text-sm">
+              <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 select-none text-[15px]">
                 <th className="py-4 px-4 font-black w-14 text-center">번호</th>
                 <th className="py-4 px-4 font-black">규정명 / 분류</th>
                 <th className="py-4 px-4 font-black w-24 text-center">규정번호</th>
-                <th className="py-4 px-4 font-black w-44 text-center">
+                <th className="py-4 px-4 font-black w-40 text-center">
                   <div className="flex items-center justify-center gap-1">
-                    <BusinessIcon sx={{ fontSize: 13 }} />
+                    <BusinessIcon sx={{ fontSize: 14 }} />
                     소관부서
                   </div>
                 </th>
-                <th className="py-4 px-4 font-black w-20 text-center">제·개정일</th>
+                <th className="py-4 px-4 font-black w-28 text-center">제·개정일</th>
                 <th className="py-4 px-4 font-black w-20 text-center">상태</th>
-                <th className="py-4 px-4 font-black w-48 text-center">작업</th>
+                <th className="py-4 px-4 font-black w-64 text-center">작업</th>
               </tr>
             </thead>
             <tbody>
@@ -431,9 +431,9 @@ export default function AdminRulesManagement() {
                         <button
                           type="button"
                           onClick={() => router.push(`/admin/editor?ruleId=${rule.id}`)}
-                          className="bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 px-3 py-1.5 rounded-lg border border-slate-200 text-sm font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm"
+                          className="bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 px-3 py-1.5 rounded-lg border border-slate-200 text-[13px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm whitespace-nowrap"
                         >
-                          <EditIcon sx={{ fontSize: 11 }} />
+                          <EditIcon sx={{ fontSize: 13 }} />
                           조문 개정
                         </button>
 
@@ -442,18 +442,18 @@ export default function AdminRulesManagement() {
                           <button
                             type="button"
                             onClick={() => handleToggleStatus(rule.id, rule.status)}
-                            className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-200 text-sm font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm whitespace-nowrap"
+                            className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-200 text-[13px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm whitespace-nowrap"
                           >
-                            <CheckCircleIcon sx={{ fontSize: 11 }} />
+                            <CheckCircleIcon sx={{ fontSize: 13 }} />
                             현행 복구
                           </button>
                         ) : (
                           <button
                             type="button"
                             onClick={() => handleToggleStatus(rule.id, rule.status)}
-                            className="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-1.5 rounded-lg border border-red-200 text-sm font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm whitespace-nowrap"
+                            className="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-1.5 rounded-lg border border-red-200 text-[13px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm whitespace-nowrap"
                           >
-                            <BlockIcon sx={{ fontSize: 11 }} />
+                            <BlockIcon sx={{ fontSize: 13 }} />
                             규정 폐지
                           </button>
                         )}
@@ -462,9 +462,9 @@ export default function AdminRulesManagement() {
                         <button
                           type="button"
                           onClick={() => handleDeleteRule(rule.id, rule.title)}
-                          className="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-lg border border-rose-200 text-sm font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm whitespace-nowrap"
+                          className="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-lg border border-rose-200 text-[13px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm whitespace-nowrap"
                         >
-                          <DeleteIcon sx={{ fontSize: 11 }} />
+                          <DeleteIcon sx={{ fontSize: 13 }} />
                           규정 삭제
                         </button>
                       </td>

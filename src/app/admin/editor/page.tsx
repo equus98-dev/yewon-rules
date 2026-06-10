@@ -174,8 +174,11 @@ function EditorContent() {
   // 신규 조항 추가 (신설)
   const handleAddArticle = () => {
     setDraftArticles((prev) => {
-      const maxNum = prev.length > 0 ? Math.max(...prev.map((p) => p.articleNumber)) : 0;
+      // 일반 조문(8000 미만) 중 최대 조 번호를 찾음
+      const normalArticles = prev.filter((p) => p.articleNumber < 8000);
+      const maxNum = normalArticles.length > 0 ? Math.max(...normalArticles.map((p) => p.articleNumber)) : 0;
       const nextNum = maxNum + 1;
+      
       const newArticle = {
         chapter: "제1장 총칙",
         articleNumber: nextNum,
@@ -189,7 +192,26 @@ function EditorContent() {
       };
 
       if (checkedArticleIndex !== null && checkedArticleIndex >= 0 && checkedArticleIndex < prev.length) {
-        newArticle.chapter = prev[checkedArticleIndex].chapter || "제1장 총칙";
+        const targetArticle = prev[checkedArticleIndex];
+        const targetNum = targetArticle.articleNumber;
+        
+        // 동일한 조 번호를 가진 기존 조문들 중에서 '의N' 형태의 최대 N값을 찾음
+        const relatedArticles = prev.filter(p => p.articleNumber === targetNum);
+        let maxSub = 1; // 1부터 시작하므로 다음은 '의2'가 됨
+        relatedArticles.forEach(a => {
+           const subMatch = a.title.match(/^의(\d+)/);
+           if (subMatch) {
+              const subNum = parseInt(subMatch[1], 10);
+              if (subNum > maxSub) maxSub = subNum;
+           }
+        });
+        const nextSub = maxSub + 1;
+        
+        newArticle.chapter = targetArticle.chapter || "제1장 총칙";
+        newArticle.articleNumber = targetNum;
+        newArticle.title = `의${nextSub}(제목)`;
+        newArticle.contentText = `제${targetNum}조의${nextSub} (제목) `;
+        
         const newArray = [...prev];
         newArray.splice(checkedArticleIndex + 1, 0, newArticle);
         setCheckedArticleIndex(null); // 추가 후 체크 해제
