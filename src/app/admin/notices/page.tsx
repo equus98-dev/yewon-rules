@@ -18,11 +18,13 @@ export default function AdminNotices() {
 
   // 폼 필드 상태
   const [title, setTitle] = useState("");
+  const [prefix, setPrefix] = useState("");
   const [content, setContent] = useState("");
   const [dept, setDept] = useState("기획조정팀");
   const [date, setDate] = useState("");
 
   const deptOptions = ["기획조정팀"];
+  const prefixOptions = ["전체공지", "교직원 안내", ""];
 
   // 1. 공지사항 로드
   const loadNotices = async () => {
@@ -56,6 +58,7 @@ export default function AdminNotices() {
   // 2. 신규 공지 작성 모달 켜기
   const handleOpenAddModal = () => {
     setEditingNotice(null);
+    setPrefix("전체공지");
     setTitle("");
     setContent("");
     setDept("기획조정팀");
@@ -66,7 +69,20 @@ export default function AdminNotices() {
   // 3. 기존 공지 수정 모달 켜기
   const handleOpenEditModal = (notice: any) => {
     setEditingNotice(notice);
-    setTitle(notice.title);
+    let noticeTitle = notice.title;
+    let noticePrefix = "";
+    const match = noticeTitle.match(/^\[(.*?)\]\s*(.*)$/);
+    if (match && prefixOptions.includes(match[1])) {
+      noticePrefix = match[1];
+      noticeTitle = match[2];
+    } else if (match && !prefixOptions.includes(match[1])) {
+      // If it has a bracket but not in our standard options, just leave it in title or add it to options
+      noticePrefix = match[1];
+      noticeTitle = match[2];
+    }
+    
+    setPrefix(noticePrefix);
+    setTitle(noticeTitle);
     setContent(notice.content);
     setDept(notice.dept);
     setDate(notice.date);
@@ -85,9 +101,10 @@ export default function AdminNotices() {
       const isEdit = !!editingNotice;
       const url = "/api/notices";
       const method = isEdit ? "PUT" : "POST";
+      const finalTitle = prefix ? `[${prefix}] ${title}` : title;
       const payload = isEdit 
-        ? { id: editingNotice.id, title, content, dept, date } 
-        : { title, content, dept, date };
+        ? { id: editingNotice.id, title: finalTitle, content, dept, date } 
+        : { title: finalTitle, content, dept, date };
 
       const res = await fetch(url, {
         method,
@@ -266,18 +283,36 @@ export default function AdminNotices() {
             <div className="p-6 overflow-y-auto space-y-5 text-[13px] font-bold text-slate-700">
               
               {/* 제목 인풋 */}
-              <div className="space-y-2">
-                <label className="text-slate-600 flex items-center gap-1 pl-1">
-                  <span className="text-[#0c3161]">•</span> 공지사항 제목
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="예: 학칙 개정에 따른 조문 최종 확정 공고"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4.5 py-3.5 text-[13.5px] text-slate-850 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-bold"
-                />
+              <div className="grid grid-cols-4 gap-4">
+                <div className="col-span-1 space-y-2">
+                  <label className="text-slate-600 flex items-center gap-1 pl-1">
+                    <span className="text-[#0c3161]">•</span> 말머리
+                  </label>
+                  <select
+                    value={prefix}
+                    onChange={(e) => setPrefix(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4.5 py-3.5 text-[13.5px] text-slate-850 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-extrabold cursor-pointer"
+                  >
+                    <option value="" className="text-slate-400">선택 안함</option>
+                    <option value="전체공지">전체공지</option>
+                    <option value="교직원 안내">교직원 안내</option>
+                    <option value="의견수렴">의견수렴</option>
+                    <option value="개정알림">개정알림</option>
+                  </select>
+                </div>
+                <div className="col-span-3 space-y-2">
+                  <label className="text-slate-600 flex items-center gap-1 pl-1">
+                    <span className="text-[#0c3161]">•</span> 공지사항 제목
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="예: 학칙 개정에 따른 조문 최종 확정 공고"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4.5 py-3.5 text-[13.5px] text-slate-850 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-bold"
+                  />
+                </div>
               </div>
 
               {/* 작성부서 & 노출날짜 병렬 */}

@@ -580,27 +580,45 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
                 등록된 공지사항이 없습니다.
               </div>
             ) : (
-              notices.map((notice: any) => (
-                <div
-                  key={notice.id}
-                  onClick={() => {
-                    if (onSelectNotice) {
-                      onSelectNotice(notice.id);
-                    }
-                  }}
-                  className="w-full p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-[#0c3161]/5 hover:border-blue-300 transition-all text-xs flex flex-col gap-1 shadow-sm cursor-pointer active:scale-98"
-                >
-                  <div className="flex items-center justify-between text-[10.5px] text-slate-400">
-                    <span className="font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 text-[10px]">
-                      {notice.dept}
-                    </span>
-                    <span>{notice.date}</span>
+              notices.map((notice: any) => {
+                const match = notice.title.match(/^\[(.*?)\]\s*(.*)$/);
+                const badgeText = match ? match[1] : (notice.title.includes("개정") ? "개정알림" : "");
+                const displayTitle = match ? match[2] : notice.title;
+                
+                let badgeClass = "bg-[#ffd54f] text-slate-800 border-[#ffc107]";
+                if (badgeText === "전체공지") badgeClass = "bg-blue-500 text-white border-blue-600";
+                else if (badgeText === "교직원 안내") badgeClass = "bg-teal-500 text-white border-teal-600";
+                else if (badgeText === "개정알림" || badgeText === "규정개정") badgeClass = "bg-[#81c784] text-white border-[#66bb6a]";
+
+                return (
+                  <div
+                    key={notice.id}
+                    onClick={() => {
+                      if (onSelectNotice) {
+                        onSelectNotice(notice.id);
+                      }
+                    }}
+                    className="w-full p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-[#0c3161]/5 hover:border-blue-300 transition-all text-xs flex flex-col gap-1 shadow-sm cursor-pointer active:scale-98"
+                  >
+                    <div className="flex items-center justify-between text-[10.5px] text-slate-400">
+                      <div className="flex gap-1">
+                        <span className="font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 text-[10px]">
+                          {notice.dept}
+                        </span>
+                        {badgeText && (
+                          <span className={`font-bold px-1.5 py-0.5 rounded border text-[10px] ${badgeClass}`}>
+                            {badgeText}
+                          </span>
+                        )}
+                      </div>
+                      <span>{notice.date}</span>
+                    </div>
+                    <h4 className="font-extrabold text-slate-700 text-[12.5px] mt-1 leading-snug line-clamp-2">
+                      {displayTitle}
+                    </h4>
                   </div>
-                  <h4 className="font-extrabold text-slate-700 text-[12.5px] mt-1 leading-snug line-clamp-2">
-                    {notice.title}
-                  </h4>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         )}

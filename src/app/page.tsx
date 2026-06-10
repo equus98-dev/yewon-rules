@@ -1444,21 +1444,34 @@ export default function Home() {
                         <div className="text-center py-20 text-slate-400 text-sm font-bold">등록된 공지사항이 아직 없습니다.</div>
                       ) : (
                         <ul className="flex flex-col">
-                          {notices.map((notice: any) => (
-                            <li key={notice.id} className="group">
-                              <div onClick={() => { setActiveNoticeId(notice.id); setActiveVerticalTab("공지사항"); setActiveRuleId(null); setActiveCategoryId(null); setIsSearching(false); }} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors">
-                                <span className={`shrink-0 px-2 py-0.5 rounded text-[11.5px] font-extrabold ${notice.title.includes("개정") ? "bg-[#81c784] text-white" : "bg-[#ffd54f] text-slate-800"}`}>
-                                  {notice.title.includes("개정") ? "개정알림" : "의견수렴"}
-                                </span>
-                                <span className="flex-1 text-[14.5px] font-bold text-slate-700 truncate group-hover:text-blue-700 transition-colors">
-                                  [{notice.title.includes("개정") ? "규정개정" : "의견수렴"}] {notice.title}
-                                </span>
-                                <span className="shrink-0 text-[13px] text-slate-500 font-bold font-mono">
-                                  {notice.date.replace(/-/g, '.')}
-                                </span>
-                              </div>
-                            </li>
-                          ))}
+                          {notices.map((notice: any) => {
+                            const match = notice.title.match(/^\[(.*?)\]\s*(.*)$/);
+                            const badgeText = match ? match[1] : (notice.title.includes("개정") ? "개정알림" : "");
+                            const displayTitle = match ? match[2] : notice.title;
+                            
+                            let badgeClass = "bg-[#ffd54f] text-slate-800";
+                            if (badgeText === "전체공지") badgeClass = "bg-blue-500 text-white";
+                            else if (badgeText === "교직원 안내") badgeClass = "bg-teal-500 text-white";
+                            else if (badgeText === "개정알림" || badgeText === "규정개정") badgeClass = "bg-[#81c784] text-white";
+                            
+                            return (
+                              <li key={notice.id} className="group">
+                                <div onClick={() => { setActiveNoticeId(notice.id); setActiveVerticalTab("공지사항"); setActiveRuleId(null); setActiveCategoryId(null); setIsSearching(false); }} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors">
+                                  {badgeText && (
+                                    <span className={`shrink-0 px-2 py-0.5 rounded text-[11.5px] font-extrabold ${badgeClass}`}>
+                                      {badgeText}
+                                    </span>
+                                  )}
+                                  <span className="flex-1 text-[14.5px] font-bold text-slate-700 truncate group-hover:text-blue-700 transition-colors">
+                                    {displayTitle}
+                                  </span>
+                                  <span className="shrink-0 text-[13px] text-slate-500 font-bold font-mono">
+                                    {notice.date.replace(/-/g, '.')}
+                                  </span>
+                                </div>
+                              </li>
+                            );
+                          })}
                         </ul>
                       )}
                     </div>
