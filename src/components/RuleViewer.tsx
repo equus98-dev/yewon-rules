@@ -139,14 +139,15 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
            
            // HTML 별지가 없는 경우 부칙 내의 텍스트 기반 별지를 스캔하여 TOC에 추가
            const hasHtmlAttachments = currentRevision.articles.some((art: any) => art.articleNumber >= 9000);
-           if (!hasHtmlAttachments) {
+           const uploadedAttachments = ruleData?.attachments?.filter((f: any) => f.title.startsWith("[별표]") || f.title.startsWith("[별지]")) || [];
+           if (!hasHtmlAttachments && uploadedAttachments.length === 0) {
               const textAttachments = items.filter((item: any) => {
                  if (!item || !item.text) return false;
                  return /^(?:\[|〔)(별지|별표|서식)/.test(String(item.text).trim());
               });
               if (textAttachments.length > 0) {
                  if (!toc.some(t => t.id === "toc-attachments")) {
-                    toc.push({ type: "chapter", id: "toc-attachments", text: "별지 목록" });
+                    toc.push({ type: "chapter", id: "toc-attachments", text: "별표/별지 목록" });
                  }
                  textAttachments.forEach((item: any, i: number) => {
                     let safeText = String(item.text).trim();
@@ -232,12 +233,19 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         });
     });
     
-    // Add attachments from articles to TOC
-    const attachmentArticles = currentRevision.articles.filter((a: any) => a.articleNumber >= 9000);
-    if (attachmentArticles.length > 0) {
-      toc.push({ type: "chapter", id: "toc-attachments", text: "별지 목록" });
-      attachmentArticles.forEach((a: any) => {
-        toc.push({ type: "attachment", id: `toc-${a.articleNumber}`, text: a.title });
+    // Add attachments from uploaded files to TOC
+    const uploadedAttachments = ruleData?.attachments?.filter((f: any) => f.title.startsWith("[별표]") || f.title.startsWith("[별지]")) || [];
+    
+    if (uploadedAttachments.length > 0) {
+      if (!toc.some((t: any) => t.id === "toc-attachments")) {
+         toc.push({ type: "chapter", id: "toc-attachments", text: "별표/별지 목록" });
+      }
+      // uploadedAttachments는 페이지 하단에 그룹별로 아코디언이 생기므로 거기로 이동할 수 있도록 id 부여
+      uploadedAttachments.forEach((a: any) => {
+        const baseName = a.title.replace(/\.[^/.]+$/, "");
+        if (!toc.some((t: any) => t.id === `toc-attach-${baseName}`)) {
+          toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: a.title });
+        }
       });
     }
     
@@ -436,6 +444,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 {currentRevision.articles.map((a: any) => {
                   const hasHtmlAttachments = currentRevision?.articles?.some((art: any) => art.articleNumber >= 9000) || false;
                   
+                  // 별지/별표 (9000번대) 조항은 더 이상 본문 하단에 HTML로 렌더링하지 않음 (첨부파일 컴포넌트로 대체)
+                  if (a.articleNumber >= 9000) return null;
+                  
                   return (
                     <ArticleRenderer
                       key={a.id}
@@ -472,7 +483,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       const isExpanded = !!expandedAttachments[group.baseName];
 
                       return (
-                        <div key={idx} className="border border-slate-300 rounded-lg overflow-hidden bg-white shadow-sm">
+                        <div id={`toc-attach-${group.baseName}`} key={idx} className="border border-slate-300 rounded-lg overflow-hidden bg-white shadow-sm">
                           {/* Accordion Header */}
                           <div 
                             className="bg-slate-50 hover:bg-slate-100 flex items-center justify-between px-4 py-3 cursor-pointer select-none border-b border-slate-200 transition-colors"

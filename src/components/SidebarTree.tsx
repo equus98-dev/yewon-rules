@@ -30,6 +30,7 @@ interface SidebarTreeProps {
   onTabChange?: (tab: string) => void;
   activeRuleId?: string | null;
   onSelectNotice?: (noticeId: string) => void;
+  hideVerticalMenu?: boolean;
 }
 
 const ClosedIcon = () => (
@@ -39,7 +40,7 @@ const OpenedIcon = () => (
   <span className="text-[10px] text-slate-500 font-bold select-none mr-0.5">▼</span>
 );
 
-export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCategory, onTabChange, onSelectNotice }: SidebarTreeProps) {
+export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCategory, onTabChange, onSelectNotice, hideVerticalMenu = false }: SidebarTreeProps) {
   // 1단 세로 메뉴 탭 상태: "규정" | "최신 제·개정" | "서식" | "공지사항" | "조직도"
   const [verticalTab, setVerticalTab] = useState<"규정" | "최신 제·개정" | "서식" | "공지사항" | "조직도">("규정");
 
@@ -299,28 +300,30 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
     <div className="h-full w-full bg-white border-r border-slate-200 flex overflow-hidden">
       
       {/* ==================== 1단계: 세로형 아이콘 메뉴바 ==================== */}
-      <div className="w-[75px] bg-[#0c3161] flex flex-col items-center py-6 gap-5 shrink-0 text-white shadow-inner z-10">
-        {verticalMenuItems.map((item) => {
-          const isActive = verticalTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => {
-                setVerticalTab(item.id);
-                if (onTabChange) onTabChange(item.id);
-              }}
-              className={`w-16 min-h-[64px] flex flex-col items-center justify-center gap-1.5 rounded-xl py-2 cursor-pointer transition-all duration-200 active:scale-95 ${
-                isActive
-                  ? "bg-white text-[#0c3161] font-bold shadow-md"
-                  : "text-blue-100 hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              {item.icon}
-              <span className="text-[13px] font-extrabold tracking-tight text-center leading-[1.15]">{item.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {!hideVerticalMenu && (
+        <div className="w-[75px] bg-[#0c3161] flex flex-col items-center py-6 gap-5 shrink-0 text-white shadow-inner z-10">
+          {verticalMenuItems.map((item) => {
+            const isActive = verticalTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setVerticalTab(item.id);
+                  if (onTabChange) onTabChange(item.id);
+                }}
+                className={`w-16 min-h-[64px] flex flex-col items-center justify-center gap-1.5 rounded-xl py-2 cursor-pointer transition-all duration-200 active:scale-95 ${
+                  isActive
+                    ? "bg-white text-[#0c3161] font-bold shadow-md"
+                    : "text-blue-100 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {item.icon}
+                <span className="text-[13px] font-extrabold tracking-tight text-center leading-[1.15]">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* ==================== 2단계: 카테고리 & 데이터 이너 패널 ==================== */}
       <div className="flex-1 h-full flex flex-col overflow-hidden bg-white">
