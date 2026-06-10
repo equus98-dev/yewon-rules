@@ -520,6 +520,11 @@ export default function ArticleRenderer({
           return null;
         }
 
+        if (item.type === "paragraph" || item.type === "text") {
+            const clean = String(item.text || "").replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, '').trim();
+            if (!clean) return null;
+        }
+
         const safeNum = item.num !== null && item.num !== undefined ? String(item.num) : "";
         const safeText = item.text !== null && item.text !== undefined ? String(item.text) : "";
         const isSubsection = item.type === "text" && /^제\d+관/.test(safeText.trim());
