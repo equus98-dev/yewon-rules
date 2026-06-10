@@ -196,7 +196,7 @@ export default function ArticleRenderer({
         if (chapter) {
           const chapterNumMatch = chapter.match(/^(제\d+장)/);
           if (chapterNumMatch) {
-            const cRegex = new RegExp(`^\\s*${chapterNumMatch[1]}[^\\n제]*\\s*`);
+            const cRegex = new RegExp(`^\\s*${chapterNumMatch[1]}[^\\n제]*\\s*`, 'm');
             if (cRegex.test(text)) {
                text = text.replace(cRegex, '').trim();
                changed = true;
@@ -206,7 +206,7 @@ export default function ArticleRenderer({
         if (section) {
           const sectionNumMatch = section.match(/^(제\d+절)/);
           if (sectionNumMatch) {
-            const sRegex = new RegExp(`^\\s*${sectionNumMatch[1]}[^\\n제]*\\s*`);
+            const sRegex = new RegExp(`^\\s*${sectionNumMatch[1]}[^\\n제]*\\s*`, 'm');
             if (sRegex.test(text)) {
                text = text.replace(sRegex, '').trim();
                changed = true;
@@ -415,7 +415,7 @@ export default function ArticleRenderer({
                  const fullTitle = `${articleNum}(${articleTitle})`;
                  const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
                  return (
-                    <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
+                    <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
                        {!hideHistory && (
                          <button 
                            onClick={() => handleOpenHistory(historyDates)}
@@ -433,7 +433,7 @@ export default function ArticleRenderer({
                     </div>
                  );
              } else {
-                 lineClass += " mt-8 mb-2 text-[14.5px] font-bold text-[#000080] block";
+                 lineClass += " mt-4 mb-2 text-[14.5px] font-bold text-[#000080] block";
              }
           } else if (/^부\s*칙/.test(trimmed)) {
              const match = trimmed.match(/^(부\s*칙)\s*(.*)/);
@@ -442,7 +442,7 @@ export default function ArticleRenderer({
                  const body = match[2].trim();
                  const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
                  return (
-                    <div key={`glued-${idx}`} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
+                    <div key={`glued-${idx}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
                        {!hideHistory && (
                          <button 
                            onClick={() => handleOpenHistory(historyDates)}
@@ -463,9 +463,9 @@ export default function ArticleRenderer({
                  lineClass += " mt-8 mb-2 text-[14.5px] font-bold text-[#000080] block";
              }
           } else if (/^제\d+장/.test(trimmed)) {
-             lineClass += " mt-8 text-[18px] font-black text-center text-[#000080] block";
+             lineClass += " mt-6 text-[18px] font-black text-center text-[#000080] block";
           } else if (/^제\d+(?:절|관)/.test(trimmed)) {
-             lineClass += " mt-6 text-[16px] font-bold text-center text-[#000080] block";
+             lineClass += " mt-4 text-[16px] font-bold text-center text-[#000080] block";
           } else {
              if (idx === 0 && isArticleBody) {
                 isInline = true;
@@ -526,7 +526,7 @@ export default function ArticleRenderer({
 
         if (item.type === "chapter" || item.type === "section" || isSubsection) {
           const isChapter = item.type === "chapter";
-          if (index > 0 && items[index - 1]?.type === item.type && items[index - 1]?.text === item.text) return null;
+          if (index > 0 && displayItems[index - 1]?.type === item.type && displayItems[index - 1]?.text === item.text) return null;
           
           let titlePart = safeText.trim();
           let historyParts: string[] = [];
@@ -576,7 +576,7 @@ export default function ArticleRenderer({
             }
 
             return (
-              <div className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
+              <div className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
                 {isAdmin && (
                   <button 
                     onClick={() => {

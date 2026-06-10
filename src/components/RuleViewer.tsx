@@ -490,12 +490,12 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                   return (
                     <React.Fragment key={a.id}>
                       {showChapter && (
-                        <div id={`toc-${a.chapter.trim().replace(/\s/g, '-')}`} className="text-center w-full mt-12 mb-6 pt-4 flex flex-col items-center gap-1.5">
+                        <div id={`toc-${a.chapter.trim().replace(/\s/g, '-')}`} className="text-center w-full mt-8 mb-6 pt-2 flex flex-col items-center gap-1.5">
                           <span className="text-[20px] font-black text-[#000080] tracking-tight">{a.chapter}</span>
                         </div>
                       )}
                       {showSection && (
-                        <div id={`toc-${a.section.trim().replace(/\s/g, '-')}`} className="text-center w-full mt-10 mb-4 flex flex-col items-center gap-1">
+                        <div id={`toc-${a.section.trim().replace(/\s/g, '-')}`} className="text-center w-full mt-6 mb-4 flex flex-col items-center gap-1">
                           <span className="text-[18px] font-bold text-[#000080]">{a.section}</span>
                         </div>
                       )}
@@ -564,7 +564,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                         type === '별표' ? 'bg-blue-50 text-blue-700 border-blue-200' :
                                         'bg-emerald-50 text-emerald-700 border-emerald-200'
                                       }`}>
-                                        [{type}]
+                                        {type}
                                       </span>
                                       <span className="font-bold text-slate-800 text-[15px]">{text}</span>
                                     </div>
