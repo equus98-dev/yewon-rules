@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { diffWords } from 'diff';
 
 interface ContentItem {
   type: "chapter" | "section" | "article" | "paragraph" | "item" | "subitem" | "text" | string;
@@ -37,11 +38,35 @@ export default function ArticleRenderer({
   hasHtmlAttachments = true,
   isAdmin = false,
 }: ArticleRendererProps) {
-  const [modalHistory, setModalHistory] = useState<string[] | null>(null);
+  const [modalHistory, setModalHistory] = useState<any[] | null>(null);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editItems, setEditItems] = useState<ContentItem[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [editHistory, setEditHistory] = useState<{ id: string, createdAt: string, beforeText: string }[]>([]);
+
+  const handleOpenHistory = async (dates: string[]) => {
+    if (!articleId) {
+      setModalHistory(dates.length > 0 ? dates.map(d => ({ isSimpleString: true, text: d })) : [{ isSimpleString: true, text: "개정 이력이 없습니다." }]);
+      return;
+    }
+
+    setIsLoadingHistory(true);
+    setModalHistory([]); // open modal with loading state
+    try {
+      const res = await fetch(`/api/articles/${articleId}/history`);
+      const data = await res.json();
+      if (data.history && data.history.length > 0) {
+        setModalHistory(data.history);
+      } else {
+        setModalHistory(dates.length > 0 ? dates.map(d => ({ isSimpleString: true, text: d })) : [{ isSimpleString: true, text: "개정 이력이 없습니다." }]);
+      }
+    } catch (e) {
+      setModalHistory(dates.length > 0 ? dates.map(d => ({ isSimpleString: true, text: d })) : [{ isSimpleString: true, text: "개정 이력을 불러오지 못했습니다." }]);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
 
   if (contentHtml && contentHtml.trim().length > 0) {
     // 제목이나 내용에 조직도/기구표가 있으면 인라인 스타일을 우선하는 org-chart-wrapper 적용
@@ -393,7 +418,7 @@ export default function ArticleRenderer({
                     <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
                        {!hideHistory && (
                          <button 
-                           onClick={() => setModalHistory(historyDates.length > 0 ? historyDates : ["개정 이력이 없습니다."])}
+                           onClick={() => handleOpenHistory(historyDates)}
                            className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
                          >
                            {badgeType}
@@ -420,7 +445,7 @@ export default function ArticleRenderer({
                     <div key={`glued-${idx}`} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
                        {!hideHistory && (
                          <button 
-                           onClick={() => setModalHistory(historyDates.length > 0 ? historyDates : ["개정 이력이 없습니다."])}
+                           onClick={() => handleOpenHistory(historyDates)}
                            className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
                          >
                            {badgeType}
@@ -576,7 +601,7 @@ export default function ArticleRenderer({
                 )}
                 {!hideHistory && !isAddendum && (
                   <button 
-                    onClick={() => setModalHistory(historyDates.length > 0 ? historyDates : ["개정 이력이 없습니다."])}
+                    onClick={() => handleOpenHistory(historyDates)}
                     className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
                   >
                     {badgeType}
