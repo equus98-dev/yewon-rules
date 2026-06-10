@@ -1374,47 +1374,47 @@ export default function Home() {
                 </div>
 
                 {/* [파트 1.5] 관련 웹사이트 롤링 배너 */}
-                <div className="w-full mt-1 mb-1">
-                  <div className="flex bg-slate-100 border border-slate-200 rounded-lg overflow-hidden h-[38px] items-center px-4 relative">
-                    <ArrowBackIosIcon sx={{ fontSize: 14 }} className="text-slate-400 shrink-0 absolute left-3 z-10" />
+                <div className="w-full -mt-3 -mb-3 z-10">
+                  <div className="flex bg-slate-100 border border-slate-200 rounded-lg overflow-hidden h-[60px] items-center px-4 relative shadow-sm">
+                    <ArrowBackIosIcon sx={{ fontSize: 16 }} className="text-slate-400 shrink-0 absolute left-3 z-10" />
                     <div className="flex-1 overflow-hidden relative h-full flex items-center mx-4" style={{ maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)' }}>
-                      <div className="flex animate-marquee gap-12 md:gap-20 items-center w-max">
+                      <div className="flex animate-marquee gap-14 md:gap-24 items-center w-max">
                         {/* 원본 세트 */}
                         <a href="https://www.yewon.ac.kr/" target="_blank" className="shrink-0">
-                           <img src="/docs/UI.png" alt="예원예술대학교" className="mix-blend-multiply object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                           <img src="/docs/UI.png" alt="예원예술대학교" className="mix-blend-multiply object-contain h-9 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
                         <a href="https://www.law.go.kr/main.html" target="_blank" className="shrink-0">
-                           <img src="/docs/h_logo1_t.png" alt="국가법령정보센터" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                           <img src="/docs/h_logo1_t.png" alt="국가법령정보센터" className="object-contain h-9 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
                         <a href="https://www.moe.go.kr/main.do?s=moe" target="_blank" className="shrink-0">
-                           <img src="/docs/kyo_t.png" alt="교육부" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                           <img src="/docs/kyo_t.png" alt="교육부" className="object-contain h-9 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
                         <a href="https://www.moleg.go.kr/index.es?sid=a1" target="_blank" className="shrink-0">
-                           <img src="/docs/rru.png" alt="법제처" className="mix-blend-multiply object-contain h-5 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                           <img src="/docs/rru.png" alt="법제처" className="mix-blend-multiply object-contain h-7 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
                         <a href="https://www.scourt.go.kr/scourt/index.html" target="_blank" className="shrink-0">
-                           <img src="/docs/logo333.png" alt="법원" className="mix-blend-multiply object-contain h-9 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all scale-110" />
+                           <img src="/docs/logo333.png" alt="법원" className="mix-blend-multiply object-contain h-11 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all scale-110" />
                         </a>
                         {/* 복제 세트 (무한 롤링용) */}
                         <a href="https://www.yewon.ac.kr/" target="_blank" className="shrink-0">
-                           <img src="/docs/UI.png" alt="예원예술대학교" className="mix-blend-multiply object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                           <img src="/docs/UI.png" alt="예원예술대학교" className="mix-blend-multiply object-contain h-9 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
                         <a href="https://www.law.go.kr/main.html" target="_blank" className="shrink-0">
-                           <img src="/docs/h_logo1_t.png" alt="국가법령정보센터" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                           <img src="/docs/h_logo1_t.png" alt="국가법령정보센터" className="object-contain h-9 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
                         <a href="https://www.moe.go.kr/main.do?s=moe" target="_blank" className="shrink-0">
-                           <img src="/docs/kyo_t.png" alt="교육부" className="object-contain h-6 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                           <img src="/docs/kyo_t.png" alt="교육부" className="object-contain h-9 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
                         <a href="https://www.moleg.go.kr/index.es?sid=a1" target="_blank" className="shrink-0">
-                           <img src="/docs/rru.png" alt="법제처" className="mix-blend-multiply object-contain h-5 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
+                           <img src="/docs/rru.png" alt="법제처" className="mix-blend-multiply object-contain h-7 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all" />
                         </a>
                         <a href="https://www.scourt.go.kr/scourt/index.html" target="_blank" className="shrink-0">
-                           <img src="/docs/logo333.png" alt="법원" className="mix-blend-multiply object-contain h-9 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all scale-110" />
+                           <img src="/docs/logo333.png" alt="법원" className="mix-blend-multiply object-contain h-11 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all scale-110" />
                         </a>
 
                       </div>
                     </div>
-                    <ArrowForwardIosIcon sx={{ fontSize: 14 }} className="text-slate-400 shrink-0 absolute right-3 z-10" />
+                    <ArrowForwardIosIcon sx={{ fontSize: 16 }} className="text-slate-400 shrink-0 absolute right-3 z-10" />
                   </div>
                 </div>
 
