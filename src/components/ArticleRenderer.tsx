@@ -159,6 +159,41 @@ export default function ArticleRenderer({
     }
   }
 
+  // 본문 맨 앞의 일반 텍스트에 장/절 이름이 포함된 경우 formatGluedText가 검은색 일반 텍스트로 중복 렌더링하는 것을 방지
+  if (chapter || section) {
+    for (let i = 0; i < Math.min(items.length, 3); i++) {
+      if (items[i] && (items[i].type === "text" || items[i].type === "paragraph")) {
+        let text = String(items[i].text || "").trim();
+        let changed = false;
+
+        if (chapter) {
+          const chapterNumMatch = chapter.match(/^(제\d+장)/);
+          if (chapterNumMatch) {
+            const cRegex = new RegExp(`^\\s*${chapterNumMatch[1]}[^\\n제]*\\s*`);
+            if (cRegex.test(text)) {
+               text = text.replace(cRegex, '').trim();
+               changed = true;
+            }
+          }
+        }
+        if (section) {
+          const sectionNumMatch = section.match(/^(제\d+절)/);
+          if (sectionNumMatch) {
+            const sRegex = new RegExp(`^\\s*${sectionNumMatch[1]}[^\\n제]*\\s*`);
+            if (sRegex.test(text)) {
+               text = text.replace(sRegex, '').trim();
+               changed = true;
+            }
+          }
+        }
+        
+        if (changed) {
+          items[i].text = text;
+        }
+      }
+    }
+  }
+
   let hasSeenBody = false;
   let addendumStarted = false;
 

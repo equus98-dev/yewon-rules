@@ -475,15 +475,17 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                   
                   const prevA = currentRevision.articles[idx - 1];
                   let chapterInJson = false;
+                  let sectionInJson = false;
                   try {
                     const parsed = typeof a.contentJson === 'string' ? JSON.parse(a.contentJson) : a.contentJson;
-                    if (Array.isArray(parsed) && parsed.some(i => i.type === 'chapter')) {
-                      chapterInJson = true;
+                    if (Array.isArray(parsed)) {
+                      if (parsed.some((i: any) => i.type === 'chapter')) chapterInJson = true;
+                      if (parsed.some((i: any) => i.type === 'section')) sectionInJson = true;
                     }
                   } catch (e) {}
 
                   const showChapter = a.chapter && (!prevA || prevA.chapter !== a.chapter) && !chapterInJson;
-                  const showSection = a.section && (!prevA || prevA.section !== a.section);
+                  const showSection = a.section && (!prevA || prevA.section !== a.section) && !sectionInJson;
 
                   return (
                     <React.Fragment key={a.id}>
