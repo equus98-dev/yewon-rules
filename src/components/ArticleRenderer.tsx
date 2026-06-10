@@ -93,7 +93,7 @@ export default function ArticleRenderer({
           </div>
         )}
         <div 
-          className={`mb-8 ql-editor ${wrapperClass} px-0 py-2 w-full`}
+          className={`mb-4 ql-editor ${wrapperClass} px-0 py-2 w-full`}
           dangerouslySetInnerHTML={{ __html: cleanHtml }}
         />
       </div>
@@ -189,7 +189,7 @@ export default function ArticleRenderer({
   // 본문 맨 앞의 일반 텍스트에 장/절 이름이 포함된 경우 formatGluedText가 검은색 일반 텍스트로 중복 렌더링하는 것을 방지
   if (chapter || section) {
     for (let i = 0; i < Math.min(items.length, 3); i++) {
-      if (items[i] && (items[i].type === "text" || items[i].type === "paragraph")) {
+      if (items[i] && (items[i].type === "text" || items[i].type === "paragraph" || items[i].type === "article")) {
         let text = String(items[i].text || "").trim();
         let changed = false;
 
@@ -504,7 +504,7 @@ export default function ArticleRenderer({
   }
 
   return (
-    <div id={id} className="mb-6 animate-fade-in rule-viewer-content font-['Pretendard']">
+    <div id={id} className="mb-2 animate-fade-in rule-viewer-content font-['Pretendard']">
       {displayItems.map((item, index) => {
         if (!item || typeof item !== 'object') return null;
 
