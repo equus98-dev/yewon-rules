@@ -109,12 +109,33 @@ function EditorContent() {
           setOriginalArticles(rev.articles);
           
           // 기존 조항들을 복사하여 편집용 초안 상태로 초기화
-          const copied = rev.articles.map((art: any) => ({
-            ...art,
-            isNew: false,
-            isDeleted: false,
-            isModified: false,
-          }));
+          const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&').replace(/\s+/g, '\\s*');
+          const copied = rev.articles.map((art: any, idx: number, arr: any[]) => {
+            let cleanText = art.contentText || "";
+            // 다음 조항의 장/절이 현재 조항의 본문 끝에 묻어있는 경우 제거
+            const nextArt = arr[idx + 1];
+            if (nextArt) {
+               if (nextArt.chapter && nextArt.chapter !== art.chapter && nextArt.section && nextArt.section !== art.section) {
+                  const chapSecRegex = new RegExp(`\\n*\\s*${escapeRegex(nextArt.chapter)}\\s*\\n*\\s*${escapeRegex(nextArt.section)}\\s*$`);
+                  cleanText = cleanText.replace(chapSecRegex, '');
+               }
+               if (nextArt.chapter && nextArt.chapter !== art.chapter) {
+                  const chapRegex = new RegExp(`\\n*\\s*${escapeRegex(nextArt.chapter)}\\s*$`);
+                  cleanText = cleanText.replace(chapRegex, '');
+               }
+               if (nextArt.section && nextArt.section !== art.section) {
+                  const secRegex = new RegExp(`\\n*\\s*${escapeRegex(nextArt.section)}\\s*$`);
+                  cleanText = cleanText.replace(secRegex, '');
+               }
+            }
+            return {
+              ...art,
+              contentText: cleanText.trim(),
+              isNew: false,
+              isDeleted: false,
+              isModified: false,
+            };
+          });
           setDraftArticles(copied);
           
           // 개정 폼 디폴트값 자동 세팅
@@ -167,8 +188,41 @@ function EditorContent() {
   // 조항 제목 변경
   const handleArticleTitleChange = (idx: number, newTitle: string) => {
     setDraftArticles((prev) =>
-      prev.map((art, i) => (i === idx ? { ...art, title: newTitle } : art))
+      prev.map((art, i) => (i === idx ? { ...art, title: newTitle, isModified: true } : art))
     );
+  };
+
+  // 장(Chapter) 일괄 변경
+  const handleChapterChange = (idx: number, newChapter: string) => {
+    setDraftArticles((prev) => {
+      const oldChapter = prev[idx].chapter;
+      const newArticles = [...prev];
+      for (let i = idx; i < newArticles.length; i++) {
+        if (newArticles[i].chapter === oldChapter) {
+          newArticles[i] = { ...newArticles[i], chapter: newChapter, isModified: true };
+        } else {
+          break;
+        }
+      }
+      return newArticles;
+    });
+  };
+
+  // 절(Section) 일괄 변경
+  const handleSectionChange = (idx: number, newSection: string) => {
+    setDraftArticles((prev) => {
+      const oldSection = prev[idx].section;
+      const oldChapter = prev[idx].chapter;
+      const newArticles = [...prev];
+      for (let i = idx; i < newArticles.length; i++) {
+        if (newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter) {
+          newArticles[i] = { ...newArticles[i], section: newSection, isModified: true };
+        } else {
+          break;
+        }
+      }
+      return newArticles;
+    });
   };
 
   // 신규 조항 추가 (신설)
@@ -604,27 +658,54 @@ function EditorContent() {
 
                       {/* 입력 영역 */}
                       {!art.isDeleted && (
-                        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-5 text-sm">
-                          <div className="space-y-2">
-                            <label className="text-xs text-slate-500 font-bold uppercase tracking-wider pl-1">조 조항 제목</label>
-                            <input
-                              type="text"
-                              value={art.title}
-                              onChange={(e) => handleArticleTitleChange(idx, e.target.value)}
-                              placeholder="예: 목적"
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-sm"
-                            />
+                        <div className="flex flex-col gap-5 mt-2">
+                          {/* 장/절 편집 입력 */}
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-sm">
+                            <div className="space-y-2">
+                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 장 (Chapter)</label>
+                              <input
+                                type="text"
+                                value={art.chapter || ""}
+                                onChange={(e) => handleChapterChange(idx, e.target.value)}
+                                placeholder="예: 제1장 총칙"
+                                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[13.5px] transition-all"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 절 (Section)</label>
+                              <input
+                                type="text"
+                                value={art.section || ""}
+                                onChange={(e) => handleSectionChange(idx, e.target.value)}
+                                placeholder="예: 제1절 목적"
+                                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[13.5px] transition-all"
+                              />
+                            </div>
                           </div>
 
-                          <div className="space-y-2">
-                            <label className="text-xs text-slate-500 font-bold uppercase tracking-wider pl-1">조문 본문 전문</label>
-                            <textarea
-                              rows={3}
-                              value={art.contentText}
-                              onChange={(e) => handleArticleTextChange(idx, e.target.value)}
-                              placeholder="예: 제1조 (목적) 이 규정은 학교의..."
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] leading-relaxed resize-none text-sm"
-                            />
+                          {/* 제목 및 본문 편집 입력 */}
+                          <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-5 text-sm">
+                            <div className="space-y-2">
+                              <label className="text-xs text-slate-500 font-bold uppercase tracking-wider pl-1">조 조항 제목</label>
+                              <input
+                                type="text"
+                                value={art.title}
+                                onChange={(e) => handleArticleTitleChange(idx, e.target.value)}
+                                placeholder="예: 목적"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-sm"
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <label className="text-xs text-slate-500 font-bold uppercase tracking-wider pl-1">조문 본문 전문</label>
+                              <textarea
+                                rows={3}
+                                value={art.contentText}
+                                onChange={(e) => handleArticleTextChange(idx, e.target.value)}
+                                placeholder="예: 제1조 (목적) 이 규정은 학교의..."
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] leading-relaxed resize-none text-sm"
+                              />
+                            </div>
                           </div>
                         </div>
                       )}
