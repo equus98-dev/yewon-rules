@@ -751,6 +751,84 @@ export default function Home() {
               </div>
               </div>
             </div>
+          ) : activeVerticalTab === "최신 제·개정" ? (
+            <div className="flex-1 overflow-y-auto bg-slate-50 scrollbar flex flex-col relative">
+              <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-8 py-5 shrink-0 flex items-center justify-between z-10 shadow-sm relative select-none">
+                <h2 className="text-2xl font-black text-[#007073] tracking-tight ml-2">
+                  최신 제·개정
+                </h2>
+                <div className="text-[14px] text-slate-500 font-medium tracking-wider">
+                  HOME &gt; <span className="font-bold text-slate-700">최신 제·개정</span>
+                </div>
+              </div>
+
+              <div className="flex-1 p-8">
+                <div className="max-w-6xl mx-auto">
+                  <div className="bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden flex flex-col">
+                    {loadingRecent ? (
+                      <div className="flex justify-center items-center py-40">
+                        <CircularProgress size={30} sx={{ color: "#0c3161" }} />
+                      </div>
+                    ) : recentRules.length === 0 ? (
+                      <div className="text-center py-40 text-slate-500 text-[15px] font-bold">
+                        등록된 최신 제·개정 규정이 없습니다.
+                      </div>
+                    ) : (
+                      <table className="w-full text-left border-collapse">
+                        <thead className="bg-[#f8fafc] border-b border-slate-200">
+                          <tr>
+                            <th className="py-4 px-4 font-black w-24 text-center border-r border-slate-200">번호</th>
+                            <th className="py-4 px-4 font-black w-32 text-center border-r border-slate-200">상태</th>
+                            <th className="py-4 px-4 font-black text-center">규정명</th>
+                            <th className="py-4 px-4 font-black w-40 text-center border-l border-slate-200">분류</th>
+                            <th className="py-4 px-4 font-black w-40 text-center border-l border-slate-200">공포일자</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {recentRules.map((rule, idx) => {
+                            const isAbolished = rule.status === "ABOLISHED";
+                            return (
+                              <tr key={rule.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors group">
+                                <td className="py-4 px-4 text-center text-slate-500 font-extrabold text-[16px]">
+                                  {recentRules.length - idx}
+                                </td>
+                                <td className="py-4 px-4 text-center">
+                                  <span className={`px-2.5 py-1 rounded text-[12.5px] font-extrabold ${isAbolished ? "bg-red-400 text-white" : "bg-[#81c784] text-white"}`}>
+                                    {rule.latestVersionName}
+                                  </span>
+                                </td>
+                                <td className="py-4 px-4">
+                                  <button
+                                    type="button"
+                                    onClick={() => { setActiveRuleId(rule.id); setActiveVerticalTab(null); }}
+                                    className={`font-bold cursor-pointer text-[15.5px] transition-colors text-left ${isAbolished ? "text-slate-400 line-through group-hover:text-slate-500" : "text-slate-800 group-hover:text-blue-800"}`}
+                                  >
+                                    {rule.title}
+                                  </button>
+                                </td>
+                                <td className="py-4 px-4 text-center text-slate-600 font-medium text-[15px]">
+                                  {rule.category?.name || "분류없음"}
+                                </td>
+                                <td className="py-4 px-4 text-center text-slate-600 font-mono text-[14.5px]">
+                                  {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString().replace(/\. /g, '.').replace(/\.$/, '') : "-"}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    )}
+                    {!loadingRecent && recentRules.length > 0 && (
+                      <div className="flex items-center justify-center py-6 border-t border-slate-200 bg-white">
+                        <div className="flex gap-1.5">
+                          <button className="px-4 py-1.5 bg-[#0c3161] text-white text-[15px] font-black shadow-sm">1</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           ) : activeRuleId ? (
             /* 규정 뷰어 표시 */
             <div className="flex-1 overflow-hidden h-full bg-white shadow-[-4px_0_15px_rgba(0,0,0,0.03)] border-l border-slate-200">
@@ -1486,8 +1564,17 @@ export default function Home() {
                         </div>
                         최신 제·개정
                       </h3>
-                      <IconButton size="small" onClick={() => window.location.reload()} sx={{ bgcolor: "#f1f5f9", "&:hover": { bgcolor: "#e2e8f0" } }}>
-                        <span className="text-slate-400 font-bold text-lg leading-none w-5 h-5 flex items-center justify-center">+</span>
+                      <IconButton 
+                        size="small" 
+                        onClick={() => { setActiveVerticalTab("최신 제·개정"); setActiveRuleId(null); setActiveCategoryId(null); setIsSearching(false); setActiveNoticeId(null); }} 
+                        sx={{ 
+                          bgcolor: "rgba(59, 155, 156, 0.15)",
+                          backgroundImage: "radial-gradient(rgba(59, 155, 156, 0.3) 1.5px, transparent 1.5px)",
+                          backgroundSize: "8px 8px",
+                          border: "1px solid rgba(59, 155, 156, 0.2)",
+                          "&:hover": { bgcolor: "rgba(59, 155, 156, 0.25)" }
+                        }}>
+                        <span className="text-[#3b9b9c] font-black text-lg leading-none w-5 h-5 flex items-center justify-center">+</span>
                       </IconButton>
                     </div>
 
