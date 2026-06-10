@@ -537,7 +537,7 @@ export default function ArticleRenderer({
                     {badgeType}
                   </button>
                 )}
-                <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
+                <div className={`flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7] ${(!hideHistory && !isAddendum) ? "" : "ml-[28px]"}`}>
                   <div id={`toc-${safeNum}`} className="w-full break-keep inline-block">
                     {isAddendum ? (
                       <>
