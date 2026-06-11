@@ -75,42 +75,41 @@ export default function ArticleRenderer({
 
     let cleanHtml = contentHtml;
 
-    // HWP 파싱 중 HTML 자체에 장/절 제목이 중복 포함된 경우 이를 제거 (최대 5개 문단 확인)
+    // HTML 자체에 장/절 제목이 중복 포함된 경우 이를 제거 (최대 5개 문단 확인)
     if (chapter || section) {
-      for (let i = 0; i < 5; i++) {
-        const match = cleanHtml.match(/^(\s*<p[^>]*>.*?<\/p>\s*)/i);
-        if (match) {
-          const rawText = match[0].replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-          const pText = rawText.replace(/\s+/g, '').replace(/&nbsp;/g, '');
-          
-          if (pText === '') {
-            // 빈 문단이면 그냥 제거하고 다음 문단 확인
-            cleanHtml = cleanHtml.replace(match[0], '');
-            continue;
-          }
-          
-          let removed = false;
-          if (chapter) {
-            const chapText = chapter.replace(/\s+/g, '');
-            if (pText === chapText || (pText.includes(chapText) && pText.length < chapText.length + 5)) {
-              cleanHtml = cleanHtml.replace(match[0], '');
-              removed = true;
-            }
-          }
-          
-          if (!removed && section) {
-            const secText = section.replace(/\s+/g, '');
-            if (pText === secText || (pText.includes(secText) && pText.length < secText.length + 5)) {
-              cleanHtml = cleanHtml.replace(match[0], '');
-              removed = true;
-            }
-          }
-          
-          if (!removed) break;
-        } else {
-          break;
+      let chapterRemoved = false;
+      let sectionRemoved = false;
+      let foundRealText = false;
+
+      cleanHtml = cleanHtml.replace(/<(p|h[1-6])(?:\s[^>]*?)?>([\s\S]*?)<\/\1>/gi, (match, tag, innerHtml) => {
+        if (foundRealText) return match;
+        
+        const rawText = innerHtml.replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        const pText = rawText.replace(/\s+/g, '').replace(/&nbsp;/g, '');
+        
+        if (pText === '') {
+           return ''; // 빈 문단이면 제거하고 계속 진행
         }
-      }
+        
+        if (chapter && !chapterRemoved) {
+          const chapText = chapter.replace(/\s+/g, '');
+          if (pText === chapText || (pText.includes(chapText) && pText.length < chapText.length + 5)) {
+            chapterRemoved = true;
+            return ''; // 장 제목 제거
+          }
+        }
+        
+        if (section && !sectionRemoved) {
+          const secText = section.replace(/\s+/g, '');
+          if (pText === secText || (pText.includes(secText) && pText.length < secText.length + 5)) {
+            sectionRemoved = true;
+            return ''; // 절 제목 제거
+          }
+        }
+        
+        foundRealText = true; // 실제 본문이 시작되었으므로 이후로는 제거하지 않음
+        return match;
+      });
     }
 
     if (articleNumber >= 9000) {
