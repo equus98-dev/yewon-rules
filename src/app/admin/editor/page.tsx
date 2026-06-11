@@ -992,6 +992,26 @@ function EditorContent() {
                               {/* 바로적용 버튼 (그룹 일괄 적용) */}
                               <button
                                 type="button"
+                                onClick={() => {
+                                  if (!confirm("이 그룹에 설정된 편·장·절·관 정보를 모두 지우시겠습니까?")) return;
+                                  const newDrafts = [...draftArticles];
+                                  for (let i = idx; i < newDrafts.length; i++) {
+                                    if (i === idx || (newDrafts[i].part === art.part && newDrafts[i].chapter === art.chapter && newDrafts[i].section === art.section && newDrafts[i].subSection === art.subSection)) {
+                                      newDrafts[i] = { ...newDrafts[i], part: "", chapter: "", section: "", subSection: "", isModified: true, isGroupModified: true };
+                                    } else {
+                                      break;
+                                    }
+                                  }
+                                  setDraftArticles(newDrafts);
+                                }}
+                                className="flex items-center gap-1.5 px-4 h-[38px] bg-white border border-red-200 text-red-600 rounded-lg text-[13px] font-black hover:bg-red-50 transition-all cursor-pointer active:scale-95 shadow-sm"
+                                title="이 편장절관 그룹 정보를 지웁니다."
+                              >
+                                <DeleteIcon sx={{ fontSize: 16 }} />
+                                삭제
+                              </button>
+                              <button
+                                type="button"
                                 onClick={async () => {
                                   if (!confirm("이 편/장/절/관에 속한 모든 조항의 소속 명칭을 실서버에 즉시 단순 반영하시겠습니까?")) return;
                                   setSaving(true);
