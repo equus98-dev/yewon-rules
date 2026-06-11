@@ -68,7 +68,7 @@ export async function GET(
     if (!targetRevisionId) targetRevisionId = revisions[0].id;
 
     const articlesRes = await pool.query(
-      `SELECT id, chapter, section, "articleNumber", title, "contentJson", "contentText", "contentHtml", "sortOrder"
+      `SELECT id, part, chapter, section, "subSection", "articleNumber", title, "contentJson", "contentText", "contentHtml", "sortOrder"
        FROM "Article" WHERE "revisionId" = $1 ORDER BY "sortOrder" ASC`,
       [targetRevisionId]
     );
@@ -76,9 +76,9 @@ export async function GET(
     const comparisonsRes = await pool.query(
       `SELECT 
         ac.id, ac."beforeArticleId", ac."afterArticleId", ac.note,
-        ba.chapter AS "before_chapter", ba.section AS "before_section", ba."articleNumber" AS "before_articleNumber",
+        ba.part AS "before_part", ba.chapter AS "before_chapter", ba.section AS "before_section", ba."subSection" AS "before_subSection", ba."articleNumber" AS "before_articleNumber",
         ba.title AS "before_title", ba."contentText" AS "before_contentText", ba."contentJson" AS "before_contentJson",
-        aa.chapter AS "after_chapter", aa.section AS "after_section", aa."articleNumber" AS "after_articleNumber",
+        aa.part AS "after_part", aa.chapter AS "after_chapter", aa.section AS "after_section", aa."subSection" AS "after_subSection", aa."articleNumber" AS "after_articleNumber",
         aa.title AS "after_title", aa."contentText" AS "after_contentText", aa."contentJson" AS "after_contentJson"
        FROM "ArticleComparison" ac
        LEFT JOIN "Article" ba ON ac."beforeArticleId" = ba.id
@@ -94,8 +94,10 @@ export async function GET(
       afterArticleId: row.afterArticleId,
       beforeArticle: row.before_articleNumber
         ? {
+            part: row.before_part,
             chapter: row.before_chapter,
             section: row.before_section,
+            subSection: row.before_subSection,
             articleNumber: row.before_articleNumber,
             title: row.before_title,
             contentText: row.before_contentText,
@@ -104,8 +106,10 @@ export async function GET(
         : null,
       afterArticle: row.after_articleNumber
         ? {
+            part: row.after_part,
             chapter: row.after_chapter,
             section: row.after_section,
+            subSection: row.after_subSection,
             articleNumber: row.after_articleNumber,
             title: row.after_title,
             contentText: row.after_contentText,

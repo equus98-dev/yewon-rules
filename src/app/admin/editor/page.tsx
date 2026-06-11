@@ -125,18 +125,24 @@ function EditorContent() {
             // 다음 조항의 장/절이 현재 조항의 본문 끝에 묻어있는 경우 제거
             const nextArt = arr[idx + 1];
             if (nextArt) {
-               if (nextArt.chapter && nextArt.chapter !== art.chapter && nextArt.section && nextArt.section !== art.section) {
-                  const chapSecRegex = new RegExp(`\\n*\\s*${escapeRegex(nextArt.chapter)}\\s*\\n*\\s*${escapeRegex(nextArt.section)}\\s*$`);
-                  cleanText = cleanText.replace(chapSecRegex, '');
+               const parts = [
+                  nextArt.part && nextArt.part !== art.part ? escapeRegex(nextArt.part) : null,
+                  nextArt.chapter && nextArt.chapter !== art.chapter ? escapeRegex(nextArt.chapter) : null,
+                  nextArt.section && nextArt.section !== art.section ? escapeRegex(nextArt.section) : null,
+                  nextArt.subSection && nextArt.subSection !== art.subSection ? escapeRegex(nextArt.subSection) : null
+               ].filter(Boolean);
+               
+               if (parts.length > 0) {
+                   const combinedRegex = new RegExp(`\\n*\\s*` + parts.join(`\\s*\\n*\\s*`) + `\\s*$`);
+                   cleanText = cleanText.replace(combinedRegex, '');
                }
-               if (nextArt.chapter && nextArt.chapter !== art.chapter) {
-                  const chapRegex = new RegExp(`\\n*\\s*${escapeRegex(nextArt.chapter)}\\s*$`);
-                  cleanText = cleanText.replace(chapRegex, '');
-               }
-               if (nextArt.section && nextArt.section !== art.section) {
-                  const secRegex = new RegExp(`\\n*\\s*${escapeRegex(nextArt.section)}\\s*$`);
-                  cleanText = cleanText.replace(secRegex, '');
-               }
+               // 잔여물 개별 제거 (역순으로 처리하여 하위 항목부터 지움)
+               [...parts].reverse().forEach(p => {
+                   if (p) {
+                       const pRegex = new RegExp(`\\n*\\s*${p}\\s*$`);
+                       cleanText = cleanText.replace(pRegex, '');
+                   }
+               });
             }
             return {
               ...art,
@@ -202,13 +208,30 @@ function EditorContent() {
     );
   };
 
+  // 편(Part) 일괄 변경
+  const handlePartChange = (idx: number, newPart: string) => {
+    setDraftArticles((prev) => {
+      const oldPart = prev[idx].part;
+      const newArticles = [...prev];
+      for (let i = idx; i < newArticles.length; i++) {
+        if (newArticles[i].part === oldPart) {
+          newArticles[i] = { ...newArticles[i], part: newPart, isModified: true };
+        } else {
+          break;
+        }
+      }
+      return newArticles;
+    });
+  };
+
   // 장(Chapter) 일괄 변경
   const handleChapterChange = (idx: number, newChapter: string) => {
     setDraftArticles((prev) => {
       const oldChapter = prev[idx].chapter;
+      const oldPart = prev[idx].part;
       const newArticles = [...prev];
       for (let i = idx; i < newArticles.length; i++) {
-        if (newArticles[i].chapter === oldChapter) {
+        if (newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
           newArticles[i] = { ...newArticles[i], chapter: newChapter, isModified: true };
         } else {
           break;
@@ -223,10 +246,30 @@ function EditorContent() {
     setDraftArticles((prev) => {
       const oldSection = prev[idx].section;
       const oldChapter = prev[idx].chapter;
+      const oldPart = prev[idx].part;
       const newArticles = [...prev];
       for (let i = idx; i < newArticles.length; i++) {
-        if (newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter) {
+        if (newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
           newArticles[i] = { ...newArticles[i], section: newSection, isModified: true };
+        } else {
+          break;
+        }
+      }
+      return newArticles;
+    });
+  };
+
+  // 관(SubSection) 일괄 변경
+  const handleSubSectionChange = (idx: number, newSubSection: string) => {
+    setDraftArticles((prev) => {
+      const oldSubSection = prev[idx].subSection;
+      const oldSection = prev[idx].section;
+      const oldChapter = prev[idx].chapter;
+      const oldPart = prev[idx].part;
+      const newArticles = [...prev];
+      for (let i = idx; i < newArticles.length; i++) {
+        if (newArticles[i].subSection === oldSubSection && newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
+          newArticles[i] = { ...newArticles[i], subSection: newSubSection, isModified: true };
         } else {
           break;
         }
@@ -244,7 +287,10 @@ function EditorContent() {
       const nextNum = maxNum + 1;
       
       const newArticle = {
+        part: "",
         chapter: "제1장 총칙",
+        section: "",
+        subSection: "",
         articleNumber: nextNum,
         title: "조항 제목",
         contentText: `제${nextNum}조 (제목) `,
@@ -675,7 +721,9 @@ function EditorContent() {
                       id={`viewer-art-${art.articleNumber}`}
                       className={`p-4 border rounded-xl space-y-1.5 shadow-sm transition-all duration-300 ${activeArticleNum === art.articleNumber ? "bg-rose-50 border-rose-200 ring-1 ring-rose-200" : "bg-slate-50 border-slate-200"}`}
                     >
-                      <div className="text-sm text-slate-500 font-black">{art.chapter || "총칙"}</div>
+                      <div className="text-[13px] text-slate-500 font-black">
+                        {[art.part, art.chapter, art.section, art.subSection].filter(Boolean).join(" > ") || "총칙"}
+                      </div>
                       <div className="text-[#0c3161] font-black text-base">{getArticleNumBadge(art.articleNumber, art.title)}</div>
                       <p className="text-slate-700 leading-relaxed font-bold mt-2 whitespace-pre-wrap text-[15px]">
                         {art.contentText}
@@ -833,26 +881,46 @@ function EditorContent() {
                       {/* 입력 영역 */}
                       {!art.isDeleted && (
                         <div className="flex flex-col gap-5 mt-2">
-                          {/* 장/절 편집 입력 */}
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-sm">
+                          {/* 편/장/절/관 편집 입력 */}
+                          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-sm">
                             <div className="space-y-2">
-                              <label className="text-xs text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 장 (Chapter)</label>
+                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 편 (Part)</label>
+                              <input
+                                type="text"
+                                value={art.part || ""}
+                                onChange={(e) => handlePartChange(idx, e.target.value)}
+                                placeholder="예: 제1편 총칙"
+                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[14px] transition-all"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 장 (Chapter)</label>
                               <input
                                 type="text"
                                 value={art.chapter || ""}
                                 onChange={(e) => handleChapterChange(idx, e.target.value)}
                                 placeholder="예: 제1장 총칙"
-                                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[15px] transition-all"
+                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[14px] transition-all"
                               />
                             </div>
                             <div className="space-y-2">
-                              <label className="text-xs text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 절 (Section)</label>
+                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 절 (Section)</label>
                               <input
                                 type="text"
                                 value={art.section || ""}
                                 onChange={(e) => handleSectionChange(idx, e.target.value)}
                                 placeholder="예: 제1절 목적"
-                                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[15px] transition-all"
+                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[14px] transition-all"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 관 (SubSection)</label>
+                              <input
+                                type="text"
+                                value={art.subSection || ""}
+                                onChange={(e) => handleSubSectionChange(idx, e.target.value)}
+                                placeholder="예: 제1관 목적"
+                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[14px] transition-all"
                               />
                             </div>
                           </div>
@@ -1035,10 +1103,12 @@ function EditorContent() {
                         const draftArt = draftArticles.find((d) => d.articleNumber === num);
 
                         // 둘 다 있고 변경 없는 경우 -> 표시 제외 또는 생략 표시
+                        const isPartChanged = oldArt && draftArt && oldArt.part !== draftArt.part;
                         const isChapterChanged = oldArt && draftArt && oldArt.chapter !== draftArt.chapter;
                         const isSectionChanged = oldArt && draftArt && oldArt.section !== draftArt.section;
+                        const isSubSectionChanged = oldArt && draftArt && oldArt.subSection !== draftArt.subSection;
                         const isTextChanged = oldArt && draftArt && oldArt.contentText !== draftArt.contentText;
-                        const isAnyChanged = isChapterChanged || isSectionChanged || isTextChanged;
+                        const isAnyChanged = isPartChanged || isChapterChanged || isSectionChanged || isSubSectionChanged || isTextChanged;
 
                         const hasNoChange = oldArt && draftArt && !isAnyChanged && !draftArt.isDeleted;
                         
@@ -1059,7 +1129,7 @@ function EditorContent() {
                             <td className="py-5 px-6 border-r border-slate-200 text-slate-700 leading-relaxed align-top">
                               {oldArt ? (
                                 <div className="space-y-1.5">
-                                  {oldArt.chapter && <div className="text-xs text-slate-400 font-bold mb-1">{oldArt.chapter} {oldArt.section ? `> ${oldArt.section}` : ''}</div>}
+                                  {(oldArt.part || oldArt.chapter || oldArt.section || oldArt.subSection) && <div className="text-xs text-slate-400 font-bold mb-1">{[oldArt.part, oldArt.chapter, oldArt.section, oldArt.subSection].filter(Boolean).join(" > ")}</div>}
                                   <div className="font-black text-slate-500 font-sans text-sm">{getArticleLabel(oldArt.articleNumber, oldArt.title)}</div>
                                   <p className="whitespace-pre-wrap mt-2 font-bold text-[14px]">{oldArt.contentText}</p>
                                 </div>
@@ -1074,7 +1144,7 @@ function EditorContent() {
                             <td className="py-5 px-6 border-r border-slate-200 text-slate-700 leading-relaxed align-top">
                               {draftArt && !draftArt.isDeleted ? (
                                 <div className="space-y-1.5">
-                                  {draftArt.chapter && <div className={`text-xs font-bold mb-1 ${isChapterChanged || isSectionChanged ? 'text-amber-600 bg-amber-50 inline-block px-1 rounded' : 'text-slate-400'}`}>{draftArt.chapter} {draftArt.section ? `> ${draftArt.section}` : ''}</div>}
+                                  {(draftArt.part || draftArt.chapter || draftArt.section || draftArt.subSection) && <div className={`text-xs font-bold mb-1 ${isPartChanged || isChapterChanged || isSectionChanged || isSubSectionChanged ? 'text-amber-600 bg-amber-50 inline-block px-1 rounded' : 'text-slate-400'}`}>{[draftArt.part, draftArt.chapter, draftArt.section, draftArt.subSection].filter(Boolean).join(" > ")}</div>}
                                   <div className="font-black text-[#0c3161] font-sans text-sm">{getArticleLabel(draftArt.articleNumber, draftArt.title)}</div>
                                   <p className={`whitespace-pre-wrap mt-2 ${isTextChanged ? 'bg-amber-50 p-3 rounded-lg border border-amber-100 text-slate-800' : ''} font-bold text-[14px]`}>
                                     {draftArt.contentText}

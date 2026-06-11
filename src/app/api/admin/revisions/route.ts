@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     let oldArticles: any[] = [];
     if (previousRevision) {
       const oldArtRes = await client.query(
-        `SELECT id, "articleNumber", "contentText", chapter, section FROM "Article" WHERE "revisionId" = $1`,
+        `SELECT id, "articleNumber", "contentText", part, chapter, section, "subSection" FROM "Article" WHERE "revisionId" = $1`,
         [previousRevision.id]
       );
       oldArticles = oldArtRes.rows;
@@ -47,11 +47,11 @@ export async function POST(request: Request) {
       for (const art of articles) {
         const artId = crypto.randomUUID();
         await client.query(
-          `INSERT INTO "Article" (id, "revisionId", chapter, section, "articleNumber", title, "contentJson", "contentText", "sortOrder", "createdAt", "updatedAt")
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())`,
-          [artId, newRevisionId, art.chapter || null, art.section || null, parseInt(art.articleNumber) || 1, art.title || "제목없음", JSON.stringify(art.contentJson || {}), art.contentText || "", art.sortOrder || 1]
+          `INSERT INTO "Article" (id, "revisionId", part, chapter, section, "subSection", "articleNumber", title, "contentJson", "contentText", "sortOrder", "createdAt", "updatedAt")
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())`,
+          [artId, newRevisionId, art.part || null, art.chapter || null, art.section || null, art.subSection || null, parseInt(art.articleNumber) || 1, art.title || "제목없음", JSON.stringify(art.contentJson || {}), art.contentText || "", art.sortOrder || 1]
         );
-        createdNewArticles.push({ id: artId, articleNumber: parseInt(art.articleNumber) || 1, contentText: art.contentText || "", chapter: art.chapter || null, section: art.section || null });
+        createdNewArticles.push({ id: artId, articleNumber: parseInt(art.articleNumber) || 1, contentText: art.contentText || "", part: art.part || null, chapter: art.chapter || null, section: art.section || null, subSection: art.subSection || null });
       }
     }
 
@@ -60,10 +60,10 @@ export async function POST(request: Request) {
       for (const num of allNums) {
         const beforeArt = oldArticles.find((a) => a.articleNumber === num);
         const afterArt = createdNewArticles.find((a) => a.articleNumber === num);
-        if (beforeArt && afterArt && (beforeArt.contentText !== afterArt.contentText || beforeArt.chapter !== afterArt.chapter || beforeArt.section !== afterArt.section)) {
+        if (beforeArt && afterArt && (beforeArt.contentText !== afterArt.contentText || beforeArt.part !== afterArt.part || beforeArt.chapter !== afterArt.chapter || beforeArt.section !== afterArt.section || beforeArt.subSection !== afterArt.subSection)) {
           let note = "일부 개정";
-          if (beforeArt.chapter !== afterArt.chapter || beforeArt.section !== afterArt.section) {
-            note = "일부 개정 (장/절 변경 포함)";
+          if (beforeArt.part !== afterArt.part || beforeArt.chapter !== afterArt.chapter || beforeArt.section !== afterArt.section || beforeArt.subSection !== afterArt.subSection) {
+            note = "일부 개정 (편/장/절/관 변경 포함)";
           }
           await client.query(`INSERT INTO "ArticleComparison" (id, "revisionId", "beforeArticleId", "afterArticleId", note, "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`, [crypto.randomUUID(), newRevisionId, beforeArt.id, afterArt.id, note]);
         } else if (beforeArt && !afterArt) {
