@@ -297,7 +297,7 @@ export default function ArticleRenderer({
     if (/<table|<tr|<td|<th|<br|<p/i.test(htmlText)) {
       return (
         <div 
-          className="html-table-wrapper block w-full overflow-x-auto"
+          className="html-table-wrapper block w-full overflow-x-auto html-content-inline"
           dangerouslySetInnerHTML={{ __html: htmlText }} 
         />
       );

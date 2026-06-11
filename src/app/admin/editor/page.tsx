@@ -297,6 +297,56 @@ function EditorContent() {
     );
   };
 
+  // 단순 수정 (실시간 저장, 개정 절차 생략)
+  const handleSimpleSave = async (idx: number) => {
+    const art = draftArticles[idx];
+    if (art.isNew) {
+      alert("신설된 조항은 단순수정이 불가합니다. 최종 배포 시 함께 저장됩니다.");
+      return;
+    }
+    if (!art.id) {
+      alert("조항 ID를 찾을 수 없습니다.");
+      return;
+    }
+    
+    if (!confirm("규정을 수정하려면, 규정개정 절차를 거쳐야하며 본 기능은 단순수정기능으로만 사용하시기 바랍니다.\n\n정말로 이 조항의 내용을 실서버에 즉시 단순 수정하시겠습니까?")) {
+      return;
+    }
+    
+    setSaving(true);
+    try {
+      let updatedContentText = art.contentText.trim();
+      let finalContentJson = art.contentJson || { paragraphs: [updatedContentText.split(") ").slice(1).join(") ") || updatedContentText] };
+
+      const res = await fetch(`/api/admin/articles/${art.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+           contentJson: finalContentJson,
+           contentText: updatedContentText,
+           title: art.title,
+           chapter: art.chapter,
+           section: art.section
+        })
+      });
+      
+      if (res.ok) {
+        alert("성공적으로 단순 수정되었습니다.");
+        setDraftArticles((prev) =>
+          prev.map((a, i) => (i === idx ? { ...a, isModified: false } : a))
+        );
+      } else {
+        const data = await res.json() as any;
+        alert(data.error || "단순 수정 실패");
+      }
+    } catch (e: any) {
+      console.error(e);
+      alert(`단순 수정 중 오류 발생: ${e.message}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // 최종 개정안 저장 및 클라우드 배포 진행
   const handlePublishRevision = async () => {
     if (!versionName || !enactmentDate || !effectiveDate) {
@@ -631,6 +681,17 @@ function EditorContent() {
                         </div>
 
                         <div className="flex items-center gap-2">
+                          {/* 단순 저장 버튼 (기존 조항에만 표시) */}
+                          {!art.isDeleted && !art.isNew && (
+                            <button
+                              type="button"
+                              onClick={() => handleSimpleSave(idx)}
+                              className="bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all cursor-pointer active:scale-95 shadow-sm"
+                              title="개정 절차 없이 현재 조항의 내용만 실시간으로 수정합니다."
+                            >
+                              저장
+                            </button>
+                          )}
                           {/* 개정(저장) 버튼 */}
                           {!art.isDeleted && (
                             <button

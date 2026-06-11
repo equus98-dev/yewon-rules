@@ -14,7 +14,7 @@ export async function PATCH(
     pool = createPool();
     const { id  } = await params;
     const body = (await request.json()) as any;
-    const { contentText, contentJson } = body;
+    const { contentText, contentJson, title, chapter, section } = body;
 
     if (!contentText) {
       return NextResponse.json({ error: "Missing required field: contentText" }, { status: 400 });
@@ -40,8 +40,8 @@ export async function PATCH(
 
     // 3. 본래 조항(Article) 덮어쓰기 업데이트
     await pool.query(
-      `UPDATE "Article" SET "contentText" = $1, "contentJson" = $2, "updatedAt" = NOW() WHERE id = $3`,
-      [contentText, cJsonStr, id]
+      `UPDATE "Article" SET "contentText" = $1, "contentJson" = $2, title = COALESCE($4, title), chapter = COALESCE($5, chapter), section = COALESCE($6, section), "updatedAt" = NOW() WHERE id = $3`,
+      [contentText, cJsonStr, id, title || null, chapter || null, section || null]
     );
 
     return NextResponse.json({ success: true });

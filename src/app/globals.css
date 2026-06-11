@@ -279,3 +279,8 @@
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+.html-content-inline > p:first-child {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
