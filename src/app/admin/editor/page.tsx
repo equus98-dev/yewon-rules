@@ -486,11 +486,11 @@ function EditorContent() {
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4 bg-slate-50 p-5 border border-slate-200 rounded-2xl text-sm">
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">대상 규정 선택</label>
+            <label className="text-sm text-slate-550 font-bold tracking-wider pl-1">대상 규정 선택</label>
             <select
               value={selectedRuleId}
               onChange={(e) => setSelectedRuleId(e.target.value)}
-              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none cursor-pointer text-sm"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none cursor-pointer text-base"
             >
               {rules.map((r) => (
                 <option key={r.id} value={r.id} className="text-slate-800">
@@ -501,55 +501,55 @@ function EditorContent() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">개정 버전 기호</label>
+            <label className="text-sm text-slate-550 font-bold tracking-wider pl-1">개정 버전 기호</label>
             <input
               type="text"
               value={versionName}
               onChange={(e) => setVersionName(e.target.value)}
               placeholder="예: 제16차 일부개정"
-              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-sm"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-base"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">공포 기호/번호</label>
+            <label className="text-sm text-slate-550 font-bold tracking-wider pl-1">공포 기호/번호</label>
             <input
               type="text"
               value={announceNum}
               onChange={(e) => setAnnounceNum(e.target.value)}
               placeholder="예: 공포 제16호"
-              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-sm"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-base"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">공포 일자</label>
+            <label className="text-sm text-slate-550 font-bold tracking-wider pl-1">공포 일자</label>
             <input
               type="date"
               value={enactmentDate}
               onChange={(e) => setEnactmentDate(e.target.value)}
-              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-sm"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-base"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">시행 일자</label>
+            <label className="text-sm text-slate-550 font-bold tracking-wider pl-1">시행 일자</label>
             <input
               type="date"
               value={effectiveDate}
               onChange={(e) => setEffectiveDate(e.target.value)}
-              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-sm"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-base"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-slate-550 font-bold tracking-wider pl-1">개정 사유/설명</label>
+            <label className="text-sm text-slate-550 font-bold tracking-wider pl-1">개정 사유/설명</label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="개정 사유 입력..."
-              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-sm"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-base"
             />
           </div>
 
@@ -594,22 +594,22 @@ function EditorContent() {
             
             {/* 좌측: 현행 규정 뷰어 (참조용, Read Only) */}
             <div className="w-[420px] bg-white border-r border-slate-200 p-6 flex flex-col overflow-hidden shrink-0 shadow-sm">
-              <h3 className="text-sm font-black text-slate-600 border-b border-slate-200 pb-3 mb-4 flex items-center gap-1.5 select-none font-sans">
+              <h3 className="text-base font-black text-slate-600 border-b border-slate-200 pb-3 mb-4 flex items-center gap-1.5 select-none font-sans">
                 <VisibilityIcon sx={{ fontSize: 18 }} />
                 [참조] 현행 규정 조문 뷰어
               </h3>
 
-              <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar text-sm">
+              <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar text-base">
                 {originalArticles.length === 0 ? (
-                  <div className="text-center py-20 text-slate-450 font-bold select-none text-sm">
+                  <div className="text-center py-20 text-slate-450 font-bold select-none text-base">
                     조회된 현행 규정이 없습니다.
                   </div>
                 ) : (
                   originalArticles.map((art) => (
                     <div key={art.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 shadow-sm">
-                      <div className="text-xs text-slate-500 font-black">{art.chapter || "총칙"}</div>
-                      <div className="text-[#0c3161] font-black text-sm">{art.title}</div>
-                      <p className="text-slate-700 leading-relaxed font-bold mt-2 whitespace-pre-wrap text-[14px]">
+                      <div className="text-sm text-slate-500 font-black">{art.chapter || "총칙"}</div>
+                      <div className="text-[#0c3161] font-black text-base">{art.title}</div>
+                      <p className="text-slate-700 leading-relaxed font-bold mt-2 whitespace-pre-wrap text-[15px]">
                         {art.contentText}
                       </p>
                     </div>
@@ -621,16 +621,16 @@ function EditorContent() {
             {/* 우측: 개정안 작업창 (실시간 인터랙티브 에디터) */}
             <div className="flex-1 p-8 flex flex-col overflow-hidden bg-slate-50">
               <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-6 shrink-0 select-none">
-                <h3 className="text-sm font-black text-slate-850 flex items-center gap-2">
+                <h3 className="text-base font-black text-slate-850 flex items-center gap-2">
                   <span className="text-[#0c3161]">■</span> 개정안 뼈대 작업 영역
                 </h3>
 
                 <button
                   type="button"
                   onClick={handleAddArticle}
-                  className="bg-white hover:bg-slate-50 text-slate-750 hover:text-slate-900 text-sm font-black px-4 py-2 rounded-lg border border-slate-200 active:scale-95 transition-all flex items-center gap-1 cursor-pointer shadow-sm"
+                  className="bg-white hover:bg-slate-50 text-slate-750 hover:text-slate-900 text-base font-black px-4 py-2 rounded-lg border border-slate-200 active:scale-95 transition-all flex items-center gap-1 cursor-pointer shadow-sm"
                 >
-                  <AddIcon sx={{ fontSize: 16 }} />
+                  <AddIcon sx={{ fontSize: 18 }} />
                   조항 신설 (+추가)
                 </button>
               </div>
@@ -670,11 +670,11 @@ function EditorContent() {
                             className="w-5 h-5 cursor-pointer accent-[#0c3161]"
                             title="이 조항 아래에 신설하려면 체크하세요"
                           />
-                          <span className="text-xs font-black bg-slate-100 text-slate-650 px-3 py-1 rounded border border-slate-200">
+                          <span className="text-sm font-black bg-slate-100 text-slate-650 px-3 py-1 rounded border border-slate-200">
                             {getArticleNumBadge(art.articleNumber, art.title)}
                           </span>
                           {tagText && (
-                            <span className={`text-[11px] font-black px-2 py-1 rounded ${tagBg}`}>
+                            <span className={`text-xs font-black px-2 py-1 rounded ${tagBg}`}>
                               {tagText}
                             </span>
                           )}
@@ -686,7 +686,7 @@ function EditorContent() {
                             <button
                               type="button"
                               onClick={() => handleSimpleSave(idx)}
-                              className="bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all cursor-pointer active:scale-95 shadow-sm"
+                              className="bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-slate-50 transition-all cursor-pointer active:scale-95 shadow-sm"
                               title="개정 절차 없이 현재 조항의 내용만 실시간으로 수정합니다."
                             >
                               저장
@@ -703,7 +703,7 @@ function EditorContent() {
                                   prev.map((a, i) => (i === idx ? { ...a, isModified: true } : a))
                                 );
                               }}
-                              className="bg-[#0c3161] border border-[#092244] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#092244] transition-all cursor-pointer active:scale-95 shadow-sm"
+                              className="bg-[#0c3161] border border-[#092244] text-white px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-[#092244] transition-all cursor-pointer active:scale-95 shadow-sm"
                             >
                               개정(저장)
                             </button>
@@ -730,49 +730,49 @@ function EditorContent() {
                           {/* 장/절 편집 입력 */}
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-sm">
                             <div className="space-y-2">
-                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 장 (Chapter)</label>
+                              <label className="text-xs text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 장 (Chapter)</label>
                               <input
                                 type="text"
                                 value={art.chapter || ""}
                                 onChange={(e) => handleChapterChange(idx, e.target.value)}
                                 placeholder="예: 제1장 총칙"
-                                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[13.5px] transition-all"
+                                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[15px] transition-all"
                               />
                             </div>
                             <div className="space-y-2">
-                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 절 (Section)</label>
+                              <label className="text-xs text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 절 (Section)</label>
                               <input
                                 type="text"
                                 value={art.section || ""}
                                 onChange={(e) => handleSectionChange(idx, e.target.value)}
                                 placeholder="예: 제1절 목적"
-                                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[13.5px] transition-all"
+                                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[15px] transition-all"
                               />
                             </div>
                           </div>
 
                           {/* 제목 및 본문 편집 입력 */}
-                          <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-5 text-sm">
+                          <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-5 text-base">
                             <div className="space-y-2">
-                              <label className="text-xs text-slate-500 font-bold uppercase tracking-wider pl-1">조 조항 제목</label>
+                              <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">조 조항 제목</label>
                               <input
                                 type="text"
                                 value={art.title}
                                 onChange={(e) => handleArticleTitleChange(idx, e.target.value)}
                                 placeholder="예: 목적"
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-sm"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-base"
                               />
                             </div>
 
                             <div className="space-y-2">
                               <div className="flex items-center justify-between">
-                                <label className="text-xs text-slate-500 font-bold uppercase tracking-wider pl-1">조문 본문 전문</label>
+                                <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">조문 본문 전문</label>
                                 <button
                                   type="button"
                                   onClick={() => {
                                     setEditorMode(prev => ({...prev, [idx]: !(prev[idx] ?? /<table|<p /i.test(art.contentText))}));
                                   }}
-                                  className="text-[11px] font-bold px-2 py-0.5 rounded border border-slate-300 text-slate-600 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                                  className="text-xs font-bold px-2 py-0.5 rounded border border-slate-300 text-slate-600 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
                                 >
                                   {(editorMode[idx] ?? /<table|<p /i.test(art.contentText)) ? "HTML 에디터 끄기" : "HTML 에디터 켜기"}
                                 </button>
@@ -787,7 +787,7 @@ function EditorContent() {
                                       height: 300,
                                       style: {
                                         fontFamily: "'Pretendard', sans-serif",
-                                        fontSize: "14px",
+                                        fontSize: "15px",
                                       },
                                       buttons: [
                                         'bold', 'italic', 'underline', 'strikethrough', '|',
@@ -807,7 +807,7 @@ function EditorContent() {
                                   value={art.contentText}
                                   onChange={(e) => handleArticleTextChange(idx, e.target.value)}
                                   placeholder="예: 제1조 (목적) 이 규정은 학교의..."
-                                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] leading-relaxed resize-none text-sm"
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] leading-relaxed resize-none text-base"
                                 />
                               )}
                             </div>
