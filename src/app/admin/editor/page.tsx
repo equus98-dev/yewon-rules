@@ -221,7 +221,7 @@ function EditorContent() {
       // 아래로 탐색
       for (let i = idx; i < newArticles.length; i++) {
         if (newArticles[i].part === oldPart) {
-          newArticles[i] = { ...newArticles[i], part: newPart, isModified: true };
+          newArticles[i] = { ...newArticles[i], part: newPart, isPartModified: true, isGroupModified: true };
         } else {
           break;
         }
@@ -229,7 +229,7 @@ function EditorContent() {
       // 위로 탐색
       for (let i = idx - 1; i >= 0; i--) {
         if (newArticles[i].part === oldPart) {
-          newArticles[i] = { ...newArticles[i], part: newPart, isModified: true };
+          newArticles[i] = { ...newArticles[i], part: newPart, isPartModified: true, isGroupModified: true };
         } else {
           break;
         }
@@ -247,7 +247,7 @@ function EditorContent() {
       // 아래로 탐색
       for (let i = idx; i < newArticles.length; i++) {
         if (newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
-          newArticles[i] = { ...newArticles[i], chapter: newChapter, isModified: true };
+          newArticles[i] = { ...newArticles[i], chapter: newChapter, isChapterModified: true, isGroupModified: true };
         } else {
           break;
         }
@@ -255,7 +255,7 @@ function EditorContent() {
       // 위로 탐색
       for (let i = idx - 1; i >= 0; i--) {
         if (newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
-          newArticles[i] = { ...newArticles[i], chapter: newChapter, isModified: true };
+          newArticles[i] = { ...newArticles[i], chapter: newChapter, isChapterModified: true, isGroupModified: true };
         } else {
           break;
         }
@@ -274,7 +274,7 @@ function EditorContent() {
       // 아래로 탐색
       for (let i = idx; i < newArticles.length; i++) {
         if (newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
-          newArticles[i] = { ...newArticles[i], section: newSection, isModified: true };
+          newArticles[i] = { ...newArticles[i], section: newSection, isSectionModified: true, isGroupModified: true };
         } else {
           break;
         }
@@ -282,7 +282,7 @@ function EditorContent() {
       // 위로 탐색
       for (let i = idx - 1; i >= 0; i--) {
         if (newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
-          newArticles[i] = { ...newArticles[i], section: newSection, isModified: true };
+          newArticles[i] = { ...newArticles[i], section: newSection, isSectionModified: true, isGroupModified: true };
         } else {
           break;
         }
@@ -302,7 +302,7 @@ function EditorContent() {
       // 아래로 탐색
       for (let i = idx; i < newArticles.length; i++) {
         if (newArticles[i].subSection === oldSubSection && newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
-          newArticles[i] = { ...newArticles[i], subSection: newSubSection, isModified: true };
+          newArticles[i] = { ...newArticles[i], subSection: newSubSection, isSubSectionModified: true, isGroupModified: true };
         } else {
           break;
         }
@@ -310,7 +310,7 @@ function EditorContent() {
       // 위로 탐색
       for (let i = idx - 1; i >= 0; i--) {
         if (newArticles[i].subSection === oldSubSection && newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
-          newArticles[i] = { ...newArticles[i], subSection: newSubSection, isModified: true };
+          newArticles[i] = { ...newArticles[i], subSection: newSubSection, isSubSectionModified: true, isGroupModified: true };
         } else {
           break;
         }
@@ -489,7 +489,7 @@ function EditorContent() {
       return;
     }
 
-    const hasModifications = draftArticles.some(art => art.isModified || art.isNew || art.isDeleted);
+    const hasModifications = draftArticles.some(art => art.isModified || art.isGroupModified || art.isNew || art.isDeleted);
     if (!hasModifications) {
       alert("수정된 조항이 없습니다. 변경 사항을 작성한 후 배포해 주십시오.");
       return;
@@ -527,9 +527,41 @@ function EditorContent() {
             finalContentHtml = null;
           }
 
+          let updatedChapter = art.chapter || "";
+          let updatedPart = art.part || "";
+          let updatedSection = art.section || "";
+          let updatedSubSection = art.subSection || "";
+
+          if (art.isChapterModified) {
+            const tag = `\n<개정 ${formattedDate}>`;
+            if (updatedChapter && !updatedChapter.includes(tag)) {
+              updatedChapter += tag;
+            }
+          }
+          if (art.isPartModified) {
+            const tag = `\n<개정 ${formattedDate}>`;
+            if (updatedPart && !updatedPart.includes(tag)) {
+              updatedPart += tag;
+            }
+          }
+          if (art.isSectionModified) {
+            const tag = `\n<개정 ${formattedDate}>`;
+            if (updatedSection && !updatedSection.includes(tag)) {
+              updatedSection += tag;
+            }
+          }
+          if (art.isSubSectionModified) {
+            const tag = `\n<개정 ${formattedDate}>`;
+            if (updatedSubSection && !updatedSubSection.includes(tag)) {
+              updatedSubSection += tag;
+            }
+          }
+
           return {
-            chapter: art.chapter,
-            section: art.section,
+            chapter: updatedChapter,
+            part: updatedPart,
+            section: updatedSection,
+            subSection: updatedSubSection,
             articleNumber: art.articleNumber,
             title: art.title,
             contentText: updatedContentText,

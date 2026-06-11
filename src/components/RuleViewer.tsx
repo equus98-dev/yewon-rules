@@ -212,11 +212,13 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           if (typeof item !== 'object') return;
           
           if (item.type === "chapter") {
-            const chapterText = typeof item.text === 'string' ? item.text.replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지') : String(item.text || "");
+            const rawText = typeof item.text === 'string' ? item.text.replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지') : String(item.text || "");
+            const chapterText = rawText.split('\n')[0].trim();
             if (toc.length > 0 && toc[toc.length - 1].type === "chapter" && toc[toc.length - 1].text === chapterText) return;
             toc.push({ type: "chapter", id: `toc-${chapterText.replace(new RegExp("\\s", "g"), '-')}`, text: chapterText });
           } else if (item.type === "section") {
-            const sectionText = typeof item.text === 'string' ? item.text : String(item.text || "");
+            const rawText = typeof item.text === 'string' ? item.text : String(item.text || "");
+            const sectionText = rawText.split('\n')[0].trim();
             if (toc.length > 0 && toc[toc.length - 1].type === "section" && toc[toc.length - 1].text === sectionText) return;
             toc.push({ type: "section", id: `toc-${sectionText.replace(new RegExp("\\s", "g"), '-')}`, text: sectionText });
           } else if (item.type === "article") {
@@ -496,13 +498,21 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                   return (
                     <React.Fragment key={a.id}>
                       {showChapter && (
-                        <div id={`toc-${a.chapter.trim().replace(/\s/g, '-')}`} className="text-center w-full mt-8 mb-6 pt-2 flex flex-col items-center gap-1.5">
-                          <span className="text-[20px] font-black text-[#000080] tracking-tight">{a.chapter}</span>
+                        <div id={`toc-${a.chapter.split('\n')[0].trim().replace(/\s/g, '-')}`} className="text-center w-full mt-8 mb-6 pt-2 flex flex-col items-center gap-1.5">
+                          {a.chapter.split('\n').map((line: string, i: number) => (
+                            <span key={i} className={i === 0 ? "text-[20px] font-black text-[#000080] tracking-tight break-keep" : "text-[13px] text-blue-500 font-medium"}>
+                              {line}
+                            </span>
+                          ))}
                         </div>
                       )}
                       {showSection && (
-                        <div id={`toc-${a.section.trim().replace(/\s/g, '-')}`} className="text-center w-full mt-6 mb-4 flex flex-col items-center gap-1">
-                          <span className="text-[18px] font-bold text-[#000080]">{a.section}</span>
+                        <div id={`toc-${a.section.split('\n')[0].trim().replace(/\s/g, '-')}`} className="text-center w-full mt-6 mb-4 flex flex-col items-center gap-1">
+                          {a.section.split('\n').map((line: string, i: number) => (
+                            <span key={i} className={i === 0 ? "text-[18px] font-bold text-[#000080] break-keep" : "text-[12px] text-blue-500 font-medium"}>
+                              {line}
+                            </span>
+                          ))}
                         </div>
                       )}
                       <ArticleRenderer
