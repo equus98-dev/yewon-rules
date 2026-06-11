@@ -12,6 +12,8 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
 const JoditEditor = dynamic(() => import("jodit-react"), {
   ssr: false,
@@ -68,6 +70,9 @@ function EditorContent() {
 
   // 활성화된(포커스된) 조항 번호 상태 (왼쪽 뷰어 동기화용)
   const [activeArticleNum, setActiveArticleNum] = useState<number | null>(null);
+
+  // 뷰어 열기/닫기 상태
+  const [isViewerOpen, setIsViewerOpen] = useState(true);
 
   // 1. 규정 마스터 목록 로드
   useEffect(() => {
@@ -739,13 +744,15 @@ function EditorContent() {
           <div className="h-full w-full flex overflow-hidden">
             
             {/* 좌측: 현행 규정 뷰어 (참조용, Read Only) */}
-            <div className="w-[420px] bg-white border-r border-slate-200 p-6 flex flex-col overflow-hidden shrink-0 shadow-sm">
-              <h3 className="text-base font-black text-slate-600 border-b border-slate-200 pb-3 mb-4 flex items-center gap-1.5 select-none font-sans">
-                <VisibilityIcon sx={{ fontSize: 18 }} />
-                [참조] 현행 규정 조문 뷰어
-              </h3>
+            <div className={`bg-white border-r border-slate-200 flex flex-col overflow-hidden shrink-0 shadow-sm transition-[width,padding] duration-300 ${isViewerOpen ? "w-[420px] p-6" : "w-0 p-0 border-r-0"}`}>
+              <div className="w-[372px]"> {/* 고정 너비를 주어 닫힐 때 내용물이 줄바꿈되지 않도록 함 */}
+                <h3 className="text-base font-black text-slate-600 border-b border-slate-200 pb-3 mb-4 flex items-center gap-1.5 select-none font-sans whitespace-nowrap">
+                  <VisibilityIcon sx={{ fontSize: 18 }} />
+                  [참조] 현행 규정 조문 뷰어
+                </h3>
+              </div>
 
-              <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar text-base">
+              <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar text-base w-[372px]">
                 {originalArticles.length === 0 ? (
                   <div className="text-center py-20 text-slate-450 font-bold select-none text-base">
                     조회된 현행 규정이 없습니다.
@@ -768,6 +775,17 @@ function EditorContent() {
                   ))
                 )}
               </div>
+            </div>
+
+            {/* 뷰어 Toggle 버튼 */}
+            <div className="relative z-30 flex items-center h-full w-0">
+              <button
+                onClick={() => setIsViewerOpen(!isViewerOpen)}
+                className="absolute -left-px w-6 h-16 bg-[#007073] hover:bg-[#005a5c] text-white flex items-center justify-center rounded-r-xl shadow-md cursor-pointer transition-colors border border-l-0 border-[#005a5c]"
+                title={isViewerOpen ? "뷰어 닫기" : "뷰어 열기"}
+              >
+                {isViewerOpen ? <KeyboardArrowLeftIcon fontSize="small" /> : <KeyboardArrowRightIcon fontSize="small" />}
+              </button>
             </div>
 
             {/* 우측: 개정안 작업창 (실시간 인터랙티브 에디터) */}
