@@ -77,6 +77,12 @@ export default function ArticleRenderer({
 
     let cleanHtml = contentHtml;
 
+    // 특정 규정(학생생활관 등) 제12조 표 내의 빨간글씨 제거 요청 반영
+    if (articleNumber === 12) {
+      cleanHtml = cleanHtml.replace(/color:\s*(?:#ff0000|red|#FF0000);?/gi, '');
+      cleanHtml = cleanHtml.replace(/color=["']?(?:#ff0000|red|#FF0000)["']?/gi, '');
+    }
+
     // 1. 중첩된 빈 태그(여백) 모두 제거 (중간 간격 문제 해결)
     // HWP 변환기는 <p><span>&nbsp;</span></p> 형태의 빈 문단을 다수 생성하여 조문 사이를 비정상적으로 벌어지게 함.
     let prevHtml = '';
