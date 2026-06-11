@@ -323,6 +323,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   }
 
   const { title, ruleNumber, category, department, attachments, revisions } = ruleData;
+  const cleanTitle = title?.replace(/-\s*\d{4}\.?\s*\d{1,2}\.?\s*\d{1,2}\.?\s*$/, '').trim() || title;
 
   // 버전을 직접 클릭하여 해당 버전의 본문을 로딩
   const handleVersionSelect = (verNum: number) => {
@@ -334,9 +335,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       
       {/* 1. 상단 타이틀 및 브레드크럼 */}
       <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-6 py-4 shrink-0 flex items-center justify-between z-10 shadow-sm relative">
-        <h1 className="text-2xl font-black text-[#007073] tracking-tight ml-2">{title}</h1>
+        <h1 className="text-2xl font-black text-[#007073] tracking-tight ml-2">{cleanTitle}</h1>
         <div className="text-[14px] text-slate-500 font-medium tracking-wider">
-          HOME &gt; 전자규정집 &gt; {category?.name || "분류"} &gt; <span className="font-bold text-slate-700">{title}</span>
+          HOME &gt; 전자규정집 &gt; {category?.name || "분류"} &gt; <span className="font-bold text-slate-700">{cleanTitle}</span>
         </div>
       </div>
 
@@ -451,7 +452,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative scroll-smooth">
           <div className="max-w-4xl mx-auto mt-4 relative">
             {/* 규정 제목 */}
-            <h2 className="text-[26px] font-black text-center text-[#007073] mb-8 tracking-tight break-keep">{title}</h2>
+            <h2 className="text-[26px] font-black text-center text-[#007073] mb-8 tracking-tight break-keep">{cleanTitle}</h2>
             
             {/* 법령 정보 (시행일, 담당부서) */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 border-b-2 border-slate-700 pb-3 gap-3">

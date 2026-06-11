@@ -259,7 +259,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
           label={
             <div className="flex items-center gap-1.5 py-1 select-none overflow-hidden">
               {icon}
-              <span className={`${textStyle} leading-relaxed truncate ${labelStyle}`}>{node.name}</span>
+              <span className={`${textStyle} leading-relaxed truncate ${labelStyle}`}>{isFile ? node.name.replace(/-\s*\d{4}\.?\s*\d{1,2}\.?\s*\d{1,2}\.?\s*$/, '').trim() : node.name}</span>
             </div>
           }
           onClick={(e) => {
@@ -480,7 +480,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
                       </span>
                     </div>
                     <h4 className="font-extrabold text-slate-800 text-[12.5px] line-clamp-1 mt-0.5">
-                      {rule.title}
+                      {rule.title.replace(/-\s*\d{4}\.?\s*\d{1,2}\.?\s*\d{1,2}\.?\s*$/, '').trim()}
                     </h4>
                     <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1">
                       <span>공포번호: {rule.announcementNumber || "미지정"}</span>
