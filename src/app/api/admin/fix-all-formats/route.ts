@@ -71,17 +71,8 @@ export async function POST(request: Request) {
             cleanText = cleanText.trim();
 
             if (cleanText !== art.contentText) {
-                // If it was changed, update contentText and generate new contentJson
-                let finalContentJson;
-                if (art.contentJson) {
-                    finalContentJson = typeof art.contentJson === 'string' ? JSON.parse(art.contentJson) : art.contentJson;
-                    // If paragraphs exist, just replace the first paragraph as a fallback or leave it?
-                    // Actually, the editor regenerates it completely if there are formatting errors!
-                    // Let's just regenerate it exactly like the editor does:
-                    finalContentJson = { paragraphs: [cleanText.split(") ").slice(1).join(") ") || cleanText] };
-                } else {
-                    finalContentJson = { paragraphs: [cleanText.split(") ").slice(1).join(") ") || cleanText] };
-                }
+                // 재생성: 포맷 오류 제거를 위해 깨끗한 contentText 기반으로 새로 paragraphs 배열 구성
+                const finalContentJson = { paragraphs: [cleanText.split(") ").slice(1).join(") ") || cleanText] };
 
                 await pool.query(
                    `UPDATE "Article" SET "contentText" = $1, "contentJson" = $2 WHERE id = $3`,
