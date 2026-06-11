@@ -115,18 +115,18 @@ export default function AdminLayout({
         </div>
 
         <div className="flex items-center gap-3 relative z-10">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 mr-1 hidden sm:flex">
-              <span className="text-sm font-bold text-blue-100 select-none drop-shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 mr-2 hidden sm:flex">
+              <span className="text-[14px] font-black text-blue-100 select-none drop-shadow-sm tracking-wide">
                 최고 관리자 님
               </span>
-              <div className="flex items-center bg-[#071f3f]/80 backdrop-blur-sm rounded-full px-2 py-0.5 border border-white/10 shadow-inner">
-                <span className="text-[11px] font-black text-rose-300 mr-1.5 font-mono w-[34px] text-center drop-shadow-sm">
+              <div className="flex items-center bg-[#071f3f]/80 backdrop-blur-sm rounded-lg px-2.5 py-1 border border-white/10 shadow-inner gap-2">
+                <span className="text-[14px] font-black text-rose-300 font-mono w-[42px] text-center drop-shadow-sm">
                   {Math.floor(sessionTimeLeft / 60)}:{String(sessionTimeLeft % 60).padStart(2, "0")}
                 </span>
                 <button
                   onClick={handleExtendSession}
-                  className="text-[10px] font-bold bg-[#0c3161] text-blue-100 border border-white/20 rounded px-1.5 py-0.5 hover:bg-white/20 transition-colors cursor-pointer active:scale-95"
+                  className="text-[13px] font-black bg-[#0c3161] text-blue-100 border border-white/20 rounded-md px-2 py-0.5 hover:bg-white/20 transition-colors cursor-pointer active:scale-95 shadow-sm"
                   title="세션 시간 30분으로 연장"
                 >
                   연장
@@ -135,7 +135,7 @@ export default function AdminLayout({
             </div>
             <button
               onClick={handleLogout}
-              className="text-xs font-bold text-white/90 hover:text-white border border-white/30 hover:border-white/70 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-all active:scale-95 shadow-sm"
+              className="text-[14px] font-black text-white/95 hover:text-white border border-white/30 hover:border-white/70 bg-white/10 backdrop-blur-sm px-4 py-1.5 rounded-lg transition-all active:scale-95 shadow-sm"
             >
               로그아웃
             </button>

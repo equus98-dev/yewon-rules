@@ -66,6 +66,9 @@ function EditorContent() {
   // 신규 조항 추가 위치 지정용 체크 인덱스
   const [checkedArticleIndex, setCheckedArticleIndex] = useState<number | null>(null);
 
+  // 활성화된(포커스된) 조항 번호 상태 (왼쪽 뷰어 동기화용)
+  const [activeArticleNum, setActiveArticleNum] = useState<number | null>(null);
+
   // 1. 규정 마스터 목록 로드
   useEffect(() => {
     async function loadRules() {
@@ -667,9 +670,13 @@ function EditorContent() {
                   </div>
                 ) : (
                   originalArticles.map((art) => (
-                    <div key={art.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 shadow-sm">
+                    <div 
+                      key={art.id} 
+                      id={`viewer-art-${art.articleNumber}`}
+                      className={`p-4 border rounded-xl space-y-1.5 shadow-sm transition-all duration-300 ${activeArticleNum === art.articleNumber ? "bg-rose-50 border-rose-200 ring-1 ring-rose-200" : "bg-slate-50 border-slate-200"}`}
+                    >
                       <div className="text-sm text-slate-500 font-black">{art.chapter || "총칙"}</div>
-                      <div className="text-[#0c3161] font-black text-base">{art.title}</div>
+                      <div className="text-[#0c3161] font-black text-base">{getArticleNumBadge(art.articleNumber, art.title)}</div>
                       <p className="text-slate-700 leading-relaxed font-bold mt-2 whitespace-pre-wrap text-[15px]">
                         {art.contentText}
                       </p>
@@ -745,6 +752,20 @@ function EditorContent() {
                       id={`editor-art-${idx}`}
                       key={idx}
                       className={`p-6 rounded-2xl border ${borderClass} transition-all space-y-4`}
+                      onFocusCapture={() => {
+                        setActiveArticleNum(art.articleNumber);
+                        const viewerEl = document.getElementById(`viewer-art-${art.articleNumber}`);
+                        if (viewerEl) {
+                          viewerEl.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
+                      }}
+                      onClickCapture={() => {
+                        setActiveArticleNum(art.articleNumber);
+                        const viewerEl = document.getElementById(`viewer-art-${art.articleNumber}`);
+                        if (viewerEl) {
+                          viewerEl.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
+                      }}
                     >
                       <div className="flex items-center justify-between gap-4 select-none">
                         <div className="flex items-center gap-3">
