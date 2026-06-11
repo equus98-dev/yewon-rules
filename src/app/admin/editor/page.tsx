@@ -374,6 +374,85 @@ function EditorContent() {
     });
   };
 
+  // 그룹 헤더 개정 취소
+  const handleCancelGroupRevision = (idx: number) => {
+    setDraftArticles((prev) => {
+      const art = prev[idx];
+      const oldPart = art.part;
+      const oldChapter = art.chapter;
+      const oldSection = art.section;
+      const oldSubSection = art.subSection;
+      const newArticles = [...prev];
+
+      const restoreGroupForArticle = (i: number) => {
+        const targetId = newArticles[i].id;
+        const original = originalArticles.find(o => o.id === targetId);
+        if (original) {
+          newArticles[i] = { 
+            ...newArticles[i], 
+            part: original.part || "",
+            chapter: original.chapter || "",
+            section: original.section || "",
+            subSection: original.subSection || "",
+            isGroupModified: false,
+            isPartModified: false,
+            isChapterModified: false,
+            isSectionModified: false,
+            isSubSectionModified: false
+          };
+        } else {
+          newArticles[i] = {
+            ...newArticles[i],
+            isGroupModified: false,
+            isPartModified: false,
+            isChapterModified: false,
+            isSectionModified: false,
+            isSubSectionModified: false
+          };
+        }
+      };
+
+      // 아래로 탐색
+      for (let i = idx; i < newArticles.length; i++) {
+        if (newArticles[i].part === oldPart && newArticles[i].chapter === oldChapter && newArticles[i].section === oldSection && newArticles[i].subSection === oldSubSection) {
+          restoreGroupForArticle(i);
+        } else {
+          break;
+        }
+      }
+      // 위로 탐색
+      for (let i = idx - 1; i >= 0; i--) {
+        if (newArticles[i].part === oldPart && newArticles[i].chapter === oldChapter && newArticles[i].section === oldSection && newArticles[i].subSection === oldSubSection) {
+          restoreGroupForArticle(i);
+        } else {
+          break;
+        }
+      }
+      return newArticles;
+    });
+  };
+
+  // 개별 조항 개정 취소
+  const handleCancelArticleRevision = (idx: number) => {
+    setDraftArticles((prev) => {
+      const newArticles = [...prev];
+      const targetId = newArticles[idx].id;
+      const original = originalArticles.find(o => o.id === targetId);
+      if (original) {
+        newArticles[idx] = { 
+          ...newArticles[idx], 
+          contentText: original.contentText,
+          title: original.title,
+          contentJson: original.contentJson,
+          isModified: false 
+        };
+      } else {
+        newArticles[idx] = { ...newArticles[idx], isModified: false };
+      }
+      return newArticles;
+    });
+  };
+
   // 조항 삭제 (삭제 표시)
   const handleToggleDeleteArticle = (idx: number) => {
     setDraftArticles((prev) =>
@@ -957,6 +1036,20 @@ function EditorContent() {
                                 <RuleIcon sx={{ fontSize: 16 }} />
                                 개정처리
                               </button>
+                              {art.isGroupModified && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if(confirm("수정한 편/장/절/관 내용을 모두 취소하고 원래대로 되돌리시겠습니까?")) {
+                                      handleCancelGroupRevision(idx);
+                                    }
+                                  }}
+                                  className="flex items-center gap-1.5 px-4 h-[38px] bg-white border border-rose-200 text-rose-600 rounded-lg text-[13px] font-black hover:bg-rose-50 hover:border-rose-300 transition-all cursor-pointer active:scale-95 shadow-sm"
+                                  title="그룹 명칭 개정을 취소합니다."
+                                >
+                                  개정 취소
+                                </button>
+                              )}
                             </div>
                           </div>
                           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white border border-slate-200 p-5 rounded-xl shadow-sm">
@@ -1083,6 +1176,21 @@ function EditorContent() {
                             >
                               <RuleIcon sx={{ fontSize: 16 }} />
                               개정처리
+                            </button>
+                          )}
+                          {/* 개정 취소 버튼 */}
+                          {!art.isDeleted && art.isModified && !art.isNew && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if(confirm("개정 내용을 취소하고 기존 내용으로 되돌리시겠습니까?")) {
+                                  handleCancelArticleRevision(idx);
+                                }
+                              }}
+                              className="flex items-center gap-1.5 px-4 h-[38px] bg-white border border-rose-200 text-rose-600 rounded-lg text-[13px] font-black hover:bg-rose-50 hover:border-rose-300 transition-all cursor-pointer active:scale-95 shadow-sm"
+                              title="수정된 내용을 원래대로 되돌립니다."
+                            >
+                              개정 취소
                             </button>
                           )}
                           {/* 삭제 토글 버튼 */}
