@@ -347,6 +347,51 @@ function EditorContent() {
     }
   };
 
+  // 일괄 단순 수정 (간격 및 중복 제목 제거)
+  const handleSimpleSaveAll = async () => {
+    if (!confirm("모든 조항의 간격 및 중복 제목 오류를 일괄 정상화하시겠습니까? (이 작업은 되돌릴 수 없으며, 실서버에 즉시 반영됩니다.)")) {
+      return;
+    }
+
+    setSaving(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (let idx = 0; idx < draftArticles.length; idx++) {
+      const art = draftArticles[idx];
+      if (art.isNew || art.isDeleted || !art.id) continue;
+
+      try {
+        let updatedContentText = art.contentText.trim();
+        let finalContentJson = art.contentJson || { paragraphs: [updatedContentText.split(") ").slice(1).join(") ") || updatedContentText] };
+
+        const res = await fetch(`/api/admin/articles/${art.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+             contentJson: finalContentJson,
+             contentText: updatedContentText,
+             title: art.title,
+             chapter: art.chapter,
+             section: art.section
+          })
+        });
+
+        if (res.ok) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch (e) {
+        failCount++;
+      }
+    }
+
+    setSaving(false);
+    alert(`조문 형식 일괄 정상화 완료!\n- 성공: ${successCount}개 조항\n- 실패: ${failCount}개 조항\n새로고침을 진행합니다.`);
+    window.location.reload();
+  };
+
   // 최종 개정안 저장 및 클라우드 배포 진행
   const handlePublishRevision = async () => {
     if (!versionName || !enactmentDate || !effectiveDate) {
@@ -476,6 +521,16 @@ function EditorContent() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleSimpleSaveAll}
+              disabled={saving || draftArticles.length === 0}
+              className="bg-white border border-[#0c3161] text-[#0c3161] hover:bg-slate-50 text-sm font-black px-4 py-2.5 rounded-xl shadow-sm active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="이 규정의 모든 조항의 간격 및 중복 제목 오류를 자동으로 일괄 수정하여 실서버에 적용합니다."
+            >
+              <SaveIcon sx={{ fontSize: 18 }} />
+              전체 조문 일괄 정상화(저장)
+            </button>
             <button
               type="button"
               onClick={handlePublishRevision}
