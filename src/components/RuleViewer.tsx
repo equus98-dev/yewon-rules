@@ -473,6 +473,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                   if (a.articleNumber >= 9000) return null;
                   
                   const prevA = currentRevision.articles[idx - 1];
+                  const nextA = currentRevision.articles[idx + 1];
                   let chapterInJson = false;
                   let sectionInJson = false;
                   try {
@@ -485,6 +486,12 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
                   const showChapter = a.chapter && (!prevA || prevA.chapter !== a.chapter) && !chapterInJson;
                   const showSection = a.section && (!prevA || prevA.section !== a.section) && !sectionInJson;
+
+                  const trailingTitles: string[] = [];
+                  if (nextA) {
+                    if (a.chapter !== nextA.chapter && nextA.chapter) trailingTitles.push(nextA.chapter);
+                    if (a.section !== nextA.section && nextA.section) trailingTitles.push(nextA.section);
+                  }
 
                   return (
                     <React.Fragment key={a.id}>
@@ -511,6 +518,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         hideHistory={hideHistory}
                         hasHtmlAttachments={hasHtmlAttachments}
                         isAdmin={isAdmin}
+                        trailingTitles={trailingTitles}
                       />
                     </React.Fragment>
                   );

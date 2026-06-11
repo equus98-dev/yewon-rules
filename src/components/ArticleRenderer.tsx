@@ -22,6 +22,7 @@ interface ArticleRendererProps {
   hideHistory?: boolean;
   hasHtmlAttachments?: boolean;
   isAdmin?: boolean;
+  trailingTitles?: string[];
 }
 
 export default function ArticleRenderer({
@@ -37,6 +38,7 @@ export default function ArticleRenderer({
   hideHistory = false,
   hasHtmlAttachments = true,
   isAdmin = false,
+  trailingTitles = [],
 }: ArticleRendererProps) {
   const [modalHistory, setModalHistory] = useState<any[] | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
@@ -139,6 +141,24 @@ export default function ArticleRenderer({
         
         foundRealTrailingText = true;
       }
+    }
+
+    // 명시적으로 전달받은 다음 장/절 제목이 HTML 끝에 남아있다면 텍스트만 제거하고 빈 태그는 남겨둠
+    // HTML 구조 파괴(unclosed tags 등)를 방지하기 위해 텍스트 치환 방식 사용
+    if (cleanHtml && trailingTitles.length > 0) {
+      trailingTitles.forEach(title => {
+        if (!title) return;
+        const chars = title.replace(/\s+/g, '').split('');
+        // 태그나 공백이 글자 사이에 끼어있어도 매칭되도록 정규식 구성
+        const regexStr = chars.map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('(?:\\s|&nbsp;|<[^>]+>)*');
+        const chapRegex = new RegExp(`(?:\\s|&nbsp;|<[^>]+>)*${regexStr}(?:\\s|&nbsp;|<[^>]+>)*$`, 'i');
+        cleanHtml = cleanHtml.replace(chapRegex, (match) => {
+          // 매칭된 문자열에서 순수 텍스트(> < 사이의 내용)만 날려버리고 태그 껍데기만 살림
+          return match.replace(/>([^<]+)</g, (m, textContent) => {
+            return textContent.trim() === '' ? m : '><';
+          }).replace(/^([^<]+)</, '<').replace(/>([^<]+)$/, '>');
+        });
+      });
     }
 
     if (articleNumber >= 9000) {
