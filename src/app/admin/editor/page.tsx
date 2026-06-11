@@ -711,7 +711,7 @@ function EditorContent() {
                   <button
                     type="button"
                     onClick={handleAddArticle}
-                    className="bg-white hover:bg-slate-50 text-slate-800 text-sm font-black px-4 py-2 rounded-lg active:scale-95 transition-all flex items-center gap-1 cursor-pointer shadow-sm"
+                    className="bg-[#0b6466] hover:bg-[#085254] text-white text-sm font-black px-4 py-2 rounded-lg active:scale-95 transition-all flex items-center gap-1 cursor-pointer shadow-sm border-none"
                   >
                     <AddIcon sx={{ fontSize: 18 }} />
                     조항 신설 (+추가)
