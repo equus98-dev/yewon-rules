@@ -76,9 +76,9 @@ export async function GET(
     const comparisonsRes = await pool.query(
       `SELECT 
         ac.id, ac."beforeArticleId", ac."afterArticleId", ac.note,
-        ba.chapter AS "before_chapter", ba."articleNumber" AS "before_articleNumber",
+        ba.chapter AS "before_chapter", ba.section AS "before_section", ba."articleNumber" AS "before_articleNumber",
         ba.title AS "before_title", ba."contentText" AS "before_contentText", ba."contentJson" AS "before_contentJson",
-        aa.chapter AS "after_chapter", aa."articleNumber" AS "after_articleNumber",
+        aa.chapter AS "after_chapter", aa.section AS "after_section", aa."articleNumber" AS "after_articleNumber",
         aa.title AS "after_title", aa."contentText" AS "after_contentText", aa."contentJson" AS "after_contentJson"
        FROM "ArticleComparison" ac
        LEFT JOIN "Article" ba ON ac."beforeArticleId" = ba.id
@@ -95,6 +95,7 @@ export async function GET(
       beforeArticle: row.before_articleNumber
         ? {
             chapter: row.before_chapter,
+            section: row.before_section,
             articleNumber: row.before_articleNumber,
             title: row.before_title,
             contentText: row.before_contentText,
@@ -104,6 +105,7 @@ export async function GET(
       afterArticle: row.after_articleNumber
         ? {
             chapter: row.after_chapter,
+            section: row.after_section,
             articleNumber: row.after_articleNumber,
             title: row.after_title,
             contentText: row.after_contentText,

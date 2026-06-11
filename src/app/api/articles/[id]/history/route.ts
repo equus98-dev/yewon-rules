@@ -38,7 +38,12 @@ export async function GET(
        )
        SELECT 
          h.depth,
+         h.note,
+         beforeArt.chapter as "beforeChapter",
+         beforeArt.section as "beforeSection",
          beforeArt."contentText" as "beforeText",
+         afterArt.chapter as "afterChapter",
+         afterArt.section as "afterSection",
          afterArt."contentText" as "afterText",
          r1."versionName" as "beforeVersion",
          r1."enactmentDate" as "beforeDate",

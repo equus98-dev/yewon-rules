@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     let oldArticles: any[] = [];
     if (previousRevision) {
       const oldArtRes = await client.query(
-        `SELECT id, "articleNumber", "contentText" FROM "Article" WHERE "revisionId" = $1`,
+        `SELECT id, "articleNumber", "contentText", chapter, section FROM "Article" WHERE "revisionId" = $1`,
         [previousRevision.id]
       );
       oldArticles = oldArtRes.rows;
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())`,
           [artId, newRevisionId, art.chapter || null, art.section || null, parseInt(art.articleNumber) || 1, art.title || "제목없음", JSON.stringify(art.contentJson || {}), art.contentText || "", art.sortOrder || 1]
         );
-        createdNewArticles.push({ id: artId, articleNumber: parseInt(art.articleNumber) || 1, contentText: art.contentText || "" });
+        createdNewArticles.push({ id: artId, articleNumber: parseInt(art.articleNumber) || 1, contentText: art.contentText || "", chapter: art.chapter || null, section: art.section || null });
       }
     }
 
@@ -60,8 +60,12 @@ export async function POST(request: Request) {
       for (const num of allNums) {
         const beforeArt = oldArticles.find((a) => a.articleNumber === num);
         const afterArt = createdNewArticles.find((a) => a.articleNumber === num);
-        if (beforeArt && afterArt && beforeArt.contentText !== afterArt.contentText) {
-          await client.query(`INSERT INTO "ArticleComparison" (id, "revisionId", "beforeArticleId", "afterArticleId", note, "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`, [crypto.randomUUID(), newRevisionId, beforeArt.id, afterArt.id, "일부 개정"]);
+        if (beforeArt && afterArt && (beforeArt.contentText !== afterArt.contentText || beforeArt.chapter !== afterArt.chapter || beforeArt.section !== afterArt.section)) {
+          let note = "일부 개정";
+          if (beforeArt.chapter !== afterArt.chapter || beforeArt.section !== afterArt.section) {
+            note = "일부 개정 (장/절 변경 포함)";
+          }
+          await client.query(`INSERT INTO "ArticleComparison" (id, "revisionId", "beforeArticleId", "afterArticleId", note, "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`, [crypto.randomUUID(), newRevisionId, beforeArt.id, afterArt.id, note]);
         } else if (beforeArt && !afterArt) {
           await client.query(`INSERT INTO "ArticleComparison" (id, "revisionId", "beforeArticleId", "afterArticleId", note, "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`, [crypto.randomUUID(), newRevisionId, beforeArt.id, null, "조항 삭제"]);
         } else if (!beforeArt && afterArt) {

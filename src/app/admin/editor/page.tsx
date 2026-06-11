@@ -1014,7 +1014,12 @@ function EditorContent() {
                         const draftArt = draftArticles.find((d) => d.articleNumber === num);
 
                         // 둘 다 있고 변경 없는 경우 -> 표시 제외 또는 생략 표시
-                        const hasNoChange = oldArt && draftArt && oldArt.contentText === draftArt.contentText && !draftArt.isDeleted;
+                        const isChapterChanged = oldArt && draftArt && oldArt.chapter !== draftArt.chapter;
+                        const isSectionChanged = oldArt && draftArt && oldArt.section !== draftArt.section;
+                        const isTextChanged = oldArt && draftArt && oldArt.contentText !== draftArt.contentText;
+                        const isAnyChanged = isChapterChanged || isSectionChanged || isTextChanged;
+
+                        const hasNoChange = oldArt && draftArt && !isAnyChanged && !draftArt.isDeleted;
                         
                         if (hasNoChange) {
                           return (
@@ -1033,6 +1038,7 @@ function EditorContent() {
                             <td className="py-5 px-6 border-r border-slate-200 text-slate-700 leading-relaxed align-top">
                               {oldArt ? (
                                 <div className="space-y-1.5">
+                                  {oldArt.chapter && <div className="text-xs text-slate-400 font-bold mb-1">{oldArt.chapter} {oldArt.section ? `> ${oldArt.section}` : ''}</div>}
                                   <div className="font-black text-slate-500 font-sans text-sm">{getArticleLabel(oldArt.articleNumber, oldArt.title)}</div>
                                   <p className="whitespace-pre-wrap mt-2 font-bold text-[14px]">{oldArt.contentText}</p>
                                 </div>
@@ -1047,8 +1053,9 @@ function EditorContent() {
                             <td className="py-5 px-6 border-r border-slate-200 text-slate-700 leading-relaxed align-top">
                               {draftArt && !draftArt.isDeleted ? (
                                 <div className="space-y-1.5">
+                                  {draftArt.chapter && <div className={`text-xs font-bold mb-1 ${isChapterChanged || isSectionChanged ? 'text-amber-600 bg-amber-50 inline-block px-1 rounded' : 'text-slate-400'}`}>{draftArt.chapter} {draftArt.section ? `> ${draftArt.section}` : ''}</div>}
                                   <div className="font-black text-[#0c3161] font-sans text-sm">{getArticleLabel(draftArt.articleNumber, draftArt.title)}</div>
-                                  <p className="whitespace-pre-wrap mt-2 bg-amber-50 p-3 rounded-lg border border-amber-100 text-slate-800 font-bold text-[14px]">
+                                  <p className={`whitespace-pre-wrap mt-2 ${isTextChanged ? 'bg-amber-50 p-3 rounded-lg border border-amber-100 text-slate-800' : ''} font-bold text-[14px]`}>
                                     {draftArt.contentText}
                                   </p>
                                 </div>
@@ -1071,7 +1078,7 @@ function EditorContent() {
                                   삭제
                                 </span>
                               )}
-                              {(oldArt && draftArt && !draftArt.isDeleted && oldArt.contentText !== draftArt.contentText) && (
+                              {(oldArt && draftArt && !draftArt.isDeleted && isAnyChanged) && (
                                 <span className="text-amber-700 bg-amber-50 border border-amber-100 px-3 py-1 rounded-md font-black text-[11px]">
                                   개정
                                 </span>
