@@ -681,19 +681,42 @@ function EditorContent() {
 
             {/* 우측: 개정안 작업창 (실시간 인터랙티브 에디터) */}
             <div className="flex-1 p-8 flex flex-col overflow-hidden bg-slate-50">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-6 shrink-0 select-none">
-                <h3 className="text-base font-black text-slate-850 flex items-center gap-2">
-                  <span className="text-[#0c3161]">■</span> 개정안 뼈대 작업 영역
+              <div className="flex items-center justify-between bg-[#9bbabf] p-4 rounded-xl mb-6 shrink-0 select-none shadow-sm">
+                <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                  <span className="text-[#092244]">■</span> 개정안 작성
                 </h3>
 
-                <button
-                  type="button"
-                  onClick={handleAddArticle}
-                  className="bg-white hover:bg-slate-50 text-slate-750 hover:text-slate-900 text-base font-black px-4 py-2 rounded-lg border border-slate-200 active:scale-95 transition-all flex items-center gap-1 cursor-pointer shadow-sm"
-                >
-                  <AddIcon sx={{ fontSize: 18 }} />
-                  조항 신설 (+추가)
-                </button>
+                <div className="flex items-center gap-3">
+                  <select
+                    className="bg-white/95 text-sm font-bold text-slate-800 border-none rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-[#0c3161]/50 cursor-pointer w-48 shadow-sm"
+                    onChange={(e) => {
+                      if (!e.target.value) return;
+                      const el = document.getElementById(`editor-art-${e.target.value}`);
+                      if (el) {
+                        el.scrollIntoView({ behavior: "smooth", block: "center" });
+                        // 약간 하이라이트 효과를 줄 수도 있음
+                        el.classList.add("ring-4", "ring-[#0c3161]/30");
+                        setTimeout(() => el.classList.remove("ring-4", "ring-[#0c3161]/30"), 1500);
+                      }
+                      e.target.value = "";
+                    }}
+                  >
+                    <option value="">조문 검색 (이동)...</option>
+                    {draftArticles.map((a, i) => {
+                      if (a.isDeleted) return null;
+                      return <option key={i} value={i}>{a.articleNumber || "신설조항"} {a.title}</option>;
+                    })}
+                  </select>
+
+                  <button
+                    type="button"
+                    onClick={handleAddArticle}
+                    className="bg-white hover:bg-slate-50 text-slate-800 text-sm font-black px-4 py-2 rounded-lg active:scale-95 transition-all flex items-center gap-1 cursor-pointer shadow-sm"
+                  >
+                    <AddIcon sx={{ fontSize: 18 }} />
+                    조항 신설 (+추가)
+                  </button>
+                </div>
               </div>
 
               {/* 편집 에디터 조항 목록 */}
@@ -719,6 +742,7 @@ function EditorContent() {
 
                   return (
                     <div
+                      id={`editor-art-${idx}`}
                       key={idx}
                       className={`p-6 rounded-2xl border ${borderClass} transition-all space-y-4`}
                     >
