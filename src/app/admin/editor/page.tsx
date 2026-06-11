@@ -22,7 +22,10 @@ const JoditEditor = dynamic(() => import("jodit-react"), {
 
 /** title이 "의N(실제제목)" 형태인 경우를 감지하여 표시용 레이블을 반환 */
 function getArticleLabel(articleNumber: number, title: string): string {
-  const subMatch = title.match(/^의(\d+)\((.*)\)$/);
+  if (articleNumber >= 8000 || (title && title.includes("부칙"))) {
+    return title || "부칙";
+  }
+  const subMatch = title?.match(/^의(\d+)\((.*)\)$/);
   if (subMatch) {
     return `제${articleNumber}조의${subMatch[1]}(${subMatch[2]})`;
   }
@@ -31,7 +34,10 @@ function getArticleLabel(articleNumber: number, title: string): string {
 
 /** 조항 번호 뱃지용 짧은 레이블 */
 function getArticleNumBadge(articleNumber: number, title: string): string {
-  const subMatch = title.match(/^의(\d+)/);
+  if (articleNumber >= 8000 || (title && title.includes("부칙"))) {
+    return title || "부칙";
+  }
+  const subMatch = title?.match(/^의(\d+)/);
   if (subMatch) {
     return `제 ${articleNumber} 조의 ${subMatch[1]}`;
   }

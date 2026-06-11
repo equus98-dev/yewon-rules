@@ -526,7 +526,7 @@ export default function ArticleRenderer({
           } else if (/^부\s*칙/.test(trimmed)) {
              const match = trimmed.match(/^(?:부\s*칙\s*)+/);
              if (match) {
-                 const titlePart = "부칙";
+                 const titlePart = title || "부칙";
                  const body = trimmed.replace(/^(?:부\s*칙\s*)+/, '').trim();
                  const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
                  return (
@@ -709,7 +709,7 @@ export default function ArticleRenderer({
                           const dateMatch = addendumBody.match(/^\(?([\d.\s]+)\.?\)?\s*/);
                           return (
                             <>
-                              <span className="font-bold mr-1 text-[#000080]">부칙</span>
+                              <span className="font-bold mr-1 text-[#000080]">{title || "부칙"}</span>
                               <span className="font-normal">{renderTextWithHistory(addendumBody)}</span>
                             </>
                           );
@@ -771,7 +771,7 @@ export default function ArticleRenderer({
               <div key={index} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
                 <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
                   <div className="w-full break-keep inline-block">
-                    <span className="font-bold mr-1 text-[#000080]">부칙</span>
+                    <span className="font-bold mr-1 text-[#000080]">{title || "부칙"}</span>
                     {addendumBody && <span className="font-normal">{renderTextWithHistory(addendumBody)}</span>}
                   </div>
                 </div>
