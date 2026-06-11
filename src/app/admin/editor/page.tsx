@@ -213,7 +213,16 @@ function EditorContent() {
     setDraftArticles((prev) => {
       const oldPart = prev[idx].part;
       const newArticles = [...prev];
+      // 아래로 탐색
       for (let i = idx; i < newArticles.length; i++) {
+        if (newArticles[i].part === oldPart) {
+          newArticles[i] = { ...newArticles[i], part: newPart, isModified: true };
+        } else {
+          break;
+        }
+      }
+      // 위로 탐색
+      for (let i = idx - 1; i >= 0; i--) {
         if (newArticles[i].part === oldPart) {
           newArticles[i] = { ...newArticles[i], part: newPart, isModified: true };
         } else {
@@ -230,7 +239,16 @@ function EditorContent() {
       const oldChapter = prev[idx].chapter;
       const oldPart = prev[idx].part;
       const newArticles = [...prev];
+      // 아래로 탐색
       for (let i = idx; i < newArticles.length; i++) {
+        if (newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
+          newArticles[i] = { ...newArticles[i], chapter: newChapter, isModified: true };
+        } else {
+          break;
+        }
+      }
+      // 위로 탐색
+      for (let i = idx - 1; i >= 0; i--) {
         if (newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
           newArticles[i] = { ...newArticles[i], chapter: newChapter, isModified: true };
         } else {
@@ -248,7 +266,16 @@ function EditorContent() {
       const oldChapter = prev[idx].chapter;
       const oldPart = prev[idx].part;
       const newArticles = [...prev];
+      // 아래로 탐색
       for (let i = idx; i < newArticles.length; i++) {
+        if (newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
+          newArticles[i] = { ...newArticles[i], section: newSection, isModified: true };
+        } else {
+          break;
+        }
+      }
+      // 위로 탐색
+      for (let i = idx - 1; i >= 0; i--) {
         if (newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
           newArticles[i] = { ...newArticles[i], section: newSection, isModified: true };
         } else {
@@ -267,7 +294,16 @@ function EditorContent() {
       const oldChapter = prev[idx].chapter;
       const oldPart = prev[idx].part;
       const newArticles = [...prev];
+      // 아래로 탐색
       for (let i = idx; i < newArticles.length; i++) {
+        if (newArticles[i].subSection === oldSubSection && newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
+          newArticles[i] = { ...newArticles[i], subSection: newSubSection, isModified: true };
+        } else {
+          break;
+        }
+      }
+      // 위로 탐색
+      for (let i = idx - 1; i >= 0; i--) {
         if (newArticles[i].subSection === oldSubSection && newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
           newArticles[i] = { ...newArticles[i], subSection: newSubSection, isModified: true };
         } else {
