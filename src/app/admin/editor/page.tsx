@@ -822,7 +822,7 @@ function EditorContent() {
           <button
             onClick={() => setActiveTab("edit")}
             className={`w-[240px] py-3 rounded-t-xl transition-all cursor-pointer text-center ${
-              activeTab === "edit" ? "bg-[#006666] text-white shadow-md" : "bg-[#008080]/30 text-[#003333] hover:bg-[#008080]/40 hover:text-slate-900"
+              activeTab === "edit" ? "bg-[#006666]/80 backdrop-blur-sm text-white shadow-md" : "bg-[#008080]/30 text-[#003333] hover:bg-[#008080]/40 hover:text-slate-900"
             }`}
           >
             조문 작성 편집기
@@ -830,7 +830,7 @@ function EditorContent() {
           <button
             onClick={() => setActiveTab("preview")}
             className={`w-[240px] py-3 rounded-t-xl transition-all cursor-pointer text-center ${
-              activeTab === "preview" ? "bg-[#006666] text-white shadow-md" : "bg-[#008080]/30 text-[#003333] hover:bg-[#008080]/40 hover:text-slate-900"
+              activeTab === "preview" ? "bg-[#006666]/80 backdrop-blur-sm text-white shadow-md" : "bg-[#008080]/30 text-[#003333] hover:bg-[#008080]/40 hover:text-slate-900"
             }`}
           >
             개정원문 실시간 프리뷰
@@ -838,7 +838,7 @@ function EditorContent() {
           <button
             onClick={() => setActiveTab("compare")}
             className={`w-[280px] py-3 rounded-t-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              activeTab === "compare" ? "bg-[#006666] text-white shadow-md" : "bg-[#008080]/30 text-[#003333] hover:bg-[#008080]/40 hover:text-slate-900"
+              activeTab === "compare" ? "bg-[#006666]/80 backdrop-blur-sm text-white shadow-md" : "bg-[#008080]/30 text-[#003333] hover:bg-[#008080]/40 hover:text-slate-900"
             }`}
           >
             <CompareArrowsIcon sx={{ fontSize: 18 }} />
