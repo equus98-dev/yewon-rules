@@ -454,8 +454,14 @@ function EditorContent() {
     <div className="h-full flex flex-col bg-slate-50 overflow-hidden text-slate-800">
       
       {/* ==================== 1. 상단 규정 선택 & 메타 폼 ==================== */}
-      <div className="bg-[#008080]/10 border-b border-slate-200 p-6 space-y-4 shrink-0 z-10 shadow-sm">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 select-none">
+      <div className="relative bg-[#008080]/10 border-b border-slate-200 p-6 space-y-4 shrink-0 z-10 shadow-sm overflow-hidden">
+        {/* 학교 전경 이미지 배경 */}
+        <div 
+          className="absolute inset-0 opacity-[0.06] bg-cover bg-center pointer-events-none" 
+          style={{ backgroundImage: "url('/yewon2.jpeg')" }}
+        />
+        
+        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 select-none">
           <div className="flex items-center gap-3">
             <Link
               href="/admin/rules"
@@ -483,7 +489,7 @@ function EditorContent() {
         </div>
 
         {/* 개정 메타데이터 정보 입력 폼 */}
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 bg-slate-50 p-5 border border-slate-200 rounded-2xl text-sm">
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-6 gap-4 bg-slate-50 p-5 border border-slate-200 rounded-2xl text-sm shadow-sm">
           
           <div className="flex flex-col gap-1.5">
             <label className="text-sm text-slate-550 font-bold tracking-wider pl-1">대상 규정 선택</label>
@@ -556,7 +562,7 @@ function EditorContent() {
         </div>
 
         {/* 탭 바 컨트롤 */}
-        <div className="flex gap-2 text-[15px] font-black select-none mt-4">
+        <div className="relative z-10 flex gap-2 text-[15px] font-black select-none mt-4">
           <button
             onClick={() => setActiveTab("edit")}
             className={`w-[240px] py-3 rounded-t-xl transition-all cursor-pointer text-center ${
