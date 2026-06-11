@@ -112,6 +112,35 @@ export default function ArticleRenderer({
       });
     }
 
+    // HTML 끝부분에 다음 장/절 제목이 잘못 붙어있는 경우 제거 (최대 3개 문단 확인)
+    // HWP 변환기 오류로 다음 장/절 제목이 이전 조문의 HTML 끝에 포함되는 경우 발생
+    if (cleanHtml) {
+      let foundRealTrailingText = false;
+      const blocks = [...cleanHtml.matchAll(/<(p|h[1-6])(?:\s[^>]*?)?>([\s\S]*?)<\/\1>/gi)];
+      
+      for (let i = blocks.length - 1; i >= Math.max(0, blocks.length - 4); i--) {
+        if (foundRealTrailingText) break;
+        
+        const matchStr = blocks[i][0];
+        const innerHtml = blocks[i][2];
+        const rawText = innerHtml.replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        const pText = rawText.replace(/\s+/g, '').replace(/&nbsp;/g, '');
+        
+        if (pText === '') {
+           cleanHtml = cleanHtml.slice(0, blocks[i].index) + cleanHtml.slice(blocks[i].index! + matchStr.length);
+           continue; // 빈 문단 제거
+        }
+        
+        // 다음 장/절 제목 패턴 검사: '제 O 장' 등으로 시작하고 서술어로 끝나지 않는 명사형 문구
+        if (/^제\d+(장|관|절|편)/.test(pText) && pText.length < 40 && !/(다|까|요|음|함)\.?$/.test(pText)) {
+          cleanHtml = cleanHtml.slice(0, blocks[i].index) + cleanHtml.slice(blocks[i].index! + matchStr.length);
+          continue;
+        }
+        
+        foundRealTrailingText = true;
+      }
+    }
+
     if (articleNumber >= 9000) {
       // HWP 파싱 중 HTML 자체에 별지 제목이 중복 포함된 경우 이를 제거 (첫 번째 P 태그가 제목인 경우)
       const match = cleanHtml.match(/^(\s*<p[^>]*>.*?<\/p>\s*)/i);
