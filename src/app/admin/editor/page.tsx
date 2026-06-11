@@ -556,27 +556,27 @@ function EditorContent() {
         </div>
 
         {/* 탭 바 컨트롤 */}
-        <div className="flex border-b border-slate-200 text-[15px] font-black select-none mt-2">
+        <div className="flex gap-2 text-[15px] font-black select-none mt-4">
           <button
             onClick={() => setActiveTab("edit")}
-            className={`px-6 py-3 border-b-2 transition-all cursor-pointer ${
-              activeTab === "edit" ? "border-[#0c3161] text-[#0c3161] font-black" : "border-transparent text-slate-500 hover:text-[#0c3161]"
+            className={`w-[240px] py-3 rounded-t-xl transition-all cursor-pointer text-center ${
+              activeTab === "edit" ? "bg-[#008080]/30 text-[#004d4d] shadow-sm" : "bg-[#008080]/15 text-[#006666] hover:bg-[#008080]/25"
             }`}
           >
             조문 작성 편집기
           </button>
           <button
             onClick={() => setActiveTab("preview")}
-            className={`px-6 py-3 border-b-2 transition-all cursor-pointer ${
-              activeTab === "preview" ? "border-[#0c3161] text-[#0c3161] font-black" : "border-transparent text-slate-500 hover:text-[#0c3161]"
+            className={`w-[240px] py-3 rounded-t-xl transition-all cursor-pointer text-center ${
+              activeTab === "preview" ? "bg-[#008080]/30 text-[#004d4d] shadow-sm" : "bg-[#008080]/15 text-[#006666] hover:bg-[#008080]/25"
             }`}
           >
             개정원문 실시간 프리뷰
           </button>
           <button
             onClick={() => setActiveTab("compare")}
-            className={`px-6 py-3 border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === "compare" ? "border-[#0c3161] text-[#0c3161] font-black" : "border-transparent text-slate-500 hover:text-[#0c3161]"
+            className={`w-[280px] py-3 rounded-t-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              activeTab === "compare" ? "bg-[#008080]/30 text-[#004d4d] shadow-sm" : "bg-[#008080]/15 text-[#006666] hover:bg-[#008080]/25"
             }`}
           >
             <CompareArrowsIcon sx={{ fontSize: 18 }} />
@@ -686,7 +686,7 @@ function EditorContent() {
                             <button
                               type="button"
                               onClick={() => handleSimpleSave(idx)}
-                              className="bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-slate-50 transition-all cursor-pointer active:scale-95 shadow-sm"
+                              className="w-[90px] h-[40px] flex items-center justify-center bg-white border border-[#0c3161] text-[#0c3161] rounded-lg text-sm font-bold hover:bg-slate-50 transition-all cursor-pointer active:scale-95 shadow-sm"
                               title="개정 절차 없이 현재 조항의 내용만 실시간으로 수정합니다."
                             >
                               저장
@@ -703,7 +703,7 @@ function EditorContent() {
                                   prev.map((a, i) => (i === idx ? { ...a, isModified: true } : a))
                                 );
                               }}
-                              className="bg-[#0c3161] border border-[#092244] text-white px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-[#092244] transition-all cursor-pointer active:scale-95 shadow-sm"
+                              className="w-[90px] h-[40px] flex items-center justify-center bg-[#0c3161] border border-[#092244] text-white rounded-lg text-sm font-bold hover:bg-[#092244] transition-all cursor-pointer active:scale-95 shadow-sm"
                             >
                               개정(저장)
                             </button>
@@ -712,14 +712,14 @@ function EditorContent() {
                           <button
                             type="button"
                             onClick={() => handleToggleDeleteArticle(idx)}
-                            className={`p-2 rounded-lg border transition-all cursor-pointer active:scale-95 ${
+                            className={`w-[90px] h-[40px] flex items-center justify-center rounded-lg border transition-all cursor-pointer active:scale-95 ${
                               art.isDeleted
                                 ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                                : "bg-rose-50 border border-rose-200 text-rose-650 hover:bg-rose-100"
+                                : "bg-rose-50 border-rose-200 text-rose-650 hover:bg-rose-100"
                             }`}
                             title={art.isDeleted ? "삭제 취소" : "삭제"}
                           >
-                            <DeleteIcon sx={{ fontSize: 18 }} />
+                            <DeleteIcon sx={{ fontSize: 20 }} />
                           </button>
                         </div>
                       </div>
