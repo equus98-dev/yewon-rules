@@ -77,6 +77,24 @@ export default function ArticleRenderer({
 
     let cleanHtml = contentHtml;
 
+    // 1. 앞뒤 빈 태그(여백) 모두 제거
+    let prevLength = -1;
+    while (cleanHtml.length !== prevLength) {
+      prevLength = cleanHtml.length;
+      cleanHtml = cleanHtml.replace(/^(?:\s|&nbsp;|<br\s*\/?>|<(p|div|span|h[1-6])(?:\s[^>]*)?>(?:\s|&nbsp;|<br\s*\/?>)*<\/\1>)+/i, '');
+      cleanHtml = cleanHtml.replace(/(?:\s|&nbsp;|<br\s*\/?>|<(p|div|span|h[1-6])(?:\s[^>]*)?>(?:\s|&nbsp;|<br\s*\/?>)*<\/\1>)+$/i, '');
+    }
+
+    // 2. HTML 태그의 인라인 스타일 중 불필요한 여백(margin) 제거
+    // HWP 원본의 과도한 여백이 웹에서 조문 간 간격을 비정상적으로 벌리는 문제 해결
+    cleanHtml = cleanHtml.replace(/style="([^"]*)"/gi, (match, styleContent) => {
+      let newStyle = styleContent.replace(/margin-top\s*:\s*[^;]+;?/gi, '');
+      newStyle = newStyle.replace(/margin-bottom\s*:\s*[^;]+;?/gi, '');
+      newStyle = newStyle.replace(/margin\s*:\s*[^;]+;?/gi, '');
+      if (newStyle.trim() === '') return '';
+      return `style="${newStyle}"`;
+    });
+
     // HTML 자체에 장/절 제목이 중복 포함된 경우 이를 제거 (최대 5개 문단 확인)
     if (chapter || section) {
       let chapterRemoved = false;
