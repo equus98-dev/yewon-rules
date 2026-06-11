@@ -457,7 +457,7 @@ function EditorContent() {
       <div className="relative bg-[#008080]/10 border-b border-slate-200 p-6 space-y-4 shrink-0 z-10 shadow-sm overflow-hidden">
         {/* 학교 전경 이미지 배경 */}
         <div 
-          className="absolute inset-0 opacity-[0.06] bg-cover bg-center pointer-events-none" 
+          className="absolute inset-0 opacity-20 bg-cover bg-center pointer-events-none" 
           style={{ backgroundImage: "url('/yewon2.jpeg')" }}
         />
         
