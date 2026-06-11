@@ -77,16 +77,23 @@ export default function ArticleRenderer({
 
     let cleanHtml = contentHtml;
 
-    // 1. 앞뒤 빈 태그(여백) 모두 제거
-    let prevLength = -1;
-    while (cleanHtml.length !== prevLength) {
-      prevLength = cleanHtml.length;
-      cleanHtml = cleanHtml.replace(/^(?:\s|&nbsp;|<br\s*\/?>|<(p|div|span|h[1-6])(?:\s[^>]*)?>(?:\s|&nbsp;|<br\s*\/?>)*<\/\1>)+/i, '');
-      cleanHtml = cleanHtml.replace(/(?:\s|&nbsp;|<br\s*\/?>|<(p|div|span|h[1-6])(?:\s[^>]*)?>(?:\s|&nbsp;|<br\s*\/?>)*<\/\1>)+$/i, '');
+    // 1. 중첩된 빈 태그(여백) 모두 제거 (중간 간격 문제 해결)
+    // HWP 변환기는 <p><span>&nbsp;</span></p> 형태의 빈 문단을 다수 생성하여 조문 사이를 비정상적으로 벌어지게 함.
+    let prevHtml = '';
+    while (cleanHtml !== prevHtml) {
+      prevHtml = cleanHtml;
+      cleanHtml = cleanHtml.replace(/<(p|div|span|h[1-6])(?:\s[^>]*)?>([\s\S]*?)<\/\1>/gi, (match, tag, inner) => {
+        const strippedInner = inner.replace(/<[^>]+>/g, '').replace(/\s|&nbsp;/gi, '');
+        if (strippedInner === '') return ''; 
+        return match;
+      });
     }
 
-    // 2. HTML 태그의 인라인 스타일 중 불필요한 여백(margin) 제거
-    // HWP 원본의 과도한 여백이 웹에서 조문 간 간격을 비정상적으로 벌리는 문제 해결
+    // 2. 앞뒤에 남은 단순 공백 및 <br> 제거
+    cleanHtml = cleanHtml.replace(/^(?:\s|&nbsp;|<br\s*\/?>)+/gi, '');
+    cleanHtml = cleanHtml.replace(/(?:\s|&nbsp;|<br\s*\/?>)+$/gi, '');
+
+    // 3. HTML 태그의 인라인 스타일 중 불필요한 위아래 여백(margin) 제거
     cleanHtml = cleanHtml.replace(/style="([^"]*)"/gi, (match, styleContent) => {
       let newStyle = styleContent.replace(/margin-top\s*:\s*[^;]+;?/gi, '');
       newStyle = newStyle.replace(/margin-bottom\s*:\s*[^;]+;?/gi, '');
@@ -95,7 +102,7 @@ export default function ArticleRenderer({
       return `style="${newStyle}"`;
     });
 
-    // HTML 자체에 장/절 제목이 중복 포함된 경우 이를 제거 (최대 5개 문단 확인)
+    // 4. HTML 본문 앞에 중복 포함된 현재 장/절 제목 제거
     if (chapter || section) {
       let chapterRemoved = false;
       let sectionRemoved = false;
@@ -107,15 +114,13 @@ export default function ArticleRenderer({
         const rawText = innerHtml.replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
         const pText = rawText.replace(/\s+/g, '').replace(/&nbsp;/g, '');
         
-        if (pText === '') {
-           return ''; // 빈 문단이면 제거하고 계속 진행
-        }
+        if (pText === '') return ''; 
         
         if (chapter && !chapterRemoved) {
           const chapText = chapter.replace(/\s+/g, '');
           if (pText === chapText || (pText.includes(chapText) && pText.length < chapText.length + 5)) {
             chapterRemoved = true;
-            return ''; // 장 제목 제거
+            return ''; 
           }
         }
         
@@ -123,58 +128,32 @@ export default function ArticleRenderer({
           const secText = section.replace(/\s+/g, '');
           if (pText === secText || (pText.includes(secText) && pText.length < secText.length + 5)) {
             sectionRemoved = true;
-            return ''; // 절 제목 제거
+            return ''; 
           }
         }
         
-        foundRealText = true; // 실제 본문이 시작되었으므로 이후로는 제거하지 않음
+        foundRealText = true; 
         return match;
       });
     }
 
-    // HTML 끝부분에 다음 장/절 제목이 잘못 붙어있는 경우 제거 (최대 3개 문단 확인)
-    // HWP 변환기 오류로 다음 장/절 제목이 이전 조문의 HTML 끝에 포함되는 경우 발생
-    if (cleanHtml) {
-      let foundRealTrailingText = false;
-      const blocks = [...cleanHtml.matchAll(/<(p|h[1-6])(?:\s[^>]*?)?>([\s\S]*?)<\/\1>/gi)];
-      
-      for (let i = blocks.length - 1; i >= Math.max(0, blocks.length - 4); i--) {
-        if (foundRealTrailingText) break;
-        
-        const matchStr = blocks[i][0];
-        const innerHtml = blocks[i][2];
-        const rawText = innerHtml.replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-        const pText = rawText.replace(/\s+/g, '').replace(/&nbsp;/g, '');
-        
-        if (pText === '') {
-           cleanHtml = cleanHtml.slice(0, blocks[i].index) + cleanHtml.slice(blocks[i].index! + matchStr.length);
-           continue; // 빈 문단 제거
-        }
-        
-        // 다음 장/절 제목 패턴 검사: '제 O 장' 등으로 시작하고 서술어로 끝나지 않는 명사형 문구
-        if (/^제\d+(장|관|절|편)/.test(pText) && pText.length < 40 && !/(다|까|요|음|함)\.?$/.test(pText)) {
-          cleanHtml = cleanHtml.slice(0, blocks[i].index) + cleanHtml.slice(blocks[i].index! + matchStr.length);
-          continue;
-        }
-        
-        foundRealTrailingText = true;
-      }
-    }
-
-    // 명시적으로 전달받은 다음 장/절 제목이 HTML 끝에 남아있다면 텍스트만 제거하고 빈 태그는 남겨둠
-    // HTML 구조 파괴(unclosed tags 등)를 방지하기 위해 텍스트 치환 방식 사용
+    // 5. 명시적으로 전달받은 다음 장/절 제목이 HTML 끝에 딸려있는 경우 (문장 구조를 파괴하지 않고 텍스트만 제거)
     if (cleanHtml && trailingTitles.length > 0) {
-      trailingTitles.forEach(title => {
+      trailingTitles.slice().reverse().forEach(title => {
         if (!title) return;
         const chars = title.replace(/\s+/g, '').split('');
-        // 태그나 공백이 글자 사이에 끼어있어도 매칭되도록 정규식 구성
         const regexStr = chars.map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('(?:\\s|&nbsp;|<[^>]+>)*');
-        const chapRegex = new RegExp(`(?:\\s|&nbsp;|<[^>]+>)*${regexStr}(?:\\s|&nbsp;|<[^>]+>)*$`, 'i');
-        cleanHtml = cleanHtml.replace(chapRegex, (match) => {
-          // 매칭된 문자열에서 순수 텍스트(> < 사이의 내용)만 날려버리고 태그 껍데기만 살림
-          return match.replace(/>([^<]+)</g, (m, textContent) => {
+        // 뒤에 알 수 없는 찌꺼기 태그가 최대 60자까지 붙어있어도 감지하도록 허용
+        const chapRegex = new RegExp(`((?:\\s|&nbsp;|<[^>]+>)*${regexStr}(?:\\s|&nbsp;|<[^>]+>)*)([\\s\\S]{0,60})$`, 'i');
+        cleanHtml = cleanHtml.replace(chapRegex, (match, titleMatch, trailingGarbage) => {
+          // trailingGarbage에 실제 의미있는 텍스트가 5자 이상 포함되어 있다면, 엉뚱한 문장을 잘못 매칭한 것일 수 있으므로 취소
+          const garbageText = trailingGarbage.replace(/<[^>]+>/g, '').replace(/\s|&nbsp;/gi, '');
+          if (garbageText.length > 5) return match;
+
+          const strippedTitle = titleMatch.replace(/>([^<]+)</g, (m: string, textContent: string) => {
             return textContent.trim() === '' ? m : '><';
           }).replace(/^([^<]+)</, '<').replace(/>([^<]+)$/, '>');
+          return strippedTitle + trailingGarbage;
         });
       });
     }
