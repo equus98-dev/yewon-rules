@@ -148,7 +148,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         // 부칙 (8000번대)인 경우 하위 조항을 TOC에 개별적으로 넣지 않고 '부칙' 하나만 추가
         if (a.articleNumber >= 8000 && a.articleNumber < 9000) {
            if (!toc.some(t => t.id === `toc-${a.articleNumber}`)) {
-              toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: a.title || "부칙" });
+              toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: "부칙" });
            }
            
            // HTML 별지가 없는 경우 부칙 내의 텍스트 기반 별지를 스캔하여 TOC에 추가
