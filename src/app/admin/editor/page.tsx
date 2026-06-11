@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { CircularProgress } from "@mui/material";
+import dynamic from "next/dynamic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveIcon from "@mui/icons-material/Save";
 import RuleIcon from "@mui/icons-material/Rule";
@@ -11,6 +12,11 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+
+const JoditEditor = dynamic(() => import("jodit-react"), {
+  ssr: false,
+  loading: () => <p className="p-4 text-slate-500">에디터 불러오는 중...</p>,
+});
 
 /** title이 "의N(실제제목)" 형태인 경우를 감지하여 표시용 레이블을 반환 */
 function getArticleLabel(articleNumber: number, title: string): string {
@@ -55,6 +61,7 @@ function EditorContent() {
 
   // 편집용 조항(Articles) 목록 상태
   const [draftArticles, setDraftArticles] = useState<any[]>([]);
+  const [editorMode, setEditorMode] = useState<Record<number, boolean>>({});
 
   // 신규 조항 추가 위치 지정용 체크 인덱스
   const [checkedArticleIndex, setCheckedArticleIndex] = useState<number | null>(null);
@@ -697,14 +704,51 @@ function EditorContent() {
                             </div>
 
                             <div className="space-y-2">
-                              <label className="text-xs text-slate-500 font-bold uppercase tracking-wider pl-1">조문 본문 전문</label>
-                              <textarea
-                                rows={3}
-                                value={art.contentText}
-                                onChange={(e) => handleArticleTextChange(idx, e.target.value)}
-                                placeholder="예: 제1조 (목적) 이 규정은 학교의..."
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] leading-relaxed resize-none text-sm"
-                              />
+                              <div className="flex items-center justify-between">
+                                <label className="text-xs text-slate-500 font-bold uppercase tracking-wider pl-1">조문 본문 전문</label>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditorMode(prev => ({...prev, [idx]: !(prev[idx] ?? /<table|<p /i.test(art.contentText))}));
+                                  }}
+                                  className="text-[11px] font-bold px-2 py-0.5 rounded border border-slate-300 text-slate-600 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                                >
+                                  {(editorMode[idx] ?? /<table|<p /i.test(art.contentText)) ? "HTML 에디터 끄기" : "HTML 에디터 켜기"}
+                                </button>
+                              </div>
+                              {(editorMode[idx] ?? /<table|<p /i.test(art.contentText)) ? (
+                                <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
+                                  <JoditEditor
+                                    value={art.contentText}
+                                    config={{
+                                      readonly: false,
+                                      placeholder: '여기에 조문 내용을 입력하세요...',
+                                      height: 300,
+                                      style: {
+                                        fontFamily: "'Pretendard', sans-serif",
+                                        fontSize: "14px",
+                                      },
+                                      buttons: [
+                                        'bold', 'italic', 'underline', 'strikethrough', '|',
+                                        'ul', 'ol', '|',
+                                        'font', 'fontsize', 'brush', 'paragraph', '|',
+                                        'table', 'link', 'image', '|',
+                                        'align', 'undo', 'redo', 'hr', 'eraser', 'fullsize',
+                                      ]
+                                    }}
+                                    onBlur={newContent => handleArticleTextChange(idx, newContent)}
+                                    onChange={() => {}}
+                                  />
+                                </div>
+                              ) : (
+                                <textarea
+                                  rows={5}
+                                  value={art.contentText}
+                                  onChange={(e) => handleArticleTextChange(idx, e.target.value)}
+                                  placeholder="예: 제1조 (목적) 이 규정은 학교의..."
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] leading-relaxed resize-none text-sm"
+                                />
+                              )}
                             </div>
                           </div>
                         </div>
