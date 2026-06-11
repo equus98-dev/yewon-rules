@@ -333,7 +333,7 @@ export default function AdminRulesManagement() {
                     소관부서
                   </div>
                 </th>
-                <th className="py-4 px-4 font-black w-28 text-center border-l border-slate-200">제·개정일</th>
+                <th className="py-4 px-4 font-black w-32 text-center border-l border-slate-200">제·개정일</th>
                 <th className="py-4 px-4 font-black w-20 text-center border-l border-slate-200">상태</th>
                 <th className="py-4 px-4 font-black w-64 text-center border-l border-slate-200">작업</th>
               </tr>
@@ -413,7 +413,7 @@ export default function AdminRulesManagement() {
                         )}
                       </td>
 
-                      <td className="py-3 px-4 text-center text-slate-500 font-bold select-none">{rule.enactmentDate}</td>
+                      <td className="py-3 px-4 text-center text-slate-500 font-bold select-none whitespace-nowrap">{rule.enactmentDate}</td>
                       <td className="py-3 px-4 text-center select-none">
                         {isAbolished ? (
                           <span className="text-red-650 font-black bg-red-50 border border-red-100 px-2 py-0.5 rounded text-xs">
