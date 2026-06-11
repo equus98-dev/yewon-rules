@@ -199,7 +199,11 @@ export default function ArticleRenderer({
       }
       
       if (targetIndex !== -1 && items[targetIndex]) {
-        items[targetIndex].text = `${fullTitle} ${String(items[targetIndex].text || "").trim()}`;
+        let originalText = String(items[targetIndex].text || "").trim();
+        if (articleNumber >= 8000 && articleNumber < 9000) {
+           originalText = originalText.replace(/^(?:부\s*칙\s*)+/, '');
+        }
+        items[targetIndex].text = `${fullTitle} ${originalText}`;
       } else {
         items.unshift({ type: "text", num: "", text: fullTitle });
       }
@@ -475,10 +479,10 @@ export default function ArticleRenderer({
                  lineClass += " mt-4 mb-2 text-[14.5px] font-bold text-[#000080] block";
              }
           } else if (/^부\s*칙/.test(trimmed)) {
-             const match = trimmed.match(/^(부\s*칙)\s*(.*)/);
+             const match = trimmed.match(/^(?:부\s*칙\s*)+/);
              if (match) {
-                 const titlePart = match[1];
-                 const body = match[2].trim();
+                 const titlePart = "부칙";
+                 const body = trimmed.replace(/^(?:부\s*칙\s*)+/, '').trim();
                  const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
                  return (
                     <div key={`glued-${idx}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
@@ -656,7 +660,7 @@ export default function ArticleRenderer({
                     {isAddendum ? (
                       <>
                         {(() => {
-                          const addendumBody = safeText.replace(/^부\s*칙\s*/, '');
+                          const addendumBody = safeText.replace(/^(?:부\s*칙\s*)+/, '');
                           const dateMatch = addendumBody.match(/^\(?([\d.\s]+)\.?\)?\s*/);
                           return (
                             <>
@@ -717,7 +721,7 @@ export default function ArticleRenderer({
           const isAddendum = safeText.replace(/\s+/g, "").startsWith("부칙");
           if (isAddendum) {
             // 부칙을 article 타입처럼 렌더링 (부칙 중복 방지, 연 아이콘 제거)
-            const addendumBody = safeText.replace(/^부\s*칙\s*/, '').trim();
+            const addendumBody = safeText.replace(/^(?:부\s*칙\s*)+/, '').trim();
             return (
               <div key={index} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
                 <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
