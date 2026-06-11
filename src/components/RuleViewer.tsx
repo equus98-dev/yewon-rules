@@ -15,7 +15,7 @@ import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import LaunchIcon from "@mui/icons-material/Launch";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import "react-quill/dist/quill.core.css";
+
 
 interface RuleViewerProps {
   ruleId: string;
