@@ -849,11 +849,90 @@ function EditorContent() {
                     tagBg = "bg-amber-50 text-amber-700 border border-amber-100 font-black";
                   }
 
+                  const prevArt = idx > 0 ? draftArticles[idx - 1] : null;
+                  const isNewGroup = !prevArt || 
+                                     art.part !== prevArt.part ||
+                                     art.chapter !== prevArt.chapter ||
+                                     art.section !== prevArt.section ||
+                                     art.subSection !== prevArt.subSection;
+                  const hasGroupInfo = Boolean(art.part || art.chapter || art.section || art.subSection);
+
                   return (
-                    <div
-                      id={`editor-art-${idx}`}
-                      key={idx}
-                      className={`p-6 rounded-2xl border ${borderClass} transition-all space-y-4`}
+                    <React.Fragment key={idx}>
+                      {/* 그룹 헤더 카드 (편장절관) */}
+                      {isNewGroup && hasGroupInfo && (
+                        <div className="p-6 rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50/50 to-white shadow-sm transition-all space-y-4 mb-2">
+                          <div className="flex items-center justify-between gap-4 select-none border-b border-indigo-100 pb-3">
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm font-black bg-indigo-100 text-indigo-800 px-3 py-1.5 rounded-md border border-indigo-200 shadow-sm">
+                                📑 소속 편·장·절·관
+                              </span>
+                              <span className="text-sm font-bold text-slate-600">
+                                {[art.part, art.chapter, art.section, art.subSection].filter(Boolean).join(" > ")}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  alert("편·장·절·관 정보가 임시 반영되었습니다. (입력 시 자동 반영됩니다)");
+                                }}
+                                className="flex items-center gap-1.5 px-4 h-[38px] bg-gradient-to-b from-[#1a4b8c] to-[#0c3161] border border-[#0a274d] text-white rounded-lg text-[13px] font-black hover:from-[#15407a] hover:to-[#092244] transition-all cursor-pointer active:scale-95 shadow-md shadow-blue-900/20"
+                              >
+                                <RuleIcon sx={{ fontSize: 16 }} />
+                                개정(저장)
+                              </button>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white border border-slate-200 p-5 rounded-xl shadow-sm">
+                            <div className="space-y-2">
+                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 편 (Part)</label>
+                              <input
+                                type="text"
+                                value={art.part || ""}
+                                onChange={(e) => handlePartChange(idx, e.target.value)}
+                                placeholder="예: 제1편 총칙"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:bg-white text-[14px] transition-all"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 장 (Chapter)</label>
+                              <input
+                                type="text"
+                                value={art.chapter || ""}
+                                onChange={(e) => handleChapterChange(idx, e.target.value)}
+                                placeholder="예: 제1장 총칙"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:bg-white text-[14px] transition-all"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 절 (Section)</label>
+                              <input
+                                type="text"
+                                value={art.section || ""}
+                                onChange={(e) => handleSectionChange(idx, e.target.value)}
+                                placeholder="예: 제1절 목적"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:bg-white text-[14px] transition-all"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 관 (SubSection)</label>
+                              <input
+                                type="text"
+                                value={art.subSection || ""}
+                                onChange={(e) => handleSubSectionChange(idx, e.target.value)}
+                                placeholder="예: 제1관 목적"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:bg-white text-[14px] transition-all"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 개별 조문 카드 */}
+                      <div
+                        id={`editor-art-${idx}`}
+                        className={`p-6 rounded-2xl border ${borderClass} transition-all space-y-4`}
                       onFocusCapture={() => {
                         setActiveArticleNum(art.articleNumber);
                         const viewerEl = document.getElementById(`viewer-art-${art.articleNumber}`);
@@ -886,6 +965,19 @@ function EditorContent() {
                               {tagText}
                             </span>
                           )}
+                          {/* 장/절 추가 버튼 (그룹 정보가 없거나, 현재 그룹과 분리하고 싶을 때) */}
+                          {(!hasGroupInfo || !isNewGroup) && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDraftArticles(prev => prev.map((a, i) => i === idx ? { ...a, chapter: a.chapter || "새 장 (명칭 입력)" } : a));
+                              }}
+                              className="text-[11px] font-bold text-slate-400 hover:text-[#0c3161] transition-colors bg-white px-2 py-1 rounded border border-slate-200 hover:border-[#0c3161] shadow-sm ml-2"
+                              title="이 조문 위에 새로운 편/장/절/관 구분선을 추가합니다."
+                            >
+                              + 장/절 추가
+                            </button>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -894,9 +986,10 @@ function EditorContent() {
                             <button
                               type="button"
                               onClick={() => handleSimpleSave(idx)}
-                              className="w-[90px] h-[40px] flex items-center justify-center bg-white border border-[#0c3161] text-[#0c3161] rounded-lg text-sm font-bold hover:bg-slate-50 transition-all cursor-pointer active:scale-95 shadow-sm"
+                              className="flex items-center gap-1.5 px-4 h-[38px] bg-white border border-slate-200 text-slate-700 rounded-lg text-[13px] font-black hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 transition-all cursor-pointer active:scale-95 shadow-sm"
                               title="개정 절차 없이 현재 조항의 내용만 실시간으로 수정합니다."
                             >
+                              <SaveIcon sx={{ fontSize: 16 }} />
                               저장
                             </button>
                           )}
@@ -911,8 +1004,9 @@ function EditorContent() {
                                   prev.map((a, i) => (i === idx ? { ...a, isModified: true } : a))
                                 );
                               }}
-                              className="w-[90px] h-[40px] flex items-center justify-center bg-[#0c3161] border border-[#092244] text-white rounded-lg text-sm font-bold hover:bg-[#092244] transition-all cursor-pointer active:scale-95 shadow-sm"
+                              className="flex items-center gap-1.5 px-4 h-[38px] bg-gradient-to-b from-[#1a4b8c] to-[#0c3161] border border-[#0a274d] text-white rounded-lg text-[13px] font-black hover:from-[#15407a] hover:to-[#092244] transition-all cursor-pointer active:scale-95 shadow-md shadow-blue-900/20"
                             >
+                              <RuleIcon sx={{ fontSize: 16 }} />
                               개정(저장)
                             </button>
                           )}
@@ -920,14 +1014,15 @@ function EditorContent() {
                           <button
                             type="button"
                             onClick={() => handleToggleDeleteArticle(idx)}
-                            className={`w-[90px] h-[40px] flex items-center justify-center rounded-lg border transition-all cursor-pointer active:scale-95 ${
+                            className={`flex items-center gap-1.5 px-4 h-[38px] rounded-lg border transition-all cursor-pointer active:scale-95 shadow-sm text-[13px] font-black ${
                               art.isDeleted
-                                ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                                : "bg-rose-50 border-rose-200 text-rose-650 hover:bg-rose-100"
+                                ? "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+                                : "bg-white border-rose-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300"
                             }`}
                             title={art.isDeleted ? "삭제 취소" : "삭제"}
                           >
-                            <DeleteIcon sx={{ fontSize: 20 }} />
+                            <DeleteIcon sx={{ fontSize: 16 }} />
+                            {art.isDeleted ? "삭제 취소" : "삭제"}
                           </button>
                         </div>
                       </div>
@@ -935,50 +1030,6 @@ function EditorContent() {
                       {/* 입력 영역 */}
                       {!art.isDeleted && (
                         <div className="flex flex-col gap-5 mt-2">
-                          {/* 편/장/절/관 편집 입력 */}
-                          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-sm">
-                            <div className="space-y-2">
-                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 편 (Part)</label>
-                              <input
-                                type="text"
-                                value={art.part || ""}
-                                onChange={(e) => handlePartChange(idx, e.target.value)}
-                                placeholder="예: 제1편 총칙"
-                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[14px] transition-all"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 장 (Chapter)</label>
-                              <input
-                                type="text"
-                                value={art.chapter || ""}
-                                onChange={(e) => handleChapterChange(idx, e.target.value)}
-                                placeholder="예: 제1장 총칙"
-                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[14px] transition-all"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 절 (Section)</label>
-                              <input
-                                type="text"
-                                value={art.section || ""}
-                                onChange={(e) => handleSectionChange(idx, e.target.value)}
-                                placeholder="예: 제1절 목적"
-                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[14px] transition-all"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-[11px] text-[#0c3161] font-black uppercase tracking-wider pl-1">소속 관 (SubSection)</label>
-                              <input
-                                type="text"
-                                value={art.subSection || ""}
-                                onChange={(e) => handleSubSectionChange(idx, e.target.value)}
-                                placeholder="예: 제1관 목적"
-                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 font-extrabold focus:outline-none focus:ring-2 focus:ring-[#0c3161] focus:border-[#0c3161] text-[14px] transition-all"
-                              />
-                            </div>
-                          </div>
-
                           {/* 제목 및 본문 편집 입력 */}
                           <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-5 text-base">
                             <div className="space-y-2">
@@ -1043,6 +1094,7 @@ function EditorContent() {
                         </div>
                       )}
                     </div>
+                    </React.Fragment>
                   );
                 })}
               </div>
