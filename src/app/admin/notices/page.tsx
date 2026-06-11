@@ -192,25 +192,25 @@ export default function AdminNotices() {
             등록된 공지사항이 아직 존재하지 않습니다. 우측 상단의 신규 등록 버튼을 눌러 첫 공지를 띄워 보세요!
           </div>
         ) : (
-          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+          <div className="max-w-[1400px] mx-auto bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden flex flex-col">
             <div className="overflow-x-auto">
               <table className="w-full text-[15px] text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 select-none font-bold">
-                    <th className="py-4 px-5 w-16 text-center font-black">번호</th>
-                    <th className="py-4 px-4 w-32 text-center font-black">작성 부서</th>
-                    <th className="py-4 px-4 font-black">공지사항 제목</th>
-                    <th className="py-4 px-4 w-36 text-center font-black">화면 노출일</th>
-                    <th className="py-4 px-5 w-24 text-center font-black">관리 액션</th>
+                <thead className="bg-[#f8fafc] border-b border-slate-200">
+                  <tr className="text-slate-800 select-none font-bold">
+                    <th className="py-4 px-5 w-16 text-center font-black border-r border-slate-200">번호</th>
+                    <th className="py-4 px-4 w-32 text-center font-black border-r border-slate-200">작성 부서</th>
+                    <th className="py-4 px-4 font-black text-center">공지사항 제목</th>
+                    <th className="py-4 px-4 w-36 text-center font-black border-l border-slate-200">화면 노출일</th>
+                    <th className="py-4 px-5 w-24 text-center font-black border-l border-slate-200">관리 액션</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {notices.map((notice, idx) => (
                     <tr 
                       key={notice.id} 
-                      className="hover:bg-slate-50/50 transition-colors group"
+                      className="border-b border-slate-200 hover:bg-slate-50 transition-colors group"
                     >
-                      <td className="py-4 px-5 text-center text-slate-500 font-bold select-none">{idx + 1}</td>
+                      <td className="py-4 px-5 text-center text-slate-500 font-extrabold text-[16px] select-none">{idx + 1}</td>
                       <td className="py-4 px-4 text-center">
                         <span className="bg-amber-50 text-amber-800 border border-amber-100 px-2.5 py-1 rounded-md text-[13px] font-black select-none">
                           {notice.dept}
