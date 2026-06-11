@@ -872,15 +872,58 @@ function EditorContent() {
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
+                              {/* 바로적용 버튼 (그룹 일괄 적용) */}
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  if (!confirm("이 편/장/절/관에 속한 모든 조항의 소속 명칭을 실서버에 즉시 단순 반영하시겠습니까?")) return;
+                                  setSaving(true);
+                                  let success = 0;
+                                  for (let i = idx; i < draftArticles.length; i++) {
+                                    const a = draftArticles[i];
+                                    if (a.isNew || a.isDeleted || !a.id) continue;
+                                    if (a.part === art.part && a.chapter === art.chapter && a.section === art.section && a.subSection === art.subSection) {
+                                      try {
+                                        const res = await fetch(`/api/admin/articles/${a.id}`, {
+                                          method: 'PATCH',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ 
+                                            contentJson: a.contentJson || { paragraphs: [a.contentText.split(") ").slice(1).join(") ") || a.contentText] },
+                                            contentText: a.contentText,
+                                            title: a.title,
+                                            chapter: a.chapter,
+                                            part: a.part,
+                                            section: a.section,
+                                            subSection: a.subSection
+                                          })
+                                        });
+                                        if (res.ok) {
+                                          success++;
+                                          setDraftArticles(prev => prev.map((item, j) => j === i ? { ...item, isModified: false } : item));
+                                        }
+                                      } catch(e) {}
+                                    } else {
+                                      break; // 그룹 벗어나면 중단
+                                    }
+                                  }
+                                  setSaving(false);
+                                  alert(`총 ${success}개 조문의 소속 명칭이 즉시 반영되었습니다.`);
+                                }}
+                                className="flex items-center gap-1.5 px-4 h-[38px] bg-white border border-slate-200 text-slate-700 rounded-lg text-[13px] font-black hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 transition-all cursor-pointer active:scale-95 shadow-sm"
+                                title="이 그룹(편장절관)에 속한 조문들의 소속 명칭을 실시간으로 서버에 저장합니다."
+                              >
+                                <SaveIcon sx={{ fontSize: 16 }} />
+                                바로적용
+                              </button>
                               <button
                                 type="button"
                                 onClick={() => {
-                                  alert("편·장·절·관 정보가 임시 반영되었습니다. (입력 시 자동 반영됩니다)");
+                                  alert("편·장·절·관 정보가 임시 반영되었습니다. (입력 시 이미 자동 반영 상태입니다)");
                                 }}
                                 className="flex items-center gap-1.5 px-4 h-[38px] bg-gradient-to-b from-[#1a4b8c] to-[#0c3161] border border-[#0a274d] text-white rounded-lg text-[13px] font-black hover:from-[#15407a] hover:to-[#092244] transition-all cursor-pointer active:scale-95 shadow-md shadow-blue-900/20"
                               >
                                 <RuleIcon sx={{ fontSize: 16 }} />
-                                개정(저장)
+                                개정처리
                               </button>
                             </div>
                           </div>
@@ -990,7 +1033,7 @@ function EditorContent() {
                               title="개정 절차 없이 현재 조항의 내용만 실시간으로 수정합니다."
                             >
                               <SaveIcon sx={{ fontSize: 16 }} />
-                              저장
+                              바로적용
                             </button>
                           )}
                           {/* 개정(저장) 버튼 */}
@@ -1007,7 +1050,7 @@ function EditorContent() {
                               className="flex items-center gap-1.5 px-4 h-[38px] bg-gradient-to-b from-[#1a4b8c] to-[#0c3161] border border-[#0a274d] text-white rounded-lg text-[13px] font-black hover:from-[#15407a] hover:to-[#092244] transition-all cursor-pointer active:scale-95 shadow-md shadow-blue-900/20"
                             >
                               <RuleIcon sx={{ fontSize: 16 }} />
-                              개정(저장)
+                              개정처리
                             </button>
                           )}
                           {/* 삭제 토글 버튼 */}
