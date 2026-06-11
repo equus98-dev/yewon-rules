@@ -454,7 +454,7 @@ function EditorContent() {
     <div className="h-full flex flex-col bg-slate-50 overflow-hidden text-slate-800">
       
       {/* ==================== 1. 상단 규정 선택 & 메타 폼 ==================== */}
-      <div className="bg-white border-b border-slate-200 p-6 space-y-4 shrink-0 z-10 shadow-sm">
+      <div className="bg-[#008080]/10 border-b border-slate-200 p-6 space-y-4 shrink-0 z-10 shadow-sm">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 select-none">
           <div className="flex items-center gap-3">
             <Link
