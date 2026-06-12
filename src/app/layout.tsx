@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
+import ChatbotWidget from "@/components/ChatbotWidget";
 
 export const runtime = "edge";
 
@@ -26,7 +27,10 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-sans bg-slate-50 min-h-screen">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <ChatbotWidget />
+        </ThemeProvider>
       </body>
     </html>
   );
