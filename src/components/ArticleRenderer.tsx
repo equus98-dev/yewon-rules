@@ -44,8 +44,41 @@ export default function ArticleRenderer({
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editItems, setEditItems] = useState<ContentItem[]>([]);
+  const [editHtml, setEditHtml] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [editHistory, setEditHistory] = useState<{ id: string, createdAt: string, beforeText: string }[]>([]);
+
+  const renderEditButton = () => {
+    if (!isAdmin) return null;
+    return (
+      <button 
+        onClick={() => {
+          if (window.confirm("본 수정기능은 규정개정이 아닌 단순오타만 수정이 가능합니다.\n개정이 필요한 경우 입안편집기를 이용하시기 바랍니다.")) {
+            if (contentHtml && contentHtml.trim().length > 0) {
+              setEditHtml(contentHtml);
+              setEditItems([]);
+            } else {
+              setEditHtml(null);
+              setEditItems(JSON.parse(JSON.stringify(items)));
+            }
+            setIsEditing(true);
+            if (articleId) {
+              fetch(`/api/admin/articles/${articleId}`)
+                .then(res => res.json() as any)
+                .then(data => {
+                  if (data.history) setEditHistory(data.history);
+                })
+                .catch(err => console.error("History fetch error:", err));
+            }
+          }
+        }}
+        className="absolute -left-8 top-1 w-6 h-6 shrink-0 flex items-center justify-center rounded mt-0.5 cursor-pointer transition-colors bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 hover:text-green-700 z-10"
+        title="이 조항 텍스트 바로 수정하기"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+      </button>
+    );
+  };
 
   const handleOpenHistory = async (dates: string[]) => {
     if (!articleId) {
@@ -176,7 +209,8 @@ export default function ArticleRenderer({
     }
 
     return (
-      <div id={id} className="animate-fade-in rule-viewer-content font-['Pretendard'] w-full">
+      <div id={id} className="animate-fade-in rule-viewer-content font-['Pretendard'] w-full relative group">
+        {renderEditButton()}
         {articleNumber >= 9000 && (
           <div className="mt-16 mb-8 border-t-2 border-slate-300 pt-10 text-left w-full">
             <span className="text-[20px] font-black text-[#000080] tracking-tight">{title}</span>
@@ -607,7 +641,8 @@ export default function ArticleRenderer({
   }
 
   return (
-    <div id={id} className="mb-2 animate-fade-in rule-viewer-content font-['Pretendard']">
+    <div id={id} className="mb-2 animate-fade-in rule-viewer-content font-['Pretendard'] relative group">
+      {renderEditButton()}
       {displayItems.map((item, index) => {
         if (!item || typeof item !== 'object') return null;
 
@@ -685,28 +720,6 @@ export default function ArticleRenderer({
 
             return (
               <div className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
-                {isAdmin && (
-                  <button 
-                    onClick={() => {
-                      if (window.confirm("본 수정기능은 규정개정이 아닌 단순오타만 수정이 가능합니다.\n개정이 필요한 경우 입안편집기를 이용하시기 바랍니다.")) {
-                        setEditItems(JSON.parse(JSON.stringify(items)));
-                        setIsEditing(true);
-                        if (articleId) {
-                          fetch(`/api/admin/articles/${articleId}`)
-                            .then(res => res.json() as any)
-                            .then(data => {
-                              if (data.history) setEditHistory(data.history);
-                            })
-                            .catch(err => console.error("History fetch error:", err));
-                        }
-                      }
-                    }}
-                    className="w-5 h-5 shrink-0 flex items-center justify-center rounded mt-0.5 cursor-pointer transition-colors bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 hover:text-green-700"
-                    title="이 조항 텍스트 바로 수정하기"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                  </button>
-                )}
                 {!hideHistory && !isAddendum && (
                   <button 
                     onClick={() => handleOpenHistory(historyDates)}
@@ -924,21 +937,30 @@ export default function ArticleRenderer({
             ⚠️ 이 기능은 띄어쓰기나 단순 오타 수정에만 사용하십시오. 규정 내용 자체의 개정이 필요할 경우 반드시 [입안편집기]를 통해 개정안을 기안해야 합니다.
           </div>
           <div className="space-y-3 bg-white p-4 border border-slate-200 rounded-lg shadow-inner max-h-[50vh] overflow-y-auto scrollbar">
-            {editItems.map((item, idx) => (
-              <div key={idx} className="flex gap-3 items-start relative">
-                {item.num && <span className="font-bold shrink-0 mt-2.5 text-[#0c3161] whitespace-nowrap min-w-[1.5rem]">{item.num}</span>}
-                <textarea
-                  className="w-full border border-slate-300 rounded p-2.5 text-[14px] text-slate-800 focus:outline-none focus:border-blue-500 min-h-[60px] resize-y shadow-sm transition-colors focus:bg-blue-50/20 leading-relaxed font-['Pretendard']"
-                  value={item.text}
-                  onChange={(e) => {
-                    const newItems = [...editItems];
-                    newItems[idx].text = e.target.value;
-                    setEditItems(newItems);
-                  }}
-                  placeholder="텍스트를 입력하세요"
+            {editHtml !== null ? (
+               <textarea
+                  className="w-full border border-slate-300 rounded p-2.5 text-[14px] text-slate-800 focus:outline-none focus:border-blue-500 min-h-[300px] resize-y shadow-sm transition-colors focus:bg-blue-50/20 leading-relaxed font-mono"
+                  value={editHtml}
+                  onChange={(e) => setEditHtml(e.target.value)}
+                  placeholder="HTML 코드를 수정하세요"
                 />
-              </div>
-            ))}
+            ) : (
+              editItems.map((item, idx) => (
+                <div key={idx} className="flex gap-3 items-start relative">
+                  {item.num && <span className="font-bold shrink-0 mt-2.5 text-[#0c3161] whitespace-nowrap min-w-[1.5rem]">{item.num}</span>}
+                  <textarea
+                    className="w-full border border-slate-300 rounded p-2.5 text-[14px] text-slate-800 focus:outline-none focus:border-blue-500 min-h-[60px] resize-y shadow-sm transition-colors focus:bg-blue-50/20 leading-relaxed font-['Pretendard']"
+                    value={item.text}
+                    onChange={(e) => {
+                      const newItems = [...editItems];
+                      newItems[idx].text = e.target.value;
+                      setEditItems(newItems);
+                    }}
+                    placeholder="텍스트를 입력하세요"
+                  />
+                </div>
+              ))
+            )}
           </div>
           {editHistory.length > 0 && (
             <div className="mt-4 bg-slate-100 rounded p-4 border border-slate-200">
@@ -974,18 +996,29 @@ export default function ArticleRenderer({
                 if (!articleId) return;
                 setIsSaving(true);
                 try {
-                  const newText = editItems.map(i => {
-                    if (i.type === 'article' || i.type === 'text') return i.text;
-                    if (i.type === 'paragraph') return i.num ? `${i.num} ${i.text}` : i.text;
-                    return `${i.num} ${i.text}`;
-                  }).join('\n');
+                  let bodyPayload: any = {};
+                  if (editHtml !== null) {
+                    bodyPayload = {
+                      contentText: contentText || "",
+                      contentJson: contentJson || {},
+                      contentHtml: editHtml
+                    };
+                  } else {
+                    const newText = editItems.map(i => {
+                      if (i.type === 'article' || i.type === 'text') return i.text;
+                      if (i.type === 'paragraph') return i.num ? `${i.num} ${i.text}` : i.text;
+                      return `${i.num} ${i.text}`;
+                    }).join('\n');
+                    bodyPayload = {
+                      contentText: newText,
+                      contentJson: editItems
+                    };
+                  }
+
                   const res = await fetch(`/api/admin/articles/${articleId}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      contentText: newText,
-                      contentJson: editItems
-                    })
+                    body: JSON.stringify(bodyPayload)
                   });
                   if (!res.ok) throw new Error('저장 실패');
                   alert('성공적으로 수정되었습니다.');
