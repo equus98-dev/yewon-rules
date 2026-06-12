@@ -445,8 +445,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         setPopupState({ isOpen: true, title: popupTitle, isLoading: true, error: null, articleData: null });
         
         try {
-          // If ruleName is empty or refers to the current rule
-          const isCurrentRule = !ruleName || ruleName.includes("이 규정") || ruleName.includes("본 규정") || ruleName.includes("동 규정") || (ruleData?.title && ruleData.title.includes(ruleName));
+          const cleanRuleName = ruleName.replace(/\s/g, '');
+          const isCurrentRule = !ruleName || cleanRuleName.includes("이규정") || cleanRuleName.includes("본규정") || cleanRuleName.includes("동규정") || (ruleData?.title && ruleData.title.replace(/\s/g, '').includes(cleanRuleName));
           
           if (isCurrentRule) {
              const articleMatch = ruleData?.currentRevision?.articles?.find((a: any) => {

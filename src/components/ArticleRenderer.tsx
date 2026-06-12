@@ -402,13 +402,13 @@ export default function ArticleRenderer({
       (match) => `<span class="text-sky-700 font-medium text-[13px] ml-1">${normalizeHistoryDate(match).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
     );
 
-    const citationRegexStr = "(([가-힣]+(?:\\s+[가-힣]+)*)\\s+)?(제\\s*\\d+\\s*조(?:의\\s*\\d+)?(?:\\s*제\\s*\\d+\\s*항)?)";
+    const citationRegexStr = "(?:((?:(?:이|본|동)\\s*)?규정|(?:(?:[가-힣]+\\s+){1,3})?(?:정관|학칙|법|령|규칙|지침|내규|헌장))\\s+)?(제\\s*\\d+\\s*조(?:의\\s*\\d+)?(?:\\s*제\\s*\\d+\\s*항)?)";
     
     // 테이블 등 HTML 태그가 포함되어 있다면 dangerouslySetInnerHTML 사용
     if (/<table|<tr|<td|<th|<br|<p/i.test(htmlText)) {
       htmlText = htmlText.replace(new RegExp(citationRegexStr, 'g'), (match, p1, p2, p3) => {
         if (p2 && (p2.endsWith("장") || p2.endsWith("절") || p2.endsWith("관"))) return match;
-        return `<a href="#" class="cited-article-link text-blue-600 hover:underline font-medium" data-rule-name="${p2 || ''}" data-article="${p3}">${match}</a>`;
+        return `<a href="#" class="cited-article-link text-sky-700 font-bold underline underline-offset-2" data-rule-name="${p1 || ''}" data-article="${p2}">${match}</a>`;
       });
       return (
         <div 
@@ -435,8 +435,8 @@ export default function ArticleRenderer({
         }
         
         const fullMatch = match[0];
-        const ruleName = match[2] ? match[2].trim() : "";
-        const article = match[3] ? match[3].trim() : "";
+        const ruleName = match[1] ? match[1].trim() : "";
+        const article = match[2] ? match[2].trim() : "";
         
         if (ruleName.endsWith("장") || ruleName.endsWith("절") || ruleName.endsWith("관")) {
            subParts.push(fullMatch);
@@ -445,7 +445,7 @@ export default function ArticleRenderer({
              <a 
                key={`${i}-${match.index}`} 
                href="#" 
-               className="cited-article-link text-blue-600 hover:underline font-medium" 
+               className="cited-article-link text-sky-700 font-bold underline underline-offset-2" 
                data-rule-name={ruleName} 
                data-article={article}
                onClick={(e) => e.preventDefault()}
