@@ -592,16 +592,26 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       if (!targetArticle) throw new Error("조문을 찾을 수 없습니다.");
       
       const selectedText = manualCitationData.selectedText;
-      const regex = new RegExp(`\\[cite[^\\]]*\\]${selectedText.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\[\\/cite\\]`, 'g');
+      
+      // 선택 영역(selectedText)에 포함되거나, 겹치는 인용 링크의 태그를 모두 벗겨냅니다.
+      const removeCitations = (content: string) => {
+        if (!content) return content;
+        return content.replace(/\[cite[^\]]*\](.*?)\[\/cite\]/g, (match, innerText) => {
+          if (selectedText.includes(innerText) || innerText.includes(selectedText)) {
+            return innerText;
+          }
+          return match;
+        });
+      };
       
       let newContentText = targetArticle.contentText;
-      if (newContentText) newContentText = newContentText.replace(regex, selectedText);
+      if (newContentText) newContentText = removeCitations(newContentText);
       
       let newContentJson = typeof targetArticle.contentJson === 'string' ? targetArticle.contentJson : JSON.stringify(targetArticle.contentJson);
-      if (newContentJson) newContentJson = newContentJson.replace(regex, selectedText);
+      if (newContentJson) newContentJson = removeCitations(newContentJson);
       
       let newContentHtml = targetArticle.contentHtml;
-      if (newContentHtml) newContentHtml = newContentHtml.replace(regex, selectedText);
+      if (newContentHtml) newContentHtml = removeCitations(newContentHtml);
 
       const res = await fetch(`/api/admin/articles/${manualCitationData.articleId}`, {
         method: "PATCH",
