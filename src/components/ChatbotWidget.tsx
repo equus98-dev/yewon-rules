@@ -96,10 +96,11 @@ export default function ChatbotWidget() {
           className="fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-tr from-[#0c3161] via-[#009b9e] to-[#eab308] hover:opacity-90 text-white rounded-full shadow-xl flex items-center justify-center transition-transform hover:scale-110 z-50 animate-bounce group"
           aria-label="챗봇 열기"
         >
+          {/* 동동 떠다니는 Hi~ 텍스트 */}
+          <div className="absolute -top-10 right-1 bg-white text-slate-800 text-[13px] font-bold px-3 py-1.5 rounded-2xl rounded-br-sm shadow-md flex items-center justify-center border border-slate-100">
+            Hi~ 👋
+          </div>
           <CuteRobotIcon width={32} height={32} />
-          <span className="absolute -top-10 right-0 bg-white text-slate-800 text-sm font-bold px-3 py-1.5 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-            AI 규정 어시스턴트
-          </span>
         </button>
       )}
 
