@@ -97,7 +97,7 @@ export default function ChatbotWidget() {
           aria-label="챗봇 열기"
         >
           {/* 동동 떠다니는 Hi~ 텍스트 */}
-          <div className="absolute -top-10 right-1 bg-white text-slate-800 text-[13px] font-bold px-3 py-1.5 rounded-2xl rounded-br-sm shadow-md flex items-center justify-center border border-slate-100">
+          <div className="absolute bottom-[110%] right-0 bg-white text-slate-800 text-[13px] font-bold px-3 py-1.5 rounded-2xl rounded-br-sm shadow-md flex items-center justify-center border border-slate-100">
             Hi~ 👋
           </div>
           <CuteRobotIcon width={32} height={32} />
