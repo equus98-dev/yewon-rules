@@ -1,0 +1,11 @@
+├ Checking if file needs uploading
+│
+├ 🌀 Uploading f448ab63-128a-4e09-a1e1-02095e73d92e.94831f34b05b2015.sql
+│ 🌀 Uploading complete.
+│
+
+{
+  "error": {
+    "text": "no such column: Ru.name at offset 140: SQLITE_ERROR"
+  }
+}

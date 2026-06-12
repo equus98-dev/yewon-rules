@@ -556,12 +556,14 @@ export default function ArticleRenderer({
              }
              lineClass += " ml-4 block";
           } else if (/^제\d+조/.test(trimmed) && !/[『「]$/.test(trimmed.slice(0, trimmed.search(/제\d+조/)))) {
-             const match = trimmed.match(/^(제\d+조의?\d*)\s*[\[〔(（]([^\]〕)）]+)[\]〕)）](.*)/);
-             if (match) {
-                 const articleNum = match[1];
-                 const articleTitle = match[2];
-                 const body = match[3].trim();
-                 const fullTitle = `${articleNum}(${articleTitle})`;
+             const match2 = trimmed.match(/^(제\d+조(?:의|\s+)?\d*)\s*(.*)/);
+             if (match2) {
+                 let articleNum = match2[1].replace(/\s/g, '');
+                 if (articleNum.match(/^제\d+조\d+$/)) {
+                     articleNum = articleNum.replace(/조(\d+)$/, '조의$1');
+                 }
+                 const body = match2[2].trim();
+                 const fullTitle = articleNum;
                  const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
                  return (
                     <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
@@ -729,11 +731,12 @@ export default function ArticleRenderer({
             let parsedTitle = "";
             
             const safeText = String(articleItem.text || "").trim();
-            const isAddendum = /^부\s*칙/.test(safeText) || safeText.replace(/\s+/g, "").startsWith("부칙");
-            const { historyDates, badgeType, badgeColor } = getBadgeInfo(safeText);
+            const plainText = safeText.replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim();
+            const isAddendum = /^부\s*칙/.test(plainText) || plainText.replace(/\s+/g, "").startsWith("부칙");
+            const { historyDates, badgeType, badgeColor } = getBadgeInfo(plainText);
             
-            if (safeText.startsWith("(") && !/^\((삭제|개정|신설|전문개정|본조신설)/.test(safeText)) {
-              const match = safeText.match(/^(\([^)]+\))(.*)/);
+            if (plainText.startsWith("(") && !/^\((삭제|개정|신설|전문개정|본조신설)/.test(plainText)) {
+              const match = plainText.match(/^(\([^)]+\))(.*)/);
               if (match) {
                 parsedTitle = match[1];
               }
@@ -754,7 +757,7 @@ export default function ArticleRenderer({
                     {isAddendum ? (
                       <>
                         {(() => {
-                          let addendumBody = safeText;
+                          let addendumBody = plainText;
                           if (title && addendumBody.startsWith(title.trim())) {
                               addendumBody = addendumBody.substring(title.trim().length).trim();
                           } else {
@@ -775,8 +778,39 @@ export default function ArticleRenderer({
                       </>
                     ) : (
                       <>
-                        <span className="font-bold mr-1 text-[#000080]">{safeNum}{parsedTitle}</span>
-                        {safeText.replace(parsedTitle, "").trim() && <span className="font-normal">{renderTextWithHistory(safeText.replace(parsedTitle, "").trim())}</span>}
+                        {(() => {
+                          let articleTitleOverride = parsedTitle;
+                          let articleNumOverride = safeNum;
+                          let actualBody = plainText.replace(parsedTitle, "").trim();
+
+                          if (!safeNum && /^제\d+조/.test(plainText)) {
+                            const match = plainText.match(/^(제\d+조(?:의|\s+)?\d*)\s*[\[〔(（]([^\]〕)）]+)[\]〕)）](.*)/);
+                            if (match) {
+                               articleNumOverride = match[1].replace(/\s/g, '');
+                               if (articleNumOverride.match(/^제\d+조\d+$/)) {
+                                   articleNumOverride = articleNumOverride.replace(/조(\d+)$/, '조의$1');
+                               }
+                               articleTitleOverride = `(${match[2]})`;
+                               actualBody = match[3].trim();
+                            } else {
+                               const match2 = plainText.match(/^(제\d+조(?:의|\s+)?\d*)\s*(.*)/);
+                               if (match2) {
+                                   articleNumOverride = match2[1].replace(/\s/g, '');
+                                   if (articleNumOverride.match(/^제\d+조\d+$/)) {
+                                       articleNumOverride = articleNumOverride.replace(/조(\d+)$/, '조의$1');
+                                   }
+                                   actualBody = match2[2].trim();
+                               }
+                            }
+                          }
+
+                          return (
+                            <>
+                              <span className="font-bold mr-1 text-[#000080]">{articleNumOverride}{articleTitleOverride}</span>
+                              {actualBody && <span className="font-normal">{renderTextWithHistory(actualBody)}</span>}
+                            </>
+                          );
+                        })()}
                       </>
                     )}
                   </div>
@@ -786,13 +820,14 @@ export default function ArticleRenderer({
           })();
 
         } else if (item.type === "paragraph") {
-          const isGlued = /^제\d+조/.test(safeText.trim()) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(safeText) || /(?<!^|\s)[①-⑮]/.test(safeText);
+          const plainText = String(item.text || "").replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim();
+          const isGlued = /^제\d+조/.test(plainText) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(plainText) || /(?<!^|\s)[①-⑮]/.test(plainText);
           if (isGlued) {
-            const isTopLevelArticle = /^제\d+조/.test(safeText.trim());
+            const isTopLevelArticle = /^제\d+조/.test(plainText);
             return (
               <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'}`}>
                 <span className="font-normal mr-1">{safeNum}</span>
-                {formatGluedText(safeText, false)}
+                {formatGluedText(plainText, false)}
               </div>
             );
           }

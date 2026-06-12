@@ -124,8 +124,21 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             const regex = /(제\d+조의?\s*\d*\s*\([^)]+\))/g;
             let match;
             let foundArticle = false;
+
+            const formatTocArticleTitle = (title: string) => {
+              const match = title.match(/^(제\d+조(?:의|\s+)?\d*)(.*)/);
+              if (match) {
+                let numPart = match[1].replace(/\s/g, '');
+                if (numPart.match(/^제\d+조\d+$/)) {
+                  numPart = numPart.replace(/조(\d+)$/, '조의$1');
+                }
+                return numPart + match[2];
+              }
+              return title;
+            };
+
             while ((match = regex.exec(textToScan)) !== null) {
-              const fullTitle = match[1];
+              const fullTitle = formatTocArticleTitle(match[1]);
               const articleNumMatch = fullTitle.match(/^(제\d+조의?\s*\d*)/);
               const articleNum = articleNumMatch ? articleNumMatch[1].replace(/\s/g, '') : fullTitle.replace(/\s/g, '');
               if (!toc.some(t => t.id === `toc-${articleNum}`)) {
@@ -136,12 +149,26 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             if (!foundArticle && a.articleNumber < 8000 && a.title) {
               const expectedTitleStart = `제${a.articleNumber}조`;
               const titleStr = /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title.trim()})`;
-              toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: titleStr });
+              const formattedTitleStr = formatTocArticleTitle(titleStr);
+              toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: formattedTitleStr });
             }
           } else if (a.articleNumber < 8000 && a.title) {
             const expectedTitleStart = `제${a.articleNumber}조`;
             const titleStr = /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title.trim()})`;
-            toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: titleStr });
+            
+            const formatTocArticleTitle = (title: string) => {
+              const match = title.match(/^(제\d+조(?:의|\s+)?\d*)(.*)/);
+              if (match) {
+                let numPart = match[1].replace(/\s/g, '');
+                if (numPart.match(/^제\d+조\d+$/)) {
+                  numPart = numPart.replace(/조(\d+)$/, '조의$1');
+                }
+                return numPart + match[2];
+              }
+              return title;
+            };
+            const formattedTitleStr = formatTocArticleTitle(titleStr);
+            toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: formattedTitleStr });
           }
           return;
         }
@@ -183,11 +210,25 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         if (a.title && a.articleNumber < 8000) {
            const expectedTitleStart = `제${a.articleNumber}조`;
            const titleStr = /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title.trim()})`;
-           const titleMatch = titleStr.match(/^(제\d+조의?\s*\d*)/);
+           
+           const formatTocArticleTitle = (title: string) => {
+             const match = title.match(/^(제\d+조(?:의|\s+)?\d*)(.*)/);
+             if (match) {
+               let numPart = match[1].replace(/\s/g, '');
+               if (numPart.match(/^제\d+조\d+$/)) {
+                 numPart = numPart.replace(/조(\d+)$/, '조의$1');
+               }
+               return numPart + match[2];
+             }
+             return title;
+           };
+           const formattedTitleStr = formatTocArticleTitle(titleStr);
+
+           const titleMatch = formattedTitleStr.match(/^(제\d+조의?\s*\d*)/);
            if (titleMatch) {
               const titleNum = titleMatch[1].replace(/\s/g, '');
               if (!toc.some(t => t.id === `toc-${titleNum}`)) {
-                 toc.push({ type: "article", id: `toc-${titleNum}`, text: titleStr });
+                 toc.push({ type: "article", id: `toc-${titleNum}`, text: formattedTitleStr });
               }
            }
         }
@@ -198,8 +239,21 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           if (typeof item === 'string') {
             const regex = /(제\d+조의?\s*\d*\s*\([^)]+\))/g;
             let match;
+            
+            const formatTocArticleTitle = (title: string) => {
+              const match = title.match(/^(제\d+조(?:의|\s+)?\d*)(.*)/);
+              if (match) {
+                let numPart = match[1].replace(/\s/g, '');
+                if (numPart.match(/^제\d+조\d+$/)) {
+                  numPart = numPart.replace(/조(\d+)$/, '조의$1');
+                }
+                return numPart + match[2];
+              }
+              return title;
+            };
+
             while ((match = regex.exec(item)) !== null) {
-              const fullTitle = match[1];
+              const fullTitle = formatTocArticleTitle(match[1]);
               const articleNumMatch = fullTitle.match(/^(제\d+조의?\s*\d*)/);
               const articleNum = articleNumMatch ? articleNumMatch[1].replace(/\s/g, '') : fullTitle.replace(/\s/g, '');
               if (!toc.some(t => t.id === `toc-${articleNum}`)) {
@@ -236,8 +290,21 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             // Extract glued articles: "제N조(제목)"
             const regex = /(제\d+조의?\d*\([^)]+\))/g;
             let match;
+            
+            const formatTocArticleTitle = (title: string) => {
+              const match = title.match(/^(제\d+조(?:의|\s+)?\d*)(.*)/);
+              if (match) {
+                let numPart = match[1].replace(/\s/g, '');
+                if (numPart.match(/^제\d+조\d+$/)) {
+                  numPart = numPart.replace(/조(\d+)$/, '조의$1');
+                }
+                return numPart + match[2];
+              }
+              return title;
+            };
+
             while ((match = regex.exec(safeText)) !== null) {
-              const fullTitle = match[1];
+              const fullTitle = formatTocArticleTitle(match[1]);
               const articleNumMatch = fullTitle.match(/^(제\d+조의?\d*)/);
               const articleNum = articleNumMatch ? articleNumMatch[1] : fullTitle;
               

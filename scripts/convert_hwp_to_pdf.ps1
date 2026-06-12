@@ -1,64 +1,42 @@
-$ErrorActionPreference = "Stop"
-
-$attachmentsDir = Join-Path $PSScriptRoot "..\public\attachments"
-$hwpFiles = Get-ChildItem -Path $attachmentsDir -Filter "*.hwp"
-
-if ($hwpFiles.Count -eq 0) {
-    Write-Host "No HWP files found in $attachmentsDir"
-    exit 0
-}
-
-Write-Host "Found $($hwpFiles.Count) HWP files. Attempting to start Hancom Office Automation..."
+$ErrorActionPreference = "Continue"
 
 try {
-    $hwp = New-Object -ComObject HwpFrame.HwpObject
+    $hwp = New-Object -ComObject HWPFrame.HwpObject
     $hwp.XHwpWindows.Item(0).Visible = $false
-    Write-Host "Hancom Office started successfully."
+    Write-Host "Hancom Office Started"
+
+    $dirs = @(
+        (Join-Path (Get-Location).Path "public\attachments"),
+        (Join-Path (Get-Location).Path "public\rules")
+    )
+
+    foreach ($dir in $dirs) {
+        if (Test-Path $dir) {
+            $files = Get-ChildItem -Path $dir -Filter "*.hwp" -File
+            foreach ($file in $files) {
+                $pdfName = [System.IO.Path]::ChangeExtension($file.Name, ".pdf")
+                $pdfPath = Join-Path $dir $pdfName
+                
+                $success = $hwp.Open($file.FullName, "HWP", "forceopen:true")
+                if ($success) {
+                    $hwp.SaveAs($pdfPath, "PDF", "")
+                    Write-Host "Converted: $pdfName"
+                    # Wait for saving to complete
+                    Start-Sleep -Milliseconds 500
+                } else {
+                    Write-Host "Failed to open: $($file.FullName)"
+                }
+                # Clear document so next open works reliably
+                $hwp.Clear(1) | Out-Null
+            }
+        }
+    }
 } catch {
-    Write-Host "Error: Failed to start Hancom Office. Please ensure Hancom Office is installed."
-    Write-Host $_.Exception.Message
-    exit 1
-}
-
-$successCount = 0
-$errorCount = 0
-
-foreach ($file in $hwpFiles) {
-    $pdfPath = [System.IO.Path]::ChangeExtension($file.FullName, ".pdf")
-    
-    if (Test-Path $pdfPath) {
-        Write-Host "Skipping (PDF already exists): $($file.Name)"
-        continue
-    }
-
-    Write-Host "Converting: $($file.Name)..."
-    
-    try {
-        # Open HWP file
-        $hwp.Open($file.FullName, "HWP", "forceopen:true") | Out-Null
-        
-        # Save as PDF
-        # PDF format code is "PDF"
-        $hwp.SaveAs($pdfPath, "PDF", "") | Out-Null
-        
-        # Close document
-        $hwp.Clear(1) | Out-Null
-        
-        $successCount++
-    } catch {
-        Write-Host "Failed to convert $($file.Name): $($_.Exception.Message)"
-        $errorCount++
-        try {
-            $hwp.Clear(1) | Out-Null
-        } catch {}
+    Write-Host "Error: $_"
+} finally {
+    if ($hwp) {
+        $hwp.Quit()
+        [System.Runtime.Interopservices.Marshal]::ReleaseComObject($hwp) | Out-Null
     }
 }
-
-Write-Host "`nConversion completed."
-Write-Host "Successfully converted: $successCount files"
-Write-Host "Errors: $errorCount"
-
-try {
-    $hwp.Quit()
-    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($hwp) | Out-Null
-} catch {}
+Write-Host "Done!"
