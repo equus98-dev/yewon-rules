@@ -53,7 +53,7 @@ export default function ManualCitationModal({
     <Modal open={isOpen} onClose={isSaving ? undefined : onClose}>
       <Box sx={modalStyle}>
         <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
-          수동 인용 연결
+          외부 법령 수동 연결
         </Typography>
         
         <Box sx={{ mb: 3, p: 2, bgcolor: '#f8fafc', borderRadius: 1, border: '1px solid #e2e8f0' }}>
@@ -65,10 +65,26 @@ export default function ManualCitationModal({
           </Typography>
         </Box>
 
+        <Box sx={{ mb: 3 }}>
+          <Button 
+            variant="outlined" 
+            size="small" 
+            color="info" 
+            fullWidth
+            onClick={() => window.open('https://www.law.go.kr/main.html', '_blank')}
+            sx={{ mb: 1, fontWeight: 'bold' }}
+          >
+            🏛️ 국가법령센터 열기 (새창)
+          </Button>
+          <Typography variant="caption" color="textSecondary" sx={{ display: 'block' }}>
+            * 새 창에서 국가법령센터를 띄워 법령을 검색한 후, 아래에 법령명과 조문을 직접 입력해주세요.
+          </Typography>
+        </Box>
+
         <TextField
           fullWidth
-          label="연결할 타 규정명 (선택)"
-          placeholder="예: 정관, 학칙 (비워두면 현재 규정)"
+          label="외부 법령명 (필수)"
+          placeholder="예: 근로기준법, 개인정보 보호법"
           value={ruleName}
           onChange={(e) => setRuleName(e.target.value)}
           margin="normal"
@@ -78,7 +94,7 @@ export default function ManualCitationModal({
         <TextField
           fullWidth
           label="연결할 조문 번호 (선택)"
-          placeholder="예: 제10조"
+          placeholder="예: 제10조 제1항"
           value={articleNum}
           onChange={(e) => setArticleNum(e.target.value)}
           margin="normal"
@@ -86,7 +102,7 @@ export default function ManualCitationModal({
         />
 
         <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mt: 1 }}>
-          * 현재 조문 내에 있는 동일한 텍스트 중 첫 번째 항목이 지정된 인용 링크로 변환됩니다.
+          * 현재 조문 내에 있는 동일한 텍스트 중 첫 번째 항목이 지정된 외부 법령 링크로 변환됩니다.
         </Typography>
 
         <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>

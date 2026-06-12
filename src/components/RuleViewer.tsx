@@ -85,6 +85,14 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   } | null>(null);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const [isManualModalSaving, setIsManualModalSaving] = useState(false);
+  const [isSelectMode, setIsSelectMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setIsSelectMode(params.get('selectMode') === 'true');
+    }
+  }, []);
 
   const handleScrollTop = () => {
     scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -576,6 +584,48 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     }
   };
 
+  const handleRemoveCitation = async () => {
+    if (!manualCitationData) return;
+    setIsManualModalSaving(true);
+    try {
+      const targetArticle = currentRevision?.articles?.find((a: any) => a.id === manualCitationData.articleId);
+      if (!targetArticle) throw new Error("조문을 찾을 수 없습니다.");
+      
+      const selectedText = manualCitationData.selectedText;
+      const regex = new RegExp(`\\[cite[^\\]]*\\]${selectedText.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\[\\/cite\\]`, 'g');
+      
+      let newContentText = targetArticle.contentText;
+      if (newContentText) newContentText = newContentText.replace(regex, selectedText);
+      
+      let newContentJson = typeof targetArticle.contentJson === 'string' ? targetArticle.contentJson : JSON.stringify(targetArticle.contentJson);
+      if (newContentJson) newContentJson = newContentJson.replace(regex, selectedText);
+      
+      let newContentHtml = targetArticle.contentHtml;
+      if (newContentHtml) newContentHtml = newContentHtml.replace(regex, selectedText);
+
+      const res = await fetch(`/api/admin/articles/${manualCitationData.articleId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contentText: newContentText,
+          contentJson: typeof targetArticle.contentJson === 'string' ? newContentJson : JSON.parse(newContentJson),
+          contentHtml: newContentHtml
+        }),
+      });
+      
+      if (!res.ok) throw new Error("업데이트 실패");
+      
+      alert("인용이 성공적으로 해제되었습니다.");
+      setManualCitationData(null);
+      window.getSelection()?.removeAllRanges();
+      window.dispatchEvent(new CustomEvent('rule-updated'));
+    } catch (e: any) {
+      alert("오류: " + e.message);
+    } finally {
+      setIsManualModalSaving(false);
+    }
+  };
+
   const handleManualCitationSave = async (ruleName: string, articleNum: string) => {
     if (!manualCitationData) return;
     setIsManualModalSaving(true);
@@ -647,6 +697,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 hideHistory={true}
                 hasHtmlAttachments={false}
                 isAdmin={false}
+                isSelectMode={isSelectMode}
+                ruleName={cleanTitle}
              />
           </div>
         )}
@@ -658,17 +710,46 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             position: 'fixed', 
             top: manualCitationData.position.top, 
             left: manualCitationData.position.left, 
-            transform: 'translate(-50%, -10px)',
+            transform: 'translate(-50%, -15px)',
             zIndex: 9999 
           }}
         >
-          <button
-            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }} 
-            onClick={() => setIsManualModalOpen(true)}
-            className="bg-sky-700 text-white px-3 py-1.5 rounded shadow-lg text-xs font-bold hover:bg-sky-800 cursor-pointer flex items-center gap-1 transition-colors"
-          >
-            🔗 인용 연결
-          </button>
+          <div className="bg-white border border-slate-200 rounded shadow-xl p-1 flex gap-1 text-xs font-bold text-slate-700 items-center animate-fade-in pointer-events-auto">
+            <button
+              onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }} 
+              onClick={() => {
+                const popup = window.open('/?selectMode=true', 'RuleSelector', 'width=1400,height=900,scrollbars=yes');
+                const handleMessage = (msg: MessageEvent) => {
+                  if (msg.data && msg.data.type === 'RULE_SELECTED') {
+                    handleManualCitationSave(msg.data.ruleName, msg.data.articleNum);
+                    window.removeEventListener('message', handleMessage);
+                  }
+                };
+                window.addEventListener('message', handleMessage);
+                setManualCitationData(null);
+                window.getSelection()?.removeAllRanges();
+              }}
+              className="px-2 py-1.5 rounded hover:bg-slate-100 flex items-center gap-1 transition-colors text-blue-700"
+            >
+              🏫 내부 연결
+            </button>
+            <div className="w-px h-3 bg-slate-300"></div>
+            <button
+              onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }} 
+              onClick={() => setIsManualModalOpen(true)}
+              className="px-2 py-1.5 rounded hover:bg-slate-100 flex items-center gap-1 transition-colors text-emerald-700"
+            >
+              ⚖️ 외부 연결
+            </button>
+            <div className="w-px h-3 bg-slate-300"></div>
+            <button
+              onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }} 
+              onClick={handleRemoveCitation}
+              className="px-2 py-1.5 rounded hover:bg-red-50 hover:text-red-700 flex items-center gap-1 transition-colors text-slate-600"
+            >
+              🗑️ 해제
+            </button>
+          </div>
         </div>
       )}
 
@@ -962,6 +1043,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         hasHtmlAttachments={hasHtmlAttachments}
                         isAdmin={isAdmin}
                         trailingTitles={trailingTitles}
+                        isSelectMode={isSelectMode}
+                        ruleName={cleanTitle}
                       />
                     </React.Fragment>
                   );
