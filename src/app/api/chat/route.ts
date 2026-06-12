@@ -4,13 +4,18 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createPool } from "@/lib/db";
 
+import { getRequestContext } from "@cloudflare/next-on-pages";
+
 export async function POST(req: Request) {
   let pool;
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const ctx = getRequestContext();
+    const env = ctx?.env as any;
+    const apiKey = env?.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+    
     if (!apiKey) {
       return NextResponse.json(
-        { reply: "서버에 GEMINI_API_KEY가 설정되어 있지 않습니다." },
+        { reply: "서버에 GEMINI_API_KEY가 설정되어 있지 않습니다. Cloudflare 설정에서 환경 변수를 추가해주세요." },
         { status: 500 }
       );
     }
@@ -65,7 +70,7 @@ ${contextText}
 3. 질문에 국가 법령 등과 비교하는 내용이 포함되어 있다면, 당신의 사전 학습된 지식을 바탕으로 대학 규정과 국가 법령 간의 차이나 비교 분석을 제공해 주세요.`;
 
     const chat = model.startChat({
-      history: history.slice(0, -1), // 제외: 마지막 사용자 메시지
+      history: history,
     });
 
     const result = await chat.sendMessage(systemPrompt + "\n\n사용자 질문: " + message);

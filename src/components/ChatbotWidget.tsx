@@ -64,16 +64,16 @@ export default function ChatbotWidget() {
         }),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch response");
-      }
-
       const data = await res.json() as any;
+
+      if (!res.ok) {
+        throw new Error(data.reply || data.error || "Failed to fetch response");
+      }
       
       setMessages(prev => [...prev, { role: "model", content: data.reply }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setMessages(prev => [...prev, { role: "model", content: "죄송합니다. 오류가 발생하여 답변을 생성하지 못했습니다." }]);
+      setMessages(prev => [...prev, { role: "model", content: error.message || "죄송합니다. 오류가 발생하여 답변을 생성하지 못했습니다." }]);
     } finally {
       setIsLoading(false);
     }
