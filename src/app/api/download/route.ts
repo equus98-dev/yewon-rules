@@ -26,11 +26,19 @@ export async function GET(request: Request) {
     // 한글 깨짐 방지를 위해 encodeURIComponent 사용
     const encodedFilename = encodeURIComponent(decodeURIComponent(filename));
 
-    // 스트림 파이프 및 헤더 설정으로 강제 다운로드
+    // 스트림 파이프 및 헤더 설정
+    const inline = searchParams.get("inline") === "true";
+    const disposition = inline ? "inline" : "attachment";
+    
+    let contentType = response.headers.get("Content-Type") || "application/octet-stream";
+    if (inline && encodedFilename.toLowerCase().endsWith(".pdf")) {
+       contentType = "application/pdf";
+    }
+
     return new Response(response.body, {
       headers: {
-        "Content-Disposition": `attachment; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`,
-        "Content-Type": response.headers.get("Content-Type") || "application/octet-stream",
+        "Content-Disposition": `${disposition}; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`,
+        "Content-Type": contentType,
       },
     });
   } catch (error) {
