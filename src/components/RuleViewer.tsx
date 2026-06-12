@@ -472,7 +472,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       
       {/* 1. 상단 타이틀 및 브레드크럼 */}
       <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-6 py-4 shrink-0 flex items-center justify-between z-10 shadow-sm relative">
-        <h1 className="text-2xl font-black text-[#007073] tracking-tight ml-2">{cleanTitle}</h1>
+        <h1 className="text-2xl font-black text-[#007073] tracking-tight ml-2">{ruleNumber ? `${ruleNumber} ` : ""}{cleanTitle}</h1>
         <div className="text-[14px] text-slate-500 font-medium tracking-wider">
           HOME &gt; 전자규정집 &gt; {category?.name || "분류"} &gt; <span className="font-bold text-slate-700">{cleanTitle}</span>
         </div>

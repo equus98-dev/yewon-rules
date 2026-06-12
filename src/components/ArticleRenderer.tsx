@@ -575,7 +575,7 @@ export default function ArticleRenderer({
                            {badgeType}
                          </button>
                        )}
-                       <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
+                       <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
                           <div className="w-full break-keep inline-block">
                              <span className="font-bold mr-1 text-[#000080]">{fullTitle}</span>
                              {body && <span className="font-normal text-slate-800">{renderTextWithHistory(body)}</span>}
@@ -584,7 +584,7 @@ export default function ArticleRenderer({
                     </div>
                  );
              } else {
-                 lineClass += " mt-4 mb-2 text-[14.5px] font-bold text-[#000080] block";
+                 lineClass += " mt-4 mb-2 text-[16px] font-bold text-[#000080] block";
              }
           } else if (/^부\s*칙/.test(trimmed)) {
              const match = trimmed.match(/^(?:부\s*칙\s*)+/);
@@ -611,7 +611,7 @@ export default function ArticleRenderer({
                            {badgeType}
                          </button>
                        )}
-                       <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
+                       <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
                           <div className="w-full break-keep inline-block">
                              <span className="font-bold mr-1 text-[#000080]">{titlePart}</span>
                              {body && <span className="font-normal text-slate-800">{renderTextWithHistory(body)}</span>}
@@ -620,7 +620,7 @@ export default function ArticleRenderer({
                     </div>
                  );
              } else {
-                 lineClass += " mt-8 mb-2 text-[14.5px] font-bold text-[#000080] block";
+                 lineClass += " mt-8 mb-2 text-[16px] font-bold text-[#000080] block";
              }
           } else if (/^제\d+장/.test(trimmed)) {
              lineClass += " mt-6 text-[18px] font-black text-center text-[#000080] block";
@@ -752,7 +752,7 @@ export default function ArticleRenderer({
                     {badgeType}
                   </button>
                 )}
-                <div className={`flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7] ${(!hideHistory && !isAddendum) ? "" : "ml-[28px]"}`}>
+                <div className={`flex-1 w-full group text-[16px] text-slate-800 leading-[1.7] ${(!hideHistory && !isAddendum) ? "" : "ml-[28px]"}`}>
                   <div id={`toc-${safeNum}`} className="w-full break-keep inline-block">
                     {isAddendum ? (
                       <>
@@ -825,14 +825,14 @@ export default function ArticleRenderer({
           if (isGlued) {
             const isTopLevelArticle = /^제\d+조/.test(plainText);
             return (
-              <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'}`}>
+              <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'}`}>
                 <span className="font-normal mr-1">{safeNum}</span>
                 {formatGluedText(plainText, false)}
               </div>
             );
           }
           return (
-            <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] pr-4 break-keep w-full" style={{ paddingLeft: '20px', textIndent: '-20px' }}>
+            <div key={index} className="text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full" style={{ paddingLeft: '20px', textIndent: '-20px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
             </div>
@@ -842,7 +842,7 @@ export default function ArticleRenderer({
 
           return (
             <React.Fragment key={index}>
-              <div className="text-slate-800 text-[14.5px] leading-[1.7] pr-4 break-keep w-full" style={{ paddingLeft: isAddendum ? '20px' : '36px', textIndent: isAddendum ? '-20px' : '-16px' }}>
+              <div className="text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full" style={{ paddingLeft: isAddendum ? '20px' : '36px', textIndent: isAddendum ? '-20px' : '-16px' }}>
                 <span className="font-normal mr-1">{safeNum}</span>
                 <span className="font-normal">{renderTextWithHistory(safeText)}</span>
               </div>
@@ -850,7 +850,7 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "subitem") {
           return (
-            <div key={index} className="text-slate-800 text-[14.5px] leading-[1.7] pr-4 break-keep w-full" style={{ paddingLeft: '52px', textIndent: '-16px' }}>
+            <div key={index} className="text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full" style={{ paddingLeft: '52px', textIndent: '-16px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
             </div>
@@ -871,7 +871,7 @@ export default function ArticleRenderer({
             }
             return (
               <div key={index} className="mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full">
-                <div className="flex-1 w-full group text-[14.5px] text-slate-800 leading-[1.7]">
+                <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
                   <div className="w-full break-keep inline-block">
                     <span className="font-bold mr-1 text-[#000080]">{title || "부칙"}</span>
                     {addendumBody && <span className="font-normal">{renderTextWithHistory(addendumBody)}</span>}
@@ -882,7 +882,7 @@ export default function ArticleRenderer({
           }
           const isGluedArticle = /^\s*제\d+(?:조|장|관|절)/.test(safeText);
           return (
-            <div key={index} className={`text-slate-800 text-[14.5px] leading-[1.7] w-full ${isGluedArticle ? '' : 'pl-[1.25rem]'} my-1.5`}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full ${isGluedArticle ? '' : 'pl-[1.25rem]'} my-1.5`}>
               {formatGluedText(safeText, false)}
             </div>
           );
@@ -931,7 +931,7 @@ export default function ArticleRenderer({
                         fullTextStr = `${item.num} ${textStr}`;
                       }
                       
-                      let itemClass = "text-[15px] leading-[1.8] text-slate-800 break-keep";
+                      let itemClass = "text-[16.5px] leading-[1.8] text-slate-800 break-keep";
                       
                       // 문서 양식 자동 스타일링 휴리스틱
                       if (i === 0 && fullTextStr.length < 30 && !item.num) {
