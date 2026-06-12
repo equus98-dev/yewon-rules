@@ -563,12 +563,12 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                   const mainGroups = groups.filter((g: any) => g.baseName.includes("[전문]") || (!g.baseName.includes("[별표]") && !g.baseName.includes("[별지]") && !g.baseName.includes("[서식]")));
                   const otherGroups = groups.filter((g: any) => !mainGroups.includes(g));
 
-                  const renderGroup = (group: any, idx: number) => {
+                  const renderGroup = (group: any, idx: number, isMain: boolean = false) => {
                       let pdfFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf"));
                       const hwpFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp"));
                       
-                      // HWP 파일만 있고 PDF가 DB에 등록되어 있지 않은 경우, 동일한 경로에 자동 변환된 PDF가 있다고 가정하고 객체 생성
-                      if (hwpFile && !pdfFile) {
+                      // HWP 파일만 있고 PDF가 DB에 등록되어 있지 않은 경우, 별표/별지에 대해서만 자동 변환된 PDF가 있다고 가정하고 객체 생성
+                      if (hwpFile && !pdfFile && !isMain) {
                         pdfFile = {
                           ...hwpFile,
                           title: hwpFile.title.replace(/\.hwp$/i, '.pdf'),
@@ -577,19 +577,21 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         };
                       }
                       
-                      const isExpanded = !!expandedAttachments[group.baseName];
+                      const isExpanded = !isMain && !!expandedAttachments[group.baseName];
 
                       return (
                         <div id={`toc-attach-${group.baseName}`} key={idx} className="border border-slate-300 rounded-lg overflow-hidden bg-white shadow-sm">
                           {/* Accordion Header */}
                           <div 
-                            className="bg-slate-50 hover:bg-slate-100 flex items-center justify-between px-4 py-3 cursor-pointer select-none border-b border-slate-200 transition-colors"
-                            onClick={() => setExpandedAttachments(prev => ({ ...prev, [group.baseName]: !isExpanded }))}
+                            className={`bg-slate-50 flex items-center justify-between px-4 py-3 select-none border-b border-slate-200 transition-colors ${isMain ? '' : 'hover:bg-slate-100 cursor-pointer'}`}
+                            onClick={() => !isMain && setExpandedAttachments(prev => ({ ...prev, [group.baseName]: !isExpanded }))}
                           >
                             <div className="flex items-center gap-2">
-                              <span className="text-slate-500 flex items-center justify-center">
-                                {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
-                              </span>
+                              {!isMain && (
+                                <span className="text-slate-500 flex items-center justify-center">
+                                  {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+                                </span>
+                              )}
                               {(() => {
                                 const match = group.baseName.match(/^\[(전문|별표|별지)\]\s*(.*)$/);
                                 if (match) {
@@ -632,7 +634,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                           </div>
 
                           {/* Accordion Body (PDF Viewer) */}
-                          {isExpanded && (
+                          {!isMain && isExpanded && (
                             <div className="bg-slate-100 p-0 w-full" style={{ height: "800px" }}>
                               {pdfFile ? (
                                 <iframe 
@@ -661,7 +663,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                               <h3 className="text-[20px] font-black text-[#004000] tracking-tight">규정 전문</h3>
                             </div>
                             <div className="space-y-4">
-                              {mainGroups.sort((a, b) => a.baseName.localeCompare(b.baseName)).map(renderGroup)}
+                              {mainGroups.sort((a, b) => a.baseName.localeCompare(b.baseName)).map((g, i) => renderGroup(g, i, true))}
                             </div>
                           </div>
                         )}
@@ -673,7 +675,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                               <h3 className="text-[20px] font-black text-[#000080] tracking-tight">별지 및 별표</h3>
                             </div>
                             <div className="space-y-4">
-                              {otherGroups.sort((a, b) => a.baseName.localeCompare(b.baseName)).map(renderGroup)}
+                              {otherGroups.sort((a, b) => a.baseName.localeCompare(b.baseName)).map((g, i) => renderGroup(g, i, false))}
                             </div>
                           </div>
                         )}
