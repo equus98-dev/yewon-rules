@@ -70,10 +70,19 @@ export async function POST(req: Request) {
 
     // 3. Gemini 호출
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel(
-      { model: "gemini-2.5-flash" }, 
-      { apiVersion: "v1beta" }
-    );
+    
+    // 무료 할당량(Quota) 초과 방지를 위해 여러 모델을 순차적으로 시도 (Fallback)
+    const fallbackModels = [
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-2.0-flash-lite",
+      "gemini-3.5-flash",
+      "gemini-pro-latest"
+    ];
+
+    let text = "";
+    let success = false;
+    let lastError: any = null;
 
     const systemPrompt = `당신은 예원예술대학교의 규정과 학칙을 친절하고 정확하게 안내하는 AI 어시스턴트입니다.
 답변할 때는 가독성을 위해 마크다운(Markdown)을 적절히 사용해 주세요.
@@ -87,13 +96,34 @@ ${contextText}
 2. 만약 질문 내용이 참고 자료에 없거나 대학교 규정과 관련이 없다면, "제공된 규정 자료에서는 해당 내용을 찾을 수 없습니다."라고 안내하세요.
 3. 질문에 국가 법령 등과 비교하는 내용이 포함되어 있다면, 당신의 사전 학습된 지식을 바탕으로 대학 규정과 국가 법령 간의 차이나 비교 분석을 제공해 주세요.`;
 
-    const chat = model.startChat({
-      history: history,
-    });
+    for (const modelName of fallbackModels) {
+      try {
+        const model = genAI.getGenerativeModel(
+          { model: modelName }, 
+          { apiVersion: "v1beta" }
+        );
 
-    const result = await chat.sendMessage(systemPrompt + "\n\n사용자 질문: " + message);
-    const response = await result.response;
-    const text = response.text();
+        const chat = model.startChat({
+          history: history,
+        });
+
+        const result = await chat.sendMessage(systemPrompt + "\\n\\n사용자 질문: " + message);
+        const response = await result.response;
+        text = response.text();
+        success = true;
+        break; // 모델 호출에 성공하면 루프 탈출
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[Chat API] ${modelName} 모델 호출 실패, 다음 모델 시도 중... 오류:`, err.message);
+      }
+    }
+
+    if (!success) {
+      if (lastError?.message?.includes("429") || lastError?.message?.includes("quota") || lastError?.message?.includes("Quota")) {
+        return NextResponse.json({ reply: "현재 AI 챗봇의 모든 무료 사용량이 소진되었습니다. 잠시 후 다시 시도해주시거나, 다른 질문을 남겨주세요." });
+      }
+      throw lastError || new Error("모든 AI 모델 호출에 실패했습니다.");
+    }
 
     return NextResponse.json({ reply: text });
 
