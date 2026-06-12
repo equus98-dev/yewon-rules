@@ -35,6 +35,7 @@ export default function AdminFilesManagement() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
   const [targetAttachmentId, setTargetAttachmentId] = useState<string | null>(null);
+  const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
 
   const handleSelectRule = (ruleId: string) => {
     // In SidebarTree we don't have the rule name directly from onSelectRule, 
@@ -50,6 +51,7 @@ export default function AdminFilesManagement() {
       if (!res.ok) throw new Error("Failed to load");
       const data = (await res.json()) as any;
       setAttachments(data);
+      setSelectedFileIds([]);
     } catch (e) {
       console.error(e);
       setAttachments([]);
@@ -130,6 +132,30 @@ export default function AdminFilesManagement() {
     }
   };
 
+  const handleToggleSelect = (id: string) => {
+    setSelectedFileIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleBatchDelete = async () => {
+    if (selectedFileIds.length === 0) return;
+    if (!confirm(`선택하신 ${selectedFileIds.length}개의 첨부파일을 일괄 삭제하시겠습니까?`)) return;
+    
+    let successCount = 0;
+    try {
+      for (const id of selectedFileIds) {
+         const res = await fetch(`/api/admin/files?id=${id}`, { method: "DELETE" });
+         if (res.ok) successCount++;
+      }
+      alert(`총 ${successCount}개의 파일이 삭제되었습니다.`);
+      setSelectedFileIds([]);
+      if (activeRule) loadAttachments(activeRule.id);
+    } catch (error: any) {
+      alert("일괄 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   // Divide files
   const mainFiles = attachments.filter(f => f.title.startsWith("[전문]"));
   const subFiles = attachments.filter(f => f.title.startsWith("[별표]") || f.title.startsWith("[별지]") || !f.title.startsWith("[전문]"));
@@ -151,6 +177,12 @@ export default function AdminFilesManagement() {
           return (
             <div key={file.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-blue-200 transition-colors">
               <div className="flex items-center gap-3 min-w-0">
+                <input 
+                  type="checkbox" 
+                  checked={selectedFileIds.includes(file.id)}
+                  onChange={() => handleToggleSelect(file.id)}
+                  className="w-4 h-4 cursor-pointer mr-1"
+                />
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border ${isPdf ? 'bg-red-50 border-red-100 text-red-600' : 'bg-blue-50 border-blue-100 text-blue-600'}`}>
                   <span className="font-black text-xs">{isPdf ? 'PDF' : 'HWP'}</span>
                 </div>
@@ -236,15 +268,27 @@ export default function AdminFilesManagement() {
                   <h3 className="font-black text-lg text-[#0c3161]">첨부파일 목록 및 업로드</h3>
                   <p className="text-xs text-slate-500 font-bold mt-1">파일의 유형을 구분하여 첨부하세요.</p>
                 </div>
-                <Button
-                  variant="contained"
-                  startIcon={<UploadFileIcon />}
-                  onClick={() => openUploadModal(null)}
-                  disabled={uploading === "new"}
-                  sx={{ bgcolor: "#0c3161", "&:hover": { bgcolor: "#092244" }, boxShadow: 'none' }}
-                >
-                  새 파일 첨부
-                </Button>
+                <div className="flex items-center gap-2">
+                  {selectedFileIds.length > 0 && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={handleBatchDelete}
+                      sx={{ fontWeight: 'bold' }}
+                    >
+                      선택 일괄 삭제 ({selectedFileIds.length})
+                    </Button>
+                  )}
+                  <Button
+                    variant="contained"
+                    startIcon={<UploadFileIcon />}
+                    onClick={() => openUploadModal(null)}
+                    disabled={uploading === "new"}
+                    sx={{ bgcolor: "#0c3161", "&:hover": { bgcolor: "#092244" }, boxShadow: 'none' }}
+                  >
+                    새 파일 첨부
+                  </Button>
+                </div>
               </div>
               
               <div className="flex-1 overflow-y-auto p-6 scrollbar bg-slate-50">
