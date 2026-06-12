@@ -250,19 +250,33 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     });
     
     // Add attachments from uploaded files to TOC
-    const uploadedAttachments = ruleData?.attachments?.filter((f: any) => f.title.startsWith("[별표]") || f.title.startsWith("[별지]")) || [];
+    const uploadedAttachments = ruleData?.attachments || [];
     
     if (uploadedAttachments.length > 0) {
       if (!toc.some((t: any) => t.id === "toc-attachments")) {
          toc.push({ type: "chapter", id: "toc-attachments", text: "별표/별지 목록" });
       }
-      // uploadedAttachments는 페이지 하단에 그룹별로 아코디언이 생기므로 거기로 이동할 수 있도록 id 부여
+      
+      const uniqueBaseNames = new Set<string>();
       uploadedAttachments.forEach((a: any) => {
         const baseName = a.title.replace(/\.[^/.]+$/, "");
-        if (!toc.some((t: any) => t.id === `toc-attach-${baseName}`)) {
-          const displayText = a.title.replace(/^\[(?:별표|별지|전문|서식)\]\s*([\d-]+\s*)?/, "");
-          toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: displayText });
+        if (!uniqueBaseNames.has(baseName)) {
+           uniqueBaseNames.add(baseName);
         }
+      });
+
+      Array.from(uniqueBaseNames).sort((a: any, b: any) => {
+         const aIsMain = a.includes("[전문]");
+         const bIsMain = b.includes("[전문]");
+         if (aIsMain && !bIsMain) return -1;
+         if (!aIsMain && bIsMain) return 1;
+         return a.localeCompare(b);
+      }).forEach((baseName: string) => {
+         if (!toc.some((t: any) => t.id === `toc-attach-${baseName}`)) {
+            const match = baseName.match(/\[(.*?)\]/);
+            const displayText = match ? match[1] : baseName;
+            toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: displayText });
+         }
       });
     }
     
@@ -536,8 +550,13 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
                 {/* Attachments Section */}
                 {attachments && attachments.length > 0 && (
-                  <div id="toc-attachments" className="mt-16 w-full space-y-4">
-                    {/* Group attachments by base name */}
+                  <div id="toc-attachments" className="mt-16 w-full">
+                    <div className="flex items-center gap-2 mb-6 border-b-2 border-slate-300 pb-3">
+                      <ArticleIcon className="text-blue-700" sx={{ fontSize: 24 }} />
+                      <h3 className="text-[20px] font-black text-[#000080] tracking-tight">별지 및 별표</h3>
+                    </div>
+                    <div className="space-y-4">
+                      {/* Group attachments by base name */}
                     {Object.values(
                       attachments.reduce((acc: any, file: any) => {
                         const baseName = file.title.replace(/\.[^/.]+$/, "");
@@ -641,6 +660,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         </div>
                       );
                     })}
+                    </div>
                   </div>
                 )}
               </div>
