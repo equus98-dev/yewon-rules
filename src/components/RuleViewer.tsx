@@ -601,9 +601,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                   return (
                                     <div className="flex items-center gap-2">
                                       <span className={`px-2 py-0.5 rounded text-[12px] font-black border ${
-                                        type === '전문' ? 'bg-slate-700 text-white border-slate-700' :
-                                        type === '별표' ? 'bg-rose-700 text-white border-rose-700' :
-                                        'bg-sky-700 text-white border-sky-700'
+                                        type === '전문' ? 'bg-slate-600/80 text-white border-slate-600/20' :
+                                        type === '별표' ? 'bg-rose-600/80 text-white border-rose-600/20' :
+                                        'bg-sky-600/80 text-white border-sky-600/20'
                                       }`}>
                                         {type}
                                       </span>
