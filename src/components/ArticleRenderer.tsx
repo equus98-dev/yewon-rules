@@ -490,7 +490,7 @@ export default function ArticleRenderer({
       })
       .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])\s*\n([①-⑮])/g, '$1 $2')
       .replace(/((?<![『「])제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])/g, '\n\n$1')
-      .replace(/(제\d+(?:장|절|관)\s+[^\s]+)/g, '\n\n$1')
+      .replace(/(제\d+(?:장|절|관)\s+(?!(?:제\d+|및|에|의|은|는|이|가|을|를|과|와)(?:\s|$))[^\s]+)/g, '\n\n$1')
       .replace(/(^|\n)(부\s*칙)\s*(.*)/g, '\n\n$2 $3');
 
     const lines = formatted.split('\n').map(l => l.trim()).filter(l => l);
