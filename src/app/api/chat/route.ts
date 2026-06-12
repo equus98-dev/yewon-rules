@@ -57,12 +57,13 @@ export async function POST(req: Request) {
     // 3. Gemini 호출
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel(
-      { model: "gemini-1.5-flash" }, 
-      { apiVersion: "v1" }
+      { model: "gemini-2.5-flash" }, 
+      { apiVersion: "v1beta" }
     );
 
     const systemPrompt = `당신은 예원예술대학교의 규정과 학칙을 친절하고 정확하게 안내하는 AI 어시스턴트입니다.
 답변할 때는 가독성을 위해 마크다운(Markdown)을 적절히 사용해 주세요.
+반드시 아래 제공된 [참고 자료]를 바탕으로 답변하세요.
 
 [참고 자료]
 ${contextText}
@@ -84,8 +85,23 @@ ${contextText}
 
   } catch (error: any) {
     console.error("[Chat API Error]:", error);
+    
+    let availableModels = "";
+    try {
+      const apiKey = process.env.GEMINI_API_KEY || (getRequestContext()?.env as any)?.GEMINI_API_KEY;
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+      const data = await res.json() as any;
+      if (data.models) {
+        availableModels = data.models.map((m: any) => m.name.replace("models/", "")).join(", ");
+      } else {
+        availableModels = JSON.stringify(data);
+      }
+    } catch (e) {
+      availableModels = "조회 실패";
+    }
+
     return NextResponse.json(
-      { reply: `오류가 발생했습니다: ${error.message}` },
+      { reply: `오류가 발생했습니다: ${error.message}\n\n[디버깅] 사용 가능한 모델 목록:\n${availableModels}` },
       { status: 500 }
     );
   } finally {
