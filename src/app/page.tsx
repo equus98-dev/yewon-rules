@@ -85,9 +85,44 @@ export default function Home() {
       const params = new URLSearchParams(window.location.search);
       if (params.get("selectMode") === "true") {
         setShowIntro(false);
+      } else {
+        const savedShowIntro = sessionStorage.getItem("showIntro");
+        if (savedShowIntro === "false") {
+          setShowIntro(false);
+          setAnimateOut(true);
+        }
       }
+
+      const savedRuleId = sessionStorage.getItem("activeRuleId");
+      if (savedRuleId) setActiveRuleId(savedRuleId);
+      
+      const savedCategoryId = sessionStorage.getItem("activeCategoryId");
+      if (savedCategoryId) setActiveCategoryId(savedCategoryId);
+      
+      const savedVerticalTab = sessionStorage.getItem("activeVerticalTab");
+      if (savedVerticalTab) setActiveVerticalTab(savedVerticalTab);
+      
+      const savedNoticeId = sessionStorage.getItem("activeNoticeId");
+      if (savedNoticeId) setActiveNoticeId(savedNoticeId);
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("showIntro", String(showIntro));
+      if (activeRuleId) sessionStorage.setItem("activeRuleId", activeRuleId);
+      else sessionStorage.removeItem("activeRuleId");
+      
+      if (activeCategoryId) sessionStorage.setItem("activeCategoryId", activeCategoryId);
+      else sessionStorage.removeItem("activeCategoryId");
+      
+      if (activeVerticalTab) sessionStorage.setItem("activeVerticalTab", activeVerticalTab);
+      else sessionStorage.removeItem("activeVerticalTab");
+      
+      if (activeNoticeId) sessionStorage.setItem("activeNoticeId", activeNoticeId);
+      else sessionStorage.removeItem("activeNoticeId");
+    }
+  }, [showIntro, activeRuleId, activeCategoryId, activeVerticalTab, activeNoticeId]);
 
   const handleEnterSystem = () => {
     setAnimateOut(true);

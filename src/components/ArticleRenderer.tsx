@@ -423,10 +423,16 @@ export default function ArticleRenderer({
 
     // 테이블 등 HTML 태그가 포함되어 있다면 dangerouslySetInnerHTML 사용
     if (/<table|<tr|<td|<th|<br|<p/i.test(htmlText)) {
+      let hiddenNoCites: string[] = [];
+      htmlText = htmlText.replace(/\[nocite\]([\s\S]*?)\[\/nocite\]/gi, (match, inner) => {
+        hiddenNoCites.push(inner);
+        return `__NOCITE_${hiddenNoCites.length - 1}__`;
+      });
       htmlText = htmlText.replace(new RegExp(citationRegexStr, 'g'), (match, p1, p2, p3) => {
         if (p2 && (p2.endsWith("장") || p2.endsWith("절") || p2.endsWith("관"))) return match;
         return `<a href="#" class="cited-article-link text-sky-700 font-bold underline underline-offset-2" data-rule-name="${p1 || ''}" data-article="${p2}">${match}</a>`;
       });
+      htmlText = htmlText.replace(/__NOCITE_(\d+)__/g, (_, i) => hiddenNoCites[parseInt(i)]);
       return (
         <div 
           className="html-table-wrapper block w-full overflow-x-auto html-content-inline"
@@ -435,10 +441,14 @@ export default function ArticleRenderer({
       );
     }
 
-    const parts = decodedText.split(/(\[cite\s+rule="[^"]*"\s+article="[^"]*"(?:\s+url="[^"]*")?\][\s\S]*?\[\/cite\]|[<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi);
+    const parts = decodedText.split(/(\[cite\s+rule="[^"]*"\s+article="[^"]*"(?:\s+url="[^"]*")?\][\s\S]*?\[\/cite\]|\[nocite\][\s\S]*?\[\/nocite\]|[<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi);
     return parts.map((part, i) => {
       if ((part.startsWith("<") && part.endsWith(">")) || (part.startsWith("(") && part.endsWith(")"))) {
         return <span key={i} className="text-sky-700 font-medium text-[13px] ml-1">{normalizeHistoryDate(part)}</span>;
+      }
+      if (part.startsWith("[nocite")) {
+        const content = part.replace(/^\[nocite\]|\[\/nocite\]$/gi, '');
+        return <span key={i}>{content}</span>;
       }
       if (part.startsWith("[cite")) {
         const m = part.match(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"(?:\s+url="([^"]*)")?\]([\s\S]*?)\[\/cite\]/i);
@@ -578,7 +588,7 @@ export default function ArticleRenderer({
 
     // Restore hidden citation tags to avoid them being split by newlines
     let hiddenCitations: string[] = [];
-    formatted = formatted.replace(/\[cite[\s\S]*?\[\/cite\]/g, (match) => {
+    formatted = formatted.replace(/\[cite[\s\S]*?\[\/cite\]|\[nocite\][\s\S]*?\[\/nocite\]/g, (match) => {
        hiddenCitations.push(match);
        return `__CITATION_${hiddenCitations.length - 1}__`;
     });

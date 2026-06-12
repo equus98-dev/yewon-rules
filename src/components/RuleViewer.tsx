@@ -603,19 +603,51 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       // 선택 영역(selectedText)에 포함되거나, 겹치는 인용 링크의 태그를 모두 벗겨냅니다.
       const removeCitations = (content: string) => {
         if (!content) return content;
-        return content.replace(/\[cite[^\]]*\](.*?)\[\/cite\]/g, (match, innerText) => {
+        let modified = false;
+        let res = content.replace(/\[cite[^\]]*\]([\s\S]*?)\[\/cite\]/g, (match, innerText) => {
           if (selectedText.includes(innerText) || innerText.includes(selectedText)) {
+            modified = true;
             return innerText;
           }
           return match;
         });
+        
+        if (!modified && content.includes(selectedText)) {
+           // If it was an auto-generated citation, there might be no [cite] tag to strip.
+           // We wrap the selectedText in [nocite] to prevent auto-generation regex from matching it.
+           res = content.replace(selectedText, `[nocite]${selectedText}[/nocite]`);
+        }
+        return res;
       };
       
       let newContentText = targetArticle.contentText;
       if (newContentText) newContentText = removeCitations(newContentText);
       
-      let newContentJson = typeof targetArticle.contentJson === 'string' ? targetArticle.contentJson : JSON.stringify(targetArticle.contentJson);
-      if (newContentJson) newContentJson = removeCitations(newContentJson);
+      let newContentJson = typeof targetArticle.contentJson === 'string' 
+        ? JSON.parse(targetArticle.contentJson) 
+        : JSON.parse(JSON.stringify(targetArticle.contentJson));
+
+      const replaceInJson = (items: any[]) => {
+         if (!Array.isArray(items)) return;
+         items.forEach(item => {
+            if (item && typeof item.text === 'string') {
+               item.text = removeCitations(item.text);
+            }
+            if (item && Array.isArray(item.children)) {
+               replaceInJson(item.children);
+            }
+         });
+      };
+      
+      if (newContentJson) {
+         if (Array.isArray(newContentJson)) {
+            replaceInJson(newContentJson);
+         } else if (newContentJson.paragraphs) {
+            newContentJson.paragraphs = newContentJson.paragraphs.map((p: any) => 
+               typeof p === 'string' ? removeCitations(p) : p
+            );
+         }
+      }
       
       let newContentHtml = targetArticle.contentHtml;
       if (newContentHtml) newContentHtml = removeCitations(newContentHtml);
@@ -625,7 +657,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contentText: newContentText,
-          contentJson: typeof targetArticle.contentJson === 'string' ? newContentJson : JSON.parse(newContentJson),
+          contentJson: newContentJson,
           contentHtml: newContentHtml
         }),
       });
