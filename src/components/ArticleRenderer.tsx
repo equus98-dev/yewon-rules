@@ -404,6 +404,11 @@ export default function ArticleRenderer({
 
     const citationRegexStr = "(?:((?:(?:이|본|동)\\s*)?규정|(?:(?:[가-힣]+\\s+){1,3})?(?:정관|학칙|법|령|규칙|지침|내규|헌장))\\s+)?(제\\s*\\d+\\s*조(?:의\\s*\\d+)?(?:\\s*제\\s*\\d+\\s*항)?)";
     
+    // 수동 인용 태그 파싱 (HTML 처리용)
+    htmlText = htmlText.replace(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"\](.*?)\[\/cite\]/gi, (match, rule, article, content) => {
+      return `<a href="#" class="cited-article-link text-sky-700 font-bold underline underline-offset-2" data-rule-name="${rule}" data-article="${article}">${content}</a>`;
+    });
+
     // 테이블 등 HTML 태그가 포함되어 있다면 dangerouslySetInnerHTML 사용
     if (/<table|<tr|<td|<th|<br|<p/i.test(htmlText)) {
       htmlText = htmlText.replace(new RegExp(citationRegexStr, 'g'), (match, p1, p2, p3) => {
@@ -418,10 +423,27 @@ export default function ArticleRenderer({
       );
     }
 
-    const parts = decodedText.split(/([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi);
+    const parts = decodedText.split(/(\[cite\s+rule="[^"]*"\s+article="[^"]*"\](?:.*?)\[\/cite\]|[<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi);
     return parts.map((part, i) => {
       if ((part.startsWith("<") && part.endsWith(">")) || (part.startsWith("(") && part.endsWith(")"))) {
         return <span key={i} className="text-sky-700 font-medium text-[13px] ml-1">{normalizeHistoryDate(part)}</span>;
+      }
+      if (part.startsWith("[cite")) {
+        const m = part.match(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"\](.*?)\[\/cite\]/i);
+        if (m) {
+          return (
+             <a 
+               key={i} 
+               href="#" 
+               className="cited-article-link text-sky-700 font-bold underline underline-offset-2" 
+               data-rule-name={m[1]} 
+               data-article={m[2]}
+               onClick={(e) => e.preventDefault()}
+             >
+               {m[3]}
+             </a>
+          );
+        }
       }
       
       const subParts: React.ReactNode[] = [];
@@ -715,7 +737,7 @@ export default function ArticleRenderer({
   }
 
   return (
-    <div id={id} className="mb-2 animate-fade-in rule-viewer-content font-['Pretendard'] relative group">
+    <div id={id} data-article-id={articleId} className="mb-2 animate-fade-in rule-viewer-content font-['Pretendard'] relative group">
       {renderEditButton()}
       {displayItems.map((item, index) => {
         if (!item || typeof item !== 'object') return null;

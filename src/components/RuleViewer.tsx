@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { CircularProgress, Typography } from "@mui/material";
 import ArticleRenderer from "./ArticleRenderer";
 import DraggablePopup from "./DraggablePopup";
+import ManualCitationModal from "./ManualCitationModal";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import HistoryIcon from "@mui/icons-material/History";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
@@ -76,6 +77,14 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const tocScrollRef = useRef<HTMLDivElement>(null);
   const [activeTocId, setActiveTocId] = useState<string>("");
   const [popupState, setPopupState] = useState<{ isOpen: boolean; title: string; isLoading?: boolean; error?: string | null; articleData?: any }>({ isOpen: false, title: "" });
+
+  const [manualCitationData, setManualCitationData] = useState<{
+    selectedText: string;
+    articleId: string;
+    position: { top: number; left: number };
+  } | null>(null);
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [isManualModalSaving, setIsManualModalSaving] = useState(false);
 
   const handleScrollTop = () => {
     scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -525,13 +534,97 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const { title, ruleNumber, category, department, attachments, revisions } = ruleData;
   const cleanTitle = title?.replace(/-\s*\d{4}\.?\s*\d{1,2}\.?\s*\d{1,2}\.?\s*$/, '').trim() || title;
 
-  // 버전을 직접 클릭하여 해당 버전의 본문을 로딩
   const handleVersionSelect = (verNum: number) => {
     setSelectedVersion(verNum);
   };
 
+  const handleMouseUp = () => {
+    if (!isAdmin) return;
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+    const text = selection.toString().trim();
+    if (text.length === 0) {
+      if (!isManualModalOpen) setManualCitationData(null);
+      return;
+    }
+    
+    // Find closest article-id
+    let node = selection.anchorNode;
+    let articleId: string | null = null;
+    while (node && node !== document.body) {
+      if (node.nodeType === 1 && (node as Element).hasAttribute('data-article-id')) {
+        articleId = (node as Element).getAttribute('data-article-id');
+        break;
+      }
+      node = node.parentNode;
+    }
+    
+    if (articleId) {
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      setManualCitationData({
+        selectedText: text,
+        articleId,
+        position: { top: rect.top - 40, left: rect.left + rect.width / 2 }
+      });
+    } else {
+      if (!isManualModalOpen) setManualCitationData(null);
+    }
+  };
+
+  const handleManualCitationSave = async (ruleName: string, articleNum: string) => {
+    if (!manualCitationData) return;
+    setIsManualModalSaving(true);
+    try {
+      const targetArticle = currentRevision?.articles?.find((a: any) => a.id === manualCitationData.articleId);
+      if (!targetArticle) throw new Error("조문을 찾을 수 없습니다.");
+      
+      const selectedText = manualCitationData.selectedText;
+      const replacement = `[cite rule="${ruleName}" article="${articleNum}"]${selectedText}[/cite]`;
+      
+      let newContentText = targetArticle.contentText;
+      if (newContentText) {
+        newContentText = newContentText.replace(selectedText, replacement);
+      }
+      
+      let newContentJson = typeof targetArticle.contentJson === 'string' 
+        ? targetArticle.contentJson 
+        : JSON.stringify(targetArticle.contentJson);
+      if (newContentJson) {
+        newContentJson = newContentJson.replace(selectedText, replacement);
+      }
+      
+      let newContentHtml = targetArticle.contentHtml;
+      if (newContentHtml) {
+        newContentHtml = newContentHtml.replace(selectedText, replacement);
+      }
+      
+      const res = await fetch(`/api/admin/articles/${manualCitationData.articleId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contentText: newContentText,
+          contentJson: newContentJson,
+          contentHtml: newContentHtml
+        })
+      });
+      
+      if (!res.ok) throw new Error("업데이트 실패");
+      
+      alert("인용이 성공적으로 연결되었습니다. 새로고침 시 적용됩니다.");
+      setIsManualModalOpen(false);
+      setManualCitationData(null);
+      window.getSelection()?.removeAllRanges();
+      window.location.reload(); 
+    } catch (e: any) {
+      alert("오류: " + e.message);
+    } finally {
+      setIsManualModalSaving(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden relative border border-slate-200">
+    <div className="flex flex-col h-full bg-white overflow-hidden relative border border-slate-200" onMouseUp={handleMouseUp}>
       <DraggablePopup 
         isOpen={popupState.isOpen}
         onClose={() => setPopupState(prev => ({ ...prev, isOpen: false }))}
@@ -554,6 +647,36 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           </div>
         )}
       </DraggablePopup>
+
+      {isAdmin && manualCitationData && !isManualModalOpen && (
+        <div 
+          style={{ 
+            position: 'fixed', 
+            top: manualCitationData.position.top, 
+            left: manualCitationData.position.left, 
+            transform: 'translate(-50%, -10px)',
+            zIndex: 9999 
+          }}
+        >
+          <button
+            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }} 
+            onClick={() => setIsManualModalOpen(true)}
+            className="bg-sky-700 text-white px-3 py-1.5 rounded shadow-lg text-xs font-bold hover:bg-sky-800 cursor-pointer flex items-center gap-1 transition-colors"
+          >
+            🔗 인용 연결
+          </button>
+        </div>
+      )}
+
+      {isManualModalOpen && manualCitationData && (
+        <ManualCitationModal
+          isOpen={isManualModalOpen}
+          onClose={() => { setIsManualModalOpen(false); setManualCitationData(null); window.getSelection()?.removeAllRanges(); }}
+          selectedText={manualCitationData.selectedText}
+          onSave={handleManualCitationSave}
+          isSaving={isManualModalSaving}
+        />
+      )}
       
       {/* 1. 상단 타이틀 및 브레드크럼 */}
       <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-6 py-4 shrink-0 flex items-center justify-between z-10 shadow-sm relative">
