@@ -27,6 +27,13 @@ interface ArticleRendererProps {
   ruleName?: string;
 }
 
+const convertCircledNum = (char: string) => {
+  const code = char.charCodeAt(0);
+  if (code >= 0x2460 && code <= 0x2473) return code - 0x245F;
+  if (code >= 0x3251 && code <= 0x325F) return code - 0x3250 + 20;
+  return 1;
+};
+
 export default function ArticleRenderer({
   id,
   articleId,
@@ -569,6 +576,30 @@ export default function ArticleRenderer({
       .replace(/(제\d+(?:장|절|관)\s+(?!(?:제\d+(?:조|항|호|목|장|절|관)?|및|에|의|은|는|이|가|을|를|과|와)(?:\s|$))[^\s]+)/g, '\n\n$1')
       .replace(/(^|\n)(부\s*칙)\s*(.*)/g, '\n\n$2 $3');
 
+    let curHang = "";
+    let curHo = "";
+    let curMok = "";
+    const baseArticlePath = `제${articleNumber}조`;
+
+    const handleItemSelect = (e: React.MouseEvent, path: string) => {
+      if (!isSelectMode) return;
+      e.stopPropagation();
+      const safeRuleName = ruleName || document.title;
+      if (window.confirm(`선택한 조문: [${safeRuleName}] ${path}\n이 조문을 인용으로 연결하시겠습니까?`)) {
+         window.opener?.postMessage({ type: 'RULE_SELECTED', ruleName: safeRuleName, articleNum: path }, '*');
+         window.close();
+      }
+    };
+
+    const InlineSelectBadge = () => {
+      if (!isSelectMode) return null;
+      return (
+        <div className="absolute top-1/2 -translate-y-1/2 right-2 hidden group-hover:flex bg-blue-600 text-white text-[11px] font-bold px-2 py-1 rounded shadow pointer-events-none items-center gap-1 z-10">
+          ✅ 선택
+        </div>
+      );
+    };
+
     const lines = formatted.split('\n').map(l => l.trim()).filter(l => l);
 
     return (
@@ -576,22 +607,29 @@ export default function ArticleRenderer({
         {lines.map((trimmed, idx) => {
           let lineClass = "break-keep text-slate-800";
           let isInline = (idx === 0 && isArticleBody);
+          let currentPath = baseArticlePath;
 
           if (/^[①-⑮]/.test(trimmed)) {
              const numMatch = trimmed.match(/^([①-⑮])\s*(.*)/);
              if (numMatch) {
+               curHang = `제${convertCircledNum(numMatch[1])}항`;
+               curHo = ""; curMok = "";
+               currentPath = `${baseArticlePath} ${curHang}`.trim();
+               const interactiveClass = isSelectMode ? "hover:bg-blue-50 cursor-pointer rounded border border-transparent hover:border-blue-300 relative group transition-colors" : "";
                if (isInline) {
                  return (
-                   <span key={`glued-${idx}`} className="font-normal text-slate-800 break-keep inline">
+                   <span key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e as any, currentPath) : undefined} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
                      <span className="mr-1">{numMatch[1]}</span>
                      {renderTextWithHistory(numMatch[2])}{" "}
+                     <InlineSelectBadge />
                    </span>
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className="w-full break-keep text-slate-800" style={{ paddingLeft: '20px', textIndent: '-20px' }}>
+                  <div key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e, currentPath) : undefined} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
+                     <InlineSelectBadge />
                   </div>
                );
              }
@@ -599,18 +637,24 @@ export default function ArticleRenderer({
           } else if (/^\d{1,2}\./.test(trimmed)) {
              const numMatch = trimmed.match(/^(\d{1,2}\.)\s*(.*)/);
              if (numMatch) {
+               curHo = `제${numMatch[1].replace('.', '')}호`;
+               curMok = "";
+               currentPath = `${baseArticlePath} ${curHang} ${curHo}`.replace(/\s+/g, ' ').trim();
+               const interactiveClass = isSelectMode ? "hover:bg-blue-50 cursor-pointer rounded border border-transparent hover:border-blue-300 relative group transition-colors" : "";
                if (isInline) {
                  return (
-                   <span key={`glued-${idx}`} className="font-normal text-slate-800 break-keep inline">
+                   <span key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e as any, currentPath) : undefined} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
                      <span className="mr-1">{numMatch[1]}</span>
                      {renderTextWithHistory(numMatch[2])}{" "}
+                     <InlineSelectBadge />
                    </span>
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className="w-full break-keep text-slate-800" style={{ paddingLeft: '36px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e, currentPath) : undefined} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '36px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
+                     <InlineSelectBadge />
                   </div>
                );
              }
@@ -618,18 +662,23 @@ export default function ArticleRenderer({
           } else if (/^[가-하]\./.test(trimmed)) {
              const numMatch = trimmed.match(/^([가-하]\.)\s*(.*)/);
              if (numMatch) {
+               curMok = `${numMatch[1].replace('.', '')}목`;
+               currentPath = `${baseArticlePath} ${curHang} ${curHo} ${curMok}`.replace(/\s+/g, ' ').trim();
+               const interactiveClass = isSelectMode ? "hover:bg-blue-50 cursor-pointer rounded border border-transparent hover:border-blue-300 relative group transition-colors" : "";
                if (isInline) {
                  return (
-                   <span key={`glued-${idx}`} className="font-normal text-slate-800 break-keep inline">
+                   <span key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e as any, currentPath) : undefined} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
                      <span className="mr-1">{numMatch[1]}</span>
                      {renderTextWithHistory(numMatch[2])}{" "}
+                     <InlineSelectBadge />
                    </span>
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className="w-full break-keep text-slate-800" style={{ paddingLeft: '52px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e, currentPath) : undefined} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '52px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
+                     <InlineSelectBadge />
                   </div>
                );
              }
@@ -816,8 +865,9 @@ export default function ArticleRenderer({
              if (currentSubitemStr) numStr += ` ${currentSubitemStr}`;
           }
 
-          if (window.confirm(`선택한 조문: [${ruleName}] ${numStr}\n이 조문을 인용으로 연결하시겠습니까?`)) {
-             window.opener.postMessage({ type: 'RULE_SELECTED', ruleName, articleNum: numStr }, '*');
+          const safeRuleName = ruleName || document.title;
+          if (window.confirm(`선택한 조문: [${safeRuleName}] ${numStr}\n이 조문을 인용으로 연결하시겠습니까?`)) {
+             window.opener.postMessage({ type: 'RULE_SELECTED', ruleName: safeRuleName, articleNum: numStr }, '*');
              window.close();
           }
         };
