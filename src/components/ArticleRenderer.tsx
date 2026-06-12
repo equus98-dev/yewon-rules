@@ -23,8 +23,6 @@ interface ArticleRendererProps {
   hasHtmlAttachments?: boolean;
   isAdmin?: boolean;
   trailingTitles?: string[];
-  isSelectMode?: boolean;
-  ruleName?: string;
 }
 
 const convertCircledNum = (char: string) => {
@@ -48,8 +46,6 @@ export default function ArticleRenderer({
   hasHtmlAttachments = true,
   isAdmin = false,
   trailingTitles = [],
-  isSelectMode = false,
-  ruleName = "",
 }: ArticleRendererProps) {
   const isAddendumArticle = title === "부칙" || (title || "").replace(/\s+/g, "").startsWith("부칙") || chapter === "부칙";
   const hideBadge = hideHistory || isAddendumArticle;
@@ -469,47 +465,6 @@ export default function ArticleRenderer({
         }
       }
       
-      const subParts: React.ReactNode[] = [];
-      let lastIndex = 0;
-      let match;
-      const regex = new RegExp(citationRegexStr, 'g');
-      
-      while ((match = regex.exec(part)) !== null) {
-        if (match.index > lastIndex) {
-          subParts.push(part.substring(lastIndex, match.index));
-        }
-        
-        const fullMatch = match[0];
-        const ruleName = match[1] ? match[1].trim() : "";
-        const article = match[2] ? match[2].trim() : "";
-        
-        if (ruleName.endsWith("장") || ruleName.endsWith("절") || ruleName.endsWith("관")) {
-           subParts.push(fullMatch);
-        } else {
-           subParts.push(
-             <a 
-               key={`${i}-${match.index}`} 
-               href="#" 
-               className="cited-article-link text-sky-700 font-bold underline underline-offset-2" 
-               data-rule-name={ruleName} 
-               data-article={article}
-               onClick={(e) => e.preventDefault()}
-             >
-               {fullMatch}
-             </a>
-           );
-        }
-        lastIndex = regex.lastIndex;
-      }
-      
-      if (lastIndex < part.length) {
-        subParts.push(part.substring(lastIndex));
-      }
-      
-      if (subParts.length > 0) {
-        return <React.Fragment key={i}>{subParts.map((sp, idx) => typeof sp === 'string' ? <React.Fragment key={idx}>{sp}</React.Fragment> : sp)}</React.Fragment>;
-      }
-
       return <React.Fragment key={i}>{part}</React.Fragment>;
     });
   };
@@ -599,17 +554,17 @@ export default function ArticleRenderer({
     const baseArticlePath = `제${articleNumber}조`;
 
     const handleItemSelect = (e: React.MouseEvent, path: string) => {
-      if (!isSelectMode) return;
+      
       e.stopPropagation();
-      const safeRuleName = ruleName || document.title;
+      const safeRuleName = title || document.title;
       if (window.confirm(`선택한 조문: [${safeRuleName}] ${path}\n이 조문을 인용으로 연결하시겠습니까?`)) {
-         window.opener?.postMessage({ type: 'RULE_SELECTED', ruleName: safeRuleName, articleNum: path }, '*');
+         window.opener?.postMessage({ type: 'RULE_SELECTED', title: safeRuleName, articleNum: path }, '*');
          window.close();
       }
     };
 
     const InlineSelectBadge = () => {
-      if (!isSelectMode) return null;
+      
       return (
         <div className="absolute top-1/2 -translate-y-1/2 right-2 hidden group-hover:flex bg-blue-600 text-white text-[11px] font-bold px-2 py-1 rounded shadow pointer-events-none items-center gap-1 z-10">
           ✅ 선택
@@ -633,10 +588,10 @@ export default function ArticleRenderer({
                curHang = `제${convertCircledNum(numMatch[1])}항`;
                curHo = ""; curMok = "";
                currentPath = `${baseArticlePath} ${curHang}`.trim();
-               const interactiveClass = isSelectMode ? "hover:bg-blue-50 cursor-pointer rounded border border-transparent hover:border-blue-300 relative group transition-colors" : "";
+               const interactiveClass = "";
                if (isInline) {
                  return (
-                   <span key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e as any, currentPath) : undefined} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
+                   <span key={`glued-${idx}`} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
                      <span className="mr-1">{numMatch[1]}</span>
                      {renderTextWithHistory(numMatch[2])}{" "}
                      <InlineSelectBadge />
@@ -644,7 +599,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e, currentPath) : undefined} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
+                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      <InlineSelectBadge />
@@ -658,10 +613,10 @@ export default function ArticleRenderer({
                curHo = `제${numMatch[1].replace('.', '')}호`;
                curMok = "";
                currentPath = `${baseArticlePath} ${curHang} ${curHo}`.replace(/\s+/g, ' ').trim();
-               const interactiveClass = isSelectMode ? "hover:bg-blue-50 cursor-pointer rounded border border-transparent hover:border-blue-300 relative group transition-colors" : "";
+               const interactiveClass = "";
                if (isInline) {
                  return (
-                   <span key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e as any, currentPath) : undefined} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
+                   <span key={`glued-${idx}`} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
                      <span className="mr-1">{numMatch[1]}</span>
                      {renderTextWithHistory(numMatch[2])}{" "}
                      <InlineSelectBadge />
@@ -669,7 +624,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e, currentPath) : undefined} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '36px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '36px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      <InlineSelectBadge />
@@ -682,10 +637,10 @@ export default function ArticleRenderer({
              if (numMatch) {
                curMok = `${numMatch[1].replace('.', '')}목`;
                currentPath = `${baseArticlePath} ${curHang} ${curHo} ${curMok}`.replace(/\s+/g, ' ').trim();
-               const interactiveClass = isSelectMode ? "hover:bg-blue-50 cursor-pointer rounded border border-transparent hover:border-blue-300 relative group transition-colors" : "";
+               const interactiveClass = "";
                if (isInline) {
                  return (
-                   <span key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e as any, currentPath) : undefined} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
+                   <span key={`glued-${idx}`} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
                      <span className="mr-1">{numMatch[1]}</span>
                      {renderTextWithHistory(numMatch[2])}{" "}
                      <InlineSelectBadge />
@@ -693,7 +648,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} onClick={isSelectMode ? (e) => handleItemSelect(e, currentPath) : undefined} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '52px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '52px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      <InlineSelectBadge />
@@ -870,7 +825,7 @@ export default function ArticleRenderer({
         }
 
         const handleSelectClick = (e: React.MouseEvent) => {
-          if (!isSelectMode) return;
+          
           e.stopPropagation();
           let numStr = `제${articleNumber}조`;
           
@@ -883,16 +838,16 @@ export default function ArticleRenderer({
              if (currentSubitemStr) numStr += ` ${currentSubitemStr}`;
           }
 
-          const safeRuleName = ruleName || document.title;
+          const safeRuleName = title || document.title;
           if (window.confirm(`선택한 조문: [${safeRuleName}] ${numStr}\n이 조문을 인용으로 연결하시겠습니까?`)) {
-             window.opener.postMessage({ type: 'RULE_SELECTED', ruleName: safeRuleName, articleNum: numStr }, '*');
+             window.opener.postMessage({ type: 'RULE_SELECTED', title: safeRuleName, articleNum: numStr }, '*');
              window.close();
           }
         };
 
-        const interactiveClass = isSelectMode ? "hover:bg-blue-50 cursor-pointer rounded border border-transparent hover:border-blue-300 relative group transition-colors" : "";
+        const interactiveClass = "";
         const SelectBadge = () => {
-          if (!isSelectMode) return null;
+          
           return (
             <div className="absolute top-1/2 -translate-y-1/2 right-2 hidden group-hover:flex bg-blue-600 text-white text-[11px] font-bold px-2 py-1 rounded shadow pointer-events-none items-center gap-1 z-10">
               ✅ 선택
@@ -955,7 +910,7 @@ export default function ArticleRenderer({
             }
 
             return (
-              <div onClick={isSelectMode ? handleSelectClick : undefined} className={`mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full ${interactiveClass}`}>
+              <div className={`mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full ${interactiveClass}`}>
                 {!hideBadge && !isAddendum && (
                   <button 
                     onClick={(e) => { e.stopPropagation(); handleOpenHistory(historyDates); }}
@@ -1038,7 +993,7 @@ export default function ArticleRenderer({
           if (isGlued) {
             const isTopLevelArticle = /^제\d+조/.test(plainText);
             return (
-              <div key={index} onClick={isSelectMode ? handleSelectClick : undefined} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'} ${interactiveClass}`}>
+              <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'} ${interactiveClass}`}>
                 <span className="font-normal mr-1">{safeNum}</span>
                 {formatGluedText(plainText, false)}
                 <SelectBadge />
@@ -1046,7 +1001,7 @@ export default function ArticleRenderer({
             );
           }
           return (
-            <div key={index} onClick={isSelectMode ? handleSelectClick : undefined} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
               <SelectBadge />
@@ -1057,7 +1012,7 @@ export default function ArticleRenderer({
 
           return (
             <React.Fragment key={index}>
-              <div onClick={isSelectMode ? handleSelectClick : undefined} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '20px' : '36px', textIndent: isAddendum ? '-20px' : '-16px' }}>
+              <div className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '20px' : '36px', textIndent: isAddendum ? '-20px' : '-16px' }}>
                 <span className="font-normal mr-1">{safeNum}</span>
                 <span className="font-normal">{renderTextWithHistory(safeText)}</span>
                 <SelectBadge />
@@ -1066,7 +1021,7 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "subitem") {
           return (
-            <div key={index} onClick={isSelectMode ? handleSelectClick : undefined} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '52px', textIndent: '-16px' }}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '52px', textIndent: '-16px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
               <SelectBadge />
@@ -1087,7 +1042,7 @@ export default function ArticleRenderer({
                 }
             }
             return (
-              <div key={index} onClick={isSelectMode ? handleSelectClick : undefined} className={`mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full ${interactiveClass}`}>
+              <div key={index} className={`mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full ${interactiveClass}`}>
                 <div className="flex-1 w-full group/text text-[16px] text-slate-800 leading-[1.7]">
                   <div className="w-full break-keep inline-block">
                     <span className="font-bold mr-1 text-[#000080]">{title || "부칙"}</span>
@@ -1100,7 +1055,7 @@ export default function ArticleRenderer({
           }
           const isGluedArticle = /^\s*제\d+(?:조|장|관|절)/.test(safeText);
           return (
-            <div key={index} onClick={isSelectMode ? handleSelectClick : undefined} className={`text-slate-800 text-[16px] leading-[1.7] w-full ${isGluedArticle ? '' : 'pl-[1.25rem]'} my-1.5 ${interactiveClass}`}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full ${isGluedArticle ? '' : 'pl-[1.25rem]'} my-1.5 ${interactiveClass}`}>
               {formatGluedText(safeText, false)}
               <SelectBadge />
             </div>

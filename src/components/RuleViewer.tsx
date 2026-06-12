@@ -557,129 +557,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     setSelectedVersion(verNum);
   };
 
-  const handleMouseUp = () => {
-    if (!isAdmin) return;
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-    const text = selection.toString().trim();
-    if (text.length === 0) {
-      if (!isManualModalOpen) setManualCitationData(null);
-      return;
-    }
-    
-    // Find closest article-id
-    let node = selection.anchorNode;
-    let articleId: string | null = null;
-    while (node && node !== document.body) {
-      if (node.nodeType === 1 && (node as Element).hasAttribute('data-article-id')) {
-        articleId = (node as Element).getAttribute('data-article-id');
-        break;
-      }
-      node = node.parentNode;
-    }
-    
-    if (articleId) {
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      setManualCitationData({
-        selectedText: text,
-        articleId,
-        position: { top: rect.top - 40, left: rect.left + rect.width / 2 }
-      });
-    } else {
-      if (!isManualModalOpen) setManualCitationData(null);
-    }
-  };
+  
 
-  const handleRemoveCitation = async () => {
-    if (!manualCitationData) return;
-    setIsManualModalSaving(true);
-    try {
-      const targetArticle = currentRevision?.articles?.find((a: any) => a.id === manualCitationData.articleId);
-      if (!targetArticle) throw new Error("조문을 찾을 수 없습니다.");
-      
-      const selectedText = manualCitationData.selectedText;
-      
-      // 선택 영역(selectedText)에 포함되거나, 겹치는 인용 링크의 태그를 모두 벗겨냅니다.
-      const removeCitations = (content: string) => {
-        if (!content) return content;
-        let modified = false;
-        let res = content.replace(/\[cite[^\]]*\]([\s\S]*?)\[\/cite\]/g, (match, innerText) => {
-          if (selectedText.includes(innerText) || innerText.includes(selectedText)) {
-            modified = true;
-            return innerText;
-          }
-          return match;
-        });
-        
-        if (!modified && content.includes(selectedText)) {
-           // Prevent double wrapping
-           if (!res.includes(`[nocite]${selectedText}[/nocite]`)) {
-              // Wrap each line individually to prevent tags from spanning across newlines and breaking the JSON parser
-              const wrappedText = selectedText.split('\n').map(part => part.trim() ? `[nocite]${part}[/nocite]` : part).join('\n');
-              res = res.replace(selectedText, wrappedText);
-           }
-        }
-        
-        // Clean up any accidentally nested [nocite] tags
-        res = res.replace(/\[nocite\]\s*\[nocite\]/g, '[nocite]').replace(/\[\/nocite\]\s*\[\/nocite\]/g, '[/nocite]');
-        return res;
-      };
-      
-      let newContentText = targetArticle.contentText;
-      if (newContentText) newContentText = removeCitations(newContentText);
-      
-      let newContentJson = typeof targetArticle.contentJson === 'string' 
-        ? JSON.parse(targetArticle.contentJson) 
-        : JSON.parse(JSON.stringify(targetArticle.contentJson));
-
-      const replaceInJson = (items: any[]) => {
-         if (!Array.isArray(items)) return;
-         items.forEach(item => {
-            if (item && typeof item.text === 'string') {
-               item.text = removeCitations(item.text);
-            }
-            if (item && Array.isArray(item.children)) {
-               replaceInJson(item.children);
-            }
-         });
-      };
-      
-      if (newContentJson) {
-         if (Array.isArray(newContentJson)) {
-            replaceInJson(newContentJson);
-         } else if (newContentJson.paragraphs) {
-            newContentJson.paragraphs = newContentJson.paragraphs.map((p: any) => 
-               typeof p === 'string' ? removeCitations(p) : p
-            );
-         }
-      }
-      
-      let newContentHtml = targetArticle.contentHtml;
-      if (newContentHtml) newContentHtml = removeCitations(newContentHtml);
-
-      const res = await fetch(`/api/admin/articles/${manualCitationData.articleId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contentText: newContentText,
-          contentJson: newContentJson,
-          contentHtml: newContentHtml
-        }),
-      });
-      
-      if (!res.ok) throw new Error("업데이트 실패");
-      
-      alert("인용이 성공적으로 해제되었습니다.");
-      setManualCitationData(null);
-      window.getSelection()?.removeAllRanges();
-      window.dispatchEvent(new CustomEvent('rule-updated'));
-    } catch (e: any) {
-      alert("오류: " + e.message);
-    } finally {
-      setIsManualModalSaving(false);
-    }
-  };
+  
 
   const handleManualCitationSave = async (ruleName: string, articleNum: string, url: string = "") => {
     if (!manualCitationData) return;
@@ -753,100 +633,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden relative border border-slate-200" onMouseUp={handleMouseUp}>
-      <DraggablePopup 
-        isOpen={popupState.isOpen}
-        onClose={() => setPopupState(prev => ({ ...prev, isOpen: false }))}
-        title={popupState.title}
-        isLoading={popupState.isLoading}
-        error={popupState.error}
-      >
-        {popupState.articleData && !popupState.url && (
-          <div className="mt-2 relative">
-             <ArticleRenderer
-                articleNumber={popupState.articleData.articleNumber}
-                title={popupState.articleData.title}
-                contentJson={popupState.articleData.contentJson}
-                contentText={popupState.articleData.contentText}
-                contentHtml={popupState.articleData.contentHtml}
-                hideHistory={true}
-                hasHtmlAttachments={false}
-                isAdmin={false}
-                isSelectMode={isSelectMode}
-                ruleName={cleanTitle}
-             />
-          </div>
-        )}
-        {popupState.url && (
-          <div className="mt-2 relative w-[800px] max-w-[90vw] h-[600px] max-h-[80vh]">
-            <iframe 
-              src={popupState.url} 
-              className="w-full h-full border border-slate-200 rounded"
-              title="외부 법령 연결"
-            />
-          </div>
-        )}
-      </DraggablePopup>
-
-      {isAdmin && manualCitationData && !isManualModalOpen && (
-        <div 
-          style={{ 
-            position: 'fixed', 
-            top: manualCitationData.position.top, 
-            left: manualCitationData.position.left, 
-            transform: 'translate(-50%, -15px)',
-            zIndex: 9999 
-          }}
-        >
-          <div className="bg-white border border-slate-200 rounded shadow-xl p-1 flex gap-1 text-xs font-bold text-slate-700 items-center animate-fade-in pointer-events-auto">
-            <button
-              onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }} 
-              onClick={() => {
-                const popup = window.open('/?selectMode=true', 'RuleSelector', 'width=1400,height=900,scrollbars=yes');
-                const handleMessage = (msg: MessageEvent) => {
-                  if (msg.data && msg.data.type === 'RULE_SELECTED') {
-                    handleManualCitationSave(msg.data.ruleName, msg.data.articleNum);
-                    window.removeEventListener('message', handleMessage);
-                  }
-                };
-                window.addEventListener('message', handleMessage);
-                setManualCitationData(null);
-                window.getSelection()?.removeAllRanges();
-              }}
-              className="px-2 py-1.5 rounded hover:bg-slate-100 flex items-center gap-1 transition-colors text-blue-700"
-            >
-              🏫 내부 연결
-            </button>
-            <div className="w-px h-3 bg-slate-300"></div>
-            <button
-              onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }} 
-              onClick={() => setIsManualModalOpen(true)}
-              className="px-2 py-1.5 rounded hover:bg-slate-100 flex items-center gap-1 transition-colors text-emerald-700"
-            >
-              ⚖️ 외부 연결
-            </button>
-            <div className="w-px h-3 bg-slate-300"></div>
-            <button
-              onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }} 
-              onClick={handleRemoveCitation}
-              className="px-2 py-1.5 rounded hover:bg-red-50 hover:text-red-700 flex items-center gap-1 transition-colors text-slate-600"
-            >
-              🗑️ 해제
-            </button>
-          </div>
-        </div>
-      )}
-
-      {isManualModalOpen && manualCitationData && (
-        <ManualCitationModal
-          isOpen={isManualModalOpen}
-          onClose={() => { setIsManualModalOpen(false); setManualCitationData(null); window.getSelection()?.removeAllRanges(); }}
-          selectedText={manualCitationData.selectedText}
-          onSave={handleManualCitationSave}
-          isSaving={isManualModalSaving}
-        />
-      )}
+    <div className="flex flex-col h-full bg-white overflow-hidden relative border border-slate-200" >
       
+
       {/* 1. 상단 타이틀 및 브레드크럼 */}
       <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-6 py-4 shrink-0 flex items-center justify-between z-10 shadow-sm relative">
         <h1 className="text-2xl font-black text-[#007073] tracking-tight ml-2">{ruleNumber ? `${ruleNumber} ` : ""}{cleanTitle}</h1>
@@ -1127,8 +916,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         hasHtmlAttachments={hasHtmlAttachments}
                         isAdmin={isAdmin}
                         trailingTitles={trailingTitles}
-                        isSelectMode={isSelectMode}
-                        ruleName={cleanTitle}
+                        
+                        
                       />
                     </React.Fragment>
                   );

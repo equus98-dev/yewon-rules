@@ -1,0 +1,1 @@
+SELECT id, title, contentText FROM Article WHERE contentText LIKE '%사립학교법%' LIMIT 5

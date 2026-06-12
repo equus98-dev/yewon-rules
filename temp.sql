@@ -1,0 +1,1 @@
+SELECT id, title, contentText FROM Article WHERE contentText LIKE '%cite%' OR contentJson LIKE '%cite%'
