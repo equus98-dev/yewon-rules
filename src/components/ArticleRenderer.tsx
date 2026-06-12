@@ -355,7 +355,28 @@ export default function ArticleRenderer({
   const isAddendumItem = (text: string) =>
     /^\(시행일\)|^\(폐지|^\(적용예외|^\(경과조치|^\(적용범위|^\(준용\)/.test(text.trim());
 
-  // 정규식: <개정 ...> 또는 <신설 ...> 등 연혁 텍스트를 파싱하여 스타일을 다르게 적용
+  const normalizeHistoryDate = (str: string) => {
+    let inner = str.replace(/^[<(\[]|[)>\]]$/g, '').trim();
+    let parts = inner.split(',').map(p => p.trim());
+    let lastAction = '';
+    let normParts = parts.map(part => {
+      let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)?\s*(.*)$/);
+      if (!match) return part;
+      let action = match[1];
+      let dateStr = match[2];
+      if (action) {
+        lastAction = action;
+      } else {
+        action = lastAction || '개정';
+      }
+      let dateNorm = dateStr.replace(/[^\d.]/g, '').split('.').map(s => s.trim()).filter(s => s.length > 0).map(s => parseInt(s, 10)).join('. ');
+      if (dateNorm) dateNorm += '.';
+      else dateNorm = dateStr;
+      return action + ' ' + dateNorm;
+    });
+    return '<' + normParts.join(', ') + '>';
+  };
+
   const renderTextWithHistory = (text: string) => {
     // DB에 &lt;table&gt; 과 같이 이스케이프되어 저장된 경우를 대비해 디코딩
     let decodedText = text
@@ -375,7 +396,7 @@ export default function ArticleRenderer({
     // 연혁 표시: <개정 ...> 부분을 파란색으로 렌더링하기 위한 문자열 준비
     let htmlText = decodedText.replace(
       /([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi,
-      (match) => `<span class="text-blue-500 text-[13px] ml-1">${match.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
+      (match) => `<span class="text-sky-700 font-medium text-[13px] ml-1">${normalizeHistoryDate(match).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
     );
 
     // 테이블 등 HTML 태그가 포함되어 있다면 dangerouslySetInnerHTML 사용
@@ -391,7 +412,7 @@ export default function ArticleRenderer({
     const parts = decodedText.split(/([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi);
     return parts.map((part, i) => {
       if ((part.startsWith("<") && part.endsWith(">")) || (part.startsWith("(") && part.endsWith(")"))) {
-        return <span key={i} className="text-blue-500 text-[13px] ml-1">{part}</span>;
+        return <span key={i} className="text-sky-700 font-medium text-[13px] ml-1">{normalizeHistoryDate(part)}</span>;
       }
       return <React.Fragment key={i}>{part}</React.Fragment>;
     });
