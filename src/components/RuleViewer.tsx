@@ -73,6 +73,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const [expandedAttachments, setExpandedAttachments] = useState<Record<string, boolean>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
   const tocScrollRef = useRef<HTMLDivElement>(null);
+  const [activeTocId, setActiveTocId] = useState<string>("");
 
   const handleScrollTop = () => {
     scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -120,13 +121,13 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           }
           
           if (textToScan) {
-            const regex = /(제\d+조의?\d*\([^)]+\))/g;
+            const regex = /(제\d+조의?\s*\d*\s*\([^)]+\))/g;
             let match;
             let foundArticle = false;
             while ((match = regex.exec(textToScan)) !== null) {
               const fullTitle = match[1];
-              const articleNumMatch = fullTitle.match(/^(제\d+조의?\d*)/);
-              const articleNum = articleNumMatch ? articleNumMatch[1] : fullTitle;
+              const articleNumMatch = fullTitle.match(/^(제\d+조의?\s*\d*)/);
+              const articleNum = articleNumMatch ? articleNumMatch[1].replace(/\s/g, '') : fullTitle.replace(/\s/g, '');
               if (!toc.some(t => t.id === `toc-${articleNum}`)) {
                 toc.push({ type: "article", id: `toc-${articleNum}`, text: fullTitle });
                 foundArticle = true;
@@ -182,9 +183,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         if (a.title && a.articleNumber < 8000) {
            const expectedTitleStart = `제${a.articleNumber}조`;
            const titleStr = /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title.trim()})`;
-           const titleMatch = titleStr.match(/^(제\d+조의?\d*)/);
+           const titleMatch = titleStr.match(/^(제\d+조의?\s*\d*)/);
            if (titleMatch) {
-              const titleNum = titleMatch[1];
+              const titleNum = titleMatch[1].replace(/\s/g, '');
               if (!toc.some(t => t.id === `toc-${titleNum}`)) {
                  toc.push({ type: "article", id: `toc-${titleNum}`, text: titleStr });
               }
@@ -195,12 +196,12 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           if (!item) return;
           
           if (typeof item === 'string') {
-            const regex = /(제\d+조의?\d*\([^)]+\))/g;
+            const regex = /(제\d+조의?\s*\d*\s*\([^)]+\))/g;
             let match;
             while ((match = regex.exec(item)) !== null) {
               const fullTitle = match[1];
-              const articleNumMatch = fullTitle.match(/^(제\d+조의?\d*)/);
-              const articleNum = articleNumMatch ? articleNumMatch[1] : fullTitle;
+              const articleNumMatch = fullTitle.match(/^(제\d+조의?\s*\d*)/);
+              const articleNum = articleNumMatch ? articleNumMatch[1].replace(/\s/g, '') : fullTitle.replace(/\s/g, '');
               if (!toc.some(t => t.id === `toc-${articleNum}`)) {
                 toc.push({ type: "article", id: `toc-${articleNum}`, text: fullTitle });
               }
@@ -289,6 +290,54 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     
     return toc;
   }, [currentRevision, ruleData?.attachments]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!scrollRef.current) return;
+      const scrollY = scrollRef.current.scrollTop;
+      
+      let currentActiveId = "";
+      for (let i = 0; i < tocItems.length; i++) {
+        const item = tocItems[i];
+        const el = document.getElementById(item.id);
+        if (el) {
+          // Adjust offset to trigger slightly before the element hits the top
+          const offsetTop = el.offsetTop - 150; 
+          if (scrollY >= offsetTop) {
+            currentActiveId = item.id;
+          } else {
+            // Since tocItems are in order, we can break early once we find an element below the scroll position
+            break;
+          }
+        }
+      }
+
+      if (currentActiveId && currentActiveId !== activeTocId) {
+        setActiveTocId(currentActiveId);
+        
+        // Auto scroll TOC
+        const tocEl = document.getElementById(`li-${currentActiveId}`);
+        if (tocEl && tocScrollRef.current) {
+          const tocContainer = tocScrollRef.current;
+          const tocElTop = tocEl.offsetTop;
+          const containerHeight = tocContainer.clientHeight;
+          const currentScroll = tocContainer.scrollTop;
+          
+          if (tocElTop < currentScroll + 50 || tocElTop > currentScroll + containerHeight - 50) {
+            tocContainer.scrollTo({ top: tocElTop - containerHeight / 3, behavior: 'smooth' });
+          }
+        }
+      }
+    };
+
+    const container = scrollRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      // Trigger once on mount
+      handleScroll();
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [tocItems, activeTocId]);
 
   // 규정 데이터 패치 (선택한 버전 포함)
   useEffect(() => {
@@ -433,7 +482,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             {tocItems.map((item, idx) => {
               let itemClass = "px-3 py-1 text-slate-600 hover:text-blue-700 hover:font-bold hover:bg-slate-50 cursor-pointer text-[13px] flex gap-1 transition-all";
               if (item.type === "chapter") {
-                itemClass = "mt-4 mb-2 px-2 py-1.5 bg-slate-50 border-y border-slate-200 font-bold text-slate-700 text-[13px] tracking-tight";
+                if (item.id === "toc-main-files" || item.id === "toc-attachments") {
+                  itemClass = "mt-4 mb-2 px-2 py-1.5 bg-red-50 border-y border-red-100 font-bold text-slate-800 text-[13px] tracking-tight";
+                } else {
+                  itemClass = "mt-4 mb-2 px-2 py-1.5 bg-slate-50 border-y border-slate-200 font-bold text-slate-700 text-[13px] tracking-tight";
+                }
               } else if (item.type === "section") {
                 itemClass = "mt-3 mb-1 px-3 py-1 bg-blue-50/30 text-blue-800 font-bold text-[13px] border-l-2 border-blue-500 tracking-tight";
               } else if (item.type === "subsection") {
@@ -445,8 +498,13 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 itemClass = "px-5 py-1 text-slate-600 hover:text-blue-700 hover:font-bold hover:bg-slate-50 cursor-pointer text-[13px] flex gap-1 transition-all";
               }
               
+              if (item.id === activeTocId) {
+                // 추가적인 active 스타일 (예: 배경색이나 글씨색)
+                itemClass += " bg-blue-50 !text-blue-700 !font-bold rounded border border-blue-200";
+              }
+
               return (
-              <li key={idx} className={itemClass}>
+              <li key={idx} id={`li-${item.id}`} className={itemClass}>
                 <a href={`#${item.id}`} className="block w-full" onClick={(e) => {
                   e.preventDefault();
                   document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
