@@ -32,7 +32,8 @@ export default function AdminFilesManagement() {
   // Upload state
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadType, setUploadType] = useState<"전문" | "별표" | "별지">("전문");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState<string | null>(null);
   const [targetAttachmentId, setTargetAttachmentId] = useState<string | null>(null);
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
@@ -62,62 +63,102 @@ export default function AdminFilesManagement() {
 
   const openUploadModal = (attachmentId: string | null) => {
     setTargetAttachmentId(attachmentId);
-    setSelectedFile(null);
+    setSelectedFiles([]);
     setUploadType("전문");
     setUploadModalOpen(true);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.name.toLowerCase().endsWith(".hwp") && !file.name.toLowerCase().endsWith(".pdf")) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    
+    const validFiles = files.filter(f => f.name.toLowerCase().endsWith(".hwp") || f.name.toLowerCase().endsWith(".pdf"));
+    if (files.length !== validFiles.length) {
       alert("HWP 또는 PDF 파일만 업로드할 수 있습니다.");
-      e.target.value = "";
-      return;
     }
-    setSelectedFile(file);
+    
+    if (targetAttachmentId && validFiles.length > 1) {
+      alert("파일 교체 시에는 1개의 파일만 업로드할 수 있습니다.");
+      setSelectedFiles([validFiles[0]]);
+    } else {
+      setSelectedFiles(prev => [...prev, ...validFiles]);
+    }
+    e.target.value = "";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length === 0) return;
+    
+    const validFiles = files.filter(f => f.name.toLowerCase().endsWith(".hwp") || f.name.toLowerCase().endsWith(".pdf"));
+    if (files.length !== validFiles.length) {
+      alert("HWP 또는 PDF 파일만 업로드할 수 있습니다.");
+    }
+    
+    if (targetAttachmentId && validFiles.length > 1) {
+      alert("파일 교체 시에는 1개의 파일만 업로드할 수 있습니다.");
+      setSelectedFiles([validFiles[0]]);
+    } else {
+      setSelectedFiles(prev => [...prev, ...validFiles]);
+    }
   };
 
   const handleUploadSubmit = async () => {
-    if (!selectedFile || !activeRule) return;
+    if (selectedFiles.length === 0 || !activeRule) return;
 
     setUploading(targetAttachmentId || "new");
     setUploadModalOpen(false);
     
-    // Prefix the file name with the selected type
-    const originalName = selectedFile.name;
-    // Clean up existing prefixes if any to avoid [전문] [별표] ...
-    const cleanName = originalName.replace(/^\[(전문|별표|별지)\]\s*/, '');
-    const newFileName = `[${uploadType}] ${cleanName}`;
+    let successCount = 0;
+
+    for (const file of selectedFiles) {
+      const originalName = file.name;
+      const cleanName = originalName.replace(/^\[(전문|별표|별지)\]\s*/, '');
+      const newFileName = `[${uploadType}] ${cleanName}`;
+      
+      const modifiedFile = new File([file], newFileName, { type: file.type });
+
+      const formData = new FormData();
+      formData.append("file", modifiedFile);
+      formData.append("ruleId", activeRule.id);
+      if (targetAttachmentId) {
+        formData.append("attachmentId", targetAttachmentId);
+      }
+
+      try {
+        const res = await fetch("/api/admin/files", {
+          method: "POST",
+          body: formData,
+        });
+        
+        if (res.ok) {
+          successCount++;
+        } else {
+          const data = await res.json() as any;
+          console.error(data.error);
+        }
+      } catch (error: any) {
+        console.error("Upload error:", error);
+      }
+    }
     
-    const modifiedFile = new File([selectedFile], newFileName, { type: selectedFile.type });
-
-    const formData = new FormData();
-    formData.append("file", modifiedFile);
-    formData.append("ruleId", activeRule.id);
-    if (targetAttachmentId) {
-      formData.append("attachmentId", targetAttachmentId);
-    }
-
-    try {
-      const res = await fetch("/api/admin/files", {
-        method: "POST",
-        body: formData,
-      });
-      
-      const data = (await res.json()) as any;
-      if (!res.ok) throw new Error(data.error || "업로드 실패");
-      
-      alert(targetAttachmentId ? "파일이 성공적으로 교체되었습니다." : "파일이 성공적으로 추가되었습니다.");
-      loadAttachments(activeRule.id);
-    } catch (error: any) {
-      console.error("Upload error:", error);
-      alert(error.message || "파일 업로드 중 오류가 발생했습니다.");
-    } finally {
-      setUploading(null);
-      setTargetAttachmentId(null);
-      setSelectedFile(null);
-    }
+    alert(targetAttachmentId ? "파일이 성공적으로 교체되었습니다." : `총 ${successCount}개의 파일이 성공적으로 업로드되었습니다.`);
+    loadAttachments(activeRule.id);
+    
+    setUploading(null);
+    setTargetAttachmentId(null);
+    setSelectedFiles([]);
   };
 
   const handleDelete = async (attachmentId: string) => {
@@ -357,23 +398,41 @@ export default function AdminFilesManagement() {
           <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: 'text.secondary' }}>
             파일 선택 (HWP, PDF)
           </Typography>
-          <div className="border border-slate-300 border-dashed rounded-lg p-6 bg-slate-50 flex flex-col items-center justify-center gap-3">
+          <div 
+            className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-3 transition-colors ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-slate-300 bg-slate-50'}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
             <input
               type="file"
               onChange={handleFileSelect}
               accept=".hwp,.pdf"
               className="hidden"
               id="file-upload-input"
+              multiple={!targetAttachmentId}
             />
             <label htmlFor="file-upload-input" className="cursor-pointer">
               <Button variant="outlined" component="span" startIcon={<UploadFileIcon />}>
-                찾아보기
+                파일 찾아보기
               </Button>
             </label>
-            {selectedFile ? (
-              <p className="text-sm font-bold text-blue-700 mt-2">{selectedFile.name}</p>
-            ) : (
-              <p className="text-xs text-slate-500 mt-2">선택된 파일이 없습니다.</p>
+            <p className="text-xs text-slate-500">또는 이곳에 파일을 드래그 앤 드롭 하세요.</p>
+            
+            {selectedFiles.length > 0 && (
+              <div className="w-full mt-4 space-y-2 max-h-32 overflow-y-auto pr-2 scrollbar">
+                {selectedFiles.map((file, i) => (
+                  <div key={i} className="flex items-center justify-between bg-white border border-blue-100 p-2 rounded-md shadow-sm">
+                    <p className="text-sm font-bold text-blue-700 truncate">{file.name}</p>
+                    <button 
+                      onClick={() => setSelectedFiles(prev => prev.filter((_, idx) => idx !== i))}
+                      className="text-red-500 hover:text-red-700 font-black text-xs px-2"
+                    >
+                      X
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </DialogContent>
@@ -383,7 +442,7 @@ export default function AdminFilesManagement() {
           </Button>
           <Button 
             onClick={handleUploadSubmit} 
-            disabled={!selectedFile}
+            disabled={selectedFiles.length === 0}
             variant="contained" 
             sx={{ bgcolor: "#0c3161", "&:hover": { bgcolor: "#092244" }, fontWeight: 'bold', boxShadow: 'none' }}
           >
