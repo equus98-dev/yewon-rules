@@ -80,6 +80,15 @@ export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
   const [animateOut, setAnimateOut] = useState(false);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("selectMode") === "true") {
+        setShowIntro(false);
+      }
+    }
+  }, []);
+
   const handleEnterSystem = () => {
     setAnimateOut(true);
     setTimeout(() => {
