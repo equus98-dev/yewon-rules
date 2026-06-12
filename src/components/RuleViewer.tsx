@@ -660,10 +660,29 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       }
       
       let newContentJson = typeof targetArticle.contentJson === 'string' 
-        ? targetArticle.contentJson 
-        : JSON.stringify(targetArticle.contentJson);
+        ? JSON.parse(targetArticle.contentJson) 
+        : JSON.parse(JSON.stringify(targetArticle.contentJson));
+
+      const replaceInJson = (items: any[]) => {
+         if (!Array.isArray(items)) return;
+         items.forEach(item => {
+            if (item && typeof item.text === 'string') {
+               item.text = item.text.replace(selectedText, replacement);
+            }
+            if (item && Array.isArray(item.children)) {
+               replaceInJson(item.children);
+            }
+         });
+      };
+      
       if (newContentJson) {
-        newContentJson = newContentJson.replace(selectedText, replacement);
+         if (Array.isArray(newContentJson)) {
+            replaceInJson(newContentJson);
+         } else if (newContentJson.paragraphs) {
+            newContentJson.paragraphs = newContentJson.paragraphs.map((p: any) => 
+               typeof p === 'string' ? p.replace(selectedText, replacement) : p
+            );
+         }
       }
       
       let newContentHtml = targetArticle.contentHtml;

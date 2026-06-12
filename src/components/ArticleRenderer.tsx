@@ -416,7 +416,7 @@ export default function ArticleRenderer({
     const citationRegexStr = "(?:((?:(?:이|본|동)\\s*)?규정|(?:(?:[가-힣]+\\s+){1,3})?(?:정관|학칙|법|령|규칙|지침|내규|헌장))\\s+)?(제\\s*\\d+\\s*조(?:의\\s*\\d+)?(?:\\s*제\\s*\\d+\\s*항)?)";
     
     // 수동 인용 태그 파싱 (HTML 처리용)
-    htmlText = htmlText.replace(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"(?:\s+url="([^"]*)")?\](.*?)\[\/cite\]/gi, (match, rule, article, url, content) => {
+    htmlText = htmlText.replace(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"(?:\s+url="([^"]*)")?\]([\s\S]*?)\[\/cite\]/gi, (match, rule, article, url, content) => {
       const urlAttr = url ? ` data-url="${url}"` : "";
       return `<a href="#" class="cited-article-link text-sky-700 font-bold underline underline-offset-2" data-rule-name="${rule}" data-article="${article}"${urlAttr}>${content}</a>`;
     });
@@ -435,13 +435,13 @@ export default function ArticleRenderer({
       );
     }
 
-    const parts = decodedText.split(/(\[cite\s+rule="[^"]*"\s+article="[^"]*"(?:\s+url="[^"]*")?\](?:.*?)\[\/cite\]|[<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi);
+    const parts = decodedText.split(/(\[cite\s+rule="[^"]*"\s+article="[^"]*"(?:\s+url="[^"]*")?\][\s\S]*?\[\/cite\]|[<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi);
     return parts.map((part, i) => {
       if ((part.startsWith("<") && part.endsWith(">")) || (part.startsWith("(") && part.endsWith(")"))) {
         return <span key={i} className="text-sky-700 font-medium text-[13px] ml-1">{normalizeHistoryDate(part)}</span>;
       }
       if (part.startsWith("[cite")) {
-        const m = part.match(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"(?:\s+url="([^"]*)")?\](.*?)\[\/cite\]/i);
+        const m = part.match(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"(?:\s+url="([^"]*)")?\]([\s\S]*?)\[\/cite\]/i);
         if (m) {
           return (
              <a 
@@ -572,9 +572,16 @@ export default function ArticleRenderer({
         return p1 + '\n' + p2 + ' ';
       })
       .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])\s*\n([①-⑮])/g, '$1 $2')
-      .replace(/((?<![『「])제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])/g, '\n\n$1')
+      .replace(/((?<![『「])제\d+조의?\d*\s*(?:\[(?![\s\S]*?\[\/cite\])|[〔(（])[^\]〕)）]+[\]〕)）])/g, '\n\n$1')
       .replace(/(제\d+(?:장|절|관)\s+(?!(?:제\d+(?:조|항|호|목|장|절|관)?|및|에|의|은|는|이|가|을|를|과|와)(?:\s|$))[^\s]+)/g, '\n\n$1')
       .replace(/(^|\n)(부\s*칙)\s*(.*)/g, '\n\n$2 $3');
+
+    // Restore hidden citation tags to avoid them being split by newlines
+    let hiddenCitations: string[] = [];
+    formatted = formatted.replace(/\[cite[\s\S]*?\[\/cite\]/g, (match) => {
+       hiddenCitations.push(match);
+       return `__CITATION_${hiddenCitations.length - 1}__`;
+    });
 
     let curHang = "";
     let curHo = "";
@@ -604,7 +611,8 @@ export default function ArticleRenderer({
 
     return (
       <>
-        {lines.map((trimmed, idx) => {
+        {lines.map((trimmedLine, idx) => {
+          let trimmed = trimmedLine.replace(/__CITATION_(\d+)__/g, (_, i) => hiddenCitations[parseInt(i, 10)] || '');
           let lineClass = "break-keep text-slate-800";
           let isInline = (idx === 0 && isArticleBody);
           let currentPath = baseArticlePath;
