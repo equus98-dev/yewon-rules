@@ -28,28 +28,42 @@ export async function POST(req: Request) {
     // 1. 키워드 추출 (간단하게 2글자 이상 단어)
     const keywords = message.split(/\s+/).filter((w: string) => w.length >= 2);
     
-    // 2. DB에서 관련 규정 검색
+    // 2. DB에서 관련 규정 검색 (관련도 점수 기반 정렬)
     let contextText = "";
     if (keywords.length > 0) {
       pool = createPool();
       let conditions: string[] = [];
       let params: string[] = [];
+      let scoreCases: string[] = [];
+      
       for (let i = 0; i < keywords.length; i++) {
-        conditions.push(`"contentText" LIKE $${i + 1} OR title LIKE $${i + 1}`);
+        const p = `$${i + 1}`;
+        conditions.push(`(a."contentText" LIKE ${p} OR a.title LIKE ${p} OR r.title LIKE ${p})`);
+        scoreCases.push(`
+          (CASE WHEN r.title LIKE ${p} THEN 5 ELSE 0 END) +
+          (CASE WHEN a.title LIKE ${p} THEN 3 ELSE 0 END) +
+          (CASE WHEN a."contentText" LIKE ${p} THEN 1 ELSE 0 END)
+        `);
         params.push(`%${keywords[i]}%`);
       }
       
-      const sql = `SELECT title, "contentText", chapter, section 
-                   FROM "Article" 
-                   WHERE ${conditions.join(" OR ")} 
-                   LIMIT 15`;
+      const sql = `
+        SELECT a.title as articleTitle, a."contentText", a.chapter, a.section, r.title as ruleTitle,
+               (${scoreCases.join(" + ")}) as relevance
+        FROM "Article" a
+        JOIN "Revision" rev ON a."revisionId" = rev.id
+        JOIN "Rule" r ON rev."ruleId" = r.id
+        WHERE ${conditions.join(" OR ")} 
+        ORDER BY relevance DESC
+        LIMIT 15
+      `;
                    
       const res = await pool.query(sql, params);
       
       if (res.rows && res.rows.length > 0) {
         contextText = "다음은 예원예술대학교 규정 DB에서 발췌한 참고 자료입니다:\n\n" + 
           res.rows.map((row: any) => 
-            `[${row.chapter || ''} ${row.section || ''} ${row.title}] ${row.contentText}`
+            `[규정명: ${row.ruleTitle}] ${row.chapter || ''} ${row.section || ''} ${row.articleTitle}\n내용: ${row.contentText}`
           ).join("\n\n");
       }
     }
