@@ -520,20 +520,92 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                     <React.Fragment key={a.id}>
                       {showChapter && (
                         <div id={`toc-${a.chapter.split('\n')[0].trim().replace(/\s/g, '-')}`} className="text-center w-full mt-8 mb-6 pt-2 flex flex-col items-center gap-1.5">
-                          {a.chapter.split('\n').map((line: string, i: number) => (
-                            <span key={i} className={i === 0 ? "text-[20px] font-black text-[#000080] tracking-tight break-keep" : "text-[13px] text-blue-500 font-medium"}>
-                              {line}
-                            </span>
-                          ))}
+                          {(() => {
+                            const historyRegex = /([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi;
+                            const histories = a.chapter.match(historyRegex);
+                            let mainTitle = a.chapter;
+                            let historyPart = "";
+                            if (histories && histories.length > 0) {
+                              mainTitle = a.chapter.replace(historyRegex, '').trim();
+                              historyPart = histories.join('');
+                            }
+                            
+                            const lines = mainTitle.split('\n');
+                            if (historyPart) {
+                              const normalizeHistoryDate = (str: string) => {
+                                let inner = str.replace(/^[<(\[]|[)>\]]$/g, '').trim();
+                                let parts = inner.split(',').map(p => p.trim());
+                                let lastAction = '';
+                                let normParts = parts.map(part => {
+                                  let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)?\s*(.*)$/);
+                                  if (!match) return part;
+                                  let action = match[1];
+                                  let dateStr = match[2];
+                                  if (action) lastAction = action;
+                                  else action = lastAction || '개정';
+                                  let dateNorm = dateStr.replace(/[^\d.]/g, '').split('.').map(s => s.trim()).filter(s => s.length > 0).map(s => parseInt(s, 10)).join('. ');
+                                  if (dateNorm) dateNorm += '.';
+                                  else dateNorm = dateStr;
+                                  return action + ' ' + dateNorm;
+                                });
+                                return '<' + normParts.join(', ') + '>';
+                              };
+                              lines.push(normalizeHistoryDate(historyPart));
+                            }
+                            return lines.map((line: string, i: number) => {
+                              const isHistoryLine = i > 0 && /^[<(\[]/.test(line.trim());
+                              return (
+                                <span key={i} className={!isHistoryLine ? "text-[20px] font-black text-[#000080] tracking-tight break-keep" : "text-[13px] text-sky-700 font-medium"}>
+                                  {line}
+                                </span>
+                              );
+                            });
+                          })()}
                         </div>
                       )}
                       {showSection && (
                         <div id={`toc-${a.section.split('\n')[0].trim().replace(/\s/g, '-')}`} className="text-center w-full mt-6 mb-4 flex flex-col items-center gap-1">
-                          {a.section.split('\n').map((line: string, i: number) => (
-                            <span key={i} className={i === 0 ? "text-[18px] font-bold text-[#000080] break-keep" : "text-[12px] text-blue-500 font-medium"}>
-                              {line}
-                            </span>
-                          ))}
+                          {(() => {
+                            const historyRegex = /([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi;
+                            const histories = a.section.match(historyRegex);
+                            let mainTitle = a.section;
+                            let historyPart = "";
+                            if (histories && histories.length > 0) {
+                              mainTitle = a.section.replace(historyRegex, '').trim();
+                              historyPart = histories.join('');
+                            }
+                            
+                            const lines = mainTitle.split('\n');
+                            if (historyPart) {
+                              const normalizeHistoryDate = (str: string) => {
+                                let inner = str.replace(/^[<(\[]|[)>\]]$/g, '').trim();
+                                let parts = inner.split(',').map(p => p.trim());
+                                let lastAction = '';
+                                let normParts = parts.map(part => {
+                                  let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)?\s*(.*)$/);
+                                  if (!match) return part;
+                                  let action = match[1];
+                                  let dateStr = match[2];
+                                  if (action) lastAction = action;
+                                  else action = lastAction || '개정';
+                                  let dateNorm = dateStr.replace(/[^\d.]/g, '').split('.').map(s => s.trim()).filter(s => s.length > 0).map(s => parseInt(s, 10)).join('. ');
+                                  if (dateNorm) dateNorm += '.';
+                                  else dateNorm = dateStr;
+                                  return action + ' ' + dateNorm;
+                                });
+                                return '<' + normParts.join(', ') + '>';
+                              };
+                              lines.push(normalizeHistoryDate(historyPart));
+                            }
+                            return lines.map((line: string, i: number) => {
+                              const isHistoryLine = i > 0 && /^[<(\[]/.test(line.trim());
+                              return (
+                                <span key={i} className={!isHistoryLine ? "text-[18px] font-bold text-[#000080] break-keep" : "text-[12px] text-sky-700 font-medium"}>
+                                  {line}
+                                </span>
+                              );
+                            });
+                          })()}
                         </div>
                       )}
                       <ArticleRenderer
