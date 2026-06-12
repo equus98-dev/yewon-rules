@@ -439,6 +439,10 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       }
     }
     loadRule();
+    
+    const handleUpdate = () => { loadRule(); };
+    window.addEventListener('rule-updated', handleUpdate);
+    return () => window.removeEventListener('rule-updated', handleUpdate);
   }, [ruleId, selectedVersion]);
 
   useEffect(() => {
@@ -611,11 +615,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       
       if (!res.ok) throw new Error("업데이트 실패");
       
-      alert("인용이 성공적으로 연결되었습니다. 새로고침 시 적용됩니다.");
+      alert("인용이 성공적으로 연결되었습니다.");
       setIsManualModalOpen(false);
       setManualCitationData(null);
       window.getSelection()?.removeAllRanges();
-      window.location.reload(); 
+      window.dispatchEvent(new CustomEvent('rule-updated'));
     } catch (e: any) {
       alert("오류: " + e.message);
     } finally {

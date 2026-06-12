@@ -1151,7 +1151,8 @@ export default function ArticleRenderer({
                   });
                   if (!res.ok) throw new Error('저장 실패');
                   alert('성공적으로 수정되었습니다.');
-                  window.location.reload();
+                  setIsEditing(false);
+                  window.dispatchEvent(new CustomEvent('rule-updated'));
                 } catch (e) {
                   console.error(e);
                   alert('저장 중 오류가 발생했습니다.');
