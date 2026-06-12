@@ -40,6 +40,8 @@ export default function ArticleRenderer({
   isAdmin = false,
   trailingTitles = [],
 }: ArticleRendererProps) {
+  const isAddendumArticle = title === "부칙" || (title || "").replace(/\s+/g, "").startsWith("부칙") || chapter === "부칙";
+  const hideBadge = hideHistory || isAddendumArticle;
   const [modalHistory, setModalHistory] = useState<any[] | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -567,7 +569,7 @@ export default function ArticleRenderer({
                  const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
                  return (
                     <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
-                       {!hideHistory && (
+                       {!hideBadge && (
                          <button 
                            onClick={() => handleOpenHistory(historyDates)}
                            className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
@@ -603,7 +605,7 @@ export default function ArticleRenderer({
                  const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
                  return (
                     <div key={`glued-${idx}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
-                       {!hideHistory && (
+                       {!hideBadge && (
                          <button 
                            onClick={() => handleOpenHistory(historyDates)}
                            className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
@@ -744,7 +746,7 @@ export default function ArticleRenderer({
 
             return (
               <div className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
-                {!hideHistory && !isAddendum && (
+                {!hideBadge && !isAddendum && (
                   <button 
                     onClick={() => handleOpenHistory(historyDates)}
                     className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
@@ -752,7 +754,7 @@ export default function ArticleRenderer({
                     {badgeType}
                   </button>
                 )}
-                <div className={`flex-1 w-full group text-[16px] text-slate-800 leading-[1.7] ${(!hideHistory && !isAddendum) ? "" : "ml-[28px]"}`}>
+                <div className={`flex-1 w-full group text-[16px] text-slate-800 leading-[1.7] ${(!hideBadge && !isAddendum) ? "" : "ml-[28px]"}`}>
                   <div id={`toc-${safeNum}`} className="w-full break-keep inline-block">
                     {isAddendum ? (
                       <>
