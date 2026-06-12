@@ -577,6 +577,28 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         };
                       }
                       
+                      const getDownloadUrl = (file: any) => {
+                        const encodedTitle = encodeURIComponent(file.title);
+                        if (file.fileUrl.startsWith('/api/files/')) {
+                          return `${file.fileUrl}?download=true&filename=${encodedTitle}`;
+                        }
+                        if (file.fileUrl.startsWith('http')) {
+                          return `${file.fileUrl}?download=${encodedTitle}`;
+                        }
+                        return `/api/download?fileUrl=${encodeURIComponent(file.fileUrl)}&filename=${encodedTitle}`;
+                      };
+
+                      const getInlineUrl = (file: any) => {
+                        const encodedTitle = encodeURIComponent(file.title);
+                        if (file.fileUrl.startsWith('/api/files/')) {
+                          return `${file.fileUrl}?filename=${encodedTitle}`;
+                        }
+                        if (file.fileUrl.startsWith('http')) {
+                          return file.fileUrl;
+                        }
+                        return `/api/download?fileUrl=${encodeURIComponent(file.fileUrl)}&inline=true&filename=${encodedTitle}`;
+                      };
+                      
                       const isExpanded = !isMain && !!expandedAttachments[group.baseName];
 
                       return (
@@ -615,17 +637,17 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                               })()}
                                 <div className="flex items-center gap-1.5 ml-3" onClick={(e) => e.stopPropagation()}>
                                   {hwpFile && (
-                                    <a href={hwpFile.fileUrl.startsWith('http') ? `${hwpFile.fileUrl}?download=${encodeURIComponent(hwpFile.title)}` : `/api/download?fileUrl=${encodeURIComponent(hwpFile.fileUrl)}`} download={hwpFile.fileUrl.startsWith('http') ? undefined : true} target="_blank" className="bg-blue-50 border border-blue-200 text-blue-700 px-1.5 py-0.5 rounded text-[11px] font-black flex items-center gap-0.5 hover:bg-blue-100 transition-colors" title="HWP 다운로드">
+                                    <a href={getDownloadUrl(hwpFile)} download={true} target="_blank" className="bg-blue-50 border border-blue-200 text-blue-700 px-1.5 py-0.5 rounded text-[11px] font-black flex items-center gap-0.5 hover:bg-blue-100 transition-colors" title="HWP 다운로드">
                                       <ArticleIcon sx={{ fontSize: 14 }} /> HWP
                                     </a>
                                   )}
                                   {pdfFile && (
-                                    <a href={pdfFile.fileUrl.startsWith('http') ? `${pdfFile.fileUrl}?download=${encodeURIComponent(pdfFile.title)}` : `/api/download?fileUrl=${encodeURIComponent(pdfFile.fileUrl)}`} download={pdfFile.fileUrl.startsWith('http') ? undefined : true} target="_blank" className="bg-red-50 border border-red-200 text-red-700 px-1.5 py-0.5 rounded text-[11px] font-black flex items-center gap-0.5 hover:bg-red-100 transition-colors" title="PDF 다운로드">
+                                    <a href={getDownloadUrl(pdfFile)} download={true} target="_blank" className="bg-red-50 border border-red-200 text-red-700 px-1.5 py-0.5 rounded text-[11px] font-black flex items-center gap-0.5 hover:bg-red-100 transition-colors" title="PDF 다운로드">
                                       <PictureAsPdfIcon sx={{ fontSize: 14 }} /> PDF
                                     </a>
                                   )}
                                   {pdfFile && (
-                                    <a href={pdfFile.fileUrl.startsWith('http') ? pdfFile.fileUrl : `/api/download?fileUrl=${encodeURIComponent(pdfFile.fileUrl)}&inline=true`} target="_blank" className="text-slate-400 hover:text-slate-600 transition-colors ml-1 flex items-center justify-center" title="새 창에서 열기">
+                                    <a href={getInlineUrl(pdfFile)} target="_blank" className="text-slate-400 hover:text-slate-600 transition-colors ml-1 flex items-center justify-center" title="새 창에서 열기">
                                       <LaunchIcon sx={{ fontSize: 16 }} />
                                     </a>
                                   )}
@@ -638,7 +660,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                             <div className="bg-slate-100 p-0 w-full" style={{ height: "800px" }}>
                               {pdfFile ? (
                                 <iframe 
-                                  src={pdfFile.fileUrl.startsWith('http') ? `${pdfFile.fileUrl}#toolbar=0` : `/api/download?fileUrl=${encodeURIComponent(pdfFile.fileUrl)}&inline=true#toolbar=0`} 
+                                  src={`${getInlineUrl(pdfFile)}#toolbar=0`} 
                                   className="w-full h-full border-none"
                                   title={group.baseName}
                                 />

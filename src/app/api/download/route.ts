@@ -21,8 +21,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "File not found on remote storage" }, { status: 404 });
     }
 
-    // 파일 이름 추출
-    const filename = fileUrl.split('/').pop() || "download.file";
+    // 파일 이름 설정
+    const reqFilename = searchParams.get("filename");
+    const filename = reqFilename || (fileUrl.split('/').pop() || "download.file");
     // 한글 깨짐 방지를 위해 encodeURIComponent 사용
     const encodedFilename = encodeURIComponent(decodeURIComponent(filename));
 
