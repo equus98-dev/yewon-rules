@@ -575,7 +575,7 @@ function EditorContent() {
     setSaving(true);
     try {
       const res = await fetch("/api/admin/fix-all-formats", { method: "POST" });
-      const data = await res.json();
+      const data = await res.json() as any;
       if (res.ok) {
         alert(`전체 규정 일괄 정상화 완료!\n총 ${data.count}개의 조문이 수정되었습니다.`);
         window.location.reload();
