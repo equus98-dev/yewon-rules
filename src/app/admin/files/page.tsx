@@ -157,13 +157,22 @@ export default function AdminFilesManagement() {
                 <div className="min-w-0">
                   <h4 className="font-bold text-slate-800 text-[15px] truncate">{file.title}</h4>
                   <p className="text-[13px] text-slate-500 mt-1 truncate">
-                    {file.fileUrl.split("/").pop()}
+                    {decodeURIComponent(file.fileUrl.split("/").pop() || "")}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0 ml-4">
                 <a 
-                  href={file.fileUrl.startsWith('http') ? `${file.fileUrl}?download=${encodeURIComponent(file.title)}` : file.fileUrl} 
+                  href={(() => {
+                    const encodedTitle = encodeURIComponent(file.title);
+                    if (file.fileUrl.startsWith('/api/files/')) {
+                      return `${file.fileUrl}?download=true&filename=${encodedTitle}`;
+                    }
+                    if (file.fileUrl.startsWith('http')) {
+                      return `${file.fileUrl}?download=${encodedTitle}`;
+                    }
+                    return `/api/download?fileUrl=${encodeURIComponent(file.fileUrl)}&filename=${encodedTitle}`;
+                  })()}
                   download={file.title}
                   target="_blank"
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors"
