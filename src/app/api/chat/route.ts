@@ -56,7 +56,10 @@ export async function POST(req: Request) {
 
     // 3. Gemini 호출
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel(
+      { model: "gemini-1.5-flash" }, 
+      { apiVersion: "v1" }
+    );
 
     const systemPrompt = `당신은 예원예술대학교의 규정과 학칙을 친절하고 정확하게 안내하는 AI 어시스턴트입니다.
 답변할 때는 가독성을 위해 마크다운(Markdown)을 적절히 사용해 주세요.
