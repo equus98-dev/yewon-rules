@@ -158,7 +158,9 @@ export default function AdminFilesManagement() {
 
   // Divide files
   const mainFiles = attachments.filter(f => f.title.startsWith("[전문]"));
-  const subFiles = attachments.filter(f => f.title.startsWith("[별표]") || f.title.startsWith("[별지]") || !f.title.startsWith("[전문]"));
+  const subFiles = attachments
+    .filter(f => f.title.startsWith("[별표]") || f.title.startsWith("[별지]") || !f.title.startsWith("[전문]"))
+    .sort((a, b) => a.title.localeCompare(b.title, 'ko', { numeric: true }));
 
   const renderFileList = (files: any[], emptyMessage: string) => {
     if (files.length === 0) {
