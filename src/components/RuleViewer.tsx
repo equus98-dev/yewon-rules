@@ -647,6 +647,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                 </div>
                               )}
                             </div>
+                          )}
                         </div>
                       );
                     };
