@@ -179,6 +179,14 @@ export default function AdminFilesManagement() {
     );
   };
 
+  const handleToggleSelectAll = () => {
+    if (selectedFileIds.length === attachments.length) {
+      setSelectedFileIds([]);
+    } else {
+      setSelectedFileIds(attachments.map(a => a.id));
+    }
+  };
+
   const handleBatchDelete = async () => {
     if (selectedFileIds.length === 0) return;
     if (!confirm(`선택하신 ${selectedFileIds.length}개의 첨부파일을 일괄 삭제하시겠습니까?`)) return;
@@ -312,6 +320,20 @@ export default function AdminFilesManagement() {
                   <p className="text-xs text-slate-500 font-bold mt-1">파일의 유형을 구분하여 첨부하세요.</p>
                 </div>
                 <div className="flex items-center gap-2">
+                  {attachments.length > 0 && (
+                    <Button
+                      variant="outlined"
+                      onClick={handleToggleSelectAll}
+                      sx={{ 
+                        borderColor: '#cbd5e1', 
+                        color: '#475569',
+                        fontWeight: 'bold',
+                        '&:hover': { bgcolor: '#f1f5f9', borderColor: '#94a3b8' }
+                      }}
+                    >
+                      {selectedFileIds.length === attachments.length ? "전체 해제" : "전체 선택"}
+                    </Button>
+                  )}
                   {selectedFileIds.length > 0 && (
                     <Button
                       variant="outlined"
