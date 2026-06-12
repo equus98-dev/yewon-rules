@@ -567,6 +567,28 @@ function EditorContent() {
     window.location.reload();
   };
 
+  // 전체 규정 일괄 정상화
+  const handleFixAllRules = async () => {
+    if (!confirm("시스템 내의 '모든 규정'에 대해 간격 및 텍스트 오류를 일괄 정상화하시겠습니까? (서버에서 전체 규정을 대상으로 백그라운드 처리되며 시간이 소요될 수 있습니다.)")) {
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/fix-all-formats", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        alert(`전체 규정 일괄 정상화 완료!\n총 ${data.count}개의 조문이 수정되었습니다.`);
+        window.location.reload();
+      } else {
+        alert("일괄 정상화 실패: " + data.error);
+      }
+    } catch (e: any) {
+      alert(`오류 발생: ${e.message}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // 최종 개정안 저장 및 클라우드 배포 진행
   const handlePublishRevision = async () => {
     if (!versionName || !enactmentDate || !effectiveDate) {
@@ -728,6 +750,16 @@ function EditorContent() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleFixAllRules}
+              disabled={saving}
+              className="bg-white border border-emerald-600 text-emerald-700 hover:bg-emerald-50 text-sm font-black px-4 py-2.5 rounded-xl shadow-sm active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="시스템 내의 '모든 규정'들의 조문 간격 및 중복 제목 오류를 자동으로 일괄 수정합니다."
+            >
+              <SaveIcon sx={{ fontSize: 18 }} />
+              전체 규정 일괄 정상화(저장)
+            </button>
             <button
               type="button"
               onClick={handleSimpleSaveAll}
