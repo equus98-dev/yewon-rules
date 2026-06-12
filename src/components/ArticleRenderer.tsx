@@ -594,7 +594,7 @@ export default function ArticleRenderer({
                    <span key={`glued-${idx}`} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
                      <span className="mr-1">{numMatch[1]}</span>
                      {renderTextWithHistory(numMatch[2])}{" "}
-                     <InlineSelectBadge />
+                     
                    </span>
                  );
                }
@@ -602,7 +602,7 @@ export default function ArticleRenderer({
                   <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
-                     <InlineSelectBadge />
+                     
                   </div>
                );
              }
@@ -619,7 +619,7 @@ export default function ArticleRenderer({
                    <span key={`glued-${idx}`} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
                      <span className="mr-1">{numMatch[1]}</span>
                      {renderTextWithHistory(numMatch[2])}{" "}
-                     <InlineSelectBadge />
+                     
                    </span>
                  );
                }
@@ -627,7 +627,7 @@ export default function ArticleRenderer({
                   <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '36px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
-                     <InlineSelectBadge />
+                     
                   </div>
                );
              }
@@ -643,7 +643,7 @@ export default function ArticleRenderer({
                    <span key={`glued-${idx}`} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
                      <span className="mr-1">{numMatch[1]}</span>
                      {renderTextWithHistory(numMatch[2])}{" "}
-                     <InlineSelectBadge />
+                     
                    </span>
                  );
                }
@@ -651,7 +651,7 @@ export default function ArticleRenderer({
                   <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '52px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
-                     <InlineSelectBadge />
+                     
                   </div>
                );
              }
@@ -982,7 +982,7 @@ export default function ArticleRenderer({
                     )}
                   </div>
                 </div>
-                <SelectBadge />
+                
               </div>
             );
           })();
@@ -996,7 +996,7 @@ export default function ArticleRenderer({
               <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'} ${interactiveClass}`}>
                 <span className="font-normal mr-1">{safeNum}</span>
                 {formatGluedText(plainText, false)}
-                <SelectBadge />
+                
               </div>
             );
           }
@@ -1004,7 +1004,7 @@ export default function ArticleRenderer({
             <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
-              <SelectBadge />
+              
             </div>
           );
         } else if (item.type === "item") {
@@ -1015,7 +1015,7 @@ export default function ArticleRenderer({
               <div className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '20px' : '36px', textIndent: isAddendum ? '-20px' : '-16px' }}>
                 <span className="font-normal mr-1">{safeNum}</span>
                 <span className="font-normal">{renderTextWithHistory(safeText)}</span>
-                <SelectBadge />
+                
               </div>
             </React.Fragment>
           );
@@ -1024,7 +1024,7 @@ export default function ArticleRenderer({
             <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '52px', textIndent: '-16px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
-              <SelectBadge />
+              
             </div>
           );
         } else {
@@ -1049,7 +1049,7 @@ export default function ArticleRenderer({
                     {addendumBody && <span className="font-normal">{renderTextWithHistory(addendumBody)}</span>}
                   </div>
                 </div>
-                <SelectBadge />
+                
               </div>
             );
           }
@@ -1057,7 +1057,7 @@ export default function ArticleRenderer({
           return (
             <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full ${isGluedArticle ? '' : 'pl-[1.25rem]'} my-1.5 ${interactiveClass}`}>
               {formatGluedText(safeText, false)}
-              <SelectBadge />
+              
             </div>
           );
         }
