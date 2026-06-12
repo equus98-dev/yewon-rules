@@ -554,8 +554,19 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       return a.baseName.localeCompare(b.baseName);
                     })
                     .map((group: any, idx) => {
-                      const pdfFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf"));
+                      let pdfFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf"));
                       const hwpFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp"));
+                      
+                      // HWP 파일만 있고 PDF가 DB에 등록되어 있지 않은 경우, 동일한 경로에 자동 변환된 PDF가 있다고 가정하고 객체 생성
+                      if (hwpFile && !pdfFile) {
+                        pdfFile = {
+                          ...hwpFile,
+                          title: hwpFile.title.replace(/\.hwp$/i, '.pdf'),
+                          fileUrl: hwpFile.fileUrl.replace(/\.hwp$/i, '.pdf'),
+                          fileType: 'PDF'
+                        };
+                      }
+                      
                       const isExpanded = !!expandedAttachments[group.baseName];
 
                       return (
