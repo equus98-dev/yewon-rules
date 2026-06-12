@@ -76,7 +76,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const tocScrollRef = useRef<HTMLDivElement>(null);
   const [activeTocId, setActiveTocId] = useState<string>("");
-  const [popupState, setPopupState] = useState<{ isOpen: boolean; title: string; isLoading?: boolean; error?: string | null; articleData?: any }>({ isOpen: false, title: "" });
+  const [popupState, setPopupState] = useState<{ isOpen: boolean; title: string; isLoading?: boolean; error?: string | null; articleData?: any; url?: string }>({ isOpen: false, title: "" });
 
   const [manualCitationData, setManualCitationData] = useState<{
     selectedText: string;
@@ -461,10 +461,17 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         const link = target.closest('.cited-article-link') as HTMLElement;
         const ruleName = link.getAttribute('data-rule-name') || "";
         const articleNum = link.getAttribute('data-article') || "";
+        const urlAttr = link.getAttribute('data-url');
         
         const popupTitle = ruleName ? `${ruleName} ${articleNum}` : articleNum;
-        setPopupState({ isOpen: true, title: popupTitle, isLoading: true, error: null, articleData: null });
+        setPopupState({ isOpen: true, title: popupTitle, isLoading: true, error: null, articleData: null, url: urlAttr || undefined });
         
+        if (urlAttr) {
+          // URL이 있으면 데이터 로드할 필요 없이 바로 보여줌
+          setPopupState({ isOpen: true, title: popupTitle, isLoading: false, articleData: null, url: urlAttr });
+          return;
+        }
+
         try {
           const cleanRuleName = ruleName.replace(/\s/g, '');
           const isCurrentRule = !ruleName || cleanRuleName.includes("이규정") || cleanRuleName.includes("본규정") || cleanRuleName.includes("동규정") || (ruleData?.title && ruleData.title.replace(/\s/g, '').includes(cleanRuleName));
@@ -636,7 +643,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     }
   };
 
-  const handleManualCitationSave = async (ruleName: string, articleNum: string) => {
+  const handleManualCitationSave = async (ruleName: string, articleNum: string, url: string = "") => {
     if (!manualCitationData) return;
     setIsManualModalSaving(true);
     try {
@@ -644,7 +651,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       if (!targetArticle) throw new Error("조문을 찾을 수 없습니다.");
       
       const selectedText = manualCitationData.selectedText;
-      const replacement = `[cite rule="${ruleName}" article="${articleNum}"]${selectedText}[/cite]`;
+      const urlPart = url ? ` url="${url}"` : "";
+      const replacement = `[cite rule="${ruleName}" article="${articleNum}"${urlPart}]${selectedText}[/cite]`;
       
       let newContentText = targetArticle.contentText;
       if (newContentText) {
@@ -696,7 +704,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         isLoading={popupState.isLoading}
         error={popupState.error}
       >
-        {popupState.articleData && (
+        {popupState.articleData && !popupState.url && (
           <div className="mt-2 relative">
              <ArticleRenderer
                 articleNumber={popupState.articleData.articleNumber}
@@ -710,6 +718,15 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 isSelectMode={isSelectMode}
                 ruleName={cleanTitle}
              />
+          </div>
+        )}
+        {popupState.url && (
+          <div className="mt-2 relative w-[800px] max-w-[90vw] h-[600px] max-h-[80vh]">
+            <iframe 
+              src={popupState.url} 
+              className="w-full h-full border border-slate-200 rounded"
+              title="외부 법령 연결"
+            />
           </div>
         )}
       </DraggablePopup>

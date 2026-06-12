@@ -7,7 +7,7 @@ interface ManualCitationModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedText: string;
-  onSave: (ruleName: string, articleNum: string) => void;
+  onSave: (ruleName: string, articleNum: string, url: string) => void;
   isSaving: boolean;
 }
 
@@ -32,21 +32,23 @@ export default function ManualCitationModal({
 }: ManualCitationModalProps) {
   const [ruleName, setRuleName] = useState("");
   const [articleNum, setArticleNum] = useState("");
+  const [url, setUrl] = useState("");
 
   // 모달이 열릴 때 초기화
   React.useEffect(() => {
     if (isOpen) {
       setRuleName("");
       setArticleNum("");
+      setUrl("");
     }
   }, [isOpen]);
 
   const handleSave = () => {
-    if (!ruleName.trim() && !articleNum.trim()) {
-       alert("규정명 또는 조문 번호를 입력해주세요.");
+    if (!ruleName.trim() && !articleNum.trim() && !url.trim()) {
+       alert("규정명, 조문 번호, 또는 URL 중 하나는 입력해주세요.");
        return;
     }
-    onSave(ruleName.trim(), articleNum.trim());
+    onSave(ruleName.trim(), articleNum.trim(), url.trim());
   };
 
   return (
@@ -97,6 +99,16 @@ export default function ManualCitationModal({
           placeholder="예: 제10조 제1항"
           value={articleNum}
           onChange={(e) => setArticleNum(e.target.value)}
+          margin="normal"
+          size="small"
+        />
+
+        <TextField
+          fullWidth
+          label="URL 링크 (선택)"
+          placeholder="예: https://www.law.go.kr/..."
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
           margin="normal"
           size="small"
         />

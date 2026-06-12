@@ -409,8 +409,9 @@ export default function ArticleRenderer({
     const citationRegexStr = "(?:((?:(?:이|본|동)\\s*)?규정|(?:(?:[가-힣]+\\s+){1,3})?(?:정관|학칙|법|령|규칙|지침|내규|헌장))\\s+)?(제\\s*\\d+\\s*조(?:의\\s*\\d+)?(?:\\s*제\\s*\\d+\\s*항)?)";
     
     // 수동 인용 태그 파싱 (HTML 처리용)
-    htmlText = htmlText.replace(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"\](.*?)\[\/cite\]/gi, (match, rule, article, content) => {
-      return `<a href="#" class="cited-article-link text-sky-700 font-bold underline underline-offset-2" data-rule-name="${rule}" data-article="${article}">${content}</a>`;
+    htmlText = htmlText.replace(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"(?:\s+url="([^"]*)")?\](.*?)\[\/cite\]/gi, (match, rule, article, url, content) => {
+      const urlAttr = url ? ` data-url="${url}"` : "";
+      return `<a href="#" class="cited-article-link text-sky-700 font-bold underline underline-offset-2" data-rule-name="${rule}" data-article="${article}"${urlAttr}>${content}</a>`;
     });
 
     // 테이블 등 HTML 태그가 포함되어 있다면 dangerouslySetInnerHTML 사용
@@ -427,13 +428,13 @@ export default function ArticleRenderer({
       );
     }
 
-    const parts = decodedText.split(/(\[cite\s+rule="[^"]*"\s+article="[^"]*"\](?:.*?)\[\/cite\]|[<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi);
+    const parts = decodedText.split(/(\[cite\s+rule="[^"]*"\s+article="[^"]*"(?:\s+url="[^"]*")?\](?:.*?)\[\/cite\]|[<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi);
     return parts.map((part, i) => {
       if ((part.startsWith("<") && part.endsWith(">")) || (part.startsWith("(") && part.endsWith(")"))) {
         return <span key={i} className="text-sky-700 font-medium text-[13px] ml-1">{normalizeHistoryDate(part)}</span>;
       }
       if (part.startsWith("[cite")) {
-        const m = part.match(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"\](.*?)\[\/cite\]/i);
+        const m = part.match(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"(?:\s+url="([^"]*)")?\](.*?)\[\/cite\]/i);
         if (m) {
           return (
              <a 
@@ -442,9 +443,10 @@ export default function ArticleRenderer({
                className="cited-article-link text-sky-700 font-bold underline underline-offset-2" 
                data-rule-name={m[1]} 
                data-article={m[2]}
+               data-url={m[3] || undefined}
                onClick={(e) => e.preventDefault()}
              >
-               {m[3]}
+               {m[4]}
              </a>
           );
         }
