@@ -36,7 +36,14 @@ const HalftoneCircle = ({ className }: { className?: string }) => (
 );
 
 export default function Home() {
-  const [activeRuleId, setActiveRuleId] = useState<string | null>(null);
+  const [activeRuleId, setActiveRuleId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("ruleId")) return params.get("ruleId");
+      return sessionStorage.getItem("activeRuleId");
+    }
+    return null;
+  });
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -44,9 +51,18 @@ export default function Home() {
   const [loadingSearch, setLoadingSearch] = useState(false);
   
   // 카테고리 뷰 관련 상태
-  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
-  const [activeNoticeId, setActiveNoticeId] = useState<string | null>(null);
-  const [activeVerticalTab, setActiveVerticalTab] = useState<string>("규정");
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") return sessionStorage.getItem("activeCategoryId");
+    return null;
+  });
+  const [activeVerticalTab, setActiveVerticalTab] = useState<string>(() => {
+    if (typeof window !== "undefined") return sessionStorage.getItem("activeVerticalTab") || "total";
+    return "total";
+  });
+  const [activeNoticeId, setActiveNoticeId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") return sessionStorage.getItem("activeNoticeId");
+    return null;
+  });
   const [activeCategoryName, setActiveCategoryName] = useState<string | null>(null);
   const [categoryRules, setCategoryRules] = useState<any[]>([]);
   const [loadingCategory, setLoadingCategory] = useState(false);
@@ -77,33 +93,30 @@ export default function Home() {
   const [sessionTimeLeft, setSessionTimeLeft] = useState<number>(1800);
 
   // 메인 화면 인트로 애니메이션 상태
-  const [showIntro, setShowIntro] = useState(true);
-  const [animateOut, setAnimateOut] = useState(false);
-
-  useEffect(() => {
+  const [showIntro, setShowIntro] = useState(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      if (params.get("selectMode") === "true") {
-        setShowIntro(false);
-      } else {
-        const savedShowIntro = sessionStorage.getItem("showIntro");
-        if (savedShowIntro === "false") {
-          setShowIntro(false);
-          setAnimateOut(true);
-        }
-      }
+      if (params.get("selectMode") === "true") return false;
+      return sessionStorage.getItem("showIntro") !== "false";
+    }
+    return true;
+  });
+  const [animateOut, setAnimateOut] = useState(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("selectMode") === "true") return false;
+      return sessionStorage.getItem("showIntro") === "false";
+    }
+    return false;
+  });
 
-      const savedRuleId = sessionStorage.getItem("activeRuleId");
-      if (savedRuleId) setActiveRuleId(savedRuleId);
-      
-      const savedCategoryId = sessionStorage.getItem("activeCategoryId");
-      if (savedCategoryId) setActiveCategoryId(savedCategoryId);
-      
-      const savedVerticalTab = sessionStorage.getItem("activeVerticalTab");
-      if (savedVerticalTab) setActiveVerticalTab(savedVerticalTab);
-      
-      const savedNoticeId = sessionStorage.getItem("activeNoticeId");
-      if (savedNoticeId) setActiveNoticeId(savedNoticeId);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      // Wait to sync state in case of query params
     }
   }, []);
 
@@ -367,6 +380,8 @@ export default function Home() {
       setLoadingCategory(false);
     }
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-slate-50 relative font-sans text-slate-800">

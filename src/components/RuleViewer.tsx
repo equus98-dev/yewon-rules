@@ -613,10 +613,16 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         });
         
         if (!modified && content.includes(selectedText)) {
-           // If it was an auto-generated citation, there might be no [cite] tag to strip.
-           // We wrap the selectedText in [nocite] to prevent auto-generation regex from matching it.
-           res = content.replace(selectedText, `[nocite]${selectedText}[/nocite]`);
+           // Prevent double wrapping
+           if (!res.includes(`[nocite]${selectedText}[/nocite]`)) {
+              // Wrap each line individually to prevent tags from spanning across newlines and breaking the JSON parser
+              const wrappedText = selectedText.split('\n').map(part => part.trim() ? `[nocite]${part}[/nocite]` : part).join('\n');
+              res = res.replace(selectedText, wrappedText);
+           }
         }
+        
+        // Clean up any accidentally nested [nocite] tags
+        res = res.replace(/\[nocite\]\s*\[nocite\]/g, '[nocite]').replace(/\[\/nocite\]\s*\[\/nocite\]/g, '[/nocite]');
         return res;
       };
       

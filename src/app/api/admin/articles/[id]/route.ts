@@ -16,7 +16,7 @@ export async function PATCH(
     const body = (await request.json()) as any;
     const { contentText, contentJson, contentHtml, title, chapter, section } = body;
 
-    const cJsonStr = contentJson ? JSON.stringify(contentJson) : "{}";
+    const cJsonStr = typeof contentJson === 'string' ? contentJson : (contentJson ? JSON.stringify(contentJson) : "{}");
     
     // 1. 현재 조항 내용 조회 (수정 전)
     const oldArtRes = await pool.query(
