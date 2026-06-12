@@ -549,30 +549,21 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 })}
 
                 {/* Attachments Section */}
-                {attachments && attachments.length > 0 && (
-                  <div id="toc-attachments" className="mt-16 w-full">
-                    <div className="flex items-center gap-2 mb-6 border-b-2 border-slate-300 pb-3">
-                      <ArticleIcon className="text-blue-700" sx={{ fontSize: 24 }} />
-                      <h3 className="text-[20px] font-black text-[#000080] tracking-tight">별지 및 별표</h3>
-                    </div>
-                    <div className="space-y-4">
-                      {/* Group attachments by base name */}
-                    {Object.values(
-                      attachments.reduce((acc: any, file: any) => {
-                        const baseName = file.title.replace(/\.[^/.]+$/, "");
-                        if (!acc[baseName]) acc[baseName] = { baseName, files: [] };
-                        acc[baseName].files.push(file);
-                        return acc;
-                      }, {})
-                    )
-                    .sort((a: any, b: any) => {
-                      const aIsMain = a.baseName.includes("[전문]");
-                      const bIsMain = b.baseName.includes("[전문]");
-                      if (aIsMain && !bIsMain) return -1;
-                      if (!aIsMain && bIsMain) return 1;
-                      return a.baseName.localeCompare(b.baseName);
-                    })
-                    .map((group: any, idx) => {
+                {/* Attachments Section */}
+                {attachments && attachments.length > 0 && (() => {
+                  const groups = Object.values(
+                    attachments.reduce((acc: any, file: any) => {
+                      const baseName = file.title.replace(/\.[^/.]+$/, "");
+                      if (!acc[baseName]) acc[baseName] = { baseName, files: [] };
+                      acc[baseName].files.push(file);
+                      return acc;
+                    }, {})
+                  ) as any[];
+
+                  const mainGroups = groups.filter((g: any) => g.baseName.includes("[전문]") || (!g.baseName.includes("[별표]") && !g.baseName.includes("[별지]") && !g.baseName.includes("[서식]")));
+                  const otherGroups = groups.filter((g: any) => !mainGroups.includes(g));
+
+                  const renderGroup = (group: any, idx: number) => {
                       let pdfFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf"));
                       const hwpFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp"));
                       
@@ -656,14 +647,39 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                 </div>
                               )}
                             </div>
-                          )}
                         </div>
                       );
-                    })}
-                    </div>
-                  </div>
-                )}
-              </div>
+                    };
+
+                    return (
+                      <>
+                        {mainGroups.length > 0 && (
+                          <div id="toc-main-attachments" className="mt-16 w-full">
+                            <div className="flex items-center gap-2 mb-6 border-b-2 border-slate-300 pb-3">
+                              <ArticleIcon className="text-emerald-600" sx={{ fontSize: 24 }} />
+                              <h3 className="text-[20px] font-black text-[#004000] tracking-tight">규정 전문</h3>
+                            </div>
+                            <div className="space-y-4">
+                              {mainGroups.sort((a, b) => a.baseName.localeCompare(b.baseName)).map(renderGroup)}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {otherGroups.length > 0 && (
+                          <div id="toc-attachments" className={mainGroups.length > 0 ? "mt-12 w-full" : "mt-16 w-full"}>
+                            <div className="flex items-center gap-2 mb-6 border-b-2 border-slate-300 pb-3">
+                              <ArticleIcon className="text-blue-700" sx={{ fontSize: 24 }} />
+                              <h3 className="text-[20px] font-black text-[#000080] tracking-tight">별지 및 별표</h3>
+                            </div>
+                            <div className="space-y-4">
+                              {otherGroups.sort((a, b) => a.baseName.localeCompare(b.baseName)).map(renderGroup)}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
             ) : (
               <div className="text-center py-20 text-slate-400">조항 내용이 없습니다.</div>
             )}
