@@ -253,10 +253,6 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     const uploadedAttachments = ruleData?.attachments || [];
     
     if (uploadedAttachments.length > 0) {
-      if (!toc.some((t: any) => t.id === "toc-attachments")) {
-         toc.push({ type: "chapter", id: "toc-attachments", text: "별표/별지 목록" });
-      }
-      
       const uniqueBaseNames = new Set<string>();
       uploadedAttachments.forEach((a: any) => {
         const baseName = a.title.replace(/\.[^/.]+$/, "");
@@ -265,19 +261,30 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         }
       });
 
-      Array.from(uniqueBaseNames).sort((a: any, b: any) => {
-         const aIsMain = a.includes("[전문]");
-         const bIsMain = b.includes("[전문]");
-         if (aIsMain && !bIsMain) return -1;
-         if (!aIsMain && bIsMain) return 1;
-         return a.localeCompare(b);
-      }).forEach((baseName: string) => {
-         if (!toc.some((t: any) => t.id === `toc-attach-${baseName}`)) {
+      const mainFiles = Array.from(uniqueBaseNames).filter((name: any) => name.includes("[전문]"));
+      const subFiles = Array.from(uniqueBaseNames).filter((name: any) => !name.includes("[전문]")).sort((a: any, b: any) => a.localeCompare(b, 'ko', { numeric: true }));
+
+      if (mainFiles.length > 0) {
+         if (!toc.some((t: any) => t.id === "toc-main-files")) {
+            toc.push({ type: "chapter", id: "toc-main-files", text: "현 규정 다운로드" });
+         }
+         mainFiles.forEach((baseName: string) => {
             const match = baseName.match(/\[(.*?)\]/);
             const displayText = match ? match[1] : baseName;
             toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: displayText });
+         });
+      }
+
+      if (subFiles.length > 0) {
+         if (!toc.some((t: any) => t.id === "toc-attachments")) {
+            toc.push({ type: "chapter", id: "toc-attachments", text: "별표/별지 목록" });
          }
-      });
+         subFiles.forEach((baseName: string) => {
+            const match = baseName.match(/\[(.*?)\]/);
+            const displayText = match ? match[1] : baseName;
+            toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: displayText });
+         });
+      }
     }
     
     return toc;
