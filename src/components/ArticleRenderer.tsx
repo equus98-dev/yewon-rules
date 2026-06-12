@@ -52,6 +52,7 @@ export default function ArticleRenderer({
 
   const renderEditButton = () => {
     if (!isAdmin) return null;
+    if (isAddendumArticle) return null;
     return (
       <button 
         onClick={() => {
@@ -259,7 +260,7 @@ export default function ArticleRenderer({
 
   // Handle glued documents where the title contains the first article but content doesn't
   const hasArticleItem = items.some(i => i && i.type === "article");
-  if (!hasArticleItem && title) {
+  if (!hasArticleItem && title && articleNumber < 8000) {
     const expectedTitleStart = `제${articleNumber}조`;
     let fullTitle = /^제\d+조/.test(title.trim()) ? title : `${expectedTitleStart}(${title})`;
     if (articleNumber >= 8000 && articleNumber < 9000) {

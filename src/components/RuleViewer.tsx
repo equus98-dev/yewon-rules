@@ -733,6 +733,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                           })()}
                         </div>
                       )}
+                      {a.articleNumber >= 8000 && (idx === 0 || (currentRevision?.articles && currentRevision.articles[idx - 1].articleNumber < 8000)) && (
+                        <div className="w-full my-12 border-t-2 border-slate-300 border-dashed"></div>
+                      )}
                       <ArticleRenderer
                         id={`toc-${a.articleNumber}`}
                         articleId={a.id}
