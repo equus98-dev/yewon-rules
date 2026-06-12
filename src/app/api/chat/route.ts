@@ -82,7 +82,7 @@ ${contextText}
   } catch (error: any) {
     console.error("[Chat API Error]:", error);
     return NextResponse.json(
-      { reply: "오류가 발생했습니다. 잠시 후 다시 시도해 주세요." },
+      { reply: `오류가 발생했습니다: ${error.message}` },
       { status: 500 }
     );
   } finally {
