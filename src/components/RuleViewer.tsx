@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { CircularProgress, Typography } from "@mui/material";
 import ArticleRenderer from "./ArticleRenderer";
+import DraggablePopup from "./DraggablePopup";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import HistoryIcon from "@mui/icons-material/History";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
@@ -74,6 +75,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const tocScrollRef = useRef<HTMLDivElement>(null);
   const [activeTocId, setActiveTocId] = useState<string>("");
+  const [popupState, setPopupState] = useState<{ isOpen: boolean; title: string; isLoading?: boolean; error?: string | null; articleData?: any }>({ isOpen: false, title: "" });
 
   const handleScrollTop = () => {
     scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -430,6 +432,67 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     loadRule();
   }, [ruleId, selectedVersion]);
 
+  useEffect(() => {
+    const handleGlobalClick = async (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && target.closest('.cited-article-link')) {
+        e.preventDefault();
+        const link = target.closest('.cited-article-link') as HTMLElement;
+        const ruleName = link.getAttribute('data-rule-name') || "";
+        const articleNum = link.getAttribute('data-article') || "";
+        
+        const popupTitle = ruleName ? `${ruleName} ${articleNum}` : articleNum;
+        setPopupState({ isOpen: true, title: popupTitle, isLoading: true, error: null, articleData: null });
+        
+        try {
+          // If ruleName is empty or refers to the current rule
+          const isCurrentRule = !ruleName || ruleName.includes("이 규정") || ruleName.includes("본 규정") || ruleName.includes("동 규정") || (ruleData?.title && ruleData.title.includes(ruleName));
+          
+          if (isCurrentRule) {
+             const articleMatch = ruleData?.currentRevision?.articles?.find((a: any) => {
+                const articleStr = String(a.articleNumber);
+                const titleStr = a.title || "";
+                return articleStr === articleNum.replace(/[^0-9]/g, '') || titleStr.includes(articleNum);
+             });
+             if (articleMatch) {
+               setPopupState({ isOpen: true, title: popupTitle, isLoading: false, articleData: articleMatch });
+             } else {
+               setPopupState({ isOpen: true, title: popupTitle, isLoading: false, error: "해당 조문을 현재 규정에서 찾을 수 없습니다." });
+             }
+          } else {
+             // Search for the other rule
+             const searchRes = await fetch(`/api/rules/search?query=${encodeURIComponent(ruleName)}`);
+             const searchData = (await searchRes.json()) as any;
+             if (searchData && searchData.rules && searchData.rules.length > 0) {
+                const foundRuleId = searchData.rules[0].id;
+                const ruleRes = await fetch(`/api/rules/${foundRuleId}`);
+                const foundRuleData = (await ruleRes.json()) as any;
+                
+                const articleMatch = foundRuleData?.currentRevision?.articles?.find((a: any) => {
+                   const articleStr = String(a.articleNumber);
+                   const titleStr = a.title || "";
+                   return articleStr === articleNum.replace(/[^0-9]/g, '') || titleStr.includes(articleNum);
+                });
+                if (articleMatch) {
+                   setPopupState({ isOpen: true, title: popupTitle, isLoading: false, articleData: articleMatch });
+                } else {
+                   setPopupState({ isOpen: true, title: popupTitle, isLoading: false, error: "해당 조문을 인용된 규정에서 찾을 수 없습니다." });
+                }
+             } else {
+                setPopupState({ isOpen: true, title: popupTitle, isLoading: false, error: "인용된 규정을 시스템에서 찾을 수 없습니다." });
+             }
+          }
+        } catch (err) {
+          console.error("Failed to load cited article:", err);
+          setPopupState({ isOpen: true, title: popupTitle, isLoading: false, error: "조문을 불러오는 중 오류가 발생했습니다." });
+        }
+      }
+    };
+    
+    document.addEventListener("click", handleGlobalClick);
+    return () => document.removeEventListener("click", handleGlobalClick);
+  }, [ruleData]);
+
   // ruleId가 바뀔 때마다 버전 초기화 및 스크롤 맨 위로 이동
   useEffect(() => {
     setSelectedVersion(null);
@@ -469,6 +532,28 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
   return (
     <div className="flex flex-col h-full bg-white overflow-hidden relative border border-slate-200">
+      <DraggablePopup 
+        isOpen={popupState.isOpen}
+        onClose={() => setPopupState(prev => ({ ...prev, isOpen: false }))}
+        title={popupState.title}
+        isLoading={popupState.isLoading}
+        error={popupState.error}
+      >
+        {popupState.articleData && (
+          <div className="mt-2 relative">
+             <ArticleRenderer
+                articleNumber={popupState.articleData.articleNumber}
+                title={popupState.articleData.title}
+                contentJson={popupState.articleData.contentJson}
+                contentText={popupState.articleData.contentText}
+                contentHtml={popupState.articleData.contentHtml}
+                hideHistory={true}
+                hasHtmlAttachments={false}
+                isAdmin={false}
+             />
+          </div>
+        )}
+      </DraggablePopup>
       
       {/* 1. 상단 타이틀 및 브레드크럼 */}
       <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-6 py-4 shrink-0 flex items-center justify-between z-10 shadow-sm relative">

@@ -402,8 +402,14 @@ export default function ArticleRenderer({
       (match) => `<span class="text-sky-700 font-medium text-[13px] ml-1">${normalizeHistoryDate(match).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
     );
 
+    const citationRegexStr = "(([가-힣]+(?:\\s+[가-힣]+)*)\\s+)?(제\\s*\\d+\\s*조(?:의\\s*\\d+)?(?:\\s*제\\s*\\d+\\s*항)?)";
+    
     // 테이블 등 HTML 태그가 포함되어 있다면 dangerouslySetInnerHTML 사용
     if (/<table|<tr|<td|<th|<br|<p/i.test(htmlText)) {
+      htmlText = htmlText.replace(new RegExp(citationRegexStr, 'g'), (match, p1, p2, p3) => {
+        if (p2 && (p2.endsWith("장") || p2.endsWith("절") || p2.endsWith("관"))) return match;
+        return `<a href="#" class="cited-article-link text-blue-600 hover:underline font-medium" data-rule-name="${p2 || ''}" data-article="${p3}">${match}</a>`;
+      });
       return (
         <div 
           className="html-table-wrapper block w-full overflow-x-auto html-content-inline"
@@ -417,6 +423,48 @@ export default function ArticleRenderer({
       if ((part.startsWith("<") && part.endsWith(">")) || (part.startsWith("(") && part.endsWith(")"))) {
         return <span key={i} className="text-sky-700 font-medium text-[13px] ml-1">{normalizeHistoryDate(part)}</span>;
       }
+      
+      const subParts: React.ReactNode[] = [];
+      let lastIndex = 0;
+      let match;
+      const regex = new RegExp(citationRegexStr, 'g');
+      
+      while ((match = regex.exec(part)) !== null) {
+        if (match.index > lastIndex) {
+          subParts.push(part.substring(lastIndex, match.index));
+        }
+        
+        const fullMatch = match[0];
+        const ruleName = match[2] ? match[2].trim() : "";
+        const article = match[3] ? match[3].trim() : "";
+        
+        if (ruleName.endsWith("장") || ruleName.endsWith("절") || ruleName.endsWith("관")) {
+           subParts.push(fullMatch);
+        } else {
+           subParts.push(
+             <a 
+               key={`${i}-${match.index}`} 
+               href="#" 
+               className="cited-article-link text-blue-600 hover:underline font-medium" 
+               data-rule-name={ruleName} 
+               data-article={article}
+               onClick={(e) => e.preventDefault()}
+             >
+               {fullMatch}
+             </a>
+           );
+        }
+        lastIndex = regex.lastIndex;
+      }
+      
+      if (lastIndex < part.length) {
+        subParts.push(part.substring(lastIndex));
+      }
+      
+      if (subParts.length > 0) {
+        return <React.Fragment key={i}>{subParts.map((sp, idx) => typeof sp === 'string' ? <React.Fragment key={idx}>{sp}</React.Fragment> : sp)}</React.Fragment>;
+      }
+
       return <React.Fragment key={i}>{part}</React.Fragment>;
     });
   };
