@@ -293,7 +293,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
     { id: "최신 제·개정" as const, label: <React.Fragment>최신<br/>제개정</React.Fragment>, icon: <HistoryIcon sx={{ fontSize: 26 }} /> },
     { id: "서식" as const, label: "서식", icon: <DescriptionIcon sx={{ fontSize: 26 }} /> },
     { id: "공지사항" as const, label: "공지", icon: <CampaignIcon sx={{ fontSize: 26 }} /> },
-    { id: "조직도" as const, label: "조직도", icon: <AccountTreeIcon sx={{ fontSize: 26 }} /> },
+    // { id: "조직도" as const, label: "조직도", icon: <AccountTreeIcon sx={{ fontSize: 26 }} /> },
   ];
 
   return (
