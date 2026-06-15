@@ -541,7 +541,18 @@ export default function ArticleRenderer({
       })
       .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])\s*\n([①-⑮])/g, '$1 $2')
       .replace(/((?<![『「])제\d+조의?\d*\s*(?:\[(?![\s\S]*?\[\/cite\])|[〔(（])[^\]〕)）]+[\]〕)）])/g, '\n\n$1')
-      .replace(/(제\d+(?:장|절|관)\s+(?!(?:제\d+(?:조|항|호|목|장|절|관)?|및|에|의|은|는|이|가|을|를|과|와)(?:\s|$))[^\s]+)/g, '\n\n$1')
+      .replace(/(제\d+(?:장|절|관)\s+(?!(?:제\d+(?:조|항|호|목|장|절|관)?|및|에|의|은|는|이|가|을|를|과|와)(?:\s|$))[^\s]+)/g, (match, p1, offset, string) => {
+         if (offset > 0) {
+             const beforeMatch = string.slice(0, offset).trim();
+             if (beforeMatch.length > 0) {
+                 const prevChar = beforeMatch[beforeMatch.length - 1];
+                 if (/[가-힣A-Za-z0-9"“'‘\[(]/.test(prevChar)) {
+                     return match;
+                 }
+             }
+         }
+         return '\n\n' + p1;
+      })
       .replace(/(^|\n)(부\s*칙)\s*(.*)/g, '\n\n$2 $3');
 
     // Restore hidden citation tags to avoid them being split by newlines
