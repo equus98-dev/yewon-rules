@@ -1557,8 +1557,17 @@ export default function Home() {
                         </div>
                         규정 공지
                       </h3>
-                      <IconButton size="small" onClick={() => { setActiveVerticalTab("공지사항"); setActiveRuleId(null); setActiveCategoryId(null); setIsSearching(false); setActiveNoticeId(null); }} sx={{ bgcolor: "#f1f5f9", "&:hover": { bgcolor: "#e2e8f0" } }}>
-                        <span className="text-slate-400 font-bold text-lg leading-none w-5 h-5 flex items-center justify-center">+</span>
+                      <IconButton 
+                        size="small" 
+                        onClick={() => { setActiveVerticalTab("공지사항"); setActiveRuleId(null); setActiveCategoryId(null); setIsSearching(false); setActiveNoticeId(null); }} 
+                        sx={{ 
+                          bgcolor: "rgba(249, 115, 22, 0.1)",
+                          backgroundImage: "radial-gradient(rgba(249, 115, 22, 0.25) 1.5px, transparent 1.5px)",
+                          backgroundSize: "8px 8px",
+                          border: "1px solid rgba(249, 115, 22, 0.2)",
+                          "&:hover": { bgcolor: "rgba(249, 115, 22, 0.2)" }
+                        }}>
+                        <span className="text-[#f97316] font-black text-lg leading-none w-5 h-5 flex items-center justify-center">+</span>
                       </IconButton>
                     </div>
 
