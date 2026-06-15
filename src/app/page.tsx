@@ -323,25 +323,15 @@ export default function Home() {
     }
   };
 
-  // 홈으로 이동 (초기화)
+  // 홈으로 이동 (초기화 및 메인 화면 이동)
   const handleGoHome = () => {
-    setActiveRuleId(null);
-    setIsSearching(false);
-    setActiveCategoryId(null);
-    setActiveCategoryName(null);
-    setCategoryRules([]);
-    setSearchQuery("");
-    setSearchResults([]);
-    setScope("current");
-    setOptionAll(true);
-    setOptionTitle(false);
-    setOptionBody(false);
-    setOptionAttachment(false);
-    setEnactmentStart("");
-    setEnactmentEnd("");
-    setSidebarKey((prev) => prev + 1); // 사이드바 컴포넌트 세션 강제 초기화 트리거!
-    setResultActiveTab("all"); // 결과 탭 '전체'로 초기화!
-    setActiveNoticeId(null);
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("activeRuleId");
+      sessionStorage.removeItem("activeCategoryId");
+      sessionStorage.removeItem("activeVerticalTab");
+      sessionStorage.removeItem("activeNoticeId");
+      window.location.href = "/";
+    }
   };
 
   // 인기 태그 바로 검색 기능
