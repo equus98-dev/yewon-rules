@@ -267,19 +267,22 @@ export default function ArticleRenderer({
 
   // Handle glued documents where the title contains the first article but content doesn't
   const hasArticleItem = items.some(i => i && i.type === "article");
-  if (!hasArticleItem && title && articleNumber < 8000) {
+  if (!hasArticleItem && title && articleNumber < 9000) {
     const expectedTitleStart = `제${articleNumber}조`;
     let fullTitle = /^제\d+조/.test(title.trim()) ? title : `${expectedTitleStart}(${title})`;
     if (articleNumber >= 8000 && articleNumber < 9000) {
       fullTitle = title.trim();
     }
     
-    // Check if the first paragraph already contains the article number
+    // Check if the first paragraph already contains the article number or title
     let alreadyHasTitle = false;
     for (let i = 0; i < Math.min(items.length, 3); i++) {
-        if (items[i] && String(items[i].text || "").trim().startsWith(expectedTitleStart)) {
-            alreadyHasTitle = true;
-            break;
+        if (items[i]) {
+            const textStr = String(items[i].text || "").trim();
+            if (textStr.startsWith(expectedTitleStart) || (articleNumber >= 8000 && textStr.replace(/\s+/g, '').startsWith(fullTitle.replace(/\s+/g, '')))) {
+                alreadyHasTitle = true;
+                break;
+            }
         }
     }
     
@@ -298,7 +301,7 @@ export default function ArticleRenderer({
         if (articleNumber >= 8000 && articleNumber < 9000) {
            originalText = originalText.replace(/^(?:부\s*칙\s*)+/, '');
         }
-        items[targetIndex].text = `${fullTitle} ${originalText}`;
+        items[targetIndex].text = `${fullTitle}\n${originalText}`;
       } else {
         items.unshift({ type: "text", num: "", text: fullTitle });
       }
