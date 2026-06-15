@@ -93,28 +93,21 @@ export default function ChatbotWidget() {
       {/* Floating Button */}
       {!isOpen && !isDismissed && (
         <div className="fixed bottom-24 right-6 z-50 flex flex-col items-end animate-bounce">
-          {/* 동동 떠다니는 텍스트 말풍선 (구름 모양) */}
-          <div className="relative mb-3 mr-2 filter drop-shadow-md flex flex-col items-center">
-            <div className="relative bg-white text-slate-800 text-[14px] font-bold px-5 py-3 flex items-start gap-2 w-max text-center justify-center" style={{ borderRadius: '40px' }}>
-              {/* 구름 볼록볼록 장식 */}
-              <div className="absolute top-[-12px] left-[15px] w-[35px] h-[35px] bg-white rounded-full"></div>
-              <div className="absolute top-[-18px] right-[30px] w-[45px] h-[45px] bg-white rounded-full"></div>
-              <div className="absolute bottom-[-8px] left-[25px] w-[25px] h-[25px] bg-white rounded-full"></div>
-              <div className="absolute bottom-[-10px] right-[20px] w-[30px] h-[30px] bg-white rounded-full"></div>
-              
-              <span className="whitespace-pre-line leading-snug relative z-10 pt-1">
+          {/* 동동 떠다니는 텍스트 말풍선 (이미지) */}
+          <div className="relative mb-2 mr-2 flex flex-col items-center">
+            <div className="relative w-[200px] h-[120px] flex items-center justify-center pb-4 pr-1">
+              <img src="/bubble.png" alt="말풍선" className="absolute inset-0 w-full h-full object-contain pointer-events-none drop-shadow-md" />
+              <span className="whitespace-pre-line leading-snug relative z-10 text-[14.5px] font-bold text-slate-800 text-center">
                 안녕?{"\n"}난 챗봇 예원이야~
               </span>
               <button 
                 onClick={(e) => { e.stopPropagation(); setIsDismissed(true); }}
-                className="relative z-10 text-slate-400 hover:text-slate-600 transition-colors p-0.5 rounded-full hover:bg-slate-100 shrink-0 -mt-1 -mr-1"
+                className="absolute top-3 right-4 z-10 text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-full hover:bg-slate-100/50 shrink-0"
                 aria-label="챗봇 숨기기"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
-            {/* 꼬리 (오른쪽 아래) */}
-            <div className="absolute -bottom-2 right-6 w-5 h-5 bg-white rounded-sm" style={{ transform: 'rotate(45deg)' }}></div>
           </div>
           
           <button
