@@ -3,8 +3,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { CircularProgress, Typography } from "@mui/material";
 import ArticleRenderer from "./ArticleRenderer";
-import CompareView from "./CompareView";
-import TwoColumnViewer from "./TwoColumnViewer";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import HistoryIcon from "@mui/icons-material/History";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
@@ -80,7 +78,6 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   
   const [isDownloadPopupOpen, setIsDownloadPopupOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<"normal" | "diff" | "twocolumn">("normal");
   const downloadRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -738,16 +735,16 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           </button>
           
           <button 
-            onClick={() => setViewMode(viewMode === "diff" ? "normal" : "diff")}
-            className={`flex items-center gap-1 px-2.5 py-1 border text-[11px] font-bold rounded transition-colors cursor-pointer ${viewMode === "diff" ? "bg-purple-50 border-purple-300 text-purple-700" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`}
+            onClick={() => window.open(`/compare?ruleId=${ruleId}`, "_blank", "width=1200,height=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes")}
+            className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer"
           >
-            <CompareArrowsIcon sx={{ fontSize: 14 }} className={viewMode === "diff" ? "text-purple-700" : "text-purple-500"} /> 신구대비표
+            <CompareArrowsIcon sx={{ fontSize: 14 }} className="text-purple-500" /> 신구대비표
           </button>
           <button 
-            onClick={() => setViewMode(viewMode === "twocolumn" ? "normal" : "twocolumn")}
-            className={`flex items-center gap-1 px-2.5 py-1 border text-[11px] font-bold rounded transition-colors cursor-pointer ${viewMode === "twocolumn" ? "bg-slate-100 border-slate-400 text-slate-800" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`}
+            onClick={() => window.open(`/twocolumn?ruleId=${ruleId}`, "_blank", "width=1400,height=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes")}
+            className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer"
           >
-            <ArticleIcon sx={{ fontSize: 14 }} className={viewMode === "twocolumn" ? "text-slate-800" : "text-slate-600"} /> 2단보기
+            <ArticleIcon sx={{ fontSize: 14 }} className="text-slate-600" /> 2단보기
           </button>
         </div>
       </div>
@@ -812,11 +809,6 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           </button>
         </div>
 
-        {viewMode === "diff" ? (
-          <CompareView currentRevision={currentRevision} allRevisions={ruleData?.revisions} />
-        ) : viewMode === "twocolumn" ? (
-          <TwoColumnViewer currentRuleId={ruleId} />
-        ) : (
         <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative scroll-smooth">
           <div className="max-w-4xl mx-auto mt-4 relative">
             {/* 규정 제목 */}
@@ -1146,11 +1138,10 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
               >
                 <KeyboardArrowDownIcon fontSize="medium" />
               </button>
-            </div>
           </div>
         </div>
-        )}
       </div>
+    </div>
 
       {/* 4. 개정정보 모달 */}
       {isHistoryModalOpen && (
