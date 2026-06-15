@@ -107,14 +107,14 @@ export default function ChatbotWidget() {
             {/* 직접 디자인한 Q/A 아이콘 */}
             <div className="relative w-[56px] h-[50px]">
               {/* Q 말풍선 (뒤쪽, 왼쪽 위) */}
-              <div className="absolute top-0 left-0 w-[32px] h-[28px] bg-gradient-to-b from-[#ff6b6b] to-[#ee5253] rounded-[10px] shadow flex items-center justify-center z-10 border border-[#ff9f43]/30 animate-bounce" style={{ animationDuration: '1s' }}>
+              <div className="absolute top-0 left-0 w-[32px] h-[28px] bg-gradient-to-b from-[#ff6b6b] to-[#ee5253] rounded-[10px] shadow flex items-center justify-center z-10 border border-[#ff9f43]/30 animate-bounce" style={{ animationDuration: '1s', animationDelay: '0.1s' }}>
                 <span className="text-white font-black text-[15px] leading-none pr-[1px] pb-[1px]" style={{ textShadow: '0 1px 2px rgba(238,82,83,0.5)' }}>Q</span>
                 {/* 꼬리 (왼쪽 아래) */}
                 <div className="absolute -bottom-[3px] left-[6px] w-[8px] h-[8px] bg-[#ee5253] transform rotate-45 border-b border-r border-[#ff9f43]/30"></div>
               </div>
               
               {/* A 말풍선 (앞쪽, 오른쪽 아래) */}
-              <div className="absolute bottom-0 right-0 w-[34px] h-[30px] bg-gradient-to-b from-[#48dbfb] to-[#0abde3] rounded-[11px] shadow-md flex items-center justify-center z-20 border border-[#48dbfb]/40 animate-bounce" style={{ animationDuration: '1s', animationDelay: '0.5s' }}>
+              <div className="absolute bottom-0 right-0 w-[34px] h-[30px] bg-gradient-to-b from-[#48dbfb] to-[#0abde3] rounded-[11px] shadow-md flex items-center justify-center z-20 border border-[#48dbfb]/40 animate-bounce" style={{ animationDuration: '1s', animationDelay: '0.2s' }}>
                 <span className="text-white font-black text-[17px] leading-none pr-[1px] pb-[1px]" style={{ textShadow: '0 1px 2px rgba(10,189,227,0.5)' }}>A</span>
                 {/* 꼬리 (오른쪽 아래) */}
                 <div className="absolute -bottom-[4px] right-[8px] w-[10px] h-[10px] bg-[#0abde3] transform rotate-45 border-b border-r border-[#48dbfb]/40 shadow-[2px_2px_2px_rgba(0,0,0,0.05)]"></div>
@@ -125,7 +125,7 @@ export default function ChatbotWidget() {
           <button
             onClick={() => setIsOpen(true)}
             className="w-14 h-14 bg-gradient-to-tr from-[#0c3161] via-[#009b9e] to-[#eab308] hover:opacity-90 text-white rounded-full shadow-xl flex items-center justify-center transition-transform hover:scale-110 animate-bounce"
-            style={{ animationDuration: '1s' }}
+            style={{ animationDuration: '1s', animationDelay: '0s' }}
             aria-label="챗봇 열기"
           >
             <CuteRobotIcon width={32} height={32} />
