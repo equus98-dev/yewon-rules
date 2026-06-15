@@ -932,7 +932,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                     }, {})
                   ) as any[];
 
-                  const mainGroups = groups.filter((g: any) => g.baseName.includes("[전문]") || (!g.baseName.includes("[별표]") && !g.baseName.includes("[별지]") && !g.baseName.includes("[서식]")));
+                  const mainGroups = groups.filter((g: any) => g.baseName.includes("[전문]") || (!g.baseName.includes("[별표") && !g.baseName.includes("[별지") && !g.baseName.includes("[서식")));
                   const otherGroups = groups.filter((g: any) => !mainGroups.includes(g));
 
                   const renderGroup = (group: any, idx: number, isMain: boolean = false) => {
