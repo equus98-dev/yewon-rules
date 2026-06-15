@@ -403,12 +403,12 @@ export default function ArticleRenderer({
 
     if (hideHistory) {
       // 연혁 숨기기
-      decodedText = decodedText.replace(/([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi, "");
+      decodedText = decodedText.replace(/([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)[^>)]*[>)])/gi, "");
     }
     
     // 연혁 표시: <개정 ...> 부분을 파란색으로 렌더링하기 위한 문자열 준비
     let htmlText = decodedText.replace(
-      /([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi,
+      /([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)[^>)]*[>)])/gi,
       (match) => `<span class="text-sky-700 font-medium text-[13px] ml-1">${normalizeHistoryDate(match).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
     );
 
@@ -440,9 +440,9 @@ export default function ArticleRenderer({
       );
     }
 
-    const parts = decodedText.split(/(\[cite\s+rule="[^"]*"\s+article="[^"]*"(?:\s+url="[^"]*")?\][\s\S]*?\[\/cite\]|\[nocite\][\s\S]*?\[\/nocite\]|[<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi);
+    const parts = decodedText.split(/(\[cite\s+rule="[^"]*"\s+article="[^"]*"(?:\s+url="[^"]*")?\][\s\S]*?\[\/cite\]|\[nocite\][\s\S]*?\[\/nocite\]|[<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)[^>)]*[>)])/gi);
     return parts.map((part, i) => {
-      if ((part.startsWith("<") && part.endsWith(">")) || (part.startsWith("(") && part.endsWith(")"))) {
+      if (/^[<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)/.test(part)) {
         return <span key={i} className="text-sky-700 font-medium text-[13px] ml-1">{normalizeHistoryDate(part)}</span>;
       }
       if (part.startsWith("[nocite")) {
@@ -474,7 +474,7 @@ export default function ArticleRenderer({
 
   const getBadgeInfo = (text: string) => {
     let historyDates: string[] = [];
-    const datesMatches = text.match(/\((?:삭제|개정|신설|전문개정|본조신설)\s*[^)]+\)/g);
+    const datesMatches = text.match(/\((?:삭제|개정|신설|전문개정|본조신설|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)\s*[^)]*\)/g);
     if (datesMatches) {
       datesMatches.forEach(match => {
         const cleaned = match.replace(/[()]/g, '').trim();
