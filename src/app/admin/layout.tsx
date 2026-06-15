@@ -84,11 +84,11 @@ export default function AdminLayout({
   }
 
   const menuItems = [
-    { label: "대시보드", href: "/admin", icon: <DashboardIcon sx={{ fontSize: 26 }} /> },
-    { label: "규정 관리", href: "/admin/rules", icon: <MenuBookIcon sx={{ fontSize: 26 }} /> },
-    { label: "서식 관리", href: "/admin/files", icon: <FolderIcon sx={{ fontSize: 26 }} /> },
-    { label: "입안편집기", href: "/admin/editor", icon: <EditIcon sx={{ fontSize: 26 }} /> },
-    { label: "공지사항", href: "/admin/notices", icon: <CampaignIcon sx={{ fontSize: 26 }} /> },
+    { label: "대시보드", href: "/admin", icon: <DashboardIcon sx={{ fontSize: 32 }} /> },
+    { label: "규정 관리", href: "/admin/rules", icon: <MenuBookIcon sx={{ fontSize: 32 }} /> },
+    { label: "서식 관리", href: "/admin/files", icon: <FolderIcon sx={{ fontSize: 32 }} /> },
+    { label: "입안편집기", href: "/admin/editor", icon: <EditIcon sx={{ fontSize: 32 }} /> },
+    { label: "공지사항", href: "/admin/notices", icon: <CampaignIcon sx={{ fontSize: 32 }} /> },
   ];
 
   return (
@@ -148,19 +148,19 @@ export default function AdminLayout({
       <div className="flex-1 flex overflow-hidden">
         
         {/* 사이드바 (Teal color with background image) */}
-        <aside className="w-[84px] bg-[#009b9e] border-r border-[#007073] flex flex-col justify-between shrink-0 shadow-[4px_0_12px_rgba(0,0,0,0.1)] z-20 relative overflow-hidden">
+        <aside className="w-[220px] bg-[#009b9e] border-r border-[#007073] flex flex-col justify-between shrink-0 shadow-[4px_0_12px_rgba(0,0,0,0.1)] z-20 relative overflow-hidden">
           {/* Background image overlay */}
           <div className="absolute inset-0 bg-[url('/yewon2.jpeg')] bg-cover bg-center opacity-30 mix-blend-multiply pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#009b9e]/50 to-[#007073]/90 pointer-events-none" />
           
-          <nav className="p-2 space-y-1 mt-3 relative z-10">
+          <nav className="p-2 space-y-2 mt-4 relative z-10">
             {menuItems.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all cursor-pointer select-none group ${
+                  className={`flex flex-row items-center justify-start gap-4 px-5 py-4 mx-2 rounded-xl transition-all cursor-pointer select-none group ${
                     isActive
                       ? "bg-white text-[#007073] shadow-md"
                       : "text-blue-50 hover:bg-white/20 hover:text-white"
@@ -169,7 +169,7 @@ export default function AdminLayout({
                   <div className={`${isActive ? "scale-110 drop-shadow-sm" : "opacity-85 group-hover:opacity-100 group-hover:scale-110 transition-all"}`}>
                     {item.icon}
                   </div>
-                  <span className={`text-[11px] text-center tracking-tight leading-tight break-keep ${isActive ? "font-black" : "font-semibold"}`}>
+                  <span className={`text-[16px] tracking-tight leading-tight break-keep ${isActive ? "font-black" : "font-bold"}`}>
                     {item.label}
                   </span>
                 </Link>
@@ -177,13 +177,13 @@ export default function AdminLayout({
             })}
           </nav>
 
-          <div className="p-2 mb-3 relative z-10">
+          <div className="p-2 mb-4 relative z-10">
             <Link
               href="/"
-              className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all cursor-pointer select-none border border-white/20 hover:bg-white/10 text-white group"
+              className="flex flex-row items-center justify-start gap-4 px-5 py-4 mx-2 rounded-xl transition-all cursor-pointer select-none border border-white/20 hover:bg-white/10 text-white group"
             >
-              <ExitToAppIcon sx={{ fontSize: 24 }} className="opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" />
-              <span className="text-[11px] font-bold text-center tracking-tight leading-tight">사용자홈</span>
+              <ExitToAppIcon sx={{ fontSize: 32 }} className="opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" />
+              <span className="text-[16px] font-bold tracking-tight leading-tight">사용자홈</span>
             </Link>
           </div>
         </aside>
