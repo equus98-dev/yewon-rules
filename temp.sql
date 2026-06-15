@@ -1,1 +1,1 @@
-SELECT id, title, contentText FROM Article WHERE contentText LIKE '%cite%' OR contentJson LIKE '%cite%'
+SELECT id, title FROM Article WHERE title LIKE '%제3조의2%' OR title LIKE '%제3조의 2%'

@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { CircularProgress, Typography } from "@mui/material";
 import ArticleRenderer from "./ArticleRenderer";
+import CompareView from "./CompareView";
+import TwoColumnViewer from "./TwoColumnViewer";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import HistoryIcon from "@mui/icons-material/History";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
@@ -75,6 +77,21 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const tocScrollRef = useRef<HTMLDivElement>(null);
   const [activeTocId, setActiveTocId] = useState<string>("");
   const [popupState, setPopupState] = useState<{ isOpen: boolean; title: string; isLoading?: boolean; error?: string | null; articleData?: any; url?: string }>({ isOpen: false, title: "" });
+  
+  const [isDownloadPopupOpen, setIsDownloadPopupOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"normal" | "diff" | "twocolumn">("normal");
+  const downloadRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (downloadRef.current && !downloadRef.current.contains(event.target as Node)) {
+        setIsDownloadPopupOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const [manualCitationData, setManualCitationData] = useState<{
     selectedText: string;
@@ -630,9 +647,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden relative border border-slate-200" >
-      
-
+    <div className="flex flex-col h-full bg-white overflow-hidden relative border border-slate-200">
       {/* 1. 상단 타이틀 및 브레드크럼 */}
       <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-6 py-4 shrink-0 flex items-center justify-between z-10 shadow-sm relative">
         <h1 className="text-2xl font-black text-[#007073] tracking-tight ml-2">{ruleNumber ? `${ruleNumber} ` : ""}{cleanTitle}</h1>
@@ -673,27 +688,66 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         </div>
 
         {/* 액션 버튼 그룹 */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <button className="flex items-center gap-1 px-2.5 py-1 border border-blue-200 bg-white text-blue-700 text-[11px] font-bold rounded hover:bg-blue-50 transition-colors cursor-pointer">
-            <FileDownloadIcon sx={{ fontSize: 14 }} /> 다운로드
-          </button>
-          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
+        <div className="flex items-center gap-1.5 flex-wrap relative">
+          <div className="relative" ref={downloadRef}>
+            <button 
+              onClick={() => setIsDownloadPopupOpen(!isDownloadPopupOpen)}
+              className="flex items-center gap-1 px-2.5 py-1 border border-blue-200 bg-white text-blue-700 text-[11px] font-bold rounded hover:bg-blue-50 transition-colors cursor-pointer"
+            >
+              <FileDownloadIcon sx={{ fontSize: 14 }} /> 다운로드
+            </button>
+            {isDownloadPopupOpen && (
+              <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded shadow-lg py-1 z-50 flex flex-col w-[120px]">
+                {(() => {
+                  const getDownloadUrl = (file: any) => file.url || `/api/download?url=${encodeURIComponent(file.s3Url)}&filename=${encodeURIComponent(file.title)}`;
+                  const mainRuleHwp = ruleData?.attachments?.find((f: any) => f.title.startsWith("[전문]") && (f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp")));
+                  const mainRulePdf = ruleData?.attachments?.find((f: any) => f.title.startsWith("[전문]") && (f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf")));
+                  
+                  return (
+                    <>
+                      <a
+                        href={mainRuleHwp ? getDownloadUrl(mainRuleHwp) : "#"}
+                        download={!!mainRuleHwp}
+                        target={mainRuleHwp ? "_blank" : undefined}
+                        onClick={(e) => !mainRuleHwp && e.preventDefault()}
+                        className={`px-3 py-1.5 text-[11px] font-bold flex items-center gap-1.5 ${mainRuleHwp ? "text-slate-700 hover:bg-blue-50 cursor-pointer" : "text-slate-300 cursor-not-allowed"}`}
+                      >
+                        <span className="bg-blue-100 text-blue-700 px-1 rounded text-[9px]">HWP</span> 다운로드
+                      </a>
+                      <a
+                        href={mainRulePdf ? getDownloadUrl(mainRulePdf) : "#"}
+                        download={!!mainRulePdf}
+                        target={mainRulePdf ? "_blank" : undefined}
+                        onClick={(e) => !mainRulePdf && e.preventDefault()}
+                        className={`px-3 py-1.5 text-[11px] font-bold flex items-center gap-1.5 ${mainRulePdf ? "text-slate-700 hover:bg-red-50 cursor-pointer" : "text-slate-300 cursor-not-allowed"}`}
+                      >
+                        <span className="bg-red-100 text-red-700 px-1 rounded text-[9px]">PDF</span> 다운로드
+                      </a>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
+          
+          <button 
+            onClick={() => setIsHistoryModalOpen(true)}
+            className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer"
+          >
             <InfoIcon sx={{ fontSize: 14 }} className="text-blue-500" /> 개정정보
           </button>
-          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
-            <ArticleIcon sx={{ fontSize: 14 }} className="text-slate-400" /> 개정문
+          
+          <button 
+            onClick={() => setViewMode(viewMode === "diff" ? "normal" : "diff")}
+            className={`flex items-center gap-1 px-2.5 py-1 border text-[11px] font-bold rounded transition-colors cursor-pointer ${viewMode === "diff" ? "bg-purple-50 border-purple-300 text-purple-700" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`}
+          >
+            <CompareArrowsIcon sx={{ fontSize: 14 }} className={viewMode === "diff" ? "text-purple-700" : "text-purple-500"} /> 신구대비표
           </button>
-          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
-            <ArticleIcon sx={{ fontSize: 14 }} className="text-emerald-500" /> 기안문
-          </button>
-          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
-            <CompareArrowsIcon sx={{ fontSize: 14 }} className="text-purple-500" /> 신구대비표
-          </button>
-          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
-            <ArticleIcon sx={{ fontSize: 14 }} className="text-slate-600" /> 2단보기
-          </button>
-          <button className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer">
-            <ArticleIcon sx={{ fontSize: 14 }} className="text-blue-500" /> 전체보기
+          <button 
+            onClick={() => setViewMode(viewMode === "twocolumn" ? "normal" : "twocolumn")}
+            className={`flex items-center gap-1 px-2.5 py-1 border text-[11px] font-bold rounded transition-colors cursor-pointer ${viewMode === "twocolumn" ? "bg-slate-100 border-slate-400 text-slate-800" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`}
+          >
+            <ArticleIcon sx={{ fontSize: 14 }} className={viewMode === "twocolumn" ? "text-slate-800" : "text-slate-600"} /> 2단보기
           </button>
         </div>
       </div>
@@ -758,6 +812,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           </button>
         </div>
 
+        {viewMode === "diff" ? (
+          <CompareView currentRevision={currentRevision} allRevisions={ruleData?.revisions} />
+        ) : viewMode === "twocolumn" ? (
+          <TwoColumnViewer currentRuleId={ruleId} />
+        ) : (
         <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar bg-white p-10 relative scroll-smooth">
           <div className="max-w-4xl mx-auto mt-4 relative">
             {/* 규정 제목 */}
@@ -1090,7 +1149,49 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             </div>
           </div>
         </div>
+        )}
       </div>
+
+      {/* 4. 개정정보 모달 */}
+      {isHistoryModalOpen && (
+        <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setIsHistoryModalOpen(false)}>
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-lg">
+              <h2 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                <InfoIcon className="text-blue-600" /> 연혁
+              </h2>
+              <button onClick={() => setIsHistoryModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer p-1">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+            <div className="p-0 overflow-y-auto flex-1">
+              {ruleData?.revisions?.length > 0 ? (
+                <div className="divide-y divide-slate-100">
+                  {ruleData.revisions.map((rev: any, index: number) => {
+                    const date = rev.enactmentDate && !isNaN(new Date(rev.enactmentDate).getTime()) 
+                                   ? new Date(rev.enactmentDate).toLocaleDateString() : "날짜없음";
+                    return (
+                      <div key={rev.version} className="p-4 hover:bg-slate-50 transition-colors">
+                        <div className="flex items-start gap-3">
+                          <div className="text-blue-600 font-bold text-[15px] mt-0.5">{ruleData.revisions.length - index}.</div>
+                          <div>
+                            <h3 className="font-bold text-slate-800 mb-1.5 text-[15px]">{ruleData.title}</h3>
+                            <p className="text-[13px] text-slate-500 font-medium break-keep">
+                              [시행 {date}] [{ruleData.department ? ruleData.department.name : "소관부서미상"}... 제{rev.version}호, {date}, {getRevisionTypeName(rev.revisionType)}]
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="p-8 text-center text-slate-500 font-bold text-sm">개정정보가 없습니다.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
