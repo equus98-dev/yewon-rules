@@ -93,29 +93,21 @@ export default function ChatbotWidget() {
       {/* Floating Button */}
       {!isOpen && !isDismissed && (
         <div className="fixed bottom-24 right-6 z-50 flex flex-col items-end animate-bounce">
-          {/* 동동 떠다니는 안내 말풍선 */}
-          <div className="relative mb-1.5 mr-1 flex flex-col items-center bg-white rounded-[24px] rounded-br-[8px] shadow-lg shadow-slate-200/50 border border-slate-100 p-4 pt-3 w-[150px]">
+          {/* 동동 떠다니는 안내 말풍선 (이미지만) */}
+          <div className="relative mb-2 mr-1 flex flex-col items-center drop-shadow-md">
             {/* 닫기 버튼 */}
             <button 
               onClick={(e) => { e.stopPropagation(); setIsDismissed(true); }}
-              className="absolute top-2 right-2 text-slate-300 hover:text-slate-500 transition-colors p-1 rounded-full hover:bg-slate-50 shrink-0"
+              className="absolute -top-2 -right-4 z-10 text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-full hover:bg-slate-100 shrink-0 bg-white/50 backdrop-blur-sm"
               aria-label="챗봇 숨기기"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             
-            {/* QA 일러스트 이미지 */}
-            <div className="w-[52px] h-[48px] mb-2 relative flex items-center justify-center pointer-events-none">
-              <img src="/bubble.png" alt="QA" className="w-full h-full object-contain" />
+            {/* 일러스트 이미지 */}
+            <div className="w-[80px] h-[70px] cursor-pointer" onClick={() => setIsOpen(true)}>
+              <img src="/bubble.png" alt="QA 말풍선" className="w-full h-full object-contain" />
             </div>
-
-            {/* 안내 텍스트 */}
-            <span className="whitespace-pre-line leading-[1.3] text-[14px] font-extrabold text-slate-800 text-center tracking-tight">
-              안녕?{"\n"}난 챗봇 예원이야~
-            </span>
-            
-            {/* 말풍선 꼬리 */}
-            <div className="absolute -bottom-[7px] right-5 w-4 h-4 bg-white border-b border-r border-slate-100 rounded-sm" style={{ transform: 'rotate(45deg)' }}></div>
           </div>
           
           <button
