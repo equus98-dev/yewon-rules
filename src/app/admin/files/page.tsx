@@ -124,8 +124,21 @@ export default function AdminFilesManagement() {
 
     for (const file of selectedFiles) {
       const originalName = file.name;
-      const cleanName = originalName.replace(/^\[(전문|별표|별지|별첨)\]\s*/, '');
-      const newFileName = `[${uploadType}] ${cleanName}`;
+      let cleanName = originalName.replace(/^[\d-]+[\s_]+/, '');
+      let newFileName = cleanName;
+      
+      const bracketMatch = cleanName.match(/^\[([^\]]+)\]\s*(.*)$/);
+      if (bracketMatch) {
+        const bracketText = bracketMatch[1];
+        const restName = bracketMatch[2];
+        if (bracketText.includes(uploadType) || bracketText.includes('별지') || bracketText.includes('별표') || bracketText.includes('별첨') || bracketText.includes('서식')) {
+          newFileName = cleanName;
+        } else {
+          newFileName = `[${uploadType}] ${restName}`;
+        }
+      } else {
+        newFileName = `[${uploadType}] ${cleanName}`;
+      }
       
       const modifiedFile = new File([file], newFileName, { type: file.type });
 
