@@ -27,6 +27,7 @@ const CuteRobotIcon = ({ width = 24, height = 24, className = "" }) => (
 export default function ChatbotWidget() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { role: "model", content: "안녕하세요! 예원예술대학교 규정 AI 어시스턴트입니다. 학칙이나 규정에 대해 궁금한 점을 물어보세요." }
   ]);
@@ -90,18 +91,30 @@ export default function ChatbotWidget() {
   return (
     <>
       {/* Floating Button */}
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-tr from-[#0c3161] via-[#009b9e] to-[#eab308] hover:opacity-90 text-white rounded-full shadow-xl flex items-center justify-center transition-transform hover:scale-110 z-50 animate-bounce group"
-          aria-label="챗봇 열기"
-        >
-          {/* 동동 떠다니는 Hi~ 텍스트 */}
-          <div className="absolute bottom-[110%] right-0 bg-white text-slate-800 text-[13px] font-bold px-3 py-1.5 rounded-2xl rounded-br-sm shadow-md flex items-center justify-center border border-slate-100">
-            Hi~ 👋
+      {!isOpen && !isDismissed && (
+        <div className="fixed bottom-24 right-6 z-50 flex flex-col items-end animate-bounce">
+          {/* 동동 떠다니는 텍스트 말풍선 */}
+          <div className="relative mb-2 bg-white text-slate-800 text-[14px] font-bold px-4 py-2.5 rounded-2xl rounded-br-sm shadow-md border border-slate-100 flex items-start gap-2 w-max">
+            <span className="whitespace-pre-line leading-snug">
+              안녕하세요!{"\n"}규정 챗봇이예요~
+            </span>
+            <button 
+              onClick={(e) => { e.stopPropagation(); setIsDismissed(true); }}
+              className="text-slate-400 hover:text-slate-600 transition-colors p-0.5 rounded-full hover:bg-slate-100 shrink-0"
+              aria-label="챗봇 숨기기"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
           </div>
-          <CuteRobotIcon width={32} height={32} />
-        </button>
+          
+          <button
+            onClick={() => setIsOpen(true)}
+            className="w-14 h-14 bg-gradient-to-tr from-[#0c3161] via-[#009b9e] to-[#eab308] hover:opacity-90 text-white rounded-full shadow-xl flex items-center justify-center transition-transform hover:scale-110"
+            aria-label="챗봇 열기"
+          >
+            <CuteRobotIcon width={32} height={32} />
+          </button>
+        </div>
       )}
 
       {/* Chat Window */}
