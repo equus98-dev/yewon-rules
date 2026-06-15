@@ -47,8 +47,8 @@ export default function TwoColumnViewer({ currentRuleId }: TwoColumnViewerProps)
     try {
       const res = await fetch(`/api/rules/search?query=${encodeURIComponent(searchQuery)}`);
       if (res.ok) {
-        const data = await res.json();
-        setSearchResults(data as any[]);
+        const data = await res.json() as any;
+        setSearchResults(data.titleMatches || []);
         setShowDropdown(true);
       }
     } catch (e) {

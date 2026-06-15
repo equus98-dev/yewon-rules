@@ -696,10 +696,20 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             {isDownloadPopupOpen && (
               <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded shadow-lg py-1 z-50 flex flex-col w-[120px]">
                 {(() => {
-                  const getDownloadUrl = (file: any) => file.url || `/api/download?url=${encodeURIComponent(file.s3Url)}&filename=${encodeURIComponent(file.title)}`;
-                  const mainRuleHwp = ruleData?.attachments?.find((f: any) => f.title.startsWith("[전문]") && (f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp")));
-                  const mainRulePdf = ruleData?.attachments?.find((f: any) => f.title.startsWith("[전문]") && (f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf")));
+                  const getDownloadUrl = (file: any) => {
+                    const encodedTitle = encodeURIComponent(file.title);
+                    if (file.fileUrl?.startsWith('/api/files/')) {
+                      return `${file.fileUrl}?filename=${encodedTitle}`;
+                    }
+                    if (file.fileUrl?.startsWith('http')) {
+                      return file.fileUrl;
+                    }
+                    return `/api/download?fileUrl=${encodeURIComponent(file.fileUrl || "")}&filename=${encodedTitle}`;
+                  };
                   
+                  const isMainFile = (title: string) => title.includes("[전문]") || (!title.includes("[별표") && !title.includes("[별지") && !title.includes("[서식") && !title.includes("[별첨"));
+                  const mainRuleHwp = ruleData?.attachments?.find((f: any) => isMainFile(f.title) && (f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp")));
+                  const mainRulePdf = ruleData?.attachments?.find((f: any) => isMainFile(f.title) && (f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf")));
                   return (
                     <>
                       <a
