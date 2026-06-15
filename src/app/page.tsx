@@ -1051,7 +1051,7 @@ export default function Home() {
                     <option value="all">전체</option>
                     <option value="title">제목</option>
                     <option value="body">본문</option>
-                    <option value="attachment">별표/별지</option>
+                    <option value="attachment">별표/별지/별첨</option>
                   </select>
 
                   {/* 검색어 인풋 및 버튼 */}
@@ -1168,7 +1168,7 @@ export default function Home() {
                                     : "bg-white text-slate-700 hover:bg-slate-50"
                                 }`}
                               >
-                                별표/별지({attachmentList.length}건)
+                                별표/별지/별첨({attachmentList.length}건)
                               </button>
                             </div>
 
@@ -1299,12 +1299,12 @@ export default function Home() {
                               </div>
                             )}
 
-                            {/* 3) 별표/별지 매칭 섹션 */}
+                            {/* 3) 별표/별지/별첨 매칭 섹션 */}
                             {(resultActiveTab === "all" || resultActiveTab === "attachment") && (
                               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
                                 <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4 select-none">
                                   <h3 className="text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                    <span className="text-[#009b9e] font-black">■</span> 별표/별지
+                                    <span className="text-[#009b9e] font-black">■</span> 별표/별지/별첨
                                     <span className="text-amber-600 font-bold ml-1">({attachmentList.length}건)</span>
                                   </h3>
                                   <button type="button" className="text-[10px] text-slate-400 font-bold border border-slate-200 rounded px-2.5 py-0.5 hover:bg-slate-50 cursor-pointer active:scale-95">
@@ -1460,7 +1460,7 @@ export default function Home() {
                                 </label>
                                 <label className="flex items-center gap-1.5 cursor-pointer font-bold text-white text-[13px] lg:text-[14px] whitespace-nowrap">
                                   <input type="checkbox" checked={optionAttachment} onChange={(e) => handleToggleOption("attachment", e.target.checked)} className="w-4 h-4 rounded cursor-pointer accent-white" />
-                                  별표/별지
+                                  별표/별지/별첨
                                 </label>
                               </div>
                             </div>

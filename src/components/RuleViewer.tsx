@@ -197,20 +197,20 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
            
            // HTML 별지가 없는 경우 부칙 내의 텍스트 기반 별지를 스캔하여 TOC에 추가
            const hasHtmlAttachments = currentRevision.articles.some((art: any) => art.articleNumber >= 9000);
-           const uploadedAttachments = ruleData?.attachments?.filter((f: any) => f.title.startsWith("[별표]") || f.title.startsWith("[별지]")) || [];
+           const uploadedAttachments = ruleData?.attachments?.filter((f: any) => f.title.startsWith("[별표]") || f.title.startsWith("[별지]") || f.title.startsWith("[별첨]")) || [];
            if (!hasHtmlAttachments && uploadedAttachments.length === 0) {
               const textAttachments = items.filter((item: any) => {
                  if (!item || !item.text) return false;
-                 return /^(?:\[|〔)(별지|별표|서식)/.test(String(item.text).trim());
+                 return /^(?:\[|〔)(별지|별표|서식|별첨)/.test(String(item.text).trim());
               });
               if (textAttachments.length > 0) {
                  if (!toc.some(t => t.id === "toc-attachments")) {
-                    toc.push({ type: "chapter", id: "toc-attachments", text: "별표/별지 목록" });
+                    toc.push({ type: "chapter", id: "toc-attachments", text: "별표/별지/별첨 목록" });
                  }
                  textAttachments.forEach((item: any, i: number) => {
                     let safeText = String(item.text).trim();
                     safeText = safeText.replace(/^〔/, '[').replace(/〕$/, ']'); // TOC 표시용 괄호 정규화
-                    const displayText = safeText.replace(/^\[(?:별표|별지|전문|서식)\]\s*([\d-]+\s*)?/, "");
+                    const displayText = safeText.replace(/^\[(?:별표|별지|전문|서식|별첨)\]\s*([\d-]+\s*)?/, "");
                     toc.push({ type: "attachment", id: `toc-text-attach-${a.articleNumber}-${i}`, text: displayText });
                  });
               }
@@ -362,7 +362,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
       if (subFiles.length > 0) {
          if (!toc.some((t: any) => t.id === "toc-attachments")) {
-            toc.push({ type: "chapter", id: "toc-attachments", text: "별표/별지 목록" });
+            toc.push({ type: "chapter", id: "toc-attachments", text: "별표/별지/별첨 목록" });
          }
          subFiles.forEach((baseName: string) => {
             const displayText = baseName;
@@ -780,7 +780,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 {currentRevision.articles.map((a: any, idx: number) => {
                   const hasHtmlAttachments = currentRevision?.articles?.some((art: any) => art.articleNumber >= 9000) || false;
                   
-                  // 별지/별표 (9000번대) 조항은 더 이상 본문 하단에 HTML로 렌더링하지 않음 (첨부파일 컴포넌트로 대체)
+                  // 별지/별표/별첨 (9000번대) 조항은 더 이상 본문 하단에 HTML로 렌더링하지 않음 (첨부파일 컴포넌트로 대체)
                   if (a.articleNumber >= 9000) return null;
                   
                   const prevA = currentRevision.articles[idx - 1];
@@ -932,7 +932,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                     }, {})
                   ) as any[];
 
-                  const mainGroups = groups.filter((g: any) => g.baseName.includes("[전문]") || (!g.baseName.includes("[별표") && !g.baseName.includes("[별지") && !g.baseName.includes("[서식")));
+                  const mainGroups = groups.filter((g: any) => g.baseName.includes("[전문]") || (!g.baseName.includes("[별표") && !g.baseName.includes("[별지") && !g.baseName.includes("[서식") && !g.baseName.includes("[별첨")));
                   const otherGroups = groups.filter((g: any) => !mainGroups.includes(g));
 
                   const renderGroup = (group: any, idx: number, isMain: boolean = false) => {
@@ -977,11 +977,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                 </span>
                               )}
                               {(() => {
-                                const match = group.baseName.match(/^\[(전문|별표|별지)\]\s*(.*)$/);
+                                const match = group.baseName.match(/^\[(전문|별표|별지|별첨)\]\s*(.*)$/);
                                 if (match) {
                                   const type = match[1];
                                   const rawText = match[2];
-                                  const displayText = rawText.replace(/^\[(?:별표|별지|전문|서식)\]\s*([\d-]+\s*)?/, "");
+                                  const displayText = rawText.replace(/^\[(?:별표|별지|전문|서식|별첨)\]\s*([\d-]+\s*)?/, "");
                                   return (
                                     <div className="flex items-center gap-2">
                                       <span className={`px-2 py-0.5 rounded text-[12px] font-black border ${
@@ -1056,7 +1056,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                           <div id="toc-attachments" className={mainGroups.length > 0 ? "mt-12 w-full" : "mt-16 w-full"}>
                             <div className="flex items-center gap-2 mb-6 border-b-2 border-slate-300 pb-3">
                               <ArticleIcon className="text-blue-700" sx={{ fontSize: 24 }} />
-                              <h3 className="text-[20px] font-black text-[#000080] tracking-tight">별지 및 별표</h3>
+                              <h3 className="text-[20px] font-black text-[#000080] tracking-tight">별표 및 별지 (별첨)</h3>
                             </div>
                             <div className="space-y-4">
                               {otherGroups.sort((a, b) => a.baseName.localeCompare(b.baseName)).map((g, i) => renderGroup(g, i, false))}

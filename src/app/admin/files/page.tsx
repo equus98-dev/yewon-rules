@@ -31,7 +31,7 @@ export default function AdminFilesManagement() {
   
   // Upload state
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [uploadType, setUploadType] = useState<"전문" | "별표" | "별지">("전문");
+  const [uploadType, setUploadType] = useState<"전문" | "별표" | "별지" | "별첨">("전문");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState<string | null>(null);
@@ -124,7 +124,7 @@ export default function AdminFilesManagement() {
 
     for (const file of selectedFiles) {
       const originalName = file.name;
-      const cleanName = originalName.replace(/^\[(전문|별표|별지)\]\s*/, '');
+      const cleanName = originalName.replace(/^\[(전문|별표|별지|별첨)\]\s*/, '');
       const newFileName = `[${uploadType}] ${cleanName}`;
       
       const modifiedFile = new File([file], newFileName, { type: file.type });
@@ -208,7 +208,7 @@ export default function AdminFilesManagement() {
   // Divide files
   const mainFiles = attachments.filter(f => f.title.startsWith("[전문]"));
   const subFiles = attachments
-    .filter(f => f.title.startsWith("[별표]") || f.title.startsWith("[별지]") || !f.title.startsWith("[전문]"))
+    .filter(f => f.title.startsWith("[별표]") || f.title.startsWith("[별지]") || f.title.startsWith("[별첨]") || !f.title.startsWith("[전문]"))
     .sort((a, b) => a.title.localeCompare(b.title, 'ko', { numeric: true }));
 
   const renderFileList = (files: any[], emptyMessage: string) => {
@@ -373,16 +373,16 @@ export default function AdminFilesManagement() {
 
                     <div className="mb-2 flex items-center gap-2">
                       <AttachmentIcon sx={{ color: "#0c3161", fontSize: 20 }} />
-                      <h4 className="font-bold text-slate-800 text-[15px]">별표 / 별지 첨부파일</h4>
+                      <h4 className="font-bold text-slate-800 text-[15px]">별표 / 별지 / 별첨 첨부파일</h4>
                     </div>
-                    {renderFileList(subFiles, "등록된 별표/별지 첨부파일이 없습니다.")}
+                    {renderFileList(subFiles, "등록된 별표/별지/별첨 첨부파일이 없습니다.")}
                   </>
                 )}
                 
                 <div className="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3">
                   <CheckCircleIcon sx={{ color: "#3b82f6", mt: 0.5 }} />
                   <div className="text-sm font-bold text-blue-900 leading-relaxed">
-                    <p className="mb-1">파일 추가 시 업로드 다이얼로그에서 [전문], [별표], [별지] 유형을 선택하면 자동으로 파일명에 반영됩니다.</p>
+                    <p className="mb-1">파일 추가 시 업로드 다이얼로그에서 [전문], [별표], [별지], [별첨] 유형을 선택하면 자동으로 파일명에 반영됩니다.</p>
                     <p className="text-blue-700/80">※ PDF 파일은 규정 본문 하단의 별지 뷰어에서 팝업이 아닌 내장 뷰어 형태로 즉시 미리보기가 가능해집니다.</p>
                   </div>
                 </div>
@@ -414,6 +414,7 @@ export default function AdminFilesManagement() {
               <FormControlLabel value="전문" control={<Radio color="primary" />} label={<span className="text-sm font-bold">규정 전문</span>} />
               <FormControlLabel value="별표" control={<Radio color="primary" />} label={<span className="text-sm font-bold">별표</span>} />
               <FormControlLabel value="별지" control={<Radio color="primary" />} label={<span className="text-sm font-bold">별지</span>} />
+              <FormControlLabel value="별첨" control={<Radio color="primary" />} label={<span className="text-sm font-bold">별첨</span>} />
             </RadioGroup>
           </FormControl>
           

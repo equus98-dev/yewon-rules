@@ -212,7 +212,7 @@ export default function ArticleRenderer({
       const match = cleanHtml.match(/^(\s*<p[^>]*>.*?<\/p>\s*)/i);
       if (match) {
         const pText = match[0].replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
-        if (/^(?:\[|〔)(별지|별표|서식)/.test(pText)) {
+        if (/^(?:\[|〔)(별지|별표|서식|별첨)/.test(pText)) {
           cleanHtml = cleanHtml.replace(match[0], '');
         }
       }
@@ -313,7 +313,7 @@ export default function ArticleRenderer({
   const attachmentStartIndex = items.findIndex((item) => {
     if (!item || !item.text) return false;
     const textStr = String(item.text).trim();
-    return /^(?:\[|〔)(별지|별표|서식)/.test(textStr);
+    return /^(?:\[|〔)(별지|별표|서식|별첨)/.test(textStr);
   });
 
   if (attachmentStartIndex !== -1) {
@@ -1088,7 +1088,7 @@ export default function ArticleRenderer({
         for (let i = 0; i < textAttachments.length; i++) {
           const item = textAttachments[i];
           const textStr = String(item.text || "").trim();
-          const isTitle = /^(?:\[|〔)(별지|별표|서식)/.test(textStr);
+          const isTitle = /^(?:\[|〔)(별지|별표|서식|별첨)/.test(textStr);
           
           if (isTitle) {
             if (currentGroup) groups.push(currentGroup);
