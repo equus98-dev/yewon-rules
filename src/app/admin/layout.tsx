@@ -106,9 +106,8 @@ export default function AdminLayout({
           <Link href="/admin">
             <div className="flex items-center cursor-pointer select-none drop-shadow-md">
               <Image src="/UI_white.png" alt="Yewon Logo" width={200} height={42} className="h-10 w-auto object-contain drop-shadow-md" />
-              <div className="ml-3 border-l-[1.5px] border-white/30 pl-4 hidden md:flex flex-row items-baseline gap-2.5 justify-center">
-                <span className="font-extrabold tracking-tight text-[22px] block opacity-95 drop-shadow-sm">규정관리시스템</span>
-                <span className="text-[15px] uppercase font-bold tracking-widest text-blue-200 opacity-90">Admin Mode</span>
+              <div className="ml-3 border-l-[1.5px] border-white/30 pl-4 hidden md:flex flex-row items-center justify-center">
+                <span className="font-extrabold tracking-tight text-[22px] block opacity-95 drop-shadow-sm">규정관리시스템 관리자모드</span>
               </div>
             </div>
           </Link>
