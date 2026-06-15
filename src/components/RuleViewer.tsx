@@ -365,8 +365,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             toc.push({ type: "chapter", id: "toc-attachments", text: "별표/별지 목록" });
          }
          subFiles.forEach((baseName: string) => {
-            const match = baseName.match(/\[(.*?)\]/);
-            const displayText = match ? match[1] : baseName;
+            const displayText = baseName;
             toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: displayText });
          });
       }
@@ -736,7 +735,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
               return (
               <li key={idx} id={`li-${item.id}`} className={itemClass}>
-                <a href={`#${item.id}`} className="block w-full" onClick={(e) => {
+                <a href={`#${item.id}`} className="block w-full truncate" title={item.text} onClick={(e) => {
                   e.preventDefault();
                   document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}>
