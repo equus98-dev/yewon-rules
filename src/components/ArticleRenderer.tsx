@@ -768,12 +768,15 @@ export default function ArticleRenderer({
   for (let i = 0; i < displayItems.length - 1; i++) {
       const curr = displayItems[i];
       const next = displayItems[i+1];
-      if (curr && curr.type === "article" && next && next.type === "paragraph") {
+      if (curr && (curr.type === "article" || curr.type === "paragraph") && next && next.type === "paragraph") {
           const currText = String(curr.text || "").trim();
-          if (currText === "" || /^\([^)]+\)$/.test(currText) || /^제\d+조의?\d*\([^)]+\)$/.test(currText)) {
-              displayItems[i] = { ...curr, text: (currText ? currText + " " : "") + String(next.text || "").trim() };
-              displayItems.splice(i+1, 1);
-              i--;
+          const nextText = String(next.text || "").trim();
+          if (currText === "" || /^\([^)]+\)$/.test(currText) || /^제\d+조의?\d*(?:\s*\([^)]+\))?$/.test(currText)) {
+              if (!/^제\d+조/.test(nextText)) {
+                  displayItems[i] = { ...curr, text: (currText ? currText + " " : "") + nextText };
+                  displayItems.splice(i+1, 1);
+                  i--;
+              }
           }
       }
   }
