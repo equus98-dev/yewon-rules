@@ -621,8 +621,8 @@ export default function ArticleRenderer({
                );
              }
              lineClass += " block";
-          } else if (/^\d{1,2}\./.test(trimmed)) {
-             const numMatch = trimmed.match(/^(\d{1,2}\.)\s*(.*)/);
+          } else if (/^\d{1,2}(?:의\d+)?\./.test(trimmed)) {
+             const numMatch = trimmed.match(/^(\d{1,2}(?:의\d+)?\.)\s*(.*)/);
              if (numMatch) {
                curHo = `제${numMatch[1].replace('.', '')}호`;
                curMok = "";
