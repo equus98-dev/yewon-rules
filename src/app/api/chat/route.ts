@@ -25,9 +25,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
-    // 1. 키워드 추출 (간단하게 2글자 이상 단어)
-    const keywords = message.split(/\s+/).filter((w: string) => w.length >= 2);
-    
+    // 1. 키워드 추출 (조사 및 특수문자 제거)
+    const rawKeywords = message.split(/\s+/).filter((w: string) => w.length >= 2);
+    const keywords = rawKeywords.map((w: string) => {
+      let word = w.replace(/[?.,!]/g, ''); // 문장부호 제거
+      const suffixes = ['은', '는', '이', '가', '을', '를', '의', '에', '에서', '로', '으로', '도', '만', '까지', '부터', '과', '와'];
+      for (const suffix of suffixes) {
+        if (word.endsWith(suffix) && word.length - suffix.length >= 1) {
+          word = word.substring(0, word.length - suffix.length);
+          break;
+        }
+      }
+      return word;
+    }).filter((w: string) => w.length >= 2); // 길이가 2 이상인 핵심 단어만
+
+    if (keywords.length === 0 && rawKeywords.length > 0) {
+      keywords.push(...rawKeywords.map((w: string) => w.replace(/[?.,!]/g, '')).filter((w: string) => w.length >= 2));
+    }
     // 2. DB에서 관련 규정 검색 (관련도 점수 기반 정렬)
     let contextText = "";
     if (keywords.length > 0) {
