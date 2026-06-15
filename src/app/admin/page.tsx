@@ -92,8 +92,7 @@ export default function AdminDashboard() {
             규정관리시스템 관리 포털에 오신 것을 환영합니다!
           </h1>
           <p className="text-sm text-slate-600 font-bold mt-2 leading-relaxed">
-            예원예술대학교 공식 규정집 데이터(213개 조항 트리 노드 및 소관 분류)가 Supabase PostgreSQL 클라우드에 성공적으로 바인딩되었습니다.<br />
-            온라인 입안편집기(DLMS) 메뉴를 통하여 실시간 규정 제·개정 및 신구대비표 생성을 편리하게 수행하십시오.
+            본 관리자 모드는 규정관리, 규정 서식(별지/별표/별첨), 입안편집기 및 공지사항을 관리할 수 있습니다.
           </p>
         </div>
 
