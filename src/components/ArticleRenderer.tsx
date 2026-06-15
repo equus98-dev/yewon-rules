@@ -529,7 +529,7 @@ export default function ArticleRenderer({
         if (offset === 0 || before.endsWith('\n')) return match;
         return '\n' + match;
       })
-      .replace(/(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/g, (match, p1, offset, string) => {
+      .replace(/(?<!\d+(?:의\d+)?\.\s*)(?<!\d)(\d{1,2}(?:의\d+)?\.)\s+(?=[^\d])/g, (match, p1, offset, string) => {
         const before = string.slice(0, offset);
         if (offset === 0 || before.endsWith('\n')) return match;
         return '\n' + p1 + ' ';
