@@ -94,25 +94,25 @@ export default function ChatbotWidget() {
       {!isOpen && !isDismissed && (
         <div className="fixed bottom-24 right-6 z-50 flex flex-col items-end animate-bounce">
           {/* 동동 떠다니는 안내 말풍선 (직접 디자인한 Q&A 아이콘) */}
-          <div className="relative -mb-1 mr-2 flex flex-col items-center drop-shadow-xl cursor-pointer group" onClick={() => setIsOpen(true)}>
+          <div className="relative mb-1 mr-2 flex flex-col items-center drop-shadow-lg cursor-pointer group" onClick={() => setIsOpen(true)}>
             {/* 닫기 버튼 */}
             <button 
               onClick={(e) => { e.stopPropagation(); setIsDismissed(true); }}
-              className="absolute -top-3 -right-4 z-30 text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-full hover:bg-slate-100 shrink-0 bg-white/60 backdrop-blur-md shadow-sm"
+              className="absolute -top-3 -right-3 z-30 text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-full hover:bg-slate-100 shrink-0 bg-white/60 backdrop-blur-md shadow-sm"
               aria-label="챗봇 숨기기"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             
             {/* 직접 디자인한 Q/A 아이콘 */}
-            <div className="relative w-[64px] h-[56px] transition-transform group-hover:scale-105">
+            <div className="relative w-[44px] h-[38px] transition-transform group-hover:scale-105">
               {/* Q 말풍선 (뒤쪽, 왼쪽 위) */}
-              <div className="absolute top-0 left-0 w-[40px] h-[38px] bg-gradient-to-b from-[#ff6b6b] to-[#ee5253] rounded-[14px] rounded-bl-[4px] shadow-md flex items-center justify-center z-10 border border-[#ff9f43]/30">
-                <span className="text-white font-black text-[20px] leading-none pr-0.5 pb-0.5" style={{ textShadow: '0 2px 4px rgba(238,82,83,0.6)' }}>Q</span>
+              <div className="absolute top-0 left-0 w-[28px] h-[26px] bg-gradient-to-b from-[#ff6b6b] to-[#ee5253] rounded-[10px] rounded-bl-[3px] shadow flex items-center justify-center z-10 border border-[#ff9f43]/30">
+                <span className="text-white font-black text-[14px] leading-none pr-[1px] pb-[1px]" style={{ textShadow: '0 1px 2px rgba(238,82,83,0.5)' }}>Q</span>
               </div>
               {/* A 말풍선 (앞쪽, 오른쪽 아래) */}
-              <div className="absolute bottom-0 right-0 w-[44px] h-[42px] bg-gradient-to-b from-[#48dbfb] to-[#0abde3] rounded-[16px] rounded-br-[4px] shadow-lg flex items-center justify-center z-20 border border-[#48dbfb]/40">
-                <span className="text-white font-black text-[24px] leading-none pr-0.5 pb-0.5" style={{ textShadow: '0 2px 4px rgba(10,189,227,0.6)' }}>A</span>
+              <div className="absolute bottom-0 right-0 w-[30px] h-[28px] bg-gradient-to-b from-[#48dbfb] to-[#0abde3] rounded-[11px] rounded-br-[3px] shadow-md flex items-center justify-center z-20 border border-[#48dbfb]/40">
+                <span className="text-white font-black text-[16px] leading-none pr-[1px] pb-[1px]" style={{ textShadow: '0 1px 2px rgba(10,189,227,0.5)' }}>A</span>
               </div>
             </div>
           </div>
