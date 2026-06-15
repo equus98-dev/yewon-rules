@@ -977,16 +977,15 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                 </span>
                               )}
                               {(() => {
-                                const match = group.baseName.match(/^\[(전문|별표|별지|별첨)\]\s*(.*)$/);
+                                const match = group.baseName.match(/^\[([^\]]+)\]\s*(.*)$/);
                                 if (match) {
                                   const type = match[1];
-                                  const rawText = match[2];
-                                  const displayText = rawText.replace(/^\[(?:별표|별지|전문|서식|별첨)\]\s*([\d-]+\s*)?/, "");
+                                  const displayText = match[2];
                                   return (
                                     <div className="flex items-center gap-2">
-                                      <span className={`px-2 py-0.5 rounded text-[12px] font-black border ${
-                                        type === '전문' ? 'bg-slate-600/80 text-white border-slate-600/20' :
-                                        type === '별표' ? 'bg-rose-600/80 text-white border-rose-600/20' :
+                                      <span className={`px-2 py-0.5 rounded text-[12px] font-black border whitespace-nowrap ${
+                                        type.includes('전문') ? 'bg-slate-600/80 text-white border-slate-600/20' :
+                                        type.includes('별표') ? 'bg-rose-600/80 text-white border-rose-600/20' :
                                         'bg-sky-600/80 text-white border-sky-600/20'
                                       }`}>
                                         {type}
