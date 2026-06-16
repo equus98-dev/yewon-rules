@@ -1267,9 +1267,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         hasHtmlAttachments={hasHtmlAttachments}
                         isAdmin={isAdmin}
                         trailingTitles={trailingTitles}
-                        
-                        
                         isBundleChild={isBundleChild}
+                        seenAddendumCoreTexts={seenAddendumCoreTexts}
                       />
                     );
                   })()}

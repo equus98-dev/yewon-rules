@@ -24,6 +24,7 @@ interface ArticleRendererProps {
   isAdmin?: boolean;
   trailingTitles?: string[];
   isBundleChild?: boolean;
+  seenAddendumCoreTexts?: Set<string>;
 }
 
 const convertCircledNum = (char: string) => {
@@ -48,6 +49,7 @@ export default function ArticleRenderer({
   isAdmin = false,
   trailingTitles = [],
   isBundleChild = false,
+  seenAddendumCoreTexts,
 }: ArticleRendererProps) {
   const isAddendumArticle =
     title === "부칙" ||
@@ -975,6 +977,17 @@ export default function ArticleRenderer({
             if (seen.includes(coreText)) {
               isDuplicate = true;
               break;
+            }
+          }
+          if (!isDuplicate && seenAddendumCoreTexts) {
+            const normalizedCore = coreText.replace(/\s+/g, '').replace(/[.·]/g, '');
+            if (normalizedCore.length > 20) {
+               for (const seen of seenAddendumCoreTexts) {
+                 if (normalizedCore.includes(seen)) {
+                   isDuplicate = true;
+                   break;
+                 }
+               }
             }
           }
         }
