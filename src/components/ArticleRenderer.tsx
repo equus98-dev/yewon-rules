@@ -854,7 +854,7 @@ export default function ArticleRenderer({
 
     // 별지/별표 찌꺼기 제거
     const cleanedClauses = clauses.map(c =>
-      c.replace(/\s*([\[〔【<])\s*(\ubc44지|\ubc44표|\uc11c식|\ubc44첨).*$/, "").trim()
+      c.replace(/\s*([\[〔【<])\s*(\ubcc4지|\ubcc4표|\uc11c식|\ubcc4첨).*$/, "").trim()
     ).filter(c => c);
 
     return (
