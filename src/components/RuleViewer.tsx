@@ -948,7 +948,56 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             {/* 조항 렌더링 */}
             {currentRevision?.articles && currentRevision.articles.length > 0 ? (
               <div className="pb-32">
-                {currentRevision.articles.map((a: any, idx: number) => {
+                {(() => {
+                  const seenAddendumCoreTexts = new Set<string>();
+                  if (currentRevision?.articles) {
+                    for (const a of currentRevision.articles) {
+                      if (!isAddendumArticle(a)) continue;
+                      
+                      let items: any[] = [];
+                      if (typeof a.contentJson === "string") {
+                        try { items = JSON.parse(a.contentJson); } catch (e) {}
+                      } else if (a.contentJson) {
+                        items = Array.isArray(a.contentJson) ? a.contentJson : (a.contentJson.paragraphs ? a.contentJson.paragraphs : [a.contentJson]);
+                      }
+                      
+                      const rawLines: string[] = [];
+                      for (const item of items) {
+                        if (!item) continue;
+                        let raw = String(item.text || "").trim();
+                        if (!raw) continue;
+                        raw = raw.replace(/^(?:부\s*칙\s*)+/, "").trim();
+                        if (raw) rawLines.push(raw);
+                      }
+                      let fullText = rawLines.join("\n");
+                      if (!fullText && a.contentText) {
+                        fullText = a.contentText.replace(/^(?:부\s*칙\s*)+/, "").trim();
+                      }
+                      
+                      const lines = fullText.split('\n');
+                      for (const line of lines) {
+                        const currentLine = line.trim();
+                        if (currentLine === "") continue;
+                        
+                        let coreText = currentLine;
+                        const match1 = currentLine.match(/^(?:부칙\s*)?제\d+조(?:의\s*\d+)?\s*\([^)]*\)\s*(.*)/);
+                        if (match1) {
+                          coreText = match1[1].trim();
+                        } else {
+                          const match2 = currentLine.match(/^(?:부칙\s*)?제\d+조(?:의\s*\d+)?\s+(.*)/);
+                          if (match2) coreText = match2[1].trim();
+                        }
+                        coreText = coreText.replace(/^[①-⑮\d]+\.\s*/, '').trim();
+                        const normalizedCore = coreText.replace(/\s+/g, '').replace(/[.·]/g, '');
+                        // ONLY add to seen if it actually HAS a title!
+                        if (normalizedCore && normalizedCore.length > 10 && /^(?:부칙\s*)?제\d+조/.test(currentLine)) {
+                          seenAddendumCoreTexts.add(normalizedCore);
+                        }
+                      }
+                    }
+                  }
+
+                  return currentRevision.articles.map((a: any, idx: number) => {
                   const hasHtmlAttachments = currentRevision?.articles?.some((art: any) => art.articleNumber >= 9000) || false;
                   // 별지/별표/별첨 (9000번대) 조항은 더 이상 본문 하단에 HTML로 렌더링하지 않음 (첨부파일 컴포넌트로 대체)
                   const isLegacyAddendum = a.articleNumber >= 9000 && isAddendumArticle(a);
@@ -1115,6 +1164,72 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                           }
                         }
                         
+                        
+                        // Check if this article is COMPLETELY a headless duplicate
+                        let isCompletelyHeadlessDuplicate = false;
+                        if (isAddendumArticle(a)) {
+                          let items: any[] = [];
+                          if (typeof a.contentJson === "string") {
+                            try { items = JSON.parse(a.contentJson); } catch (e) {}
+                          } else if (a.contentJson) {
+                            items = Array.isArray(a.contentJson) ? a.contentJson : (a.contentJson.paragraphs ? a.contentJson.paragraphs : [a.contentJson]);
+                          }
+                          
+                          const rawLines: string[] = [];
+                          for (const item of items) {
+                            if (!item) continue;
+                            let raw = String(item.text || "").trim();
+                            if (!raw) continue;
+                            raw = raw.replace(/^(?:부\s*칙\s*)+/, "").trim();
+                            if (raw) rawLines.push(raw);
+                          }
+                          let fullText = rawLines.join("\n");
+                          if (!fullText && a.contentText) {
+                            fullText = a.contentText.replace(/^(?:부\s*칙\s*)+/, "").trim();
+                          }
+                          
+                          const lines = fullText.split('\n');
+                          let hasAnyTitle = false;
+                          let allLinesAreDuplicates = true;
+                          let validLinesCount = 0;
+                          
+                          for (const line of lines) {
+                            if (line.trim() === "") continue;
+                            if (/^(?:부칙\s*)?제\d+조/.test(line.trim())) {
+                                hasAnyTitle = true;
+                                break;
+                            }
+                            
+                            validLinesCount++;
+                            const normalizedCore = line.trim().replace(/^[①-⑮\d]+\.\s*/, '').replace(/\s+/g, '').replace(/[.·]/g, '');
+                            if (normalizedCore && normalizedCore.length > 10) {
+                              let found = false;
+                              for (const seen of seenAddendumCoreTexts) {
+                                if (seen.includes(normalizedCore) || normalizedCore.includes(seen)) {
+                                  found = true;
+                                  break;
+                                }
+                              }
+                              if (!found) {
+                                allLinesAreDuplicates = false;
+                                break;
+                              }
+                            } else {
+                              allLinesAreDuplicates = false;
+                              break;
+                            }
+                          }
+                          
+                          // If it doesn't have ANY title in its text, and ALL its lines are found in seen texts, it's a headless duplicate!
+                          if (!hasAnyTitle && validLinesCount > 0 && allLinesAreDuplicates) {
+                            isCompletelyHeadlessDuplicate = true;
+                          }
+                        }
+
+                        if (isCompletelyHeadlessDuplicate) {
+                          return null;
+                        }
+                        
                         return (
                           <ArticleRenderer
                         id={(() => {
@@ -1160,7 +1275,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                   })()}
                     </React.Fragment>
                   );
-                })}
+                });
+              })()}
 
                 {/* Attachments Section */}
                 {/* Attachments Section */}
