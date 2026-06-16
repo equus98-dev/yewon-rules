@@ -363,12 +363,14 @@ function EditorContent() {
         // 부칙 번호 부여 (8000번대)
         const existingAddendums = newArticles.filter(a => a.articleNumber >= 8000 && a.articleNumber < 9000);
         let nextAddendumNum = 8000;
+        let addendumChapter = "부칙";
         if (existingAddendums.length > 0) {
            nextAddendumNum = Math.max(...existingAddendums.map(a => a.articleNumber)) + 1;
+           addendumChapter = existingAddendums[existingAddendums.length - 1].chapter || "";
         }
         
         newArticles.push({
-          chapter: "부칙",
+          chapter: addendumChapter,
           articleNumber: nextAddendumNum,
           title: "부칙",
           contentText: `부칙 (${revisionAnnounceDate})\n제1조(시행일) 이 규정은 ${effStr}부터 시행한다.`,
