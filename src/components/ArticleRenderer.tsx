@@ -417,14 +417,14 @@ export default function ArticleRenderer({
   const isAddendumItem = (text: string) =>
     /^\(시행일\)|^\(폐지|^\(적용예외|^\(경과조치|^\(적용범위|^\(준용\)/.test(text.trim());
 
-  const HISTORY_REGEX = /(<[^>]*\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?[^>]*>|<(?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|폐지)[^>]*>|\((?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|폐지)\s*\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?[^)]*\)|\((?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|폐지)\)|\(\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?[^)]*\))/gi;
+  const HISTORY_REGEX = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
 
   const normalizeHistoryDate = (str: string) => {
     let inner = str.replace(/^[<(\[]|[)>\]]$/g, '').trim();
     let parts = inner.split(',').map(p => p.trim());
     let lastAction = '';
     let normParts = parts.map(part => {
-      let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|폐지)?\s*(.*)$/);
+      let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지)?\s*(.*)$/);
       if (!match) return part;
       let action = match[1];
       let dateStr = match[2];
@@ -1136,7 +1136,7 @@ export default function ArticleRenderer({
           let titlePart = safeText.trim();
           let historyParts: string[] = [];
           
-          const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|전문개정|본조신설)[^>\])＞）]*[>\])＞）])/g;
+          const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|전문개정|본조신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/g;
           const matches = titlePart.match(historyRegex);
           if (matches) {
              historyParts = matches;

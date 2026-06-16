@@ -401,16 +401,17 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           
           if (typeof item !== 'object') return;
           
+          const historyRegexPattern = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
           if (item.type === "chapter") {
             const rawText = typeof item.text === 'string' ? item.text.replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지') : String(item.text || "");
-            const chapterText = rawText.split('\n')[0].trim();
+            const chapterText = rawText.split('\n')[0].replace(historyRegexPattern, '').trim();
             if (toc.length > 0 && toc[toc.length - 1].type === "chapter" && toc[toc.length - 1].text === chapterText) return;
-            toc.push({ type: "chapter", id: `toc-${chapterText.replace(new RegExp("\\s", "g"), '-')}`, text: chapterText });
+            toc.push({ type: "chapter", id: `toc-${rawText.split('\n')[0].trim().replace(new RegExp("\\s", "g"), '-')}`, text: chapterText });
           } else if (item.type === "section") {
             const rawText = typeof item.text === 'string' ? item.text : String(item.text || "");
-            const sectionText = rawText.split('\n')[0].trim();
+            const sectionText = rawText.split('\n')[0].replace(historyRegexPattern, '').trim();
             if (toc.length > 0 && toc[toc.length - 1].type === "section" && toc[toc.length - 1].text === sectionText) return;
-            toc.push({ type: "section", id: `toc-${sectionText.replace(new RegExp("\\s", "g"), '-')}`, text: sectionText });
+            toc.push({ type: "section", id: `toc-${rawText.split('\n')[0].trim().replace(new RegExp("\\s", "g"), '-')}`, text: sectionText });
           } else if (item.type === "article") {
             const articleNum = typeof item.num === 'string' ? item.num : String(item.num || "");
             if (!toc.some(t => t.id === `toc-${articleNum}`)) {
@@ -977,7 +978,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       {showChapter && (
                         <div id={`toc-${a.chapter.split('\n')[0].trim().replace(/\s/g, '-')}`} className="text-center w-full mt-8 mb-6 pt-2 flex flex-col items-center gap-1.5">
                           {(() => {
-                            const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>\])＞）]*[>\])＞）])/gi;
+                            const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
                             const histories = a.chapter.match(historyRegex);
                             let mainTitle = a.chapter;
                             let historyPart = "";
@@ -1022,7 +1023,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       {showSection && (
                         <div id={`toc-${a.section.split('\n')[0].trim().replace(/\s/g, '-')}`} className="text-center w-full mt-6 mb-4 flex flex-col items-center gap-1">
                           {(() => {
-                            const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>\])＞）]*[>\])＞）])/gi;
+                            const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
                             const histories = a.section.match(historyRegex);
                             let mainTitle = a.section;
                             let historyPart = "";
