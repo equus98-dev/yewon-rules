@@ -24,6 +24,7 @@ export async function POST(request: Request) {
 
     let successCount = 0;
     let failCount = 0;
+    const failDetails: any[] = [];
 
     for (const a of articles) {
       try {
@@ -54,10 +55,11 @@ export async function POST(request: Request) {
       } catch (err: any) {
         failCount++;
         console.error(`Failed to insert article ${a.id} in Edge runtime:`, err.message);
+        failDetails.push({ id: a.id, error: err.message });
       }
     }
 
-    return NextResponse.json({ success: true, successCount, failCount });
+    return NextResponse.json({ success: true, successCount, failCount, failDetails });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   } finally {
