@@ -593,7 +593,7 @@ export default function ArticleRenderer({
     }
 
     let formatted = text
-      .replace(/([①-⑮])/g, (match, p1, offset, string) => {
+      .replace(/([①-⑳])/g, (match, p1, offset, string) => {
         const before = string.slice(0, offset);
         if (/(?:제|\(|,|및|또는|와|과|이나|나)\s*$/.test(before)) return match;
         if (offset === 0 || before.endsWith('\n')) return match;
@@ -609,7 +609,7 @@ export default function ArticleRenderer({
         if (offset === 0 || before.endsWith('\n')) return match;
         return p1 + '\n' + p2 + ' ';
       })
-      .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])\s*\n([①-⑮])/g, '$1 $2')
+      .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])\s*\n([①-⑳])/g, '$1 $2')
       .replace(/((?<![『「])제\d+조의?\d*\s*(?:\[(?![\s\S]*?\[\/cite\])|[〔(（])[^\]〕)）]+[\]〕)）])/g, '\n\n$1')
       .replace(/(제\d+(?:장|절|관)\s+(?!(?:제\d+(?:조|항|호|목|장|절|관)?|및|에|의|은|는|이|가|을|를|과|와)(?:\s|$))[^\s]+)/g, (match, p1, offset, string) => {
          if (offset > 0) {
@@ -694,8 +694,8 @@ export default function ArticleRenderer({
           let isInline = (idx === 0 && isArticleBody);
           let currentPath = baseArticlePath;
 
-          if (/^[①-⑮]/.test(trimmed)) {
-             const numMatch = trimmed.match(/^([①-⑮])\s*(.*)/);
+          if (/^[①-⑳]/.test(trimmed)) {
+             const numMatch = trimmed.match(/^([①-⑳])\s*(.*)/);
              if (numMatch) {
                curHang = `제${convertCircledNum(numMatch[1])}항`;
                curHo = ""; curMok = "";
@@ -967,7 +967,7 @@ export default function ArticleRenderer({
       }
 
       // '1.', '①' 등 짧은 기호로만 된 경우 오작동 방지
-      coreText = coreText.replace(/^[①-⑮\d]+\.\s*/, '').trim();
+      coreText = coreText.replace(/^[①-⑳\d]+[.)]?\s*/, '').trim();
 
       if (coreText && coreText.length > 10) {
         let isDuplicate = false;
@@ -1317,7 +1317,7 @@ export default function ArticleRenderer({
 
         } else if (item.type === "paragraph") {
           const plainText = String(item.text || "").replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim();
-          const isGlued = /^제\d+조/.test(plainText) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(plainText) || /(?<!^|\s)[①-⑮]/.test(plainText);
+          const isGlued = /^제\d+조/.test(plainText) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(plainText) || /(?<!^|\s)[①-⑳]/.test(plainText);
           if (isGlued) {
             const isTopLevelArticle = /^제\d+조/.test(plainText);
             return (

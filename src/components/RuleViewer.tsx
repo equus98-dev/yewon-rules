@@ -990,7 +990,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                           const match2 = currentLine.match(/^(?:부칙\s*)?제\d+조(?:의\s*\d+)?\s+(.*)/);
                           if (match2) coreText = match2[1].trim();
                         }
-                        coreText = coreText.replace(/^[①-⑮\d]+\.\s*/, '').trim();
+                        coreText = coreText.replace(/^[①-⑳\d]+[.)]?\s*/, '').trim();
                         const normalizedCore = coreText.replace(/\s+/g, '').replace(/[.·]/g, '');
                         // Add all lines > 15 chars to running set. No title check needed because it only filters future articles!
                         if (normalizedCore && normalizedCore.length > 15) {
@@ -1204,7 +1204,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                             }
                             
                             validLinesCount++;
-                            const normalizedCore = line.trim().replace(/^[①-⑮\d]+\.\s*/, '').replace(/\s+/g, '').replace(/[.·]/g, '');
+                            const normalizedCore = line.trim().replace(/^[①-⑳\d]+[.)]?\s*/, '').replace(/\s+/g, '').replace(/[.·]/g, '');
                             if (normalizedCore && normalizedCore.length > 10) {
                               let found = false;
                               for (const seen of cumulativeSeenSets[idx]) {
