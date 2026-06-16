@@ -77,6 +77,13 @@ export default function AdminRulesManagement() {
   const [editingDeptValue, setEditingDeptValue] = useState<string>("");
   const [savingDept, setSavingDept] = useState(false);
 
+  // 개정 이력 관리(롤백) 모달 상태
+  const [openHistory, setOpenHistory] = useState(false);
+  const [historyRuleId, setHistoryRuleId] = useState("");
+  const [historyRuleTitle, setHistoryRuleTitle] = useState("");
+  const [historyRevisions, setHistoryRevisions] = useState<any[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
   // 데이터 로드
   useEffect(() => {
     async function loadData() {
@@ -180,6 +187,49 @@ export default function AdminRulesManagement() {
         setRules((prev) => prev.filter((r) => r.id !== ruleId));
       } else {
         alert(`삭제 실패: ${data.error || "알 수 없는 에러"}`);
+      }
+    } catch (e) {
+      console.error(e);
+      alert("네트워크 오류 발생");
+    }
+  };
+
+  // 연혁 관리 모달 열기
+  const handleOpenHistory = async (ruleId: string, title: string) => {
+    setHistoryRuleId(ruleId);
+    setHistoryRuleTitle(title);
+    setHistoryRevisions([]);
+    setOpenHistory(true);
+    setLoadingHistory(true);
+    
+    try {
+      const res = await fetch(`/api/rules/${ruleId}`);
+      if (!res.ok) throw new Error("Failed to fetch rule info");
+      const data = await res.json();
+      setHistoryRevisions(data.revisions || []);
+    } catch (e) {
+      console.error(e);
+      alert("연혁을 불러오지 못했습니다.");
+      setOpenHistory(false);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  // 최신 개정 취소 (롤백)
+  const handleDeleteRevision = async (revisionId: string, versionName: string) => {
+    if (!confirm(`[경고] 가장 최근 개정된 "${versionName}" 내역을 완전히 삭제하시겠습니까?\n이 작업은 되돌릴 수 없으며, 연관된 모든 조문 및 부칙 데이터가 삭제됩니다.`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/revisions/${revisionId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("개정 내역이 성공적으로 취소되었습니다.");
+        setOpenHistory(false);
+      } else {
+        alert(`취소 실패: ${data.error || "알 수 없는 에러"}`);
       }
     } catch (e) {
       console.error(e);
@@ -487,6 +537,16 @@ export default function AdminRulesManagement() {
                           </button>
                         )}
 
+                        {/* 연혁 관리 */}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenHistory(rule.id, rule.title)}
+                          className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg border border-indigo-200 text-[13px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm whitespace-nowrap"
+                        >
+                          <AutoFixHighIcon sx={{ fontSize: 13 }} />
+                          연혁 관리
+                        </button>
+
                         {/* 3) 규정 삭제 */}
                         <button
                           type="button"
@@ -644,6 +704,88 @@ export default function AdminRulesManagement() {
         </form>
       </Dialog>
 
+      {/* 4. 연혁 관리 모달 */}
+      <Dialog
+        open={openHistory}
+        onClose={() => setOpenHistory(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{ style: { borderRadius: "12px", padding: "10px" } }}
+      >
+        <DialogTitle className="font-black text-[#000080] border-b border-slate-200 pb-4 mb-4 flex justify-between items-center text-lg">
+          [{historyRuleTitle}] 개정 이력 관리
+          <IconButton onClick={() => setOpenHistory(false)} size="small"><CloseIcon /></IconButton>
+        </DialogTitle>
+        <DialogContent className="text-[15px] leading-relaxed pb-6 min-h-[300px]">
+          {loadingHistory ? (
+            <div className="flex justify-center items-center h-40">
+              <CircularProgress />
+            </div>
+          ) : historyRevisions.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left text-slate-700 border-collapse">
+                <thead className="bg-slate-50 border-b border-slate-300">
+                  <tr>
+                    <th className="py-3 px-4 font-bold whitespace-nowrap text-center">버전</th>
+                    <th className="py-3 px-4 font-bold whitespace-nowrap text-center">개정구분</th>
+                    <th className="py-3 px-4 font-bold whitespace-nowrap text-center">버전명</th>
+                    <th className="py-3 px-4 font-bold whitespace-nowrap text-center">공포일</th>
+                    <th className="py-3 px-4 font-bold whitespace-nowrap text-center">시행일</th>
+                    <th className="py-3 px-4 font-bold whitespace-nowrap text-center">관리</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {historyRevisions.map((rev, idx) => (
+                    <tr key={rev.id} className="hover:bg-slate-50">
+                      <td className="py-3 px-4 text-center font-medium">v{rev.version}</td>
+                      <td className="py-3 px-4 text-center">
+                        <span className={`px-2 py-1 rounded text-[11px] font-bold ${
+                          rev.revisionType === 'ENACTMENT' ? 'bg-sky-100 text-sky-700' :
+                          rev.revisionType === 'FULL_REVISION' ? 'bg-red-100 text-red-700' :
+                          'bg-emerald-100 text-emerald-700'
+                        }`}>
+                          {rev.revisionType === 'ENACTMENT' ? '제정' :
+                           rev.revisionType === 'FULL_REVISION' ? '전부개정' : '일부개정'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center font-bold">{rev.versionName}</td>
+                      <td className="py-3 px-4 text-center text-slate-500">
+                        {rev.enactmentDate ? new Date(rev.enactmentDate).toLocaleDateString() : '-'}
+                      </td>
+                      <td className="py-3 px-4 text-center text-slate-500">
+                        {rev.effectiveDate ? new Date(rev.effectiveDate).toLocaleDateString() : '-'}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        {idx === 0 && rev.version > 1 ? (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteRevision(rev.id, rev.versionName)}
+                            className="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded border border-red-200 text-xs font-bold transition-colors whitespace-nowrap"
+                          >
+                            <DeleteIcon sx={{ fontSize: 14, mr: 0.5 }} />최신 롤백(삭제)
+                          </button>
+                        ) : idx === 0 && rev.version === 1 ? (
+                           <span className="text-xs text-slate-400">제정 삭제 불가</span>
+                        ) : (
+                           <span className="text-xs text-slate-400">-</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="mt-4 p-4 bg-amber-50 text-amber-800 rounded-lg text-sm border border-amber-200">
+                <strong className="block mb-1">⚠️ 주의사항</strong>
+                연혁의 무결성을 보장하기 위해 <strong>가장 최신의 개정 내역</strong>만 취소(삭제)할 수 있습니다. 취소 시 해당 버전에 포함된 조항 및 부칙 데이터가 영구 삭제되며, 시스템은 자동으로 이전 버전을 현행 규정으로 복구합니다.
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-12 text-slate-500">
+              조회된 개정 이력이 없습니다.
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
