@@ -235,6 +235,8 @@ export default function ArticleRenderer({
           cleanHtml = cleanHtml.replace(match[0], '');
         }
       }
+    }
+
     if (cleanHtml) {
       if (isAddendumArticle) {
         cleanHtml = cleanHtml.replace(/(\([가-힣A-Za-z0-9\s·,]{2,}[^)]*\))/g, (match, paren, offset, str) => {
