@@ -935,9 +935,11 @@ export default function ArticleRenderer({
       }
     }
 
-    // 중복되는 부칙/조 제목 접두사 제거 (데이터베이스에 "부칙제1조(시행일)\n제1조(시행일)" 같이 중복 저장된 경우)
+    // 중복되는 부칙/조 제목 접두사 제거 및 조문제목 없는 본문 찌꺼기(DB 파싱 오류) 제거
     const lines = fullText.split('\n');
     const newLines: string[] = [];
+    const seenCoreTexts = new Set<string>();
+
     for (let i = 0; i < lines.length; i++) {
       const currentLine = lines[i].trim();
       if (currentLine === "") continue;
@@ -951,6 +953,35 @@ export default function ArticleRenderer({
           }
         }
       }
+
+      // 조문제목 없는 본문 중복 찌꺼기 제거 (ex: 제N조 본문이 뒤에 제목 없이 다시 나오는 경우)
+      let coreText = currentLine;
+      const match1 = currentLine.match(/^(?:부칙\s*)?제\d+조(?:의\s*\d+)?\s*\([^)]*\)\s*(.*)/);
+      if (match1) {
+        coreText = match1[1].trim();
+      } else {
+        const match2 = currentLine.match(/^(?:부칙\s*)?제\d+조(?:의\s*\d+)?\s+(.*)/);
+        if (match2) coreText = match2[1].trim();
+      }
+
+      // '1.', '①' 등 짧은 기호로만 된 경우 오작동 방지
+      coreText = coreText.replace(/^[①-⑮\d]+\.\s*/, '').trim();
+
+      if (coreText && coreText.length > 10) {
+        let isDuplicate = false;
+        // 제목이 없는 줄인 경우, 이전에 나온 조문 본문과 동일한지 확인
+        if (!/^(?:부칙\s*)?제\d+조/.test(currentLine)) {
+          for (const seen of seenCoreTexts) {
+            if (seen.includes(coreText)) {
+              isDuplicate = true;
+              break;
+            }
+          }
+        }
+        if (isDuplicate) continue;
+        seenCoreTexts.add(coreText);
+      }
+      
       newLines.push(currentLine);
     }
     fullText = newLines.join('\n');
