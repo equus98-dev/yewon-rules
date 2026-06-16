@@ -1066,7 +1066,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       )}
                       {/* 부칙 묶음 구분선 및 묶음 소속 여부 판별 */}
                       {(() => {
-                        let separator = null;
+                        let separator: React.ReactNode = null;
                         if (isAddendumArticle(a)) {
                           const pa = idx > 0 ? currentRevision?.articles?.[idx - 1] : null;
                           const prevIsAddendum = pa ? isAddendumArticle(pa) : false;
