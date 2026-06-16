@@ -196,7 +196,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         if (a.chapter && a.chapter !== lastChapter) {
             // 부칙 chapter는 가운데 장 헤더로 표시하지 않음 (ArticleRenderer에서 통합 처리)
             if (!/^부\s*칙/.test((a.chapter || '').replace(/\s+/g, ''))) {
-              const cleanChapter = a.chapter.replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지');
+              const cleanChapter = a.chapter.replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지').replace(/\s*<[^>]*>.*$/g, '');
               toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: cleanChapter });
             }
             lastChapter = a.chapter;
@@ -261,7 +261,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
               const expectedTitleStart = `제${a.articleNumber}조`;
               const titleStr = /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title.trim()})`;
               const formattedTitleStr = formatTocArticleTitle(titleStr);
-              toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: formattedTitleStr });
+              const articleNumMatch = formattedTitleStr.match(/^(제\d+조의?\d*)/);
+              const uniqueId = articleNumMatch ? `toc-${articleNumMatch[1]}` : `toc-${a.articleNumber}`;
+              if (!toc.some(t => t.id === uniqueId)) {
+                toc.push({ type: "article", id: uniqueId, text: formattedTitleStr });
+              }
             }
           } else if (a.articleNumber < 8000 && a.title) {
             const expectedTitleStart = `제${a.articleNumber}조`;
@@ -279,7 +283,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
               return title;
             };
             const formattedTitleStr = formatTocArticleTitle(titleStr);
-            toc.push({ type: "article", id: `toc-${a.articleNumber}`, text: formattedTitleStr });
+            const articleNumMatch = formattedTitleStr.match(/^(제\d+조의?\d*)/);
+            const uniqueId = articleNumMatch ? `toc-${articleNumMatch[1]}` : `toc-${a.articleNumber}`;
+            if (!toc.some(t => t.id === uniqueId)) {
+              toc.push({ type: "article", id: uniqueId, text: formattedTitleStr });
+            }
           }
           return;
         }
@@ -1058,7 +1066,20 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         return null;
                       })()}
                       <ArticleRenderer
-                        id={`toc-${a.articleNumber}`}
+                        id={(() => {
+                          if (a.articleNumber >= 8000) return `toc-${a.articleNumber}`;
+                          const expectedTitleStart = `제${a.articleNumber}조`;
+                          const titleStr = a.title && /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title?.trim() || ''})`;
+                          const match = titleStr.match(/^(제\d+조(?:의|\s+)?\d*)/);
+                          if (match) {
+                            let numPart = match[1].replace(/\s/g, '');
+                            if (numPart.match(/^제\d+조\d+$/)) {
+                              numPart = numPart.replace(/조(\d+)$/, '조의$1');
+                            }
+                            return `toc-${numPart}`;
+                          }
+                          return `toc-${a.articleNumber}`;
+                        })()}
                         articleId={a.id}
                         chapter={a.chapter}
                         section={a.section}

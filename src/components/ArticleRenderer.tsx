@@ -644,8 +644,8 @@ export default function ArticleRenderer({
       if (before.match(/제\d+조의?\d*\s*$/)) return match;
       if (before.match(/\d\s*$/)) return match;
 
-      if (isAddendumArticle) {
-        return '\n' + match;
+      if (!isAddendumArticle) {
+        return match;
       }
 
       if (!before.match(/(?:^|[.\s>\]]|&nbsp;)$/i)) return match;
