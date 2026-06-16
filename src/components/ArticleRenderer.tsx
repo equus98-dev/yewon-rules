@@ -238,26 +238,21 @@ export default function ArticleRenderer({
     }
 
     if (cleanHtml) {
-      if (isAddendumArticle) {
-        cleanHtml = cleanHtml.replace(/(\([가-힣A-Za-z0-9\s·,]{2,}[^)]*\))/g, (match, paren, offset, str) => {
-          const before = str.slice(0, offset);
-          if (before.match(/(?:<br\s*\/?>|<\/p>|<p>)\s*$/i)) return match;
-          if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
-          if (before.match(/제\d+조\s*$/)) return match;
-          if (before.match(/\d\s*$/)) return match;
+      cleanHtml = cleanHtml.replace(/(\([가-힣A-Za-z0-9\s·,]{2,}[^)]*\))/g, (match, paren, offset, str) => {
+        const before = str.slice(0, offset);
+        if (before.match(/(?:<br\s*\/?>|<\/p>|<p>)\s*$/i)) return match;
+        if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+        if (before.match(/제\d+조의?\d*\s*$/)) return match;
+        if (before.match(/\d\s*$/)) return match;
+
+        const isAddendumKeyword = /(?:시행일|경과조치|적용례|적용범위|준용|폐지|예외|단서|특례|임기|존속기간|관련|시행|적용)/.test(match);
+        if (isAddendumArticle || isAddendumKeyword) {
           return '<br/>' + match;
-        });
-      } else {
-        cleanHtml = cleanHtml.replace(/(\([가-힣\s·]{2,}\))/g, (match, paren, offset, str) => {
-          const before = str.slice(0, offset);
-          if (before.match(/(?:<br\s*\/?>|<\/p>|<p>)\s*$/i)) return match;
-          if (!before.match(/(?:^|[.\s>\]])$/)) return match;
-          if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
-          if (before.match(/제\d+조\s*$/)) return match;
-          if (before.match(/\d\s*$/)) return match;
-          return '<br/>' + match;
-        });
-      }
+        }
+
+        if (!before.match(/(?:^|[.\s>\]]|&nbsp;)$/i)) return match;
+        return '<br/>' + match;
+      });
     }
 
     return (
@@ -604,13 +599,21 @@ export default function ArticleRenderer({
       // 부칙 바로 뒤의 날짜 괄호/꺽쇠는 붙여두고, 그 뒤에 이어지는 시행일(숫자 또는 괄호) 앞에서 줄바꿈 수행
       .replace(/(부\s*칙\s*(?:\([^)]*\)|<[^>]*>|\[[^\]]*\]|〔[^〕]*〕)?)\s+(\d{1,2}\.|\([가-힣\s·]{2,}\))/gi, '$1\n$2');
 
-    if (isAddendumArticle) {
-      // 부칙인 경우: 어떠한 숨은 문자나 예외 상황이 있더라도 무조건 괄호 앞에서 줄바꿈 (숫자/조항번호 뒤 제외)
-      formatted = formatted.replace(/(?<!\d+(?:의\d+)?\.\s*)(?<!제\d+조\s*)(?<!\d\s*)(\([가-힣A-Za-z0-9\s·,]{2,}[^)]*\))/g, '\n$1');
-    } else {
-      // 본문인 경우: 입각(의거) 등의 인라인 괄호가 깨지지 않도록, 괄호 앞이 공백이나 마침표일 때만 줄바꿈
-      formatted = formatted.replace(/(?<=^|[.\s>\]])(?<!\d+(?:의\d+)?\.\s*)(?<!제\d+조\s*)(?<!\d\s*)(\([가-힣\s·]{2,}\))/g, '\n$1');
-    }
+    formatted = formatted.replace(/(\([가-힣A-Za-z0-9\s·,]{2,}[^)]*\))/g, (match, paren, offset, str) => {
+      const before = str.slice(0, offset);
+      if (before.match(/\n\s*$/)) return match;
+      if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+      if (before.match(/제\d+조의?\d*\s*$/)) return match;
+      if (before.match(/\d\s*$/)) return match;
+
+      const isAddendumKeywordMatch = /(?:시행일|경과조치|적용례|적용범위|준용|폐지|예외|단서|특례|임기|존속기간|관련|시행|적용)/.test(match);
+      if (isAddendumArticle || isAddendumKeywordMatch) {
+        return '\n' + match;
+      }
+
+      if (!before.match(/(?:^|[.\s>\]]|&nbsp;)$/i)) return match;
+      return '\n' + match;
+    });
 
     // Restore hidden citation tags to avoid them being split by newlines
     let hiddenCitations: string[] = [];
