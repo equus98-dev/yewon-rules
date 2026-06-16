@@ -796,6 +796,7 @@ export default function ArticleRenderer({
   let currentParagraphStr = "";
   let currentItemStr = "";
   let currentSubitemStr = "";
+  let hasRenderedEditBtn = false;
 
   return (
     <div id={id} data-article-id={articleId} className="mb-2 animate-fade-in rule-viewer-content font-['Pretendard'] relative group">
