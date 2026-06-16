@@ -415,24 +415,41 @@ export default function ArticleRenderer({
   const isAddendumItem = (text: string) =>
     /^\(시행일\)|^\(폐지|^\(적용예외|^\(경과조치|^\(적용범위|^\(준용\)/.test(text.trim());
 
+  const HISTORY_REGEX = /(<[^>]*\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?[^>]*>|<(?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|폐지)[^>]*>|\((?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|폐지)\s*\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?[^)]*\)|\((?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|폐지)\)|\(\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?[^)]*\))/gi;
+
   const normalizeHistoryDate = (str: string) => {
     let inner = str.replace(/^[<(\[]|[)>\]]$/g, '').trim();
     let parts = inner.split(',').map(p => p.trim());
     let lastAction = '';
     let normParts = parts.map(part => {
-      let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)?\s*(.*)$/);
+      let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|폐지)?\s*(.*)$/);
       if (!match) return part;
       let action = match[1];
       let dateStr = match[2];
+      
       if (action) {
         lastAction = action;
       } else {
         action = lastAction || '개정';
       }
-      let dateNorm = dateStr.replace(/[^\d.]/g, '').split('.').map(s => s.trim()).filter(s => s.length > 0).map(s => parseInt(s, 10)).join('. ');
+      
+      let dateMatch = dateStr.match(/^([\d.\s]+)(.*)$/);
+      let datePart = dateStr;
+      let restPart = '';
+      if (dateMatch && dateMatch[1].replace(/[^\d]/g, '').length >= 4) {
+        datePart = dateMatch[1];
+        restPart = dateMatch[2].trim();
+      } else {
+        dateMatch = null;
+      }
+
+      let dateNorm = datePart.replace(/[^\d.]/g, '').split('.').map(s => s.trim()).filter(s => s.length > 0).map(s => parseInt(s, 10)).join('. ');
       if (dateNorm) dateNorm += '.';
-      else dateNorm = dateStr;
-      return action + ' ' + dateNorm;
+      else dateNorm = datePart.trim();
+      
+      let result = action + (dateNorm ? ' ' + dateNorm : '');
+      if (restPart) result += ' ' + restPart;
+      return result.trim();
     });
     return '<' + normParts.join(', ') + '>';
   };
@@ -455,12 +472,12 @@ export default function ArticleRenderer({
 
     if (hideHistory) {
       // 연혁 숨기기
-      decodedText = decodedText.replace(/([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)[^>)]*[>)])/gi, "");
+      decodedText = decodedText.replace(HISTORY_REGEX, "");
     }
     
     // 연혁 표시: <개정 ...> 부분을 파란색으로 렌더링하기 위한 문자열 준비
     let htmlText = decodedText.replace(
-      /([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)[^>)]*[>)])/gi,
+      HISTORY_REGEX,
       (match) => `<span class="text-sky-700 font-medium text-[13px] ml-1">${normalizeHistoryDate(match).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
     );
 
