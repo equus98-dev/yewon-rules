@@ -118,6 +118,60 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
   const currentRevision = ruleData?.currentRevision;
 
+  const calculatedEnactmentDateStr = useMemo(() => {
+    if (!ruleData) return "미정";
+
+    // 1. Check if there's any explicit ENACTMENT revision in history
+    if (ruleData.revisions && Array.isArray(ruleData.revisions)) {
+      const enactmentRev = ruleData.revisions.find((r: any) => r.revisionType === 'ENACTMENT');
+      if (enactmentRev && enactmentRev.enactmentDate) {
+        const d = new Date(enactmentRev.enactmentDate);
+        if (!isNaN(d.getTime())) return d.toLocaleDateString('ko-KR');
+      }
+    }
+
+    // 2. Scan '부칙' (Addendum) to find the oldest date
+    if (currentRevision && currentRevision.articles && Array.isArray(currentRevision.articles)) {
+      const addenda = currentRevision.articles.filter((a: any) => a.title === '부칙' || a.chapter === '부칙');
+      let oldestDate: Date | null = null;
+      const dateRegex = /(19|20)\d{2}\s*(년|\.)\s*\d{1,2}\s*(월|\.)\s*\d{1,2}\s*(일|\.)?/g;
+
+      addenda.forEach((a: any) => {
+        let textToScan = a.contentText || "";
+        if (!textToScan && a.contentJson) {
+          try {
+            const parsed = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
+            if (Array.isArray(parsed)) {
+              textToScan = parsed.map(i => i.text || "").join(" ");
+            } else if (parsed.paragraphs) {
+              textToScan = parsed.paragraphs.join(" ");
+            }
+          } catch (e) {}
+        }
+
+        let match;
+        while ((match = dateRegex.exec(textToScan)) !== null) {
+          const rawMatch = match[0].replace(/[년월일\s]/g, '.');
+          const parts = rawMatch.split('.').filter(p => p.length > 0).map(Number);
+          if (parts.length >= 3) {
+            const d = new Date(parts[0], parts[1] - 1, parts[2]);
+            if (!isNaN(d.getTime())) {
+              if (!oldestDate || d < oldestDate) {
+                oldestDate = d;
+              }
+            }
+          }
+        }
+      });
+
+      if (oldestDate) {
+        return oldestDate.toLocaleDateString('ko-KR');
+      }
+    }
+
+    return "미정";
+  }, [ruleData, currentRevision]);
+
   const tocItems = useMemo(() => {
     if (!currentRevision || !currentRevision.articles) return [];
     let toc: any[] = [];
@@ -828,7 +882,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 border-b-2 border-slate-700 pb-3 gap-3">
               <div className="text-[14px] font-medium text-[#1E5D9B]">
                 [시행 {currentRevision?.effectiveDate ? new Date(currentRevision.effectiveDate).toLocaleDateString('ko-KR') : (currentRevision?.enactmentDate ? new Date(currentRevision.enactmentDate).toLocaleDateString('ko-KR') : "미정")}] 
-                [{currentRevision?.revisionType ? getRevisionTypeName(currentRevision.revisionType) : ""}{currentRevision?.enactmentDate ? ` ${new Date(currentRevision.enactmentDate).toLocaleDateString('ko-KR')}` : ""}]
+                [제정 {calculatedEnactmentDateStr}]
+                {currentRevision?.revisionType && currentRevision.revisionType !== 'ENACTMENT' ? ` [${getRevisionTypeName(currentRevision.revisionType)} ${currentRevision.enactmentDate ? new Date(currentRevision.enactmentDate).toLocaleDateString('ko-KR') : "미정"}]` : ""}
               </div>
               <div className="text-right text-[13.5px] font-medium text-slate-700 flex items-center justify-end gap-1">
                 담당부서: <span className="font-bold">{department?.name || "미지정"}</span>
