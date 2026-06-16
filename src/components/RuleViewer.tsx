@@ -1012,9 +1012,19 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                           })()}
                         </div>
                       )}
-                      {a.articleNumber >= 8000 && (idx === 0 || (currentRevision?.articles && currentRevision.articles[idx - 1].articleNumber < 8000)) && (
-                        <div className="w-full my-12 border-t-2 border-slate-300 border-dashed"></div>
-                      )}
+                      {/* 부칙 구분선: 부칙 article이 처음 등장할 때만 조문 끝에 구분선 표시 */}
+                      {(() => {
+                        const isAddendum = a.title === '부칙' || (a.title || '').replace(/\s+/g, '').startsWith('부칙') || a.chapter === '부칙';
+                        const prevIsNotAddendum = idx === 0 || (() => {
+                          const pa = currentRevision?.articles?.[idx - 1];
+                          if (!pa) return true;
+                          return !(pa.title === '부칙' || (pa.title || '').replace(/\s+/g, '').startsWith('부칙') || pa.chapter === '부칙');
+                        })();
+                        if (isAddendum && prevIsNotAddendum) {
+                          return <div className="w-full mt-10 mb-6 border-t border-dashed border-slate-400" />;
+                        }
+                        return null;
+                      })()}
                       <ArticleRenderer
                         id={`toc-${a.articleNumber}`}
                         articleId={a.id}

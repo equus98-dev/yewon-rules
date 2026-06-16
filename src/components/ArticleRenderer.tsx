@@ -799,6 +799,93 @@ export default function ArticleRenderer({
   let currentSubitemStr = "";
   let hasRenderedEditBtn = false;
 
+  // ─────────────────────────────────────────────────────────
+  // 부칙 전용 통합 렌더러
+  // isAddendumArticle이 true이면 여기서 바로 반환 → 하위 중복 분기 없음
+  // ─────────────────────────────────────────────────────────
+  if (isAddendumArticle) {
+    // contentJson/contentText 에서 부칙 본문 줄들 추출
+    const addendumLines: string[] = [];
+    for (const item of displayItems) {
+      if (!item) continue;
+      let raw = String(item.text || "").trim();
+      // "부칙" 접두어만 있는 줄은 헤더이므로 본문에서 제외
+      const stripped = raw.replace(/^(?:부\s*칙\s*)+/, "").trim();
+      // title 자체가 본문에 포함된 경우 제거
+      if (title && stripped.startsWith(title.trim())) {
+        const body = stripped.substring(title.trim().length).trim();
+        if (body) addendumLines.push(body);
+      } else if (stripped) {
+        addendumLines.push(stripped);
+      }
+    }
+
+    return (
+      <div id={id} data-article-id={articleId} className="animate-fade-in rule-viewer-content font-['Pretendard'] w-full">
+        {/* 부칙 헤더 */}
+        <p className="font-bold text-[16px] text-slate-900 mb-2 mt-2">
+          부칙
+          {title && title !== '부칙' && !/^부\s*칙$/.test(title.trim()) && (
+            <span className="font-normal text-[14px] text-slate-500 ml-2">{title.replace(/^부\s*칙\s*/, '').trim()}</span>
+          )}
+        </p>
+        {/* 부칙 본문 */}
+        <div className="text-[16px] text-slate-800 leading-[1.8] flex flex-col gap-1">
+          {addendumLines.map((line, i) => {
+            // 별지/별표 찌꺼기 제거
+            const cleaned = line.replace(/\s*(\[|〔|【|<)\s*(별지|별표|서식|별첨).*$/, '').trim();
+            if (!cleaned) return null;
+            return (
+              <div key={i} className="break-keep">
+                {renderTextWithHistory(cleaned)}
+              </div>
+            );
+          })}
+        </div>
+        {/* 편집 다이얼로그 (부칙도 단순수정 지원) */}
+        <Dialog open={isEditing} onClose={() => !isSaving && setIsEditing(false)} maxWidth="md" fullWidth>
+          <DialogTitle sx={{ p: 0 }}>
+            <div className="flex justify-between items-center bg-slate-50 border-b border-slate-200 px-4 py-3">
+              <span className="font-bold text-[#0c3161]">부칙 단순 수정</span>
+              <IconButton size="small" onClick={() => !isSaving && setIsEditing(false)} sx={{ p: 0.5 }}>
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </div>
+          </DialogTitle>
+          <DialogContent className="p-6 bg-slate-50">
+            <div className="space-y-3 bg-white p-4 border border-slate-200 rounded-lg shadow-inner max-h-[50vh] overflow-y-auto scrollbar">
+              {editItems.map((item, idx) => (
+                <div key={idx} className="flex gap-3 items-start">
+                  {item.num && <span className="font-bold shrink-0 mt-2.5 text-[#0c3161] whitespace-nowrap min-w-[1.5rem]">{item.num}</span>}
+                  <textarea
+                    className="w-full border border-slate-300 rounded p-2.5 text-[14px] text-slate-800 focus:outline-none focus:border-blue-500 min-h-[60px] resize-y"
+                    value={item.text}
+                    onChange={(e) => { const n = [...editItems]; n[idx].text = e.target.value; setEditItems(n); }}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button type="button" className="px-4 py-2 border border-slate-300 text-slate-600 bg-white rounded font-bold text-sm" onClick={() => setIsEditing(false)} disabled={isSaving}>취소</button>
+              <button type="button" className="px-4 py-2 bg-[#0c3161] text-white rounded font-bold text-sm" onClick={async () => {
+                if (!articleId) return;
+                setIsSaving(true);
+                try {
+                  const newText = editItems.map(i => (i.num ? `${i.num} ${i.text}` : i.text)).join('\n');
+                  const res = await fetch(`/api/admin/articles/${articleId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contentText: newText, contentJson: editItems }) });
+                  if (!res.ok) throw new Error('저장 실패');
+                  alert('수정 완료');
+                  setIsEditing(false);
+                  window.dispatchEvent(new CustomEvent('rule-updated'));
+                } catch { alert('오류 발생'); } finally { setIsSaving(false); }
+              }} disabled={isSaving}>{isSaving ? '저장 중...' : '수정 완료'}</button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+
   return (
     <div id={id} data-article-id={articleId} className="mb-2 animate-fade-in rule-viewer-content font-['Pretendard'] relative group">
       {displayItems.map((item, index) => {
