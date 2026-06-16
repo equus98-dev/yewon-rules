@@ -259,7 +259,14 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             }
             if (!foundArticle && a.articleNumber < 8000 && a.title) {
               const expectedTitleStart = `제${a.articleNumber}조`;
-              const titleStr = /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title.trim()})`;
+              let titleStr = a.title.trim();
+              if (!/^제\d+조/.test(titleStr)) {
+                 if (/^의\s*\d+/.test(titleStr)) {
+                    titleStr = `${expectedTitleStart}${titleStr}`;
+                 } else {
+                    titleStr = `${expectedTitleStart}(${titleStr})`;
+                 }
+              }
               const formattedTitleStr = formatTocArticleTitle(titleStr);
               const articleNumMatch = formattedTitleStr.match(/^(제\d+조의?\d*)/);
               const uniqueId = articleNumMatch ? `toc-${articleNumMatch[1]}` : `toc-${a.articleNumber}`;
@@ -269,7 +276,14 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             }
           } else if (a.articleNumber < 8000 && a.title) {
             const expectedTitleStart = `제${a.articleNumber}조`;
-            const titleStr = /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title.trim()})`;
+            let titleStr = a.title.trim();
+            if (!/^제\d+조/.test(titleStr)) {
+               if (/^의\s*\d+/.test(titleStr)) {
+                  titleStr = `${expectedTitleStart}${titleStr}`;
+               } else {
+                  titleStr = `${expectedTitleStart}(${titleStr})`;
+               }
+            }
             
             const formatTocArticleTitle = (title: string) => {
               const match = title.match(/^(제\d+조(?:의|\s+)?\d*)(.*)/);
@@ -324,7 +338,14 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         // DB Migration 중 본문에서 유실된 제1조 제목 강제 복구 (TOC용)
         if (a.title && a.articleNumber < 8000) {
            const expectedTitleStart = `제${a.articleNumber}조`;
-           const titleStr = /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title.trim()})`;
+           let titleStr = a.title.trim();
+           if (!/^제\d+조/.test(titleStr)) {
+              if (/^의\s*\d+/.test(titleStr)) {
+                 titleStr = `${expectedTitleStart}${titleStr}`;
+              } else {
+                 titleStr = `${expectedTitleStart}(${titleStr})`;
+              }
+           }
            
            const formatTocArticleTitle = (title: string) => {
              const match = title.match(/^(제\d+조(?:의|\s+)?\d*)(.*)/);
@@ -956,7 +977,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       {showChapter && (
                         <div id={`toc-${a.chapter.split('\n')[0].trim().replace(/\s/g, '-')}`} className="text-center w-full mt-8 mb-6 pt-2 flex flex-col items-center gap-1.5">
                           {(() => {
-                            const historyRegex = /([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi;
+                            const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>\])＞）]*[>\])＞）])/gi;
                             const histories = a.chapter.match(historyRegex);
                             let mainTitle = a.chapter;
                             let historyPart = "";
@@ -988,7 +1009,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                               lines.push(normalizeHistoryDate(historyPart));
                             }
                             return lines.map((line: string, i: number) => {
-                              const isHistoryLine = i > 0 && /^[<(\[]/.test(line.trim());
+                              const isHistoryLine = i > 0 && /^[<(\[＜（]/.test(line.trim());
                               return (
                                 <span key={i} className={!isHistoryLine ? "text-[20px] font-black text-[#000080] tracking-tight break-keep" : "text-[13px] text-sky-700 font-medium"}>
                                   {line}
@@ -1001,7 +1022,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       {showSection && (
                         <div id={`toc-${a.section.split('\n')[0].trim().replace(/\s/g, '-')}`} className="text-center w-full mt-6 mb-4 flex flex-col items-center gap-1">
                           {(() => {
-                            const historyRegex = /([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>)]*[>)])/gi;
+                            const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)[^>\])＞）]*[>\])＞）])/gi;
                             const histories = a.section.match(historyRegex);
                             let mainTitle = a.section;
                             let historyPart = "";
@@ -1033,7 +1054,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                               lines.push(normalizeHistoryDate(historyPart));
                             }
                             return lines.map((line: string, i: number) => {
-                              const isHistoryLine = i > 0 && /^[<(\[]/.test(line.trim());
+                              const isHistoryLine = i > 0 && /^[<(\[＜（]/.test(line.trim());
                               return (
                                 <span key={i} className={!isHistoryLine ? "text-[18px] font-bold text-[#000080] break-keep" : "text-[12px] text-sky-700 font-medium"}>
                                   {line}
@@ -1083,7 +1104,16 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         id={(() => {
                           if (a.articleNumber >= 8000) return `toc-${a.articleNumber}`;
                           const expectedTitleStart = `제${a.articleNumber}조`;
-                          const titleStr = a.title && /^제\d+조/.test(a.title.trim()) ? a.title.trim() : `${expectedTitleStart}(${a.title?.trim() || ''})`;
+                          let titleStr = (a.title || '').trim();
+                          if (titleStr && !/^제\d+조/.test(titleStr)) {
+                             if (/^의\s*\d+/.test(titleStr)) {
+                                titleStr = `${expectedTitleStart}${titleStr}`;
+                             } else {
+                                titleStr = `${expectedTitleStart}(${titleStr})`;
+                             }
+                          } else if (!titleStr) {
+                             titleStr = expectedTitleStart;
+                          }
                           const match = titleStr.match(/^(제\d+조(?:의|\s+)?\d*)/);
                           if (match) {
                             let numPart = match[1].replace(/\s/g, '');

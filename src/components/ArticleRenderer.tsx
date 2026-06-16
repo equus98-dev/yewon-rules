@@ -1132,7 +1132,7 @@ export default function ArticleRenderer({
           let titlePart = safeText.trim();
           let historyParts: string[] = [];
           
-          const historyRegex = /(<[^>]+>|\([^)]*(개정|삭제|신설|전문개정|본조신설)[^)]*\))/g;
+          const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|전문개정|본조신설)[^>\])＞）]*[>\])＞）])/g;
           const matches = titlePart.match(historyRegex);
           if (matches) {
              historyParts = matches;
