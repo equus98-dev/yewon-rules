@@ -939,10 +939,24 @@ export default function ArticleRenderer({
     }
 
     // 중복되는 부칙/조 제목 접두사 제거 (데이터베이스에 "부칙제1조(시행일)\n제1조(시행일)" 같이 중복 저장된 경우)
-    while (fullText.match(/(?:^|\n)(부칙\s*제\d+조(?:의\s*\d+)?\s*\([^)]*\)|제\d+조(?:의\s*\d+)?\s*\([^)]*\))\s*\n(?=(?:부칙\s*)?제\d+조(?:의\s*\d+)?\s*\([^)]*\))/)) {
-      fullText = fullText.replace(/(?:^|\n)(부칙\s*제\d+조(?:의\s*\d+)?\s*\([^)]*\)|제\d+조(?:의\s*\d+)?\s*\([^)]*\))\s*\n(?=(?:부칙\s*)?제\d+조(?:의\s*\d+)?\s*\([^)]*\))/, '\n');
+    const lines = fullText.split('\n');
+    const newLines = [];
+    for (let i = 0; i < lines.length; i++) {
+      const currentLine = lines[i].trim();
+      if (currentLine === "") continue;
+      
+      if (i < lines.length - 1) {
+        const nextLine = lines[i+1].trim();
+        // 현재 줄이 "제N조(...)" 형태이고, 다음 줄이 현재 줄과 정확히 동일한 내용으로 시작하는 경우
+        if (/^(?:부칙\s*)?제\d+조(?:의\s*\d+)?\s*\(.*?\)$/.test(currentLine)) {
+          if (nextLine.startsWith(currentLine)) {
+            continue; // 중복된 현재 줄(제목만 있는 줄)을 건너뜀
+          }
+        }
+      }
+      newLines.push(currentLine);
     }
-    fullText = fullText.trim();
+    fullText = newLines.join('\n');
 
     // 개행으로 쪼개진 번호(숫자. 또는 제N조)와 (시행일) 키워드 괄호를 하나로 묶음
     fullText = fullText
