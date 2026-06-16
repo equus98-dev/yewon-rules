@@ -890,11 +890,20 @@ export default function ArticleRenderer({
   // isAddendumArticle이 true이면 여기서 바로 반환 → 하위 중복 분기 없음
   // ─────────────────────────────────────────────────────────
   if (isAddendumArticle) {
-    // ── 1. 모든 아이템에서 텍스트 수집
+    // ── 1. 모든 아이템에서 텍스트 수집 (별표/별지 나오면 이후 무시)
     const rawLines: string[] = [];
     for (const item of displayItems) {
       if (!item) continue;
-      let raw = String(item.text || "").trim();
+      const itemText = String(item.text || "").trim();
+      // 별표/별지/서식으로 시작하는 아이템이 나오면 이후는 모두 찌꺼기이므로 중단
+      if (/^[\[〔【<]\s*(별표|별지|서식|별첨)/.test(itemText)) break;
+      // num이 있는 article 타입: "제N조(제목) 본문" 형태로 합쳐서 추가
+      let raw = "";
+      if (item.type === "article" && item.num) {
+        raw = (item.num + " " + itemText).trim();
+      } else {
+        raw = itemText;
+      }
       if (!raw) continue;
       raw = raw.replace(/^(?:부\s*칙\s*)+/, "").trim();
       if (raw) rawLines.push(raw);
