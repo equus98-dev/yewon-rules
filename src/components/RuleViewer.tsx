@@ -888,10 +888,10 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         <div className="relative z-30 flex items-center h-full w-0">
           <button
             onClick={() => setIsTocOpen(!isTocOpen)}
-            className="absolute -left-px w-6 h-16 bg-[#007073] hover:bg-[#005a5c] text-white flex items-center justify-center rounded-r-xl shadow-md cursor-pointer transition-colors border border-l-0 border-[#005a5c]"
+            className="absolute -left-px w-4 h-10 bg-[#007073] hover:bg-[#005a5c] text-white flex items-center justify-center rounded-r-lg shadow-md cursor-pointer transition-colors border border-l-0 border-[#005a5c] active:scale-95"
             title={isTocOpen ? "목차 닫기" : "목차 열기"}
           >
-            {isTocOpen ? <KeyboardArrowLeftIcon fontSize="small" /> : <KeyboardArrowRightIcon fontSize="small" />}
+            {isTocOpen ? <KeyboardArrowLeftIcon sx={{ fontSize: 13 }} /> : <KeyboardArrowRightIcon sx={{ fontSize: 13 }} />}
           </button>
         </div>
 

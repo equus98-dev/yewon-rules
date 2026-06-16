@@ -828,13 +828,19 @@ export default function ArticleRenderer({
     }
 
     // ── 3. 헤더 날짜 어노테이션 추출
-    // 첫 토큰이 <개정 날짜> 형태이면 부칙 헤더 줄에 붙임
+    // 첫 토큰이 <제정 날짜> 또는 (제정 날짜) 형태이면 부칙 헤더 줄에 붙임
     let headerAnnotation = "";
-    const annotationMatch = fullText.match(/^(<[^>]+>)\s*/);
+    const annotationMatch = fullText.match(/^([<(][^>)]+[>)])\s*/);
     if (annotationMatch) {
       const candidate = annotationMatch[1];
-      if (/\d{2,4}\.|\d{4}년|개정|제정/.test(candidate)) {
-        headerAnnotation = candidate;
+      if (/\d{2,4}\.|\d{4}년|개정|제정|신설/.test(candidate)) {
+        let normalized = candidate;
+        if (normalized.startsWith("(")) {
+          normalized = "<" + normalized.substring(1, normalized.length - 1) + ">";
+        }
+        // 날짜 끝에 마침표 보정
+        normalized = normalized.replace(/(\d{1,2})([>)])$/, "$1.$2");
+        headerAnnotation = normalized;
         fullText = fullText.substring(annotationMatch[0].length).trim();
       }
     }
@@ -842,8 +848,20 @@ export default function ArticleRenderer({
     // title이 "부칙 (날짜)" 형태면 title에서 날짜 추출
     if (!headerAnnotation && title && title !== "부칙" && !/^부\s*칙$/.test(title.trim())) {
       const titleRest = title.replace(/^부\s*칙\s*/, "").trim();
-      if (titleRest) headerAnnotation = titleRest;
+      if (titleRest) {
+        let normalized = titleRest;
+        if (normalized.startsWith("(")) {
+          normalized = "<" + normalized.substring(1, normalized.length - 1) + ">";
+        }
+        normalized = normalized.replace(/(\d{1,2})([>)])$/, "$1.$2");
+        headerAnnotation = normalized;
+      }
     }
+
+    // 개행으로 쪼개진 번호(숫자. 또는 제N조)와 (시행일) 키워드 괄호를 하나로 묶음
+    fullText = fullText
+      .replace(/((?:^|\n)\d{1,2}\.)\s*\n\s*(?=\()/g, "$1 ")
+      .replace(/((?:^|\n)제\d+조(?:의\s*\d+)?)\s*\n\s*(?=\()/g, "$1");
 
     // ── 4. 본문을 절 단위로 분리
     // (시행일), (준용), (경과조치) 등 키워드로 시작하는 절, 또는 1. / 제1조 형식

@@ -658,13 +658,13 @@ export default function Home() {
           >
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="bg-[#0c3161] hover:bg-[#092244] text-white w-5.5 h-20 rounded-r-2xl shadow-lg border-y border-r border-[#092244] active:scale-95 transition-all select-none cursor-pointer flex items-center justify-center"
+              className="bg-[#0c3161] hover:bg-[#092244] text-white w-3.5 h-10 rounded-r-lg shadow-lg border-y border-r border-[#092244] active:scale-95 transition-all select-none cursor-pointer flex items-center justify-center"
               title={isSidebarOpen ? "규정구조도 접기" : "규정구조도 펼치기"}
             >
               {isSidebarOpen ? (
-                <ArrowBackIosIcon sx={{ fontSize: 11, ml: 0.5, color: "white" }} />
+                <ArrowBackIosIcon sx={{ fontSize: 8, ml: 0.5, color: "white" }} />
               ) : (
-                <ArrowForwardIosIcon sx={{ fontSize: 11, color: "white" }} />
+                <ArrowForwardIosIcon sx={{ fontSize: 8, color: "white" }} />
               )}
             </button>
           </div>
