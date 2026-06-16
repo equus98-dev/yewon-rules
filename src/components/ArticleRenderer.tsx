@@ -238,15 +238,25 @@ export default function ArticleRenderer({
     }
 
     if (cleanHtml) {
-      cleanHtml = cleanHtml.replace(/(\([가-힣A-Za-z0-9\s·,]{2,}[^)]*\))/g, (match, paren, offset, str) => {
+      // 1. Addendum Keywords: Break unconditionally, even if there are HTML tags or zero-width spaces inside
+      cleanHtml = cleanHtml.replace(/(\([^)]*(?:시행일|경과조치|적용례|적용범위|준용|폐지|예외|단서|특례|임기|존속기간|관련|시행|적용)[^)]*\))/g, (match, paren, offset, str) => {
+        const before = str.slice(0, offset);
+        if (before.match(/(?:<br\s*\/?>|<\/p>|<p>)\s*$/i)) return match;
+        if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+        if (before.match(/제\d+조의?\d*\s*$/)) return match;
+        if (before.match(/\d\s*$/)) return match;
+        return '<br/>' + match;
+      });
+
+      // 2. Normal Parentheses: Break only if boundary conditions are met, or if it is an Addendum Article
+      cleanHtml = cleanHtml.replace(/(\((?:<[^>]+>)*[가-힣A-Za-z0-9\s·,\u200B-\u200D\uFEFF]{2,}[^)]*\))/g, (match, paren, offset, str) => {
         const before = str.slice(0, offset);
         if (before.match(/(?:<br\s*\/?>|<\/p>|<p>)\s*$/i)) return match;
         if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
         if (before.match(/제\d+조의?\d*\s*$/)) return match;
         if (before.match(/\d\s*$/)) return match;
 
-        const isAddendumKeyword = /(?:시행일|경과조치|적용례|적용범위|준용|폐지|예외|단서|특례|임기|존속기간|관련|시행|적용)/.test(match);
-        if (isAddendumArticle || isAddendumKeyword) {
+        if (isAddendumArticle) {
           return '<br/>' + match;
         }
 
@@ -599,15 +609,25 @@ export default function ArticleRenderer({
       // 부칙 바로 뒤의 날짜 괄호/꺽쇠는 붙여두고, 그 뒤에 이어지는 시행일(숫자 또는 괄호) 앞에서 줄바꿈 수행
       .replace(/(부\s*칙\s*(?:\([^)]*\)|<[^>]*>|\[[^\]]*\]|〔[^〕]*〕)?)\s+(\d{1,2}\.|\([가-힣\s·]{2,}\))/gi, '$1\n$2');
 
-    formatted = formatted.replace(/(\([가-힣A-Za-z0-9\s·,]{2,}[^)]*\))/g, (match, paren, offset, str) => {
+    // 1. Addendum Keywords: Break unconditionally
+    formatted = formatted.replace(/(\([^)]*(?:시행일|경과조치|적용례|적용범위|준용|폐지|예외|단서|특례|임기|존속기간|관련|시행|적용)[^)]*\))/g, (match, paren, offset, str) => {
+      const before = str.slice(0, offset);
+      if (before.match(/\n\s*$/)) return match;
+      if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+      if (before.match(/제\d+조의?\d*\s*$/)) return match;
+      if (before.match(/\d\s*$/)) return match;
+      return '\n' + match;
+    });
+
+    // 2. Normal Parentheses: Break only if boundary conditions are met
+    formatted = formatted.replace(/(\((?:<[^>]+>)*[가-힣A-Za-z0-9\s·,\u200B-\u200D\uFEFF]{2,}[^)]*\))/g, (match, paren, offset, str) => {
       const before = str.slice(0, offset);
       if (before.match(/\n\s*$/)) return match;
       if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
       if (before.match(/제\d+조의?\d*\s*$/)) return match;
       if (before.match(/\d\s*$/)) return match;
 
-      const isAddendumKeywordMatch = /(?:시행일|경과조치|적용례|적용범위|준용|폐지|예외|단서|특례|임기|존속기간|관련|시행|적용)/.test(match);
-      if (isAddendumArticle || isAddendumKeywordMatch) {
+      if (isAddendumArticle) {
         return '\n' + match;
       }
 

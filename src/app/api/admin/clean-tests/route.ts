@@ -12,11 +12,11 @@ export async function GET(request: Request) {
     // Delete Articles and Revisions that were created after 2026-06-01
     // We will check by enactmentDate string or timestamp
     
-    // Get the revisions to delete
+    // Get the revisions to delete (only test revisions, which are NOT '현행본')
     const findRes = await pool.query(`
       SELECT id, "versionName", "enactmentDate" 
       FROM "Revision" 
-      WHERE "enactmentDate" >= '2026-06-01' OR "createdAt" >= '2026-06-01' OR "createdAt" >= 1777593600000
+      WHERE "versionName" != '현행본'
     `);
     
     const ids = findRes.rows.map((r: any) => r.id);
