@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body = await request.json() as any;
     const articles = body.articles;
 
     if (!Array.isArray(articles) || articles.length === 0) {
