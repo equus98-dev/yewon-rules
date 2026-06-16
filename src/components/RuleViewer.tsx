@@ -949,9 +949,12 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             {currentRevision?.articles && currentRevision.articles.length > 0 ? (
               <div className="pb-32">
                 {(() => {
-                  const seenAddendumCoreTexts = new Set<string>();
+                  const cumulativeSeenSets: Set<string>[] = [];
+                  const currentRunningSet = new Set<string>();
+                  
                   if (currentRevision?.articles) {
                     for (const a of currentRevision.articles) {
+                      cumulativeSeenSets.push(new Set(currentRunningSet));
                       if (!isAddendumArticle(a)) continue;
                       
                       let items: any[] = [];
@@ -989,9 +992,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         }
                         coreText = coreText.replace(/^[①-⑮\d]+\.\s*/, '').trim();
                         const normalizedCore = coreText.replace(/\s+/g, '').replace(/[.·]/g, '');
-                        // ONLY add to seen if it actually HAS a title!
-                        if (normalizedCore && normalizedCore.length > 10 && /^(?:부칙\s*)?제\d+조/.test(currentLine)) {
-                          seenAddendumCoreTexts.add(normalizedCore);
+                        // Add all lines > 15 chars to running set. No title check needed because it only filters future articles!
+                        if (normalizedCore && normalizedCore.length > 15) {
+                          currentRunningSet.add(normalizedCore);
                         }
                       }
                     }
@@ -1204,8 +1207,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                             const normalizedCore = line.trim().replace(/^[①-⑮\d]+\.\s*/, '').replace(/\s+/g, '').replace(/[.·]/g, '');
                             if (normalizedCore && normalizedCore.length > 10) {
                               let found = false;
-                              for (const seen of seenAddendumCoreTexts) {
-                                if (seen.includes(normalizedCore) || normalizedCore.includes(seen)) {
+                              for (const seen of cumulativeSeenSets[idx]) {
+                                if (normalizedCore.startsWith(seen) || seen.startsWith(normalizedCore)) {
                                   found = true;
                                   break;
                                 }
@@ -1268,7 +1271,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         isAdmin={isAdmin}
                         trailingTitles={trailingTitles}
                         isBundleChild={isBundleChild}
-                        seenAddendumCoreTexts={seenAddendumCoreTexts}
+                        seenAddendumCoreTexts={cumulativeSeenSets[idx]}
                       />
                     );
                   })()}

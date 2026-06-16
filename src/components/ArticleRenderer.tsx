@@ -981,9 +981,9 @@ export default function ArticleRenderer({
           }
           if (!isDuplicate && seenAddendumCoreTexts) {
             const normalizedCore = coreText.replace(/\s+/g, '').replace(/[.·]/g, '');
-            if (normalizedCore.length > 20) {
+            if (normalizedCore.length > 15) {
                for (const seen of seenAddendumCoreTexts) {
-                 if (normalizedCore.includes(seen)) {
+                 if (normalizedCore.startsWith(seen) || seen.startsWith(normalizedCore)) {
                    isDuplicate = true;
                    break;
                  }
