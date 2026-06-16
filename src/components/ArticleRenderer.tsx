@@ -973,10 +973,14 @@ export default function ArticleRenderer({
         let isDuplicate = false;
         // 제목이 없는 줄인 경우, 이전에 나온 조문 본문과 동일한지 확인
         if (!/^(?:부칙\s*)?제\d+조/.test(currentLine)) {
-          for (const seen of seenCoreTexts) {
-            if (seen.includes(coreText)) {
-              isDuplicate = true;
-              break;
+          const normalizedCore = coreText.replace(/\s+/g, '').replace(/[.·]/g, '');
+          if (normalizedCore.length > 15) {
+            for (const seen of seenCoreTexts) {
+              const normalizedSeen = seen.replace(/\s+/g, '').replace(/[.·]/g, '');
+              if (normalizedSeen.length > 15 && (normalizedCore.startsWith(normalizedSeen) || normalizedSeen.startsWith(normalizedCore))) {
+                isDuplicate = true;
+                break;
+              }
             }
           }
           if (!isDuplicate && seenAddendumCoreTexts) {
@@ -1013,7 +1017,7 @@ export default function ArticleRenderer({
 
     // 별지/별표 찌꺼기 제거
     const cleanedClauses = clauses.map(c =>
-      c.replace(/\s*([\[〔【<])\s*(\ubcc4지|\ubcc4표|\uc11c식|\ubcc4첨).*$/, "").trim()
+      c.replace(/\s*([\[〔【<])\s*(별지|별표|서식|별첨)[\s\S]*$/, "").trim()
     ).filter(c => c);
 
     return (
