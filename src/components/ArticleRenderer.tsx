@@ -483,7 +483,7 @@ export default function ArticleRenderer({
       (match) => `<span class="text-sky-700 font-medium text-[13px] ml-1">${normalizeHistoryDate(match).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
     );
 
-    const citationRegexStr = "(?:((?:(?:이|본|동)\\s*)?규정|(?:(?:[가-힣]+\\s+){1,3})?(?:정관|학칙|법|령|규칙|지침|내규|헌장))\\s+)?(제\\s*\\d+\\s*조(?:의\\s*\\d+)?(?:\\s*제\\s*\\d+\\s*항)?)";
+
     
     // 수동 인용 태그 파싱 (HTML 처리용)
     htmlText = htmlText.replace(/\[cite\s+rule="([^"]*)"\s+article="([^"]*)"(?:\s+url="([^"]*)")?\]([\s\S]*?)\[\/cite\]/gi, (match, rule, article, url, content) => {
@@ -498,10 +498,7 @@ export default function ArticleRenderer({
         hiddenNoCites.push(inner);
         return `__NOCITE_${hiddenNoCites.length - 1}__`;
       });
-      htmlText = htmlText.replace(new RegExp(citationRegexStr, 'g'), (match, p1, p2, p3) => {
-        if (p2 && (p2.endsWith("장") || p2.endsWith("절") || p2.endsWith("관"))) return match;
-        return `<a href="#" class="cited-article-link text-sky-700 font-bold underline underline-offset-2" data-rule-name="${p1 || ''}" data-article="${p2}">${match}</a>`;
-      });
+
       htmlText = htmlText.replace(/__NOCITE_(\d+)__/g, (_, i) => hiddenNoCites[parseInt(i)]);
       return (
         <div 
