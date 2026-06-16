@@ -55,6 +55,20 @@ const getRevisionTypeName = (type: string | undefined | null) => {
   }
 };
 
+const isAddendumArticle = (a: any) => {
+  if (!a) return false;
+  const title = a.title || "";
+  const chapter = a.chapter || "";
+  const contentText = a.contentText || "";
+  return (
+    title === "부칙" ||
+    title.replace(/\s+/g, "").startsWith("부칙") ||
+    chapter === "부칙" ||
+    chapter.replace(/\s+/g, "").startsWith("부칙") ||
+    (!title && !chapter && /^부\s*칙/.test(contentText.trim()))
+  );
+};
+
 export default function RuleViewer(props: RuleViewerProps) {
   return (
     <RuleViewerErrorBoundary>
@@ -132,7 +146,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
     // 2. Scan '부칙' (Addendum) to find the oldest date
     if (currentRevision && currentRevision.articles && Array.isArray(currentRevision.articles)) {
-      const addenda = currentRevision.articles.filter((a: any) => a.title === '부칙' || a.chapter === '부칙');
+      const addenda = currentRevision.articles.filter(isAddendumArticle);
       let oldestDate: Date | null = null;
       const dateRegex = /(19|20)\d{2}\s*(년|\.)\s*\d{1,2}\s*(월|\.)\s*\d{1,2}\s*(일|\.)?/g;
 
@@ -193,7 +207,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         }
 
         // 부칙 article이면 TOC에 '부칙' 항목 추가 (articleNumber 범위 무관)
-        const isAddendumToc = a.title === '부칙' || (a.title || '').replace(/\s+/g, '').startsWith('부칙') || (a.chapter || '').replace(/\s+/g, '').startsWith('부칙');
+        const isAddendumToc = isAddendumArticle(a);
         if (isAddendumToc) {
           if (!toc.some(t => t.text === '부칙')) {
             toc.push({ type: 'chapter', id: `toc-${a.articleNumber}`, text: '부칙' });
@@ -904,10 +918,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 {currentRevision.articles.map((a: any, idx: number) => {
                   const hasHtmlAttachments = currentRevision?.articles?.some((art: any) => art.articleNumber >= 9000) || false;
                   // 별지/별표/별첨 (9000번대) 조항은 더 이상 본문 하단에 HTML로 렌더링하지 않음 (첨부파일 컴포넌트로 대체)
-                  const isLegacyAddendum = a.articleNumber >= 9000 && (
-                    a.title === '부칙' || (a.title || '').includes('부칙') || a.chapter === '부칙' ||
-                    (a.contentText || '').replace(/\s+/g, '').startsWith('부칙')
-                  );
+                  const isLegacyAddendum = a.articleNumber >= 9000 && isAddendumArticle(a);
                   if (a.articleNumber >= 9000 && !isLegacyAddendum) return null;
 
                   const prevA = currentRevision.articles[idx - 1];
@@ -1026,11 +1037,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       )}
                       {/* 부칙 구분선: 부칙 article이 처음 등장할 때만 조문 끝에 구분선 표시 */}
                       {(() => {
-                        const isAddendum = a.title === '부칙' || (a.title || '').replace(/\s+/g, '').startsWith('부칙') || a.chapter === '부칙';
+                        const isAddendum = isAddendumArticle(a);
                         const prevIsNotAddendum = idx === 0 || (() => {
                           const pa = currentRevision?.articles?.[idx - 1];
                           if (!pa) return true;
-                          return !(pa.title === '부칙' || (pa.title || '').replace(/\s+/g, '').startsWith('부칙') || pa.chapter === '부칙');
+                          return !isAddendumArticle(pa);
                         })();
                         if (isAddendum && prevIsNotAddendum) {
                           return <div className="w-full mt-10 mb-6 border-t border-dashed border-slate-400" />;

@@ -47,7 +47,14 @@ export default function ArticleRenderer({
   isAdmin = false,
   trailingTitles = [],
 }: ArticleRendererProps) {
-  const isAddendumArticle = title === "부칙" || (title || "").replace(/\s+/g, "").startsWith("부칙") || chapter === "부칙";
+  const isAddendumArticle =
+    title === "부칙" ||
+    (title || "").replace(/\s+/g, "").startsWith("부칙") ||
+    chapter === "부칙" ||
+    (chapter || "").replace(/\s+/g, "").startsWith("부칙") ||
+    // title/chapter가 없어도 contentText가 부칙으로 시작하는 경우 (예: 1-0-1 정관)
+    (!title && !chapter && /^부\s*칙/.test((contentText || "").trim()));
+
   const hideBadge = hideHistory || isAddendumArticle;
   const [modalHistory, setModalHistory] = useState<any[] | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
@@ -804,45 +811,75 @@ export default function ArticleRenderer({
   // isAddendumArticle이 true이면 여기서 바로 반환 → 하위 중복 분기 없음
   // ─────────────────────────────────────────────────────────
   if (isAddendumArticle) {
-    // contentJson/contentText 에서 부칙 본문 줄들 추출
-    const addendumLines: string[] = [];
+    // ── 1. 모든 아이템에서 텍스트 수집
+    const rawLines: string[] = [];
     for (const item of displayItems) {
       if (!item) continue;
       let raw = String(item.text || "").trim();
-      // "부칙" 접두어만 있는 줄은 헤더이므로 본문에서 제외
-      const stripped = raw.replace(/^(?:부\s*칙\s*)+/, "").trim();
-      // title 자체가 본문에 포함된 경우 제거
-      if (title && stripped.startsWith(title.trim())) {
-        const body = stripped.substring(title.trim().length).trim();
-        if (body) addendumLines.push(body);
-      } else if (stripped) {
-        addendumLines.push(stripped);
+      if (!raw) continue;
+      raw = raw.replace(/^(?:부\s*칙\s*)+/, "").trim();
+      if (raw) rawLines.push(raw);
+    }
+
+    // ── 2. 전체 텍스트 결합 (비어있으면 contentText fallback)
+    let fullText = rawLines.join("\n");
+    if (!fullText && contentText) {
+      fullText = contentText.replace(/^(?:부\s*칙\s*)+/, "").trim();
+    }
+
+    // ── 3. 헤더 날짜 어노테이션 추출
+    // 첫 토큰이 <개정 날짜> 형태이면 부칙 헤더 줄에 붙임
+    let headerAnnotation = "";
+    const annotationMatch = fullText.match(/^(<[^>]+>)\s*/);
+    if (annotationMatch) {
+      const candidate = annotationMatch[1];
+      if (/\d{2,4}\.|\d{4}년|개정|제정/.test(candidate)) {
+        headerAnnotation = candidate;
+        fullText = fullText.substring(annotationMatch[0].length).trim();
       }
     }
 
+    // title이 "부칙 (날짜)" 형태면 title에서 날짜 추출
+    if (!headerAnnotation && title && title !== "부칙" && !/^부\s*칙$/.test(title.trim())) {
+      const titleRest = title.replace(/^부\s*칙\s*/, "").trim();
+      if (titleRest) headerAnnotation = titleRest;
+    }
+
+    // ── 4. 본문을 절 단위로 분리
+    // (시행일), (준용), (경과조치) 등 키워드로 시작하는 절, 또는 1. / 제1조 형식
+    const clauseSplitter = /(?=\((?:시행일|준용|경과|적용|폐지|시행|별칙|준칙|특례|위임)[^)]*\)|(?:^|\n)\d{1,2}\.\s|(?:^|\n)제\d+조)/gm;
+    const clauses: string[] = fullText
+      ? fullText.split(clauseSplitter).map(s => s.trim()).filter(s => s)
+      : [];
+
+    // 별지/별표 찌꺼기 제거
+    const cleanedClauses = clauses.map(c =>
+      c.replace(/\s*([\[〔【<])\s*(\ubc44지|\ubc44표|\uc11c식|\ubc44첨).*$/, "").trim()
+    ).filter(c => c);
+
     return (
       <div id={id} data-article-id={articleId} className="animate-fade-in rule-viewer-content font-['Pretendard'] w-full">
-        {/* 부칙 헤더 */}
-        <p className="font-bold text-[16px] text-slate-900 mb-2 mt-2">
+        {/* 부칙 헤더: "부칙 <개정 날짜>" 한 줄 */}
+        <p className="font-bold text-[16px] text-slate-900 mb-1 mt-1">
           부칙
-          {title && title !== '부칙' && !/^부\s*칙$/.test(title.trim()) && (
-            <span className="font-normal text-[14px] text-slate-500 ml-2">{title.replace(/^부\s*칙\s*/, '').trim()}</span>
+          {headerAnnotation && (
+            <span className="font-normal text-[13px] text-sky-700 ml-2">
+              {renderTextWithHistory(headerAnnotation)}
+            </span>
           )}
         </p>
-        {/* 부칙 본문 */}
-        <div className="text-[16px] text-slate-800 leading-[1.8] flex flex-col gap-1">
-          {addendumLines.map((line, i) => {
-            // 별지/별표 찌꺼기 제거
-            const cleaned = line.replace(/\s*(\[|〔|【|<)\s*(별지|별표|서식|별첨).*$/, '').trim();
-            if (!cleaned) return null;
-            return (
-              <div key={i} className="break-keep">
-                {renderTextWithHistory(cleaned)}
-              </div>
-            );
-          })}
+        {/* 부칙 본문 - 각 절 개별 줄 */}
+        <div className="text-[16px] text-slate-800 leading-[1.8]">
+          {cleanedClauses.length > 0
+            ? cleanedClauses.map((clause, i) => (
+                <div key={i} className="break-keep">{renderTextWithHistory(clause)}</div>
+              ))
+            : fullText && (
+                <div className="break-keep">{renderTextWithHistory(fullText)}</div>
+              )
+          }
         </div>
-        {/* 편집 다이얼로그 (부칙도 단순수정 지원) */}
+        {/* 편집 다이얼로그 */}
         <Dialog open={isEditing} onClose={() => !isSaving && setIsEditing(false)} maxWidth="md" fullWidth>
           <DialogTitle sx={{ p: 0 }}>
             <div className="flex justify-between items-center bg-slate-50 border-b border-slate-200 px-4 py-3">
