@@ -205,7 +205,7 @@ export default function AdminRulesManagement() {
     try {
       const res = await fetch(`/api/rules/${ruleId}`);
       if (!res.ok) throw new Error("Failed to fetch rule info");
-      const data = await res.json();
+      const data = (await res.json()) as any;
       setHistoryRevisions(data.revisions || []);
     } catch (e) {
       console.error(e);
