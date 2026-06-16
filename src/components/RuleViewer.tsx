@@ -895,10 +895,10 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
               <div className="pb-32">
                 {currentRevision.articles.map((a: any, idx: number) => {
                   const hasHtmlAttachments = currentRevision?.articles?.some((art: any) => art.articleNumber >= 9000) || false;
-                  
                   // 별지/별표/별첨 (9000번대) 조항은 더 이상 본문 하단에 HTML로 렌더링하지 않음 (첨부파일 컴포넌트로 대체)
-                  if (a.articleNumber >= 9000) return null;
-                  
+                  const isLegacyAddendum = a.articleNumber >= 9000 && (a.title === '부칙' || (a.title || "").includes('부칙') || a.chapter === '부칙');
+                  if (a.articleNumber >= 9000 && !isLegacyAddendum) return null;
+
                   const prevA = currentRevision.articles[idx - 1];
                   const nextA = currentRevision.articles[idx + 1];
                   let chapterInJson = false;
@@ -1020,7 +1020,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         articleId={a.id}
                         chapter={a.chapter}
                         section={a.section}
-                        articleNumber={a.articleNumber}
+                        articleNumber={isLegacyAddendum ? 8999 : a.articleNumber}
                         title={a.title}
                         contentJson={a.contentJson}
                         contentText={a.contentText}
