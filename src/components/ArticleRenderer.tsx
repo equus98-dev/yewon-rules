@@ -420,6 +420,11 @@ export default function ArticleRenderer({
       .replace(/&#39;/g, "'")
       .replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지');
 
+    // 만약 테이블 태그가 없고 단순히 <p>나 </p> 등의 태그만 텍스트로 들어가 있다면 이를 정화해줍니다.
+    if (!/<table/i.test(decodedText)) {
+      decodedText = decodedText.replace(/<\/?[pP](?:\s[^>]*)?>/g, "");
+    }
+
     if (hideHistory) {
       // 연혁 숨기기
       decodedText = decodedText.replace(/([<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)[^>)]*[>)])/gi, "");
@@ -572,7 +577,9 @@ export default function ArticleRenderer({
          }
          return '\n\n' + p1;
       })
-      .replace(/(^|\n)(부\s*칙)\s*(.*)/g, '\n\n$2 $3');
+      .replace(/(^|\n)(부\s*칙)\s*(.*)/g, '\n\n$2 $3')
+      // () 괄호 기준으로 줄바꿈하되, 앞에 숫자나 조항 번호가 있는 형태(예: 1. (시행일), 제1조 (시행일))는 제외
+      .replace(/(?<!\d+(?:의\d+)?\.\s*)(?<!제\d+조\s*)(?<!\d\s*)(\([가-힣\s·]{2,}\))/g, '\n$1');
 
     // Restore hidden citation tags to avoid them being split by newlines
     let hiddenCitations: string[] = [];
