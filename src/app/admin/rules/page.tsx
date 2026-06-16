@@ -224,7 +224,7 @@ export default function AdminRulesManagement() {
       const res = await fetch(`/api/admin/revisions/${revisionId}`, {
         method: "DELETE",
       });
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (res.ok) {
         alert("개정 내역이 성공적으로 취소되었습니다.");
         setOpenHistory(false);
