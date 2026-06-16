@@ -235,6 +235,27 @@ export default function ArticleRenderer({
           cleanHtml = cleanHtml.replace(match[0], '');
         }
       }
+    if (cleanHtml) {
+      if (isAddendumArticle) {
+        cleanHtml = cleanHtml.replace(/(\([가-힣A-Za-z0-9\s·,]{2,}[^)]*\))/g, (match, paren, offset, str) => {
+          const before = str.slice(0, offset);
+          if (before.match(/(?:<br\s*\/?>|<\/p>|<p>)\s*$/i)) return match;
+          if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+          if (before.match(/제\d+조\s*$/)) return match;
+          if (before.match(/\d\s*$/)) return match;
+          return '<br/>' + match;
+        });
+      } else {
+        cleanHtml = cleanHtml.replace(/(\([가-힣\s·]{2,}\))/g, (match, paren, offset, str) => {
+          const before = str.slice(0, offset);
+          if (before.match(/(?:<br\s*\/?>|<\/p>|<p>)\s*$/i)) return match;
+          if (!before.match(/(?:^|[.\s>\]])$/)) return match;
+          if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+          if (before.match(/제\d+조\s*$/)) return match;
+          if (before.match(/\d\s*$/)) return match;
+          return '<br/>' + match;
+        });
+      }
     }
 
     return (
