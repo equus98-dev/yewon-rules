@@ -925,14 +925,16 @@ export default function ArticleRenderer({
     }
 
     // title이 "부칙 (날짜)" 형태면 title에서 날짜 추출
+    // 단, "제N조..." 형태의 조문 번호이면 headerAnnotation으로 쓰지 않음
     if (!headerAnnotation && title && title !== "부칙" && !/^부\s*칙$/.test(title.trim())) {
       const titleRest = title.replace(/^부\s*칙\s*/, "").trim();
-      if (titleRest) {
+      // "제N조..." 형태이면 조문 제목이므로 스킵, 날짜/제정/개정 키워드 있는 경우에만 headerAnnotation으로 설정
+      if (titleRest && !/^제\d+조/.test(titleRest) && /\d{2,4}[.\s년]|개정|제정|신설/.test(titleRest)) {
         let normalized = titleRest;
         if (normalized.startsWith("(")) {
           normalized = "<" + normalized.substring(1, normalized.length - 1) + ">";
         }
-        normalized = normalized.replace(/(\d{1,2})([>)])$/, "$1.$2");
+        normalized = normalized.replace(/(\d{1,2})([>])$/, "$1.$2");
         headerAnnotation = normalized;
       }
     }
