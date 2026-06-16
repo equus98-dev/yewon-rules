@@ -1043,26 +1043,40 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                           })()}
                         </div>
                       )}
-                      {/* 부칙 구분선: 부칙 article이 처음 등장할 때만 조문 끝에 구분선 표시 */}
+                      {/* 부칙 묶음 구분선 및 여백 */}
                       {(() => {
                         const isAddendum = isAddendumArticle(a);
-                        const prevIsNotAddendum = idx === 0 || (() => {
-                          const pa = currentRevision?.articles?.[idx - 1];
-                          if (!pa) return true;
-                          return !isAddendumArticle(pa);
-                        })();
-                        if (isAddendum && prevIsNotAddendum) {
+                        if (!isAddendum) return null;
+                        
+                        const pa = idx > 0 ? currentRevision?.articles?.[idx - 1] : null;
+                        const prevIsAddendum = pa ? isAddendumArticle(pa) : false;
+                        
+                        if (!prevIsAddendum) {
+                          // 문서 내 첫 부칙 시작점
                           return <div className="w-full mt-10 mb-6 border-t border-dashed border-slate-400" />;
                         }
-                        return null;
-                      })()}
-                      {/* 부칙간 여백: 이전 조항도 부칙이고 현재 조항도 부칙이면 부칙 간 엔터 한 줄 간격(h-6) 추가 */}
-                      {(() => {
-                        const isAddendum = isAddendumArticle(a);
-                        const prevIsAddendum = idx > 0 && isAddendumArticle(currentRevision?.articles?.[idx - 1]);
-                        if (isAddendum && prevIsAddendum) {
-                          return <div className="w-full h-6" />;
+                        
+                        // 이전 조항도 부칙일 경우, 새로운 부칙 묶음(Bundle)의 시작인지 판별
+                        const currTitle = a.title || a.contentText || "";
+                        const isCurrJustBuchik = /^부\s*칙/.test(currTitle) && !/제\d+조/.test(currTitle);
+                        const isCurrArticle1 = /제1조/.test(currTitle);
+                        
+                        const prevTitle = pa.title || pa.contentText || "";
+                        const isPrevJustBuchik = /^부\s*칙/.test(prevTitle) && !/제\d+조/.test(prevTitle);
+                        
+                        let isNewBundle = false;
+                        if (isCurrJustBuchik) {
+                          isNewBundle = true;
+                        } else if (isCurrArticle1 && !isPrevJustBuchik) {
+                          isNewBundle = true;
                         }
+                        
+                        if (isNewBundle) {
+                          // 새로운 부칙 묶음이 시작될 때 시각적 구분선 추가
+                          return <div className="w-full mt-10 mb-6 border-t border-dashed border-slate-400" />;
+                        }
+                        
+                        // 같은 부칙 묶음 내에서는 분리되어 보이지 않도록 간격(여백) 없음
                         return null;
                       })()}
                       <ArticleRenderer
