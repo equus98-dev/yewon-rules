@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
 import dynamic from "next/dynamic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveIcon from "@mui/icons-material/Save";
@@ -14,6 +14,7 @@ import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import CloseIcon from "@mui/icons-material/Close";
 
 const JoditEditor = dynamic(() => import("jodit-react"), {
   ssr: false,
@@ -79,6 +80,13 @@ function EditorContent() {
 
   // 뷰어 열기/닫기 상태
   const [isViewerOpen, setIsViewerOpen] = useState(true);
+
+  // 개정처리 팝업 상태
+  const [revisionPopupOpen, setRevisionPopupOpen] = useState(false);
+  const [revisionTargetIdx, setRevisionTargetIdx] = useState<number | null>(null);
+  const [revisionDate, setRevisionDate] = useState("");
+  const [revisionAnnounceDate, setRevisionAnnounceDate] = useState("");
+  const [revisionEffectiveDate, setRevisionEffectiveDate] = useState("");
 
   // 1. 규정 마스터 목록 로드
   useEffect(() => {
@@ -298,6 +306,78 @@ function EditorContent() {
   };
 
   // 관(SubSection) 일괄 변경
+  const handleSubSectionChange = (idx: number, newSubSection: string) => {
+    setDraftArticles((prev) => {
+      const oldSubSection = prev[idx].subSection;
+      const oldSection = prev[idx].section;
+      const oldChapter = prev[idx].chapter;
+      const oldPart = prev[idx].part;
+      const newArticles = [...prev];
+      for (let i = idx; i < newArticles.length; i++) {
+        if (newArticles[i].subSection === oldSubSection && newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
+          newArticles[i] = { ...newArticles[i], subSection: newSubSection, isSubSectionModified: true, isGroupModified: true };
+        } else {
+          break;
+        }
+      }
+      for (let i = idx - 1; i >= 0; i--) {
+        if (newArticles[i].subSection === oldSubSection && newArticles[i].section === oldSection && newArticles[i].chapter === oldChapter && newArticles[i].part === oldPart) {
+          newArticles[i] = { ...newArticles[i], subSection: newSubSection, isSubSectionModified: true, isGroupModified: true };
+        } else {
+          break;
+        }
+      }
+      return newArticles;
+    });
+  };
+
+  // 개정처리 팝업 서브밋 핸들러
+  const handleRevisionSubmit = () => {
+    if (revisionTargetIdx === null) return;
+    
+    // YYYY. M. D. 포맷 생성
+    const d = new Date(revisionDate);
+    const dateStr = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
+    const badgeStr = `<개정 ${dateStr}>`;
+
+    setDraftArticles((prev) => {
+      const newArticles = [...prev];
+      const target = newArticles[revisionTargetIdx];
+      
+      // 조문 본문에 뱃지 추가 (이미 없으면 추가)
+      if (target.contentText && !target.contentText.includes(badgeStr)) {
+        target.contentText = target.contentText + `\n${badgeStr}`;
+      } else if (!target.contentText) {
+        target.contentText = badgeStr;
+      }
+      target.isModified = true;
+      target.isGroupModified = true;
+      
+      // 부칙 조문이 이미 있는지 확인 후 없으면 추가
+      const hasAddendum = newArticles.some(a => a.title === "부칙" && (a.contentText || "").includes(`(${revisionAnnounceDate})`));
+      
+      if (!hasAddendum) {
+        const effDate = new Date(revisionEffectiveDate);
+        const effStr = `${effDate.getFullYear()}년 ${effDate.getMonth() + 1}월 ${effDate.getDate()}일`;
+        
+        newArticles.push({
+          chapter: "부칙",
+          articleNumber: 9999,
+          title: "부칙",
+          contentText: `부칙 (${revisionAnnounceDate})\n제1조(시행일) 이 규정은 ${effStr}부터 시행한다.`,
+          contentJson: { paragraphs: [`부칙 (${revisionAnnounceDate})`, `제1조(시행일) 이 규정은 ${effStr}부터 시행한다.`] },
+          sortOrder: newArticles.length + 1,
+          isNew: true,
+          isModified: true
+        });
+      }
+      
+      return newArticles;
+    });
+
+    alert("개정 내용 및 부칙이 임시 반영되었습니다. (최종 배포 시 함께 저장됩니다.)");
+    setRevisionPopupOpen(false);
+  };
   const handleSubSectionChange = (idx: number, newSubSection: string) => {
     setDraftArticles((prev) => {
       const oldSubSection = prev[idx].subSection;
@@ -1087,7 +1167,12 @@ function EditorContent() {
                               <button
                                 type="button"
                                 onClick={() => {
-                                  alert("편·장·절·관 정보가 임시 반영되었습니다. (입력 시 이미 자동 반영 상태입니다)");
+                                  setRevisionTargetIdx(idx);
+                                  const today = new Date().toISOString().split("T")[0];
+                                  setRevisionDate(today);
+                                  setRevisionAnnounceDate(today);
+                                  setRevisionEffectiveDate(today);
+                                  setRevisionPopupOpen(true);
                                 }}
                                 className="flex items-center gap-1.5 px-4 h-[38px] bg-gradient-to-b from-[#1a4b8c] to-[#0c3161] border border-[#0a274d] text-white rounded-lg text-[13px] font-black hover:from-[#15407a] hover:to-[#092244] transition-all cursor-pointer active:scale-95 shadow-md shadow-blue-900/20"
                               >
@@ -1224,11 +1309,12 @@ function EditorContent() {
                             <button
                               type="button"
                               onClick={() => {
-                                alert("해당 조문의 개정 내용이 임시 반영되었습니다. 최종 배포 시 함께 저장됩니다.");
-                                // 강제 수정 마킹
-                                setDraftArticles((prev) =>
-                                  prev.map((a, i) => (i === idx ? { ...a, isModified: true } : a))
-                                );
+                                setRevisionTargetIdx(idx);
+                                const today = new Date().toISOString().split("T")[0];
+                                setRevisionDate(today);
+                                setRevisionAnnounceDate(today);
+                                setRevisionEffectiveDate(today);
+                                setRevisionPopupOpen(true);
                               }}
                               className="flex items-center gap-1.5 px-4 h-[38px] bg-gradient-to-b from-[#1a4b8c] to-[#0c3161] border border-[#0a274d] text-white rounded-lg text-[13px] font-black hover:from-[#15407a] hover:to-[#092244] transition-all cursor-pointer active:scale-95 shadow-md shadow-blue-900/20"
                             >
@@ -1536,7 +1622,68 @@ function EditorContent() {
         )}
 
       </div>
-
+      <Dialog open={revisionPopupOpen} onClose={() => setRevisionPopupOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ p: 0 }}>
+          <div className="flex justify-between items-center bg-slate-50 border-b border-slate-200 px-4 py-3">
+            <span className="font-bold text-[#0c3161] flex items-center gap-2">
+              <RuleIcon sx={{ fontSize: 20 }} /> 부칙 설정 및 개정처리
+            </span>
+            <IconButton size="small" onClick={() => setRevisionPopupOpen(false)} sx={{ p: 0.5 }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </div>
+        </DialogTitle>
+        <DialogContent className="p-6 bg-white">
+          <div className="text-[13px] text-slate-600 mb-6 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+            해당 조항에 개정 뱃지를 삽입하고 부칙을 자동 생성합니다.<br/>
+            하단의 개정 관련 일자 3가지를 확인하거나 수정해 주세요.
+          </div>
+          <div className="space-y-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-black text-slate-700">1. 개정(제정)일</label>
+              <input
+                type="date"
+                value={revisionDate}
+                onChange={(e) => setRevisionDate(e.target.value)}
+                className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#0c3161]"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-black text-slate-700">2. 공포일</label>
+              <input
+                type="date"
+                value={revisionAnnounceDate}
+                onChange={(e) => setRevisionAnnounceDate(e.target.value)}
+                className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#0c3161]"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-black text-slate-700">3. 시행일</label>
+              <input
+                type="date"
+                value={revisionEffectiveDate}
+                onChange={(e) => setRevisionEffectiveDate(e.target.value)}
+                className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#0c3161]"
+              />
+            </div>
+          </div>
+          <div className="mt-8 flex justify-end gap-2">
+            <button
+              onClick={() => setRevisionPopupOpen(false)}
+              className="px-4 py-2 border border-slate-300 text-slate-600 bg-white rounded font-bold text-sm hover:bg-slate-50 transition-colors"
+            >
+              취소
+            </button>
+            <button
+              onClick={handleRevisionSubmit}
+              className="px-4 py-2 bg-[#0c3161] text-white rounded font-bold text-sm hover:bg-blue-800 flex items-center gap-2 transition-colors shadow-sm"
+            >
+              <SaveIcon sx={{ fontSize: 16 }} />
+              저장 및 개정처리
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

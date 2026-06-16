@@ -122,7 +122,7 @@ export default function TwoColumnViewer({ currentRuleId }: TwoColumnViewerProps)
         </div>
 
         {/* Content */}
-        <div className="flex-1 relative flex flex-col">
+        <div className="flex-1 relative flex flex-col min-h-0 overflow-hidden">
           {rightRuleId ? (
             <RuleViewer ruleId={rightRuleId} />
           ) : (

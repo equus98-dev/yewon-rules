@@ -82,7 +82,7 @@ export default function ArticleRenderer({
             }
           }
         }}
-        className="absolute -left-8 top-1 w-6 h-6 shrink-0 flex items-center justify-center rounded mt-0.5 cursor-pointer transition-colors bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 hover:text-green-700 z-10"
+        className="absolute -left-8 top-5 w-6 h-6 shrink-0 flex items-center justify-center rounded mt-0.5 cursor-pointer transition-colors bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 hover:text-green-700 z-10"
         title="이 조항 텍스트 바로 수정하기"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
@@ -771,7 +771,7 @@ export default function ArticleRenderer({
       if (curr && (curr.type === "article" || curr.type === "paragraph") && next && next.type === "paragraph") {
           const currText = String(curr.text || "").trim();
           const nextText = String(next.text || "").trim();
-          if (currText === "" || /^\([^)]+\)$/.test(currText) || /^제\d+조의?\d*(?:\s*\([^)]+\))?$/.test(currText)) {
+          if (currText === "" || /^\([^)]+\)$/.test(currText) || /^제\d+조/.test(currText)) {
               if (!/^제\d+조/.test(nextText)) {
                   displayItems[i] = { ...curr, text: (currText ? currText + " " : "") + nextText };
                   displayItems.splice(i+1, 1);

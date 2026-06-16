@@ -1336,6 +1336,17 @@ export default function Home() {
                                           if (isHwp) typeBg = "bg-rose-50 text-rose-700 border border-rose-100";
                                           if (isPdf) typeBg = "bg-red-50 text-red-700 border border-red-100";
 
+                                          const getDownloadUrl = (file: any) => {
+                                            const encodedTitle = encodeURIComponent(file.title + (file.fileType ? `.${file.fileType}` : ''));
+                                            if (file.fileUrl?.startsWith('/api/files/')) {
+                                              return `${file.fileUrl}?download=true&filename=${encodedTitle}`;
+                                            }
+                                            if (file.fileUrl?.startsWith('http')) {
+                                              return `${file.fileUrl}?download=${encodedTitle}`;
+                                            }
+                                            return `/api/download?fileUrl=${encodeURIComponent(file.fileUrl || "")}&filename=${encodedTitle}`;
+                                          };
+
                                           return (
                                             <tr
                                               key={att.id}
@@ -1344,8 +1355,8 @@ export default function Home() {
                                               <td className="py-2.5 px-3 text-center text-slate-400 font-bold align-middle">{idx + 1}</td>
                                               <td className="py-2.5 px-3 font-extrabold text-slate-800 flex items-center justify-between gap-4">
                                                 <a
-                                                  href={att.fileUrl.startsWith('http') ? `${att.fileUrl}?download=${encodeURIComponent(att.title + '.hwp')}` : att.fileUrl}
-                                                  download={att.fileUrl.startsWith('http') ? undefined : true}
+                                                  href={getDownloadUrl(att)}
+                                                  download={att.fileUrl?.startsWith('http') ? undefined : true}
                                                   target="_blank"
                                                   rel="noopener noreferrer"
                                                   className="flex items-center gap-2 hover:text-blue-700 cursor-pointer min-w-0"

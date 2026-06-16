@@ -538,11 +538,22 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
                   if (isHwp) typeBg = "bg-rose-50 text-rose-700 border border-rose-100";
                   if (isPdf) typeBg = "bg-red-50 text-red-700 border border-red-100";
 
+                  const getDownloadUrl = (file: any) => {
+                    const encodedTitle = encodeURIComponent(file.title + (file.fileType ? `.${file.fileType}` : ''));
+                    if (file.fileUrl?.startsWith('/api/files/')) {
+                      return `${file.fileUrl}?download=true&filename=${encodedTitle}`;
+                    }
+                    if (file.fileUrl?.startsWith('http')) {
+                      return `${file.fileUrl}?download=${encodedTitle}`;
+                    }
+                    return `/api/download?fileUrl=${encodeURIComponent(file.fileUrl || "")}&filename=${encodedTitle}`;
+                  };
+
                   return (
                     <a
                       key={att.id}
-                      href={att.fileUrl.startsWith('http') ? `${att.fileUrl}?download=${encodeURIComponent(att.title + '.hwp')}` : `/api/download?fileUrl=${encodeURIComponent(att.fileUrl)}`}
-                      download={att.fileUrl.startsWith('http') ? undefined : true}
+                      href={getDownloadUrl(att)}
+                      download={att.fileUrl?.startsWith('http') ? undefined : true}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full p-2.5 rounded-lg border border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50/30 transition-all flex items-start gap-2.5 cursor-pointer text-left"
