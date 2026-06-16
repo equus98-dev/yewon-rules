@@ -693,7 +693,8 @@ export default function ArticleRenderer({
                  const fullTitle = articleNum;
                  const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
                  return (
-                    <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
+                    <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full group/text">
+                       {renderEditButton(true)}
                        {!hideBadge && (
                          <button 
                            onClick={() => handleOpenHistory(historyDates)}
@@ -1036,7 +1037,6 @@ export default function ArticleRenderer({
             const isTopLevelArticle = /^제\d+조/.test(plainText);
             return (
               <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'} relative ${interactiveClass}`}>
-                {showEditBtn && renderEditButton(true)}
                 <span className="font-normal mr-1">{safeNum}</span>
                 {formatGluedText(plainText, false)}
                 
