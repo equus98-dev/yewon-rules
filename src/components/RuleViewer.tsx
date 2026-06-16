@@ -1048,6 +1048,15 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         }
                         return null;
                       })()}
+                      {/* 부칙간 여백: 이전 조항도 부칙이고 현재 조항도 부칙이면 부칙 간 엔터 한 줄 간격(h-6) 추가 */}
+                      {(() => {
+                        const isAddendum = isAddendumArticle(a);
+                        const prevIsAddendum = idx > 0 && isAddendumArticle(currentRevision?.articles?.[idx - 1]);
+                        if (isAddendum && prevIsAddendum) {
+                          return <div className="w-full h-6" />;
+                        }
+                        return null;
+                      })()}
                       <ArticleRenderer
                         id={`toc-${a.articleNumber}`}
                         articleId={a.id}

@@ -865,7 +865,7 @@ export default function ArticleRenderer({
 
     // ── 4. 본문을 절 단위로 분리
     // (시행일), (준용), (경과조치) 등 키워드로 시작하는 절, 또는 1. / 제1조 형식
-    const clauseSplitter = /(?=\((?:시행일|준용|경과|적용|폐지|시행|별칙|준칙|특례|위임)[^)]*\)|(?:^|\n)\d{1,2}\.\s|(?:^|\n)제\d+조)/gm;
+    const clauseSplitter = /(?=(?<!(?:^|\n|\s)\d{1,2}\.\s*|제\d+조(?:의\s*\d+)?\s*)\((?:시행일|준용|경과|적용|폐지|시행|별칙|준칙|특례|위임)[^)]*\)|(?:^|\n)\d{1,2}\.\s|(?:^|\n)제\d+조)/gm;
     const clauses: string[] = fullText
       ? fullText.split(clauseSplitter).map(s => s.trim()).filter(s => s)
       : [];
