@@ -207,6 +207,18 @@ export default function ArticleRenderer({
       });
     }
 
+    // 6. 부칙 등에 딸려온 별지/별표 HTML 통째로 잘라내기
+    if (articleNumber < 9000 && title.includes('부칙') && cleanHtml) {
+       const formMatch = cleanHtml.match(/(\[|〔|【|<)\s*(별지|별표|서식|별첨)\s*(제\d+호|[0-9]+)?.*?(\]|〕|】|>)/i);
+       if (formMatch && formMatch.index !== undefined) {
+          const cutIdx = formMatch.index;
+          const remainder = cleanHtml.substring(cutIdx);
+          if (remainder.toLowerCase().includes('<table')) {
+             cleanHtml = cleanHtml.substring(0, cutIdx);
+          }
+       }
+    }
+
     if (articleNumber >= 9000) {
       // HWP 파싱 중 HTML 자체에 별지 제목이 중복 포함된 경우 이를 제거 (첫 번째 P 태그가 제목인 경우)
       const match = cleanHtml.match(/^(\s*<p[^>]*>.*?<\/p>\s*)/i);
@@ -804,7 +816,13 @@ export default function ArticleRenderer({
         }
 
         const safeNum = item.num !== null && item.num !== undefined ? String(item.num) : "";
-        const safeText = item.text !== null && item.text !== undefined ? String(item.text) : "";
+        let safeText = item.text !== null && item.text !== undefined ? String(item.text) : "";
+        
+        // 부칙인 경우, 텍스트 맨 끝에 딸려온 별지/별표 문자열 제거
+        if (articleNumber < 9000 && title.includes('부칙')) {
+           safeText = safeText.replace(/\s*(\[|〔|【|<)\s*(별지|별표|서식|별첨)\s*(제\d+호|[0-9]+)?.*?(\]|〕|】|>)\s*$/i, '');
+        }
+
         const plainItemText = safeText.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '').trim();
         const numText = safeNum.trim();
 
