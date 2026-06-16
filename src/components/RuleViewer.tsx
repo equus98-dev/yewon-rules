@@ -180,13 +180,25 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     
     currentRevision.articles.forEach((a: any) => {
         if (a.chapter && a.chapter !== lastChapter) {
-            const cleanChapter = a.chapter.replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지');
-            toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: cleanChapter });
+            // 부칙 chapter는 가운데 장 헤더로 표시하지 않음 (ArticleRenderer에서 통합 처리)
+            if (!/^부\s*칙/.test((a.chapter || '').replace(/\s+/g, ''))) {
+              const cleanChapter = a.chapter.replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지');
+              toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: cleanChapter });
+            }
             lastChapter = a.chapter;
         }
         if (a.section && a.section !== lastSection) {
             toc.push({ type: "section", id: `toc-${a.articleNumber}`, text: a.section });
             lastSection = a.section;
+        }
+
+        // 부칙 article이면 TOC에 '부칙' 항목 추가 (articleNumber 범위 무관)
+        const isAddendumToc = a.title === '부칙' || (a.title || '').replace(/\s+/g, '').startsWith('부칙') || (a.chapter || '').replace(/\s+/g, '').startsWith('부칙');
+        if (isAddendumToc) {
+          if (!toc.some(t => t.text === '부칙')) {
+            toc.push({ type: 'chapter', id: `toc-${a.articleNumber}`, text: '부칙' });
+          }
+          return;
         }
 
         let items: any = [];
@@ -259,11 +271,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         }
 
         if (a.articleNumber >= 8000 && a.articleNumber < 9000) {
-           if (!toc.some(t => t.text === "부칙")) {
-              toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: "부칙" });
-           }
-           
-           // HTML 별지가 없는 경우 부칙 내의 텍스트 기반 별지를 스캔하여 TOC에 추가
+           // 부칙(8000번대)의 별표/별지 텍스트 기반 TOC 스캔 유지
            const hasHtmlAttachments = currentRevision.articles.some((art: any) => art.articleNumber >= 9000);
            const uploadedAttachments = ruleData?.attachments?.filter((f: any) => f.title.startsWith("[별표]") || f.title.startsWith("[별지]") || f.title.startsWith("[별첨]")) || [];
            if (!hasHtmlAttachments && uploadedAttachments.length === 0) {
@@ -277,7 +285,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                  }
                  textAttachments.forEach((item: any, i: number) => {
                     let safeText = String(item.text).trim();
-                    safeText = safeText.replace(/^〔/, '[').replace(/〕$/, ']'); // TOC 표시용 괄호 정규화
+                    safeText = safeText.replace(/^〔/, '[').replace(/〕$/, ']');
                     const displayText = safeText.replace(/^\[(?:별표|별지|전문|서식|별첨)\]\s*([\d-]+\s*)?/, "");
                     toc.push({ type: "attachment", id: `toc-text-attach-${a.articleNumber}-${i}`, text: displayText });
                  });
@@ -896,7 +904,10 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 {currentRevision.articles.map((a: any, idx: number) => {
                   const hasHtmlAttachments = currentRevision?.articles?.some((art: any) => art.articleNumber >= 9000) || false;
                   // 별지/별표/별첨 (9000번대) 조항은 더 이상 본문 하단에 HTML로 렌더링하지 않음 (첨부파일 컴포넌트로 대체)
-                  const isLegacyAddendum = a.articleNumber >= 9000 && (a.title === '부칙' || (a.title || "").includes('부칙') || a.chapter === '부칙');
+                  const isLegacyAddendum = a.articleNumber >= 9000 && (
+                    a.title === '부칙' || (a.title || '').includes('부칙') || a.chapter === '부칙' ||
+                    (a.contentText || '').replace(/\s+/g, '').startsWith('부칙')
+                  );
                   if (a.articleNumber >= 9000 && !isLegacyAddendum) return null;
 
                   const prevA = currentRevision.articles[idx - 1];
@@ -911,7 +922,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                     }
                   } catch (e) {}
 
-                  const showChapter = a.chapter && (!prevA || prevA.chapter !== a.chapter) && !chapterInJson;
+                  const showChapter = a.chapter && (!prevA || prevA.chapter !== a.chapter) && !chapterInJson
+                    && !/^부\s*칙/.test((a.chapter || '').replace(/\s+/g, '')); // 부칙 chapter는 장 헤더 억제
                   const showSection = a.section && (!prevA || prevA.section !== a.section) && !sectionInJson;
 
                   const trailingTitles: string[] = [];
