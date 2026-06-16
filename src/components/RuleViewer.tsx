@@ -136,7 +136,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       let oldestDate: Date | null = null;
       const dateRegex = /(19|20)\d{2}\s*(년|\.)\s*\d{1,2}\s*(월|\.)\s*\d{1,2}\s*(일|\.)?/g;
 
-      addenda.forEach((a: any) => {
+      for (const a of addenda) {
         let textToScan = a.contentText || "";
         if (!textToScan && a.contentJson) {
           try {
@@ -162,7 +162,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             }
           }
         }
-      });
+      }
 
       if (oldestDate) {
         return oldestDate.toLocaleDateString('ko-KR');
