@@ -940,7 +940,7 @@ export default function ArticleRenderer({
 
     // 중복되는 부칙/조 제목 접두사 제거 (데이터베이스에 "부칙제1조(시행일)\n제1조(시행일)" 같이 중복 저장된 경우)
     const lines = fullText.split('\n');
-    const newLines = [];
+    const newLines: string[] = [];
     for (let i = 0; i < lines.length; i++) {
       const currentLine = lines[i].trim();
       if (currentLine === "") continue;
