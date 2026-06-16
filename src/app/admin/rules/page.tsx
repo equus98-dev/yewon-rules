@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  IconButton,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
@@ -710,7 +711,7 @@ export default function AdminRulesManagement() {
         onClose={() => setOpenHistory(false)}
         maxWidth="md"
         fullWidth
-        PaperProps={{ style: { borderRadius: "12px", padding: "10px" } }}
+        sx={{ borderRadius: "12px", padding: "10px" }}
       >
         <DialogTitle className="font-black text-[#000080] border-b border-slate-200 pb-4 mb-4 flex justify-between items-center text-lg">
           [{historyRuleTitle}] 개정 이력 관리
