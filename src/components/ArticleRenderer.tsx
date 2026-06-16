@@ -57,7 +57,7 @@ export default function ArticleRenderer({
   const [isSaving, setIsSaving] = useState(false);
   const [editHistory, setEditHistory] = useState<{ id: string, createdAt: string, beforeText: string }[]>([]);
 
-  const renderEditButton = () => {
+  const renderEditButton = (isItemRelative = false) => {
     if (!isAdmin) return null;
     if (isAddendumArticle) return null;
     return (
@@ -82,7 +82,7 @@ export default function ArticleRenderer({
             }
           }
         }}
-        className="absolute -left-8 top-5 w-6 h-6 shrink-0 flex items-center justify-center rounded mt-0.5 cursor-pointer transition-colors bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 hover:text-green-700 z-10"
+        className={`absolute -left-8 ${isItemRelative ? 'top-0' : 'top-5'} w-6 h-6 shrink-0 flex items-center justify-center rounded mt-0.5 cursor-pointer transition-colors bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 hover:text-green-700 z-10`}
         title="이 조항 텍스트 바로 수정하기"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
@@ -781,11 +781,11 @@ export default function ArticleRenderer({
       const curr = displayItems[i];
       const next = displayItems[i+1];
       if (curr && (curr.type === "article" || curr.type === "paragraph") && next && next.type === "paragraph") {
-          const currText = String(curr.text || "").trim();
-          const nextText = String(next.text || "").trim();
-          if (currText === "" || /^\([^)]+\)$/.test(currText) || /^제\d+조/.test(currText)) {
-              if (!/^제\d+조/.test(nextText)) {
-                  displayItems[i] = { ...curr, text: (currText ? currText + " " : "") + nextText };
+          const currTextPlain = String(curr.text || "").replace(/<[^>]+>/g, '').trim();
+          const nextTextPlain = String(next.text || "").replace(/<[^>]+>/g, '').trim();
+          if (currTextPlain === "" || /^\([^)]+\)$/.test(currTextPlain) || /^제\d+조/.test(currTextPlain)) {
+              if (!/^제\d+조/.test(nextTextPlain)) {
+                  displayItems[i] = { ...curr, text: (curr.text ? curr.text + " " : "") + (next.text || "") };
                   displayItems.splice(i+1, 1);
                   i--;
               }
@@ -799,7 +799,6 @@ export default function ArticleRenderer({
 
   return (
     <div id={id} data-article-id={articleId} className="mb-2 animate-fade-in rule-viewer-content font-['Pretendard'] relative group">
-      {renderEditButton()}
       {displayItems.map((item, index) => {
         if (!item || typeof item !== 'object') return null;
 
@@ -892,6 +891,12 @@ export default function ArticleRenderer({
 
         const isSubsection = item.type === "text" && /^제\d+관/.test(safeText.trim());
 
+        let showEditBtn = false;
+        if (!hasRenderedEditBtn && item.type !== "chapter" && item.type !== "section" && !isSubsection) {
+           showEditBtn = true;
+           hasRenderedEditBtn = true;
+        }
+
         if (item.type === "chapter" || item.type === "section" || isSubsection) {
           const isChapter = item.type === "chapter";
           if (index > 0 && displayItems[index - 1]?.type === item.type && displayItems[index - 1]?.text === item.text) return null;
@@ -946,6 +951,7 @@ export default function ArticleRenderer({
 
             return (
               <div className={`mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full ${interactiveClass}`}>
+                {showEditBtn && renderEditButton(true)}
                 {!hideBadge && !isAddendum && (
                   <button 
                     onClick={(e) => { e.stopPropagation(); handleOpenHistory(historyDates); }}
@@ -1028,7 +1034,8 @@ export default function ArticleRenderer({
           if (isGlued) {
             const isTopLevelArticle = /^제\d+조/.test(plainText);
             return (
-              <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'} ${interactiveClass}`}>
+              <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'} relative ${interactiveClass}`}>
+                {showEditBtn && renderEditButton(true)}
                 <span className="font-normal mr-1">{safeNum}</span>
                 {formatGluedText(plainText, false)}
                 
@@ -1036,7 +1043,8 @@ export default function ArticleRenderer({
             );
           }
           return (
-            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
+              {showEditBtn && renderEditButton(true)}
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
               
@@ -1047,7 +1055,8 @@ export default function ArticleRenderer({
 
           return (
             <React.Fragment key={index}>
-              <div className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '20px' : '36px', textIndent: isAddendum ? '-20px' : '-16px' }}>
+              <div className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '20px' : '36px', textIndent: isAddendum ? '-20px' : '-16px' }}>
+                {showEditBtn && renderEditButton(true)}
                 <span className="font-normal mr-1">{safeNum}</span>
                 <span className="font-normal">{renderTextWithHistory(safeText)}</span>
                 

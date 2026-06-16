@@ -360,9 +360,16 @@ function EditorContent() {
         const effDate = new Date(revisionEffectiveDate);
         const effStr = `${effDate.getFullYear()}년 ${effDate.getMonth() + 1}월 ${effDate.getDate()}일`;
         
+        // 부칙 번호 부여 (8000번대)
+        const existingAddendums = newArticles.filter(a => a.articleNumber >= 8000 && a.articleNumber < 9000);
+        let nextAddendumNum = 8000;
+        if (existingAddendums.length > 0) {
+           nextAddendumNum = Math.max(...existingAddendums.map(a => a.articleNumber)) + 1;
+        }
+        
         newArticles.push({
           chapter: "부칙",
-          articleNumber: 9999,
+          articleNumber: nextAddendumNum,
           title: "부칙",
           contentText: `부칙 (${revisionAnnounceDate})\n제1조(시행일) 이 규정은 ${effStr}부터 시행한다.`,
           contentJson: { paragraphs: [`부칙 (${revisionAnnounceDate})`, `제1조(시행일) 이 규정은 ${effStr}부터 시행한다.`] },
