@@ -631,7 +631,7 @@ export default function ArticleRenderer({
     formatted = formatted.replace(/(\([^)]*(?:시행일|경과조치|적용례|적용범위|준용|폐지|예외|단서|특례|임기|존속기간|관련|시행|적용)[^)]*\))/g, (match, paren, offset, str) => {
       const before = str.slice(0, offset);
       if (before.match(/\n\s*$/)) return match;
-      if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+      if (!isAddendumArticle && before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
       if (before.match(/제\d+조의?\d*\s*$/)) return match;
       if (before.match(/\d\s*$/)) return match;
       return '\n' + match;
@@ -641,7 +641,7 @@ export default function ArticleRenderer({
     formatted = formatted.replace(/(\((?:<[^>]+>)*[가-힣A-Za-z0-9\s·,\u200B-\u200D\uFEFF]{2,}[^)]*\))/g, (match, paren, offset, str) => {
       const before = str.slice(0, offset);
       if (before.match(/\n\s*$/)) return match;
-      if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+      if (!isAddendumArticle && before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
       if (before.match(/제\d+조의?\d*\s*$/)) return match;
       if (before.match(/\d\s*$/)) return match;
 
@@ -1121,7 +1121,7 @@ export default function ArticleRenderer({
         
         // 부칙인 경우, 텍스트 맨 끝에 딸려온 별지/별표 문자열 제거
         if (articleNumber < 9000 && title.includes('부칙')) {
-           safeText = safeText.replace(/\s*(\[|〔|【|<)\s*(별지|별표|서식|별첨)\s*(제\d+호|[0-9]+)?.*?(\]|〕|】|>)\s*$/i, '');
+           safeText = safeText.replace(/\s*([\[〔【<「『])\s*(별지|별표|서식|별첨)\s*(제\d+호|[0-9]+)?.*?([\]〕】>」』])\s*$/i, '');
         }
 
         const plainItemText = safeText.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '').trim();
