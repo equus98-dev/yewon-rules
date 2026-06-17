@@ -477,8 +477,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             toc.push({ type: "chapter", id: "toc-main-files", text: "현 규정 다운로드" });
          }
          mainFiles.forEach((baseName: string) => {
-            const match = baseName.match(/\[(.*?)\]/);
-            const displayText = match ? match[1] : baseName;
+            // [전문] 1-0-4 교원 징계규정 → "전문 | 1-0-4 교원 징계규정"
+            const basicMatch = baseName.match(/^\[([^\]]+)\]\s*(.*)$/);
+            const displayText = basicMatch ? `[${basicMatch[1]}] ${basicMatch[2]}` : baseName;
             toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: displayText });
          });
       }
@@ -488,8 +489,18 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             toc.push({ type: "chapter", id: "toc-attachments", text: "별표/별지/별첨 목록" });
          }
          subFiles.forEach((baseName: string) => {
-            const displayText = baseName;
-            toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: displayText });
+            // [별지] 1-0-4 [별지 제1-1호 서식] 확인서 → "[별지 제1-1호 서식] 1-0-4 확인서"
+            const detailedMatch = baseName.match(/^\[(?:별지|별표|별첨|서식)\]\s*([\d\-]+\s+)\[([^\]]+)\]\s*(.*)$/);
+            if (detailedMatch) {
+              const ruleNum = detailedMatch[1].trim();
+              const badgeText = detailedMatch[2];
+              const fileName = detailedMatch[3];
+              toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: `[${badgeText}] ${ruleNum} ${fileName}` });
+            } else {
+              const basicMatch2 = baseName.match(/^\[([^\]]+)\]\s*(.*)$/);
+              const displayText = basicMatch2 ? `[${basicMatch2[1]}] ${basicMatch2[2]}` : baseName;
+              toc.push({ type: "attachment", id: `toc-attach-${baseName}`, text: displayText });
+            }
          });
       }
     }
