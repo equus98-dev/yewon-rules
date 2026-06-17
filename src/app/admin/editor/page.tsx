@@ -87,6 +87,17 @@ function EditorContent() {
   const [revisionDate, setRevisionDate] = useState("");
   const [revisionAnnounceDate, setRevisionAnnounceDate] = useState("");
   const [revisionEffectiveDate, setRevisionEffectiveDate] = useState("");
+  const [revisionAddendumContent, setRevisionAddendumContent] = useState("");
+  const [isAddendumEdited, setIsAddendumEdited] = useState(false);
+
+  // 부칙 내용 자동 생성 (수정되지 않았을 경우에만)
+  useEffect(() => {
+    if (!isAddendumEdited && revisionPopupOpen) {
+      const effDate = new Date(revisionEffectiveDate || new Date());
+      const effStr = !isNaN(effDate.getTime()) ? `${effDate.getFullYear()}년 ${effDate.getMonth() + 1}월 ${effDate.getDate()}일` : "";
+      setRevisionAddendumContent(`부칙 (${revisionAnnounceDate || ""})\n제1조(시행일) 이 규정은 ${effStr}부터 시행한다.`);
+    }
+  }, [revisionAnnounceDate, revisionEffectiveDate, revisionPopupOpen, isAddendumEdited]);
 
   // 1. 규정 마스터 목록 로드
   useEffect(() => {
@@ -379,8 +390,8 @@ function EditorContent() {
           chapter: addendumChapter,
           articleNumber: nextAddendumNum,
           title: "부칙",
-          contentText: `부칙 (${revisionAnnounceDate})\n제1조(시행일) 이 규정은 ${effStr}부터 시행한다.`,
-          contentJson: { paragraphs: [`부칙 (${revisionAnnounceDate})`, `제1조(시행일) 이 규정은 ${effStr}부터 시행한다.`] },
+          contentText: revisionAddendumContent,
+          contentJson: { paragraphs: revisionAddendumContent.split('\n') },
           sortOrder: newArticles.length + 1,
           isNew: true,
           isModified: true
@@ -392,6 +403,7 @@ function EditorContent() {
 
     alert("개정 내용 및 부칙이 임시 반영되었습니다. (최종 배포 시 함께 저장됩니다.)");
     setRevisionPopupOpen(false);
+    setIsAddendumEdited(false);
   };
 
 
@@ -1656,10 +1668,42 @@ function EditorContent() {
                 className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#0c3161]"
               />
             </div>
+            <div className="flex flex-col gap-1.5 mt-2">
+              <label className="text-[13px] font-black text-slate-700">4. 부칙 내용</label>
+              <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
+                <JoditEditor
+                  value={revisionAddendumContent}
+                  config={{
+                    readonly: false,
+                    placeholder: '여기에 부칙 내용을 직접 입력하거나 수정하세요...',
+                    height: 250,
+                    style: {
+                      fontFamily: "'Pretendard', sans-serif",
+                      fontSize: "14px",
+                    },
+                    buttons: [
+                      'bold', 'italic', 'underline', 'strikethrough', '|',
+                      'ul', 'ol', '|',
+                      'font', 'fontsize', 'brush', 'paragraph', '|',
+                      'table', 'link', 'image', '|',
+                      'align', 'undo', 'redo', 'hr', 'eraser', 'fullsize',
+                    ]
+                  }}
+                  onBlur={newContent => {
+                    setRevisionAddendumContent(newContent);
+                    setIsAddendumEdited(true);
+                  }}
+                  onChange={() => {}}
+                />
+              </div>
+            </div>
           </div>
           <div className="mt-8 flex justify-end gap-2">
             <button
-              onClick={() => setRevisionPopupOpen(false)}
+              onClick={() => {
+                setRevisionPopupOpen(false);
+                setIsAddendumEdited(false);
+              }}
               className="px-4 py-2 border border-slate-300 text-slate-600 bg-white rounded font-bold text-sm hover:bg-slate-50 transition-colors"
             >
               취소
