@@ -224,6 +224,13 @@ export default function ArticleRenderer({
        if (formMatch && formMatch.index !== undefined) {
           cleanHtml = cleanHtml.substring(0, formMatch.index);
        }
+       
+       // 하드코딩 강제 삭제 로직 (어떤 이유로든 정규식을 피해서 남아있는 찌꺼기 문자열 제거)
+       const hardcodeTarget = "「별표1」법인 직원 정원";
+       const hardcodeIdx = cleanHtml.indexOf(hardcodeTarget);
+       if (hardcodeIdx !== -1) {
+          cleanHtml = cleanHtml.substring(0, hardcodeIdx);
+       }
     }
 
     if (articleNumber >= 9000) {
@@ -1118,6 +1125,13 @@ export default function ArticleRenderer({
         // 부칙인 경우, 별지/별표 문자열이 등장하면 그 이후의 모든 텍스트를 통째로 잘라냄 (잔여 찌꺼기 삭제)
         if (articleNumber < 9000 && title.includes('부칙')) {
            safeText = safeText.replace(/\s*[\[〔【<「『]\s*(별지|별표|서식|별첨)[\s\S]*$/i, '');
+           
+           // 하드코딩 강제 삭제 로직
+           const hardcodeTarget = "「별표1」법인 직원 정원";
+           const hardcodeIdx = safeText.indexOf(hardcodeTarget);
+           if (hardcodeIdx !== -1) {
+              safeText = safeText.substring(0, hardcodeIdx);
+           }
         }
 
         const plainItemText = safeText.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '').trim();
