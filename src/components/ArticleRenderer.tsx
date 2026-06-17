@@ -1125,12 +1125,12 @@ export default function ArticleRenderer({
         // 부칙인 경우, 별지/별표 문자열이 등장하면 그 이후의 모든 텍스트를 통째로 잘라냄 (잔여 찌꺼기 삭제)
         if (articleNumber < 9000 && title.includes('부칙')) {
            safeText = safeText.replace(/\s*[\[〔【<「『]\s*(별지|별표|서식|별첨)[\s\S]*$/i, '');
-           
-           // 하드코딩 강제 삭제 로직
-           const hardcodeMatch = safeText.match(/「(?:<[^>]+>|\s|&nbsp;)*별(?:<[^>]+>|\s|&nbsp;)*표(?:<[^>]+>|\s|&nbsp;)*1(?:<[^>]+>|\s|&nbsp;)*」(?:<[^>]+>|\s|&nbsp;)*법(?:<[^>]+>|\s|&nbsp;)*인(?:<[^>]+>|\s|&nbsp;)*직(?:<[^>]+>|\s|&nbsp;)*원/);
-           if (hardcodeMatch && hardcodeMatch.index !== undefined) {
-              safeText = safeText.substring(0, hardcodeMatch.index);
-           }
+        }
+        
+        // 🚨 하드코딩 강제 삭제 킬스위치 (부칙 인식 실패 시에도 무조건 동작하도록 조건 밖으로 분리)
+        const hardcodeMatchText = safeText.match(/「(?:<[^>]+>|\s|&nbsp;)*별(?:<[^>]+>|\s|&nbsp;)*표(?:<[^>]+>|\s|&nbsp;)*1(?:<[^>]+>|\s|&nbsp;)*」(?:<[^>]+>|\s|&nbsp;)*법(?:<[^>]+>|\s|&nbsp;)*인(?:<[^>]+>|\s|&nbsp;)*직(?:<[^>]+>|\s|&nbsp;)*원/);
+        if (hardcodeMatchText && hardcodeMatchText.index !== undefined) {
+           safeText = safeText.substring(0, hardcodeMatchText.index);
         }
 
         const plainItemText = safeText.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '').trim();

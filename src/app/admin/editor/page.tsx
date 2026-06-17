@@ -392,12 +392,14 @@ function EditorContent() {
            addendumChapter = existingAddendums[existingAddendums.length - 1].chapter || "";
         }
         
+        const plainText = revisionAddendumContent.replace(/<[^>]+>/g, '').trim();
         newArticles.push({
           chapter: addendumChapter,
           articleNumber: nextAddendumNum,
           title: "부칙",
-          contentText: revisionAddendumContent,
-          contentJson: { paragraphs: revisionAddendumContent.split('\n') },
+          contentHtml: revisionAddendumContent,
+          contentText: plainText,
+          contentJson: { paragraphs: plainText ? plainText.split('\n') : [] },
           sortOrder: newArticles.length + 1,
           isNew: true,
           isModified: true
