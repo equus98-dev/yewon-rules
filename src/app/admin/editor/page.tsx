@@ -164,9 +164,9 @@ function EditorContent() {
                });
             }
 
-            // 부칙인 경우, 텍스트 맨 끝에 딸려온 별지/별표 문자열 제거
+            // 부칙인 경우, 별지/별표 문자열이 등장하면 그 이후의 모든 텍스트를 통째로 잘라냄 (잔여 찌꺼기 삭제)
             if (art.articleNumber < 9000 && (art.title === "부칙" || (art.title || "").includes("부칙"))) {
-               cleanText = cleanText.replace(/\s*([\[〔【<「『])\s*(별지|별표|서식|별첨)\s*(제\d+호|[0-9]+)?.*?([\]〕】>」』])\s*$/i, '');
+               cleanText = cleanText.replace(/\s*[\[〔【<「『]\s*(별지|별표|서식|별첨)[\s\S]*$/i, '');
             }
 
             return {

@@ -1119,9 +1119,9 @@ export default function ArticleRenderer({
         const safeNum = item.num !== null && item.num !== undefined ? String(item.num) : "";
         let safeText = item.text !== null && item.text !== undefined ? String(item.text) : "";
         
-        // 부칙인 경우, 텍스트 맨 끝에 딸려온 별지/별표 문자열 제거
+        // 부칙인 경우, 별지/별표 문자열이 등장하면 그 이후의 모든 텍스트를 통째로 잘라냄 (잔여 찌꺼기 삭제)
         if (articleNumber < 9000 && title.includes('부칙')) {
-           safeText = safeText.replace(/\s*([\[〔【<「『])\s*(별지|별표|서식|별첨)\s*(제\d+호|[0-9]+)?.*?([\]〕】>」』])\s*$/i, '');
+           safeText = safeText.replace(/\s*[\[〔【<「『]\s*(별지|별표|서식|별첨)[\s\S]*$/i, '');
         }
 
         const plainItemText = safeText.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '').trim();
