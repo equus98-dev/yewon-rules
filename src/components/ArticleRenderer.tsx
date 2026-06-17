@@ -225,11 +225,11 @@ export default function ArticleRenderer({
           cleanHtml = cleanHtml.substring(0, formMatch.index);
        }
        
-       // 하드코딩 강제 삭제 로직 (어떤 이유로든 정규식을 피해서 남아있는 찌꺼기 문자열 제거)
-       const hardcodeTarget = "「별표1」법인 직원 정원";
-       const hardcodeIdx = cleanHtml.indexOf(hardcodeTarget);
-       if (hardcodeIdx !== -1) {
-          cleanHtml = cleanHtml.substring(0, hardcodeIdx);
+       // 하드코딩 강제 삭제 로직 (어떤 이유로든 정규식을 피해서 남아있는 찌꺼기 문자열 강력 제거)
+       // 중간에 HTML 태그(<span...>)나 &nbsp; 가 섞여 있어도 감지
+       const hardcodeMatch = cleanHtml.match(/「(?:<[^>]+>|\s|&nbsp;)*별(?:<[^>]+>|\s|&nbsp;)*표(?:<[^>]+>|\s|&nbsp;)*1(?:<[^>]+>|\s|&nbsp;)*」(?:<[^>]+>|\s|&nbsp;)*법(?:<[^>]+>|\s|&nbsp;)*인(?:<[^>]+>|\s|&nbsp;)*직(?:<[^>]+>|\s|&nbsp;)*원/);
+       if (hardcodeMatch && hardcodeMatch.index !== undefined) {
+          cleanHtml = cleanHtml.substring(0, hardcodeMatch.index);
        }
     }
 
@@ -1127,10 +1127,9 @@ export default function ArticleRenderer({
            safeText = safeText.replace(/\s*[\[〔【<「『]\s*(별지|별표|서식|별첨)[\s\S]*$/i, '');
            
            // 하드코딩 강제 삭제 로직
-           const hardcodeTarget = "「별표1」법인 직원 정원";
-           const hardcodeIdx = safeText.indexOf(hardcodeTarget);
-           if (hardcodeIdx !== -1) {
-              safeText = safeText.substring(0, hardcodeIdx);
+           const hardcodeMatch = safeText.match(/「(?:<[^>]+>|\s|&nbsp;)*별(?:<[^>]+>|\s|&nbsp;)*표(?:<[^>]+>|\s|&nbsp;)*1(?:<[^>]+>|\s|&nbsp;)*」(?:<[^>]+>|\s|&nbsp;)*법(?:<[^>]+>|\s|&nbsp;)*인(?:<[^>]+>|\s|&nbsp;)*직(?:<[^>]+>|\s|&nbsp;)*원/);
+           if (hardcodeMatch && hardcodeMatch.index !== undefined) {
+              safeText = safeText.substring(0, hardcodeMatch.index);
            }
         }
 
