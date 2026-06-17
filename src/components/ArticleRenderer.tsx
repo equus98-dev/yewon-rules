@@ -224,12 +224,13 @@ export default function ArticleRenderer({
        if (formMatch && formMatch.index !== undefined) {
           cleanHtml = cleanHtml.substring(0, formMatch.index);
        }
-       
-       // 하드코딩 강제 삭제 로직 (어떤 이유로든 정규식을 피해서 남아있는 찌꺼기 문자열 강력 제거)
-       // 중간에 HTML 태그(<span...>)나 &nbsp; 가 섞여 있어도 감지
-       const hardcodeMatch = cleanHtml.match(/「(?:<[^>]+>|\s|&nbsp;)*별(?:<[^>]+>|\s|&nbsp;)*표(?:<[^>]+>|\s|&nbsp;)*1(?:<[^>]+>|\s|&nbsp;)*」(?:<[^>]+>|\s|&nbsp;)*법(?:<[^>]+>|\s|&nbsp;)*인(?:<[^>]+>|\s|&nbsp;)*직(?:<[^>]+>|\s|&nbsp;)*원/);
-       if (hardcodeMatch && hardcodeMatch.index !== undefined) {
-          cleanHtml = cleanHtml.substring(0, hardcodeMatch.index);
+    }
+    
+    // 🚨 하드코딩 강제 삭제 킬스위치 (부칙 인식 실패 시에도 무조건 동작하도록 조건 밖으로 분리)
+    if (cleanHtml) {
+       const hardcodeMatchHtml = cleanHtml.match(/「(?:<[^>]+>|\s|&nbsp;)*별(?:<[^>]+>|\s|&nbsp;)*표(?:<[^>]+>|\s|&nbsp;)*1(?:<[^>]+>|\s|&nbsp;)*」(?:<[^>]+>|\s|&nbsp;)*법(?:<[^>]+>|\s|&nbsp;)*인(?:<[^>]+>|\s|&nbsp;)*직(?:<[^>]+>|\s|&nbsp;)*원/);
+       if (hardcodeMatchHtml && hardcodeMatchHtml.index !== undefined) {
+          cleanHtml = cleanHtml.substring(0, hardcodeMatchHtml.index);
        }
     }
 
