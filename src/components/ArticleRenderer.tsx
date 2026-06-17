@@ -220,13 +220,9 @@ export default function ArticleRenderer({
 
     // 6. 부칙 등에 딸려온 별지/별표 HTML 통째로 잘라내기
     if (articleNumber < 9000 && title.includes('부칙') && cleanHtml) {
-       const formMatch = cleanHtml.match(/(\[|〔|【|<)\s*(별지|별표|서식|별첨)\s*(제\d+호|[0-9]+)?.*?(\]|〕|】|>)/i);
+       const formMatch = cleanHtml.match(/[\[〔【<「『]\s*(별지|별표|서식|별첨)/i);
        if (formMatch && formMatch.index !== undefined) {
-          const cutIdx = formMatch.index;
-          const remainder = cleanHtml.substring(cutIdx);
-          if (remainder.toLowerCase().includes('<table')) {
-             cleanHtml = cleanHtml.substring(0, cutIdx);
-          }
+          cleanHtml = cleanHtml.substring(0, formMatch.index);
        }
     }
 
