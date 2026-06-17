@@ -699,7 +699,7 @@ export default function Home() {
               </div>
 
               <div className="flex-1 p-8">
-                <div className="max-w-6xl mx-auto">
+                <div className="w-full">
                   <div className="flex flex-col gap-4">
 
                   {activeNoticeId ? (() => {
