@@ -959,10 +959,14 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       
                       let items: any[] = [];
                       if (typeof a.contentJson === "string") {
-                        try { items = JSON.parse(a.contentJson); } catch (e) {}
+                        try { 
+                          const parsed = JSON.parse(a.contentJson); 
+                          items = Array.isArray(parsed) ? parsed : (parsed.paragraphs ? parsed.paragraphs : [parsed]);
+                        } catch (e) {}
                       } else if (a.contentJson) {
                         items = Array.isArray(a.contentJson) ? a.contentJson : (a.contentJson.paragraphs ? a.contentJson.paragraphs : [a.contentJson]);
                       }
+                      if (!Array.isArray(items)) items = [];
                       
                       const rawLines: string[] = [];
                       for (const item of items) {
