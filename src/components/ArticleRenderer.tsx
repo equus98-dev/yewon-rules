@@ -273,6 +273,11 @@ export default function ArticleRenderer({
       });
     }
 
+    if (cleanHtml && isAddendumArticle) {
+      // 부칙 제목을 다른 규정들처럼 굵게 표시 (contentHtml에 직접 <p>부칙</p>이 들어있는 경우)
+      cleanHtml = cleanHtml.replace(/<p>(\s*부\s*칙\s*)<\/p>/i, '<p class="font-bold text-[16px]">$1</p>');
+    }
+
     return (
       <div id={id} className="animate-fade-in rule-viewer-content font-['Pretendard'] w-full relative group">
         {renderEditButton()}
