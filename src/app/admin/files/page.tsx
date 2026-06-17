@@ -124,7 +124,7 @@ export default function AdminFilesManagement() {
 
     for (const file of selectedFiles) {
       const originalName = file.name;
-      let cleanName = originalName.replace(/^[\d-]+[\s_]+/, '');
+      let cleanName = originalName; // 파일명 원본 그대로 유지 (규정번호 제거하지 않음)
       let newFileName = cleanName;
       
       const bracketMatch = cleanName.match(/^\[([^\]]+)\]\s*(.*)$/);
