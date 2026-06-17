@@ -1346,10 +1346,31 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                 </span>
                               )}
                               {(() => {
-                                const match = group.baseName.match(/^\[([^\]]+)\]\s*(.*)$/);
-                                if (match) {
-                                  const type = match[1];
-                                  const displayText = match[2];
+                                // 제목 파싱: [타입] 1-0-4 [세부태그] 이름 형태 처리
+                                const raw = group.baseName;
+                                
+                                // 패턴 1: [별지] 1-0-4 [별지 제1-1호 서식] 확인서 → 배지: 별지 제1-1호 서식, 텍스트: 1-0-4 확인서
+                                const detailedMatch = raw.match(/^\[(?:별지|별표|별첨|서식)\]\s*([\d\-]+\s+)\[([^\]]+)\]\s*(.*)$/);
+                                if (detailedMatch) {
+                                  const ruleNum = detailedMatch[1].trim();
+                                  const badgeText = detailedMatch[2];
+                                  const fileName = detailedMatch[3];
+                                  const badgeColor = badgeText.includes('별표') ? 'bg-rose-600/80 text-white border-rose-600/20' : 'bg-sky-600/80 text-white border-sky-600/20';
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <span className={`px-2 py-0.5 rounded text-[12px] font-black border whitespace-nowrap ${badgeColor}`}>
+                                        {badgeText}
+                                      </span>
+                                      <span className="font-bold text-slate-800 text-[15px]">{ruleNum} {fileName}</span>
+                                    </div>
+                                  );
+                                }
+                                
+                                // 패턴 2: [전문] 1-0-4 교원 징계규정 (기본 [타입] 이름 형태)
+                                const basicMatch = raw.match(/^\[([^\]]+)\]\s*(.*)$/);
+                                if (basicMatch) {
+                                  const type = basicMatch[1];
+                                  const displayText = basicMatch[2];
                                   return (
                                     <div className="flex items-center gap-2">
                                       <span className={`px-2 py-0.5 rounded text-[12px] font-black border whitespace-nowrap ${
@@ -1363,7 +1384,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                     </div>
                                   );
                                 }
-                                return <span className="font-bold text-slate-800 text-[15px]">{group.baseName}</span>;
+                                return <span className="font-bold text-slate-800 text-[15px]">{raw}</span>;
                               })()}
                                 <div className="flex items-center gap-1.5 ml-3" onClick={(e) => e.stopPropagation()}>
                                   {hwpFile && (
