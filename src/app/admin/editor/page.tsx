@@ -146,11 +146,17 @@ function EditorContent() {
 
         const rev = data.currentRevision;
         if (rev && Array.isArray(rev.articles)) {
-          setOriginalArticles(rev.articles);
+          // 별표, 별지, 서식, 별첨 등은 조문 리스트에서 제외 (첨부파일 탭에서 별도 관리됨)
+          const filteredArticles = rev.articles.filter((art: any) => {
+            const titleOrContent = (art.title || "") + " " + (art.contentText || "");
+            return !/^[\[〔【<「『]?\s*(별지|별표|서식|별첨)/i.test(titleOrContent.trim());
+          });
+
+          setOriginalArticles(filteredArticles);
           
           // 기존 조항들을 복사하여 편집용 초안 상태로 초기화
           const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&').replace(/\s+/g, '\\s*');
-          const copied = rev.articles.map((art: any, idx: number, arr: any[]) => {
+          const copied = filteredArticles.map((art: any, idx: number, arr: any[]) => {
             let cleanText = art.contentText || "";
             // 다음 조항의 장/절이 현재 조항의 본문 끝에 묻어있는 경우 제거
             const nextArt = arr[idx + 1];
@@ -999,9 +1005,16 @@ function EditorContent() {
                         {[art.part, art.chapter, art.section, art.subSection].filter(Boolean).join(" > ") || "총칙"}
                       </div>
                       <div className="text-[#0c3161] font-black text-base">{getArticleNumBadge(art.articleNumber, art.title)}</div>
-                      <p className="text-slate-700 leading-relaxed font-bold mt-2 whitespace-pre-wrap text-[15px]">
-                        {art.contentText}
-                      </p>
+                      {/<table|<p|<span|<br|<div/i.test(art.contentText || "") ? (
+                        <div 
+                          className="text-slate-700 leading-relaxed font-bold mt-2 text-[15px] html-viewer-content"
+                          dangerouslySetInnerHTML={{ __html: art.contentText || "" }}
+                        />
+                      ) : (
+                        <p className="text-slate-700 leading-relaxed font-bold mt-2 whitespace-pre-wrap text-[15px]">
+                          {art.contentText}
+                        </p>
+                      )}
                     </div>
                   ))
                 )}
