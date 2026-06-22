@@ -591,7 +591,10 @@ export default function ArticleRenderer({
     }
 
     if (/<tr|<td|<th/i.test(text)) {
-       return <div className="html-table-wrapper block w-full overflow-x-auto" dangerouslySetInnerHTML={{ __html: text }} />;
+        const wrapperCls = text.includes('custom-rule-table') 
+          ? "block w-full overflow-x-auto" 
+          : "html-table-wrapper block w-full overflow-x-auto";
+        return <div className={wrapperCls} dangerouslySetInnerHTML={{ __html: text }} />;
     }
 
     if (text.length < 50 && !/^\s*제\d+(?:조|장|관|절)/.test(text)) {
