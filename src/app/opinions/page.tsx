@@ -203,8 +203,8 @@ export default function OpinionsPage() {
         <div className="w-[375px] shrink-0 h-full border-r border-slate-200 z-10 hidden lg:block bg-white">
           <SidebarTree onSelectRule={() => {}} />
         </div>
-        <main className="flex-1 flex flex-col items-center py-10 px-4 md:px-8 overflow-y-auto w-full bg-[#f3f4f6]">
-          <div className="w-full max-w-5xl bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+        <main className="flex-1 flex flex-col py-6 px-4 md:px-6 overflow-y-auto w-full bg-[#f3f4f6]">
+          <div className="w-full bg-white p-8 rounded-2xl shadow-sm border border-slate-200 min-h-full">
             <h1 className="text-3xl font-black text-[#0c3161] mb-8 border-b-2 border-[#1668a6] pb-4">의견수렴</h1>
           
           {mode === "list" && (
