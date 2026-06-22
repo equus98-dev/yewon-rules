@@ -619,7 +619,7 @@ export default function ArticleRenderer({
         return p1 + '\n' + p2 + ' ';
       })
       .replace(/(제\d+조의?\d*\s*[\[〔(（][^\]〕)）]+[\]〕)）])\s*\n([①-⑳])/g, '$1 $2')
-      .replace(/((?<![『「])제\d+조의?\d*\s*(?:\[(?![\s\S]*?\[\/cite\])|[〔(（])[^\]〕)）]+[\]〕)）])/g, '\n\n$1')
+      .replace(/(^|\n|[.!?]\s*)((?<![『「])제\d+조의?\d*\s*(?:\[(?![ \s\S]*?\[\/cite\])|[〔(（])[^\]〕)）]+[\]〕)）])/g, '$1\n\n$2')
       .replace(/(제\d+(?:장|절|관)\s+(?!(?:제\d+(?:조|항|호|목|장|절|관)?|및|에|의|은|는|이|가|을|를|과|와)(?:\s|$))[^\s]+)/g, (match, p1, offset, string) => {
          if (offset > 0) {
              const beforeMatch = string.slice(0, offset).trim();
