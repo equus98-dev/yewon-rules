@@ -158,12 +158,8 @@
   word-break: keep-all !important;
 }
 
-/* 1. 상단 제목행 (th 태그 및 굵은 글씨가 포함된 td) 음영 처리 */
-.html-table-wrapper th,
-.html-table-wrapper td:has(b),
-.html-table-wrapper td:has(strong),
-.html-table-wrapper td:has([style*="bold"]),
-.html-table-wrapper td[style*="bold"] {
+/* 1. 상단 제목행 (th 태그) 음영 처리 */
+.html-table-wrapper th {
   background-color: #f3f4f6 !important;
   font-weight: 700 !important;
   color: #0f172a !important;

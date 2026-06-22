@@ -929,7 +929,20 @@ export default function ArticleRenderer({
     }
 
     // ── 2.5 DB 업데이트가 누락되었거나 너무 커서 실패한 경우를 위한 안전장치: HTML 표(table) 내부의 개행문자(엔터) 제거
-    fullText = fullText.replace(/<table[\s\S]*?<\/table>/gi, match => match.replace(/\r?\n/g, ''));
+    fullText = fullText.replace(/<table[\s\S]*?<\/table>/gi, match => {
+      let clean = match.replace(/\r?\n/g, '');
+      // 특정 표(종전 재적학부)의 상단 2개 행을 자동으로 th로 변환하여 CSS 음영이 올바르게 적용되도록 처리
+      if (clean.includes('종전 재적학부') && clean.includes('변경된 재적학부')) {
+         clean = clean.replace(/<td([^>]*)>(.*?)종전\s*재적학부\(과\)\s*및\s*전공(.*?)<\/td>/g, '<th$1>$2종전 재적학부(과) 및 전공$3</th>');
+         clean = clean.replace(/<td([^>]*)>(.*?)변경된\s*재적학부\(과\)\s*및\s*전공(.*?)<\/td>/g, '<th$1>$2변경된 재적학부(과) 및 전공$3</th>');
+         // 띄어쓰기나 &nbsp;가 포함된 학부(과), 전공도 매칭
+         clean = clean.replace(/<td([^>]*)>(.*?)학부(?:\s|&nbsp;)*(?:\(\s*과\s*\)|과)(.*?)<\/td>/gi, '<th$1>$2학부(과)$3</th>');
+         clean = clean.replace(/<td([^>]*)>(.*?)전(?:\s|&nbsp;)*공(.*?)<\/td>/gi, '<th$1>$2전공$3</th>');
+         // 글로벌문화예술경영학부 등 첫번째 열의 굵은 글씨가 불필요하게 음영처리되는 것을 막기 위해 인라인 bold 제거
+         clean = clean.replace(/font-weight:\s*bold/gi, 'font-weight: normal');
+      }
+      return clean;
+    });
 
 
     // ── 3. 헤더 날짜 어노테이션 추출
