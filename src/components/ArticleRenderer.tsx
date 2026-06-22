@@ -996,7 +996,7 @@ export default function ArticleRenderer({
       if (coreText && coreText.length > 10) {
         let isDuplicate = false;
         // 제목이 없는 줄인 경우, 이전에 나온 조문 본문과 동일한지 확인
-        if (!/^(?:부칙\s*)?제\d+조/.test(currentLine)) {
+        if (!/^(?:부칙\s*)?제\d+조/.test(currentLine) && !/^[①-⑳\d]+[.)]/.test(currentLine)) {
           const normalizedCore = coreText.replace(/\s+/g, '').replace(/[.·]/g, '');
           if (normalizedCore.length > 15) {
             for (const seen of seenCoreTexts) {
