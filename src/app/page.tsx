@@ -1094,7 +1094,7 @@ export default function Home() {
 
               {/* 2. 하단 메인 그룹별 검색결과 목록 대시보드 */}
               <div className="p-8 overflow-y-auto flex-1 bg-slate-50 scrollbar">
-                <div className="max-w-5xl mx-auto">
+                <div className="w-full mx-auto">
                   
                   {/* 로딩 표시 */}
                   {loadingSearch ? (
@@ -1186,7 +1186,7 @@ export default function Home() {
                                 </div>
 
                                 <div className="overflow-x-auto">
-                                  <table className="w-full text-xs text-left border-collapse">
+                                  <table className="w-full text-[14px] text-left border-collapse">
                                     <thead>
                                       <tr className="bg-slate-50/50 border-y border-slate-200 text-slate-600 select-none">
                                         <th className="py-2.5 px-3 font-extrabold w-14 text-center">번호</th>
@@ -1212,7 +1212,7 @@ export default function Home() {
                                             >
                                               <td className="py-2.5 px-3 text-center text-slate-400 font-bold">{idx + 1}</td>
                                               <td className="py-2.5 px-3 font-extrabold text-slate-800 hover:text-blue-700 transition-colors flex items-center gap-2">
-                                                <span className="bg-blue-50 text-blue-800 px-1.5 py-0.5 rounded text-[9px] font-black shrink-0 select-none">
+                                                <span className="bg-blue-50 text-blue-800 px-2 py-0.5 rounded text-[11px] font-black shrink-0 select-none">
                                                   {rule.departmentName}
                                                 </span>
                                                 <span className={`${isAbolished ? "line-through text-slate-400 font-semibold" : ""}`}>
@@ -1247,7 +1247,7 @@ export default function Home() {
                                 </div>
 
                                 <div className="overflow-x-auto">
-                                  <table className="w-full text-xs text-left border-collapse">
+                                  <table className="w-full text-[14px] text-left border-collapse">
                                     <thead>
                                       <tr className="bg-slate-50/50 border-y border-slate-200 text-slate-600 select-none">
                                         <th className="py-2.5 px-3 font-extrabold w-14 text-center">번호</th>
@@ -1271,10 +1271,10 @@ export default function Home() {
                                           >
                                             <td className="py-3 px-3 text-center text-slate-400 font-bold align-middle">{idx + 1}</td>
                                             <td className="py-3 px-3 min-w-[300px]">
-                                              <div className="font-extrabold text-slate-800 text-xs">
+                                              <div className="font-extrabold text-slate-800 text-[15px]">
                                                 {match.title} <span className="text-slate-400 font-bold"> &gt; {match.articleTitle}</span>
                                               </div>
-                                              <div className="text-[11px] text-slate-600 mt-1.5 leading-relaxed bg-slate-50 p-2.5 rounded border border-slate-150 font-bold">
+                                              <div className="text-[14px] text-slate-600 mt-2 leading-relaxed bg-slate-50 p-3 rounded border border-slate-150 font-medium">
                                                 {match.snippet}
                                               </div>
                                             </td>
@@ -1313,7 +1313,7 @@ export default function Home() {
                                 </div>
 
                                 <div className="overflow-x-auto">
-                                  <table className="w-full text-xs text-left border-collapse">
+                                  <table className="w-full text-[14px] text-left border-collapse">
                                     <thead>
                                       <tr className="bg-slate-50/50 border-y border-slate-200 text-slate-600 select-none">
                                         <th className="py-2.5 px-3 font-extrabold w-14 text-center">번호</th>
@@ -1361,11 +1361,11 @@ export default function Home() {
                                                   rel="noopener noreferrer"
                                                   className="flex items-center gap-2 hover:text-blue-700 cursor-pointer min-w-0"
                                                 >
-                                                  <span className={`w-7 h-7 rounded shrink-0 flex items-center justify-center font-black text-[9px] uppercase ${typeBg}`}>
+                                                  <span className={`w-8 h-8 rounded shrink-0 flex items-center justify-center font-black text-[10px] uppercase ${typeBg}`}>
                                                     {att.fileType || "FIL"}
                                                   </span>
-                                                  <span className="truncate" title={att.title}>{att.title}</span>
-                                                  <span className="text-slate-400 font-bold text-[10px] shrink-0">({att.ruleTitle})</span>
+                                                  <span className="truncate text-[14px]" title={att.title}>{att.title}</span>
+                                                  <span className="text-slate-400 font-bold text-[12px] shrink-0">({att.ruleTitle})</span>
                                                 </a>
                                                 <button
                                                   type="button"
