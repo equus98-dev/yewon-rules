@@ -182,8 +182,10 @@ export default function OpinionsPage() {
 
   return (
     <div className="flex h-screen bg-[#f3f4f6]">
-      <SidebarTree onSelectRule={() => {}} />
-      <main className="flex-1 flex flex-col items-center py-10 px-4 md:px-8 overflow-y-auto">
+      <div className="w-[375px] shrink-0 h-full border-r border-slate-200 z-10 hidden lg:block">
+        <SidebarTree onSelectRule={() => {}} />
+      </div>
+      <main className="flex-1 flex flex-col items-center py-10 px-4 md:px-8 overflow-y-auto w-full">
         <div className="w-full max-w-5xl bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
           <h1 className="text-3xl font-black text-[#0c3161] mb-8 border-b-2 border-[#1668a6] pb-4">의견수렴</h1>
           

@@ -1,0 +1,1 @@
+SELECT id, chapter, articleNumber, title, contentText FROM Article WHERE revisionId = (SELECT id FROM Revision WHERE ruleId = (SELECT id FROM Rule WHERE ruleNumber = '2-0-2') ORDER BY createdAt DESC LIMIT 1) AND (chapter LIKE '%%부칙%%' OR title LIKE '%%부칙%%');  
