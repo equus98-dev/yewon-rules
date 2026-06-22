@@ -1303,7 +1303,7 @@ export default function ArticleRenderer({
                     {isAddendum ? (
                       <>
                         {(() => {
-                          let addendumBody = plainText;
+                          let addendumBody = safeText;
                           if (title && addendumBody.startsWith(title.trim())) {
                               addendumBody = addendumBody.substring(title.trim().length).trim();
                           } else {
@@ -1327,10 +1327,13 @@ export default function ArticleRenderer({
                         {(() => {
                           let articleTitleOverride = parsedTitle;
                           let articleNumOverride = safeNum;
-                          let actualBody = plainText.replace(parsedTitle, "").trim();
+                          let actualBody = safeText;
+                          if (parsedTitle) {
+                             actualBody = actualBody.replace(parsedTitle, "").trim();
+                          }
 
                           if (!safeNum && /^제\d+조/.test(plainText)) {
-                            const match = plainText.match(/^(제\d+조(?:의|\s+)?\d*)\s*[\[〔(（]([^\]〕)）]+)[\]〕)）](.*)/);
+                            const match = safeText.match(/^(제\d+조(?:의|\s+)?\d*)\s*[\[〔(（]([^\]〕)）]+)[\]〕)）](.*)/);
                             if (match) {
                                articleNumOverride = match[1].replace(/\s/g, '');
                                if (articleNumOverride.match(/^제\d+조\d+$/)) {
@@ -1339,7 +1342,7 @@ export default function ArticleRenderer({
                                articleTitleOverride = `(${match[2]})`;
                                actualBody = match[3].trim();
                             } else {
-                               const match2 = plainText.match(/^(제\d+조(?:의|\s+)?\d*)\s*(.*)/);
+                               const match2 = safeText.match(/^(제\d+조(?:의|\s+)?\d*)\s*(.*)/);
                                if (match2) {
                                    articleNumOverride = match2[1].replace(/\s/g, '');
                                    if (articleNumOverride.match(/^제\d+조\d+$/)) {
@@ -1374,7 +1377,7 @@ export default function ArticleRenderer({
             return (
               <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'} relative ${interactiveClass}`}>
                 <span className="font-normal mr-1">{safeNum}</span>
-                {formatGluedText(plainText, false)}
+                {formatGluedText(safeText, false)}
                 
               </div>
             );
