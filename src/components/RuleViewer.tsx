@@ -463,7 +463,12 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     if (uploadedAttachments.length > 0) {
       const uniqueBaseNames = new Set<string>();
       uploadedAttachments.forEach((a: any) => {
-        const baseName = a.title.replace(/\.[^/.]+$/, "");
+        const baseName = a.title
+          .replace(/\.[^/.]+$/, "")
+          .replace(/\(최종\)$/i, "")
+          .replace(/[\u200B-\u200D\uFEFF]/g, "")
+          .trim()
+          .replace(/\s+/g, " ");
         if (!uniqueBaseNames.has(baseName)) {
            uniqueBaseNames.add(baseName);
         }
