@@ -313,8 +313,8 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
                 }}
                 className={`w-16 min-h-[64px] flex flex-col items-center justify-center gap-1.5 rounded-xl py-2 cursor-pointer transition-all duration-200 active:scale-95 ${
                   isActive
-                    ? "bg-white text-[#155a96] font-bold shadow-md"
-                    : "text-blue-100 hover:bg-white/10 hover:text-white"
+                    ? "bg-white text-[#1668a6] font-bold shadow-md"
+                    : "text-blue-100 hover:bg-white/20 hover:text-white"
                 }`}
               >
                 {item.icon}
@@ -332,7 +332,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
         <div className={`h-14 border-b border-slate-200 flex items-center justify-center px-4 shrink-0 select-none relative overflow-hidden ${verticalTab === '규정' ? 'text-white' : 'bg-slate-50 text-slate-800'}`}>
           {verticalTab === '규정' && (
             <>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#155a96] to-[#1a7bc8] opacity-90 mix-blend-multiply z-10" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#1668a6] to-[#248fd6] opacity-90 mix-blend-multiply z-10" />
               <img src="/yewon2.jpeg" alt="background" className="absolute inset-0 w-full h-full object-cover opacity-50 z-0" />
             </>
           )}

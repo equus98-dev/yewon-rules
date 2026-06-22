@@ -1401,7 +1401,7 @@ export default function Home() {
               <div className="max-w-[1400px] w-full mx-auto p-6 md:p-8 flex flex-col gap-8 min-h-0">
                 
                 {/* [파트 1] 상단 검색 배너 (전면 중앙 - 파란색 그라데이션 및 꽉 찬 배경 이미지) */}
-                <div className="bg-gradient-to-r from-[#155a96] via-[#1a7bc8] to-[#155a96] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
+                <div className="bg-gradient-to-r from-[#1668a6] via-[#248fd6] to-[#1668a6] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
                   
                   {/* 전체 학교 배경 (은은하게 블렌딩) */}
                   <div className="absolute inset-0 z-0 pointer-events-none">
