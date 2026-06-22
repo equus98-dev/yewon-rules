@@ -605,6 +605,7 @@ export default function ArticleRenderer({
     }
 
     let formatted = text
+      .replace(/(^|\s)[?•·○●\uF0B7]\s+(?=[가-하]\.|\d{1,2}(?:의\d+)?\.)/g, '$1')
       .replace(/([①-⑳])/g, (match, p1, offset, string) => {
         const before = string.slice(0, offset);
         const after = string.slice(offset + 1);
@@ -624,7 +625,7 @@ export default function ArticleRenderer({
         if (offset === 0 || before.endsWith('\n')) return match;
         return p1 + '\n' + p2 + ' ';
       })
-      .replace(/(제\d+조의?\d*\s*[\[〔(（].*?[\]〕)）])\s*\n([①-⑳])/g, '$1 $2')
+      .replace(/(제\d+조의?\d*\s*[\[〔(（].*?[\]〕)）])\s*\n+(?=[^\n])/g, '$1 ')
       .replace(/(^|\n|[.!?]\s*)((?<![『「])제\d+조의?\d*\s*(?:\[(?![ \s\S]*?\[\/cite\])|[〔(（]).*?[\]〕)）])/g, '$1\n\n$2')
       .replace(/(제\d+(?:장|절|관)\s+(?!(?:제\d+(?:조|항|호|목|장|절|관)?|및|에|의|은|는|이|가|을|를|과|와)(?:\s|$))[^\s]+)/g, (match, p1, offset, string) => {
          if (offset > 0) {
