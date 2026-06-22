@@ -1305,7 +1305,12 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 {attachments && attachments.length > 0 && (() => {
                   const groups = Object.values(
                     attachments.reduce((acc: any, file: any) => {
-                      const baseName = file.title.replace(/\.[^/.]+$/, "");
+                      const baseName = file.title
+                        .replace(/\.[^/.]+$/, "")
+                        .replace(/\(최종\)$/i, "")
+                        .replace(/[\u200B-\u200D\uFEFF]/g, "")
+                        .trim()
+                        .replace(/\s+/g, " ");
                       if (!acc[baseName]) acc[baseName] = { baseName, files: [] };
                       acc[baseName].files.push(file);
                       return acc;
