@@ -301,7 +301,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
       
       {/* ==================== 1단계: 세로형 아이콘 메뉴바 ==================== */}
       {!hideVerticalMenu && (
-        <div className="w-[75px] bg-[#155a96] flex flex-col items-center py-6 gap-5 shrink-0 text-white shadow-inner z-10">
+        <div className="w-[75px] bg-[#0d3c6e] flex flex-col items-center py-6 gap-5 shrink-0 text-white shadow-inner z-10">
           {verticalMenuItems.map((item) => {
             const isActive = verticalTab === item.id;
             return (
