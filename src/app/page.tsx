@@ -689,8 +689,8 @@ export default function Home() {
             </div>
           ) : activeVerticalTab === "공지사항" ? (
             <div className="flex-1 overflow-y-auto bg-slate-50 scrollbar flex flex-col relative">
-              <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-8 py-5 shrink-0 flex items-center justify-between z-10 shadow-sm relative select-none">
-                <h2 className="text-2xl font-black text-[#007073] tracking-tight ml-2">
+              <div className="bg-[#3b82f6]/[0.12] border-b border-slate-200 px-8 py-5 shrink-0 flex items-center justify-between z-10 shadow-sm relative select-none">
+                <h2 className="text-2xl font-black text-[#1d4ed8] tracking-tight ml-2">
                   공지사항
                 </h2>
                 <div className="text-[14px] text-slate-500 font-medium tracking-wider">
@@ -736,7 +736,7 @@ export default function Home() {
                         <span>페이지: 1/1</span>
                       </div>
 
-                      <div className="bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden">
+                      <div className="bg-white border-t-2 border-[#1d4ed8] shadow-sm overflow-hidden">
                         {loadingNotices ? (
                           <div className="flex flex-col items-center justify-center py-24 gap-4">
                             <CircularProgress size={30} sx={{ color: "#0c3161" }} />
@@ -802,8 +802,8 @@ export default function Home() {
             </div>
           ) : activeVerticalTab === "최신 제·개정" ? (
             <div className="flex-1 overflow-y-auto bg-slate-50 scrollbar flex flex-col relative">
-              <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-8 py-5 shrink-0 flex items-center justify-between z-10 shadow-sm relative select-none">
-                <h2 className="text-2xl font-black text-[#007073] tracking-tight ml-2">
+              <div className="bg-[#3b82f6]/[0.12] border-b border-slate-200 px-8 py-5 shrink-0 flex items-center justify-between z-10 shadow-sm relative select-none">
+                <h2 className="text-2xl font-black text-[#1d4ed8] tracking-tight ml-2">
                   최신 제·개정
                 </h2>
                 <div className="text-[14px] text-slate-500 font-medium tracking-wider">
@@ -887,8 +887,8 @@ export default function Home() {
             /* 카테고리(분야/부서/폴더) 뷰 표시 */
             <div className="flex-1 overflow-y-auto bg-slate-50 scrollbar flex flex-col relative">
               {/* 카테고리 뷰 헤더 타이틀 (상단 꽉 찬 배경) */}
-              <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-8 py-5 shrink-0 flex items-center justify-between z-10 shadow-sm relative select-none">
-                <h2 className="text-2xl font-black text-[#007073] tracking-tight ml-2">
+              <div className="bg-[#3b82f6]/[0.12] border-b border-slate-200 px-8 py-5 shrink-0 flex items-center justify-between z-10 shadow-sm relative select-none">
+                <h2 className="text-2xl font-black text-[#1d4ed8] tracking-tight ml-2">
                   {activeCategoryName}
                 </h2>
                 <div className="text-[14px] text-slate-500 font-medium tracking-wider">
@@ -1065,7 +1065,7 @@ export default function Home() {
                     />
                     <button
                       type="submit"
-                      className="bg-[#009b9e] hover:bg-[#008082] text-white text-xs font-black px-4 h-[28px] rounded-r cursor-pointer active:scale-95 transition-all shrink-0 whitespace-nowrap"
+                      className="bg-[#3b82f6] hover:bg-[#2563eb] text-white text-xs font-black px-4 h-[28px] rounded-r cursor-pointer active:scale-95 transition-all shrink-0 whitespace-nowrap"
                     >
                       검색
                     </button>
@@ -1177,7 +1177,7 @@ export default function Home() {
                               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6">
                                 <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4 select-none">
                                   <h3 className="text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                    <span className="text-[#009b9e] font-black">■</span> 규정명
+                                    <span className="text-[#3b82f6] font-black">■</span> 규정명
                                     <span className="text-amber-600 font-bold ml-1">({titleList.length}건)</span>
                                   </h3>
                                   <button type="button" className="text-[10px] text-slate-400 font-bold border border-slate-200 rounded px-2.5 py-0.5 hover:bg-slate-50 cursor-pointer active:scale-95">
@@ -1238,7 +1238,7 @@ export default function Home() {
                               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6">
                                 <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4 select-none">
                                   <h3 className="text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                    <span className="text-[#009b9e] font-black">■</span> 규정내용
+                                    <span className="text-[#3b82f6] font-black">■</span> 규정내용
                                     <span className="text-amber-600 font-bold ml-1">({bodyList.length}건)</span>
                                   </h3>
                                   <button type="button" className="text-[10px] text-slate-400 font-bold border border-slate-200 rounded px-2.5 py-0.5 hover:bg-slate-50 cursor-pointer active:scale-95">
@@ -1285,7 +1285,7 @@ export default function Home() {
                                               <button
                                                 type="button"
                                                 onClick={() => setActiveRuleId(match.id)}
-                                                className="bg-[#009b9e] hover:bg-[#008082] text-white text-[10px] font-black px-2.5 py-1 rounded cursor-pointer active:scale-95 transition-all select-none shadow-sm"
+                                                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white text-[10px] font-black px-2.5 py-1 rounded cursor-pointer active:scale-95 transition-all select-none shadow-sm"
                                               >
                                                 보기
                                               </button>
@@ -1304,7 +1304,7 @@ export default function Home() {
                               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
                                 <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4 select-none">
                                   <h3 className="text-sm font-black text-slate-800 flex items-center gap-1.5">
-                                    <span className="text-[#009b9e] font-black">■</span> 별표/별지/별첨
+                                    <span className="text-[#3b82f6] font-black">■</span> 별표/별지/별첨
                                     <span className="text-amber-600 font-bold ml-1">({attachmentList.length}건)</span>
                                   </h3>
                                   <button type="button" className="text-[10px] text-slate-400 font-bold border border-slate-200 rounded px-2.5 py-0.5 hover:bg-slate-50 cursor-pointer active:scale-95">
@@ -1370,7 +1370,7 @@ export default function Home() {
                                                 <button
                                                   type="button"
                                                   onClick={() => setActiveRuleId(att.ruleId)}
-                                                  className="border border-[#009b9e] text-[#009b9e] hover:bg-[#009b9e] hover:text-white text-[9px] font-black px-2.5 py-0.5 rounded cursor-pointer transition-all active:scale-95 shrink-0 select-none shadow-sm"
+                                                  className="border border-[#3b82f6] text-[#3b82f6] hover:bg-[#3b82f6] hover:text-white text-[9px] font-black px-2.5 py-0.5 rounded cursor-pointer transition-all active:scale-95 shrink-0 select-none shadow-sm"
                                                 >
                                                   규정 보기
                                                 </button>
@@ -1401,7 +1401,7 @@ export default function Home() {
               <div className="max-w-[1400px] w-full mx-auto p-6 md:p-8 flex flex-col gap-8 min-h-0">
                 
                 {/* [파트 1] 상단 검색 배너 (전면 중앙 - 부드러운 배경색 및 우측 이미지) */}
-                <div className="bg-[#009b9e] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
+                <div className="bg-[#3b82f6] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
                   
                   {/* 우측 끝 학교 배경 (규정목록 헤더와 동일한 블렌딩) */}
                   <div 
@@ -1487,9 +1487,9 @@ export default function Home() {
                                 <input type="date" value={enactmentEnd} onChange={(e) => setEnactmentEnd(e.target.value)} className="bg-white text-slate-800 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold text-xs lg:text-sm h-8 w-[120px] lg:w-[130px]" />
                               </div>
                               <div className="flex items-center gap-1 mt-1 md:mt-0 ml-0 md:ml-2">
-                                <button type="button" onClick={() => handleQuickDate("1w")} className="bg-white text-[#009b9e] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm whitespace-nowrap">1주</button>
-                                <button type="button" onClick={() => handleQuickDate("1m")} className="bg-white text-[#009b9e] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm whitespace-nowrap">1달</button>
-                                <button type="button" onClick={() => handleQuickDate("1y")} className="bg-white text-[#009b9e] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm whitespace-nowrap">1년</button>
+                                <button type="button" onClick={() => handleQuickDate("1w")} className="bg-white text-[#3b82f6] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm whitespace-nowrap">1주</button>
+                                <button type="button" onClick={() => handleQuickDate("1m")} className="bg-white text-[#3b82f6] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm whitespace-nowrap">1달</button>
+                                <button type="button" onClick={() => handleQuickDate("1y")} className="bg-white text-[#3b82f6] font-bold text-xs px-2.5 py-1.5 rounded-sm hover:bg-slate-100 transition-colors shadow-sm whitespace-nowrap">1년</button>
                               </div>
                             </div>
                           </div>
