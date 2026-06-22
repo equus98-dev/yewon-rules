@@ -1400,19 +1400,16 @@ export default function Home() {
             <div className="flex-1 flex flex-col overflow-y-auto scrollbar bg-slate-50 relative">
               <div className="max-w-[1400px] w-full mx-auto p-6 md:p-8 flex flex-col gap-8 min-h-0">
                 
-                {/* [파트 1] 상단 검색 배너 (전면 중앙 - 부드러운 배경색 및 우측 이미지) */}
-                <div className="bg-[#3b82f6] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
+                {/* [파트 1] 상단 검색 배너 (전면 중앙 - 남색 그라데이션 및 꽉 찬 배경 이미지) */}
+                <div className="bg-gradient-to-r from-[#0c3161] via-[#1e3a8a] to-[#0c3161] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
                   
-                  {/* 우측 끝 학교 배경 (규정목록 헤더와 동일한 블렌딩) */}
-                  <div 
-                    className="absolute inset-y-0 right-0 w-[90%] z-0 pointer-events-none"
-                    style={{ WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 50%)', maskImage: 'linear-gradient(to right, transparent 0%, black 50%)' }}
-                  >
+                  {/* 전체 학교 배경 (은은하게 블렌딩) */}
+                  <div className="absolute inset-0 z-0 pointer-events-none">
                     <Image
                       src="/yewon2.jpeg"
                       alt="예원예술대학교 전경"
                       fill
-                      className="object-cover object-[center_30%] opacity-50 mix-blend-multiply"
+                      className="object-cover opacity-25 mix-blend-luminosity"
                     />
                   </div>
 
