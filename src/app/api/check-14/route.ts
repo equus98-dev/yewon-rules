@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const revRes = await db.prepare(`SELECT id FROM Revision WHERE ruleId = ? ORDER BY version DESC LIMIT 1`).bind(ruleRes.id).first();
     if (!revRes) return NextResponse.json({ error: "Revision not found" });
 
-    const article = await db.prepare(`SELECT id, contentText, contentJson, contentHtml FROM Article WHERE revisionId = ? AND articleNumber = 14`).bind(revRes.id).first();
+    const article = await db.prepare(`SELECT id, contentText, contentJson, contentHtml FROM Article WHERE revisionId = ? AND articleNumber = 26`).bind(revRes.id).first();
 
     return NextResponse.json({ success: true, article });
   } catch (error: any) {
