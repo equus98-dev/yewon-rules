@@ -604,6 +604,7 @@ export default function ArticleRenderer({
     let formatted = text
       .replace(/([①-⑳])/g, (match, p1, offset, string) => {
         const before = string.slice(0, offset);
+        if (/(?:^|\n)제\d+조(?:의\d+)?\s*(?:\[.*\]|\(.*\)|\〔.*\〕)?\s*$/.test(before)) return match;
         if (/(?:제|\(|,|및|또는|와|과|이나|나)\s*$/.test(before)) return match;
         if (offset === 0 || before.endsWith('\n')) return match;
         return '\n' + match;
