@@ -928,6 +928,10 @@ export default function ArticleRenderer({
       fullText = contentText.replace(/^(?:부\s*칙\s*)+/, "").trim();
     }
 
+    // ── 2.5 DB 업데이트가 누락되었거나 너무 커서 실패한 경우를 위한 안전장치: HTML 표(table) 내부의 개행문자(엔터) 제거
+    fullText = fullText.replace(/<table[\s\S]*?<\/table>/gi, match => match.replace(/\r?\n/g, ''));
+
+
     // ── 3. 헤더 날짜 어노테이션 추출
     // 첫 토큰이 <제정 날짜> 또는 (제정 날짜) 형태이면 부칙 헤더 줄에 붙임
     let headerAnnotation = "";
