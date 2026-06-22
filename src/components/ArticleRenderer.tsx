@@ -883,12 +883,12 @@ export default function ArticleRenderer({
   for (let i = 0; i < displayItems.length - 1; i++) {
       const curr = displayItems[i];
       const next = displayItems[i+1];
-      if (curr && (curr.type === "article" || curr.type === "paragraph") && next && (next.type === "paragraph" || next.type === "text")) {
+      if (curr && (curr.type === "article" || curr.type === "paragraph" || curr.type === "text") && next && (next.type === "paragraph" || next.type === "text" || next.type === "item")) {
           const currTextPlain = String(curr.text || "").replace(/<[^>]+>/g, '').trim();
           const nextTextPlain = String(next.text || "").replace(/<[^>]+>/g, '').trim();
           if (currTextPlain === "" || /^\([^)]+\)$/.test(currTextPlain) || /^제\d+조/.test(currTextPlain)) {
               if (!/^제\d+조/.test(nextTextPlain)) {
-                  displayItems[i] = { ...curr, text: (curr.text ? curr.text + " " : "") + (next.text || "") };
+                  displayItems[i] = { ...curr, text: (curr.text ? curr.text + " " : "") + (next.num ? next.num + " " : "") + (next.text || "") };
                   displayItems.splice(i+1, 1);
                   i--;
               }
