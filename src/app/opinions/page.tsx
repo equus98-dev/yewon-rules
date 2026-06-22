@@ -181,13 +181,31 @@ export default function OpinionsPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#f3f4f6]">
-      <div className="w-[375px] shrink-0 h-full border-r border-slate-200 z-10 hidden lg:block">
-        <SidebarTree onSelectRule={() => {}} />
-      </div>
-      <main className="flex-1 flex flex-col items-center py-10 px-4 md:px-8 overflow-y-auto w-full">
-        <div className="w-full max-w-5xl bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-          <h1 className="text-3xl font-black text-[#0c3161] mb-8 border-b-2 border-[#1668a6] pb-4">의견수렴</h1>
+    <div className="flex flex-col h-screen overflow-hidden bg-slate-50 relative">
+      <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 z-25 shrink-0 shadow-sm">
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.href = '/'}>
+          <img src="/UI.png" alt="예원예술대학교 로고" className="h-10 w-auto object-contain" />
+          <span className="text-blue-900 font-extrabold text-lg ml-2 border-l border-slate-300 pl-3.5 hidden sm:inline-block tracking-tight">
+            규정관리시스템
+          </span>
+          <span className="text-xs text-slate-400 font-bold tracking-wider hidden md:inline-block pt-1 ml-1">
+            Yewon Arts University Rule Management
+          </span>
+        </div>
+        <div className="flex items-center gap-4">
+          <button onClick={() => window.location.href = '/'} className="font-bold text-sm text-slate-700 hover:text-blue-900">홈으로</button>
+          <span className="text-slate-300 font-bold select-none text-sm">|</span>
+          <button onClick={() => window.location.href = '/admin'} className="font-bold text-sm text-slate-700 hover:text-blue-900">관리자 로그인</button>
+        </div>
+      </header>
+
+      <div className="flex flex-1 overflow-hidden relative">
+        <div className="w-[375px] shrink-0 h-full border-r border-slate-200 z-10 hidden lg:block bg-white">
+          <SidebarTree onSelectRule={() => {}} />
+        </div>
+        <main className="flex-1 flex flex-col items-center py-10 px-4 md:px-8 overflow-y-auto w-full bg-[#f3f4f6]">
+          <div className="w-full max-w-5xl bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+            <h1 className="text-3xl font-black text-[#0c3161] mb-8 border-b-2 border-[#1668a6] pb-4">의견수렴</h1>
           
           {mode === "list" && (
             <>
@@ -333,6 +351,7 @@ export default function OpinionsPage() {
 
         </div>
       </main>
+      </div>
     </div>
   );
 }
