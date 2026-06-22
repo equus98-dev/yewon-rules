@@ -1,1 +1,1 @@
-SELECT A.articleNumber, A.title, A.contentJson FROM Article A JOIN Revision R ON A.revisionId = R.id JOIN Rule Ru ON R.ruleId = Ru.id WHERE Ru.name LIKE '%대학원 학칙%' AND A.articleNumber >= 8000 ORDER BY A.articleNumber ASC;
+SELECT a.id, a.articleNumber, a.title, a.contentJson, a.contentText FROM Article a JOIN Revision r ON a.revisionId = r.id JOIN Rule ru ON r.ruleId = ru.id WHERE ru.ruleNumber = '2-0-2' AND a.articleNumber = 17;

@@ -15,6 +15,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import ForumIcon from "@mui/icons-material/Forum";
 
 interface TreeNode {
   id: string;
@@ -41,8 +42,13 @@ const OpenedIcon = () => (
 );
 
 export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCategory, onTabChange, onSelectNotice, hideVerticalMenu = false }: SidebarTreeProps) {
-  // 1단 세로 메뉴 탭 상태: "규정" | "최신 제·개정" | "서식" | "공지사항" | "조직도"
-  const [verticalTab, setVerticalTab] = useState<"규정" | "최신 제·개정" | "서식" | "공지사항" | "조직도">("규정");
+  // 1단 세로 메뉴 탭 상태: "규정" | "최신 제·개정" | "서식" | "공지사항" | "조직도" | "의견수렴"
+  const [verticalTab, setVerticalTab] = useState<"규정" | "최신 제·개정" | "서식" | "공지사항" | "조직도" | "의견수렴">(() => {
+    if (typeof window !== "undefined") {
+      if (window.location.pathname.startsWith("/opinions")) return "의견수렴";
+    }
+    return "규정";
+  });
 
   // 조직도 모달 상태
   const [orgChartOpen, setOrgChartOpen] = useState(false);
@@ -289,11 +295,11 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
 
   // 1단 세로바 아이템 정보
   const verticalMenuItems = [
-    { id: "규정" as const, label: "규정", icon: <MenuBookIcon sx={{ fontSize: 26 }} /> },
-    { id: "최신 제·개정" as const, label: <React.Fragment>최신<br/>제개정</React.Fragment>, icon: <HistoryIcon sx={{ fontSize: 26 }} /> },
-    { id: "서식" as const, label: "서식", icon: <DescriptionIcon sx={{ fontSize: 26 }} /> },
-    { id: "공지사항" as const, label: "공지", icon: <CampaignIcon sx={{ fontSize: 26 }} /> },
-    // { id: "조직도" as const, label: "조직도", icon: <AccountTreeIcon sx={{ fontSize: 26 }} /> },
+    { id: "규정" as const, label: "규정", icon: <MenuBookIcon sx={{ fontSize: 26 }} />, href: "/" },
+    { id: "최신 제·개정" as const, label: <React.Fragment>최신<br/>제개정</React.Fragment>, icon: <HistoryIcon sx={{ fontSize: 26 }} />, href: "/" },
+    { id: "서식" as const, label: "서식", icon: <DescriptionIcon sx={{ fontSize: 26 }} />, href: "/" },
+    { id: "공지사항" as const, label: "공지", icon: <CampaignIcon sx={{ fontSize: 26 }} />, href: "/" },
+    { id: "의견수렴" as const, label: "의견수렴", icon: <ForumIcon sx={{ fontSize: 26 }} />, href: "/opinions" },
   ];
 
   return (
@@ -308,6 +314,10 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
               <button
                 key={item.id}
                 onClick={() => {
+                  if (item.href && window.location.pathname !== item.href) {
+                    window.location.href = item.href + (item.id !== "규정" && item.id !== "의견수렴" ? `?tab=${encodeURIComponent(item.id)}` : "");
+                    return;
+                  }
                   setVerticalTab(item.id);
                   if (onTabChange) onTabChange(item.id);
                 }}

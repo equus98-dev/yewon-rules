@@ -192,16 +192,16 @@ export default function AdminNotices() {
             등록된 공지사항이 아직 존재하지 않습니다. 우측 상단의 신규 등록 버튼을 눌러 첫 공지를 띄워 보세요!
           </div>
         ) : (
-          <div className="max-w-[1400px] mx-auto bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden flex flex-col">
+          <div className="w-full bg-white border-t-2 border-[#007073] shadow-sm overflow-hidden flex flex-col">
             <div className="overflow-x-auto">
               <table className="w-full text-[15px] text-left border-collapse">
-                <thead className="bg-[#f8fafc] border-b border-slate-200">
-                  <tr className="text-slate-800 select-none font-bold">
-                    <th className="py-4 px-5 w-16 text-center font-black border-r border-slate-200">번호</th>
-                    <th className="py-4 px-4 w-32 text-center font-black border-r border-slate-200">작성 부서</th>
+                <thead>
+                  <tr className="bg-[#007073] text-white select-none font-bold text-[15px]">
+                    <th className="py-4 px-5 w-16 text-center font-black border-r border-[#009b9e]/40">번호</th>
+                    <th className="py-4 px-4 w-32 text-center font-black border-r border-[#009b9e]/40">작성 부서</th>
                     <th className="py-4 px-4 font-black text-center">공지사항 제목</th>
-                    <th className="py-4 px-4 w-36 text-center font-black border-l border-slate-200">화면 노출일</th>
-                    <th className="py-4 px-5 w-24 text-center font-black border-l border-slate-200">관리 액션</th>
+                    <th className="py-4 px-4 w-36 text-center font-black border-l border-[#009b9e]/40">화면 노출일</th>
+                    <th className="py-4 px-5 w-24 text-center font-black border-l border-[#009b9e]/40">관리 액션</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">

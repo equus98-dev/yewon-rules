@@ -400,22 +400,22 @@ export default function AdminRulesManagement() {
 
       {/* 2. 메인 규정 테이블 영역 */}
       <div className="flex-1 overflow-auto p-8 scrollbar">
-        <div className="max-w-[1400px] mx-auto bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden flex flex-col">
+        <div className="w-full bg-white border-t-2 border-[#007073] shadow-sm overflow-hidden flex flex-col">
           <table className="w-full text-sm text-left border-collapse">
-            <thead className="bg-[#f8fafc] border-b border-slate-200">
-              <tr className="text-slate-800 select-none text-[15px]">
-                <th className="py-4 px-4 font-black w-14 text-center border-r border-slate-200">번호</th>
+            <thead>
+              <tr className="bg-[#007073] text-white select-none text-[15px]">
+                <th className="py-4 px-4 font-black w-14 text-center border-r border-[#009b9e]/40">번호</th>
                 <th className="py-4 px-4 font-black text-center">규정명 / 분류</th>
-                <th className="py-4 px-4 font-black w-24 text-center border-l border-slate-200">규정번호</th>
-                <th className="py-4 px-4 font-black w-40 text-center border-l border-slate-200">
+                <th className="py-4 px-4 font-black w-24 text-center border-l border-[#009b9e]/40">규정번호</th>
+                <th className="py-4 px-4 font-black w-40 text-center border-l border-[#009b9e]/40">
                   <div className="flex items-center justify-center gap-1">
                     <BusinessIcon sx={{ fontSize: 14 }} />
                     소관부서
                   </div>
                 </th>
-                <th className="py-4 px-4 font-black w-32 text-center border-l border-slate-200">제·개정일</th>
-                <th className="py-4 px-4 font-black w-20 text-center border-l border-slate-200">상태</th>
-                <th className="py-4 px-4 font-black w-64 text-center border-l border-slate-200">작업</th>
+                <th className="py-4 px-4 font-black w-32 text-center border-l border-[#009b9e]/40">제·개정일</th>
+                <th className="py-4 px-4 font-black w-20 text-center border-l border-[#009b9e]/40">상태</th>
+                <th className="py-4 px-4 font-black w-64 text-center border-l border-[#009b9e]/40">작업</th>
               </tr>
             </thead>
             <tbody>
