@@ -1441,9 +1441,10 @@ export default function ArticleRenderer({
             );
           }
           const isGluedArticle = /^\s*제\d+(?:조|장|관|절)/.test(safeText);
+          const textToFormat = safeNum ? `${safeNum} ${safeText}` : safeText;
           return (
             <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full ${isGluedArticle ? '' : 'pl-[1.25rem]'} my-1.5 ${interactiveClass}`}>
-              {formatGluedText(safeText, false)}
+              {formatGluedText(textToFormat, false)}
               
             </div>
           );

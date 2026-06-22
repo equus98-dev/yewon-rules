@@ -1,7 +1,13 @@
-const text = '이 규정은... 한다. 제2조(적용범위) ... 재무회계규칙 제52조(법인에 비치할 장부와 서류) 및 제53조(학교에 비치할 장부와 서류)에 의한다.';
+const HISTORY_REGEX = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
 
-const regex1 = /((?<![『「])제\d+조의?\d*\s*(?:\[(?![\s\S]*?\[\/cite\])|[〔(（])[^\]〕)）]+[\]〕)）])/g;
-console.log('Original regex:', text.replace(regex1, '\n\n$1'));
+console.log("Match 2026:", HISTORY_REGEX.test("<삭제 2026.02.24>"));
+HISTORY_REGEX.lastIndex = 0;
+console.log("Match 2022 space:", HISTORY_REGEX.test("<삭제 2022. 1. 24.>"));
+HISTORY_REGEX.lastIndex = 0;
+console.log("Match 2016:", HISTORY_REGEX.test("<개정 2016. 11. 17.>"));
 
-const regex2 = /(^|\n|\.\s*)((?<![『「])제\d+조의?\d*\s*(?:\[(?![\s\S]*?\[\/cite\])|[〔(（])[^\]〕)）]+[\]〕)）])/g;
-console.log('New regex:', text.replace(regex2, '$1\n\n$2'));
+// Let's test the parts split logic
+const splitRegex = /(\[cite\s+rule="[^"]*"\s+article="[^"]*"(?:\s+url="[^"]*")?\][\s\S]*?\[\/cite\]|\[nocite\][\s\S]*?\[\/nocite\]|[<(](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)[^>)]*[>)])/gi;
+console.log("Split 2026:", "<삭제 2026.02.24>".split(splitRegex));
+console.log("Split 2022:", "<삭제 2022. 1. 24.>".split(splitRegex));
+console.log("Split 2016:", "<개정 2016. 11. 17.>".split(splitRegex));
