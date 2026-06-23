@@ -70,10 +70,25 @@ export async function GET(request: Request) {
          LEFT JOIN "Category" c ON r."categoryId" = c.id
          LEFT JOIN "Department" d ON r."departmentId" = d.id
          ${finalWhereClause}
-         ORDER BY string_to_array(r."ruleNumber", '-')::int[] ASC, r.title ASC`,
+         ORDER BY r.title ASC`,
         [...values, ...revValues]
       );
-      return NextResponse.json(res.rows);
+      
+      const sortedRows = res.rows.sort((a: any, b: any) => {
+        if (!a.ruleNumber && !b.ruleNumber) return 0;
+        if (!a.ruleNumber) return 1;
+        if (!b.ruleNumber) return -1;
+        const partsA = a.ruleNumber.split('-').map(Number);
+        const partsB = b.ruleNumber.split('-').map(Number);
+        for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+          const valA = partsA[i] || 0;
+          const valB = partsB[i] || 0;
+          if (valA !== valB) return valA - valB;
+        }
+        return 0;
+      });
+
+      return NextResponse.json(sortedRows);
     }
 
     const optionList = options.split(",");
