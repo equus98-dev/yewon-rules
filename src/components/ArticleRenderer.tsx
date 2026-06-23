@@ -1506,6 +1506,7 @@ export default function ArticleRenderer({
                                   articleNumOverride = numMatch[1];
                                   articleTitleOverride = numMatch[2] + (articleTitleOverride || "");
                               }
+                              articleNumOverride = articleNumOverride.replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
                           }
 
                           if (articleTitleOverride) {
@@ -1513,8 +1514,9 @@ export default function ArticleRenderer({
                           }
 
                           if (parsedTitle) {
-                             actualBody = actualBody.replace(parsedTitle, "").trim();
+                             actualBody = actualBody.replace(parsedTitle, "");
                           }
+                          actualBody = actualBody.replace(/^(?:\s|&nbsp;|<br\s*\/?>|<\/?p[^>]*>)+/gi, '').trim();
 
                           if (!safeNum && /^제\d+조/.test(plainText)) {
                             const match = safeText.match(/^(제\d+조(?:의|\s+)?\d*)\s*[\[〔(（]([^\]〕)）]+)[\]〕)）](.*)/);
