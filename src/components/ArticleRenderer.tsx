@@ -256,6 +256,14 @@ export default function ArticleRenderer({
         return '<br/>' + match;
       });
 
+      // 1-5. Hangs (①~⑳) should start on a new line if they are glued to previous text
+      cleanHtml = cleanHtml.replace(/([①-⑳])/g, (match, p1, offset, str) => {
+        const before = str.slice(0, offset);
+        if (before.match(/(?:<br\s*\/?>|<\/p>|<p>|<div[^>]*>|<td[^>]*>|<th[^>]*>|<li[^>]*>)\s*$/i)) return match;
+        if (before.match(/(?:^|\n)\s*$/)) return match;
+        return '<br/>' + match;
+      });
+
       // 2. Normal Parentheses: Break only if boundary conditions are met, or if it is an Addendum Article
       cleanHtml = cleanHtml.replace(/(\((?:<[^>]+>)*[가-힣A-Za-z0-9\s·,\u200B-\u200D\uFEFF]{2,}[^)]*\))/g, (match, paren, offset, str) => {
         const before = str.slice(0, offset);
