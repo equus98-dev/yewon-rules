@@ -728,6 +728,7 @@ export default function ArticleRenderer({
     // 1. Convert block-level HTML tags (<p>, <br>) to newlines so that we can process lines accurately.
     let formatted = text
       .replace(/<\/?p[^>]*>/gi, '\n')
+      .replace(/<\/?div[^>]*>/gi, '\n')
       .replace(/<br\s*\/?>/gi, '\n')
       .replace(/&nbsp;/gi, ' ')
       .replace(/\n\s*①/g, ' ①')
@@ -1555,7 +1556,7 @@ export default function ArticleRenderer({
                             <>
                               <span className="font-bold text-[#000080]">{articleNumOverride}</span>
                               {articleTitleOverride && <span className="font-normal text-slate-800 ml-1 mr-1">{articleTitleOverride}</span>}
-                              {actualBody && <span className="font-normal"> {formatGluedText(actualBody, true)}</span>}
+                              {actualBody && <> {formatGluedText(actualBody, true)}</>}
                             </>
                           );
                         })()}
