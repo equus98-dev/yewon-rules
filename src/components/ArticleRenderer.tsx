@@ -246,6 +246,23 @@ export default function ArticleRenderer({
     }
 
     if (cleanHtml) {
+      // 1-6. Hos (1., 2. etc) should start on a new line
+      cleanHtml = cleanHtml.replace(/(^|[^0-9a-zA-Z가-힣])(\d{1,2}(?:의\d+)?\.)\s*(?=[^\d])/g, (match, p1, p2, offset, str) => {
+        const before = str.slice(0, offset + p1.length);
+        if (before.match(/(?:<br\s*\/?>|<\/p>|<p>|<div[^>]*>|<td[^>]*>|<th[^>]*>|<li[^>]*>)\s*$/i)) return match;
+        if (before.match(/(?:^|\n)\s*$/)) return match;
+        // 인용구 생략
+        if (before.match(/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/)) return match;
+        // 날짜 내부 생략
+        if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+        // < > 내부 태그는 cleanHtml이므로 태그 자체일 수 있지만, 속성값 내부 방지용으로 추가
+        const openAngles = (before.match(/</g) || []).length;
+        const closeAngles = (before.match(/>/g) || []).length;
+        if (openAngles > closeAngles) return match;
+        
+        return p1 + '<br/>' + p2 + ' ';
+      });
+
       // 1. Addendum Keywords: Break unconditionally only in Addendum Articles
       cleanHtml = cleanHtml.replace(/(\([^)]*(?:시행일|경과조치|적용례|적용범위|준용|폐지|예외|단서|특례|임기|존속기간|관련|시행|적용)[^)]*\))/g, (match, paren, offset, str) => {
         const before = str.slice(0, offset);
@@ -630,10 +647,19 @@ export default function ArticleRenderer({
         
         return '\n' + match;
       })
-      .replace(/(?<!\d+(?:의\d+)?\.\s*)(?<!\d)(\d{1,2}(?:의\d+)?\.)\s+(?=[^\d])/g, (match, p1, offset, string) => {
-        const before = string.slice(0, offset);
+      .replace(/(^|[^0-9a-zA-Z가-힣])(\d{1,2}(?:의\d+)?\.)\s*(?=[^\d])/g, (match, p1, p2, offset, string) => {
+        const before = string.slice(0, offset + p1.length);
         if (offset === 0 || before.match(/(?:^|\n)\s*$/)) return match;
-        return '\n' + p1 + ' ';
+        // 인용구인 경우 생략
+        if (before.match(/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/)) return match;
+        // 날짜(예: 2008. 7.) 내부인 경우 생략
+        if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+        // < > 태그 내부인 경우 생략
+        const openAngles = (before.match(/</g) || []).length;
+        const closeAngles = (before.match(/>/g) || []).length;
+        if (openAngles > closeAngles) return match;
+        
+        return p1 + '\n' + p2 + ' ';
       })
       .replace(/(^|\s)([가-하]\.)[ \t]+/g, (match, p1, p2, offset, string) => {
         const before = string.slice(0, offset + p1.length);
