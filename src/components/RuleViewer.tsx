@@ -133,10 +133,57 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
   const currentRevision = ruleData?.currentRevision;
 
+  const addendumDates = useMemo(() => {
+    if (!currentRevision || !currentRevision.articles || !Array.isArray(currentRevision.articles)) {
+      return { oldestDate: null, latestDate: null };
+    }
+    const addenda = currentRevision.articles.filter(isAddendumArticle);
+    let oldestDate: Date | null = null;
+    let latestDate: Date | null = null;
+    const dateRegex = /(19|20)\d{2}\s*(?:년|\.)\s*\d{1,2}\s*(?:월|\.)\s*\d{1,2}\s*(?:일|\.)?/g;
+
+    for (const a of addenda) {
+      let textToScan = a.contentText || "";
+      if (!textToScan && a.contentJson) {
+        try {
+          const parsed = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
+          if (Array.isArray(parsed)) {
+            textToScan = parsed.map((i: any) => i.text || "").join(" ");
+          } else if (parsed.paragraphs) {
+            textToScan = parsed.paragraphs.join(" ");
+          }
+        } catch (e) {}
+      }
+
+      let match;
+      while ((match = dateRegex.exec(textToScan)) !== null) {
+        const rawMatch = match[0].replace(/[년월일\s]/g, '.');
+        const parts = rawMatch.split('.').filter(p => p.length > 0).map(Number);
+        if (parts.length >= 3) {
+          const d = new Date(parts[0], parts[1] - 1, parts[2]);
+          if (!isNaN(d.getTime())) {
+            if (!oldestDate || d < oldestDate) {
+              oldestDate = d;
+            }
+            if (!latestDate || d > latestDate) {
+              latestDate = d;
+            }
+          }
+        }
+      }
+    }
+    return { oldestDate, latestDate };
+  }, [currentRevision]);
+
   const calculatedEnactmentDateStr = useMemo(() => {
     if (!ruleData) return "미정";
 
-    // 1. Check if there's any explicit ENACTMENT revision in history
+    // 1. 부칙(Addendum) 본문에 기재된 최초 부칙 일자를 최우선 제정일로 적용
+    if (addendumDates.oldestDate) {
+      return addendumDates.oldestDate.toLocaleDateString('ko-KR');
+    }
+
+    // 2. 부칙에 명시적 날짜가 없을 경우, DB 리비전 이력 중 ENACTMENT 리비전의 날짜를 사용
     if (ruleData.revisions && Array.isArray(ruleData.revisions)) {
       const enactmentRev = ruleData.revisions.find((r: any) => r.revisionType === 'ENACTMENT');
       if (enactmentRev && enactmentRev.enactmentDate) {
@@ -145,47 +192,35 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       }
     }
 
-    // 2. Scan '부칙' (Addendum) to find the oldest date
-    if (currentRevision && currentRevision.articles && Array.isArray(currentRevision.articles)) {
-      const addenda = currentRevision.articles.filter(isAddendumArticle);
-      let oldestDate: Date | null = null;
-      const dateRegex = /(19|20)\d{2}\s*(년|\.)\s*\d{1,2}\s*(월|\.)\s*\d{1,2}\s*(일|\.)?/g;
+    return "미정";
+  }, [ruleData, addendumDates]);
 
-      for (const a of addenda) {
-        let textToScan = a.contentText || "";
-        if (!textToScan && a.contentJson) {
-          try {
-            const parsed = typeof a.contentJson === "string" ? JSON.parse(a.contentJson) : a.contentJson;
-            if (Array.isArray(parsed)) {
-              textToScan = parsed.map(i => i.text || "").join(" ");
-            } else if (parsed.paragraphs) {
-              textToScan = parsed.paragraphs.join(" ");
-            }
-          } catch (e) {}
-        }
+  const calculatedEffectiveDateStr = useMemo(() => {
+    if (!ruleData) return "미정";
 
-        let match;
-        while ((match = dateRegex.exec(textToScan)) !== null) {
-          const rawMatch = match[0].replace(/[년월일\s]/g, '.');
-          const parts = rawMatch.split('.').filter(p => p.length > 0).map(Number);
-          if (parts.length >= 3) {
-            const d = new Date(parts[0], parts[1] - 1, parts[2]);
-            if (!isNaN(d.getTime())) {
-              if (!oldestDate || d < oldestDate) {
-                oldestDate = d;
-              }
-            }
-          }
+    // 1. 부칙(Addendum) 본문에 기재된 가장 최근 부칙의 시행일을 최우선 시행일로 적용
+    if (addendumDates.latestDate) {
+      if (currentRevision?.effectiveDate) {
+        const revEff = new Date(currentRevision.effectiveDate);
+        if (!isNaN(revEff.getTime()) && revEff > addendumDates.latestDate) {
+          return revEff.toLocaleDateString('ko-KR');
         }
       }
+      return addendumDates.latestDate.toLocaleDateString('ko-KR');
+    }
 
-      if (oldestDate) {
-        return oldestDate.toLocaleDateString('ko-KR');
-      }
+    // 2. 부칙에 날짜가 없을 경우 기존처럼 DB 리비전 정보 사용
+    if (currentRevision?.effectiveDate) {
+      const d = new Date(currentRevision.effectiveDate);
+      if (!isNaN(d.getTime())) return d.toLocaleDateString('ko-KR');
+    }
+    if (currentRevision?.enactmentDate) {
+      const d = new Date(currentRevision.enactmentDate);
+      if (!isNaN(d.getTime())) return d.toLocaleDateString('ko-KR');
     }
 
     return "미정";
-  }, [ruleData, currentRevision]);
+  }, [ruleData, currentRevision, addendumDates]);
 
   const tocItems = useMemo(() => {
     if (!currentRevision || !currentRevision.articles) return [];
@@ -953,8 +988,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             {/* 법령 정보 (시행일, 담당부서) */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 border-b-2 border-slate-700 pb-3 gap-3">
               <div className="text-[14px] font-medium text-[#1E5D9B]">
-                [시행 {currentRevision?.effectiveDate ? new Date(currentRevision.effectiveDate).toLocaleDateString('ko-KR') : (currentRevision?.enactmentDate ? new Date(currentRevision.enactmentDate).toLocaleDateString('ko-KR') : "미정")}] 
-                [제정 {calculatedEnactmentDateStr}]
+                [시행 {calculatedEffectiveDateStr}] [제정 {calculatedEnactmentDateStr}]
                 {currentRevision?.revisionType && currentRevision.revisionType !== 'ENACTMENT' ? ` [${getRevisionTypeName(currentRevision.revisionType)} ${currentRevision.enactmentDate ? new Date(currentRevision.enactmentDate).toLocaleDateString('ko-KR') : "미정"}]` : ""}
               </div>
               <div className="text-right text-[13.5px] font-medium text-slate-700 flex items-center justify-end gap-1">
