@@ -86,7 +86,7 @@ export default function RuleEditPage({ id }: { id: string }) {
     height: 600,
     askBeforePasteHTML: false,
     askBeforePasteFromWord: false,
-    defaultActionOnPaste: "insert_as_html",
+    defaultActionOnPaste: "insert_as_html" as "insert_as_html",
     style: {
       fontFamily: "'Pretendard', sans-serif",
       fontSize: "15px",
