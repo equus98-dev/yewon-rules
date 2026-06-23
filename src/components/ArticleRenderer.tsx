@@ -527,6 +527,7 @@ export default function ArticleRenderer({
 
     // 1-5. Hangs (①~⑳) should start on a new line if they are glued to previous text
     htmlText = htmlText.replace(/([①-⑳])/g, (match, p1, offset, str) => {
+      if (offset === 0) return match;
       const before = str.slice(0, offset);
       // 조문 제목 바로 뒤에 나오는 ① 등은 줄바꿈하지 않음
       if (before.match(/(?:^|<[^>]+>)*제\d+조(?:의\d+)?(?:<[^>]+>)*\s*(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*$/)) return match;
@@ -638,6 +639,9 @@ export default function ArticleRenderer({
                    titleText = "";
                    bodyText = match2[2].trim();
                }
+               
+               // Remove leading <br/> from bodyText so it doesn't force a newline
+               bodyText = bodyText.replace(/^(?:<br\s*\/?>\s*)+/i, '');
                
                const fullTitle = articleNum + titleText;
                const { historyDates, badgeType, badgeColor } = getBadgeInfo(text.split(/<table/i)[0]);
