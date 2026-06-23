@@ -1519,7 +1519,7 @@ export default function ArticleRenderer({
                           actualBody = actualBody.replace(/^(?:\s|&nbsp;|<br\s*\/?>|<\/?p[^>]*>)+/gi, '').trim();
 
                           if (/^제\d+조/.test(plainText)) {
-                            const match = plainText.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^()]*?(?:\([^()]*\)[^()]*?)*)[\]〕)）](.*)/);
+                            const match = plainText.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^()]*?(?:\([^()]*\)[^()]*?)*)[\]〕)）]([\s\S]*)/);
                             if (match) {
                                articleNumOverride = match[1].replace(/\s/g, '');
                                if (articleNumOverride.match(/^제\d+조\d+$/)) {
@@ -1533,7 +1533,7 @@ export default function ArticleRenderer({
                                const remover = new RegExp('^(?:\\s|&nbsp;|<[^>]+>)*' + regexPattern, 'i');
                                actualBody = actualBody.replace(remover, '').trim();
                             } else {
-                               const match2 = plainText.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)(.*)/);
+                               const match2 = plainText.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)([\s\S]*)/);
                                if (match2) {
                                    articleNumOverride = match2[1].replace(/\s/g, '');
                                    if (articleNumOverride.match(/^제\d+조\d+$/)) {
