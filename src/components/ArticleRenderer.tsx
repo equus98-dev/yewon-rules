@@ -574,6 +574,9 @@ export default function ArticleRenderer({
       (match) => `<span class="text-sky-700 font-medium text-[13px] ml-1">${normalizeHistoryDate(match).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
     );
 
+    // HTML에서 \n은 공백으로 처리되어 줄바꿈이 사라지므로, <br/>로 변환
+    htmlText = htmlText.replace(/\n/g, '<br/>');
+
     // 1-5. Hangs (①~⑳) should start on a new line if they are glued to previous text
     htmlText = htmlText.replace(/([①-⑳])/g, (match, p1, offset, str) => {
       if (offset === 0) return match;
@@ -582,8 +585,8 @@ export default function ArticleRenderer({
       if (before.match(/^(?:<[^>]+>)*(?:제\d+조(?:의\d+)?(?:<[^>]+>)*\s*)?(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*$/)) return match;
       // 인용구인 경우 (예: 제①항, 제1항 및 ②항) 줄바꿈 생략
       if (/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/.test(before)) return match;
+      // <br/>, </p>, <p> 등 블록 요소 뒤에는 이미 줄바꿈이 있으므로 추가하지 않음
       if (before.match(/(?:<br\s*\/?>|<\/p>|<p>|<div[^>]*>|<td[^>]*>|<th[^>]*>|<li[^>]*>)\s*$/i)) return match;
-      if (before.match(/(?:^|\n)\s*$/)) return match;
       return '<br/>' + match;
     });
     
