@@ -1408,6 +1408,9 @@ function EditorContent() {
                                       readonly: false,
                                       placeholder: '여기에 조문 내용을 입력하세요...',
                                       height: 300,
+                                      askBeforePasteHTML: false,
+                                      askBeforePasteFromWord: false,
+                                      defaultActionOnPaste: "insert_as_html",
                                       style: {
                                         fontFamily: "'Pretendard', sans-serif",
                                         fontSize: "15px",
@@ -1692,6 +1695,9 @@ function EditorContent() {
                     readonly: false,
                     placeholder: '여기에 부칙 내용을 직접 입력하거나 수정하세요...',
                     height: 250,
+                    askBeforePasteHTML: false,
+                    askBeforePasteFromWord: false,
+                    defaultActionOnPaste: "insert_as_html",
                     style: {
                       fontFamily: "'Pretendard', sans-serif",
                       fontSize: "14px",
