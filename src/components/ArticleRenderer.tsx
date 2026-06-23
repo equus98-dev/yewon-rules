@@ -1535,9 +1535,31 @@ export default function ArticleRenderer({
           </div>
         </DialogTitle>
         <DialogContent className="p-6 bg-white">
-          <pre className="whitespace-pre-wrap text-[13.5px] font-['Pretendard'] text-slate-700 leading-relaxed font-medium mt-2">
-            {modalHistory?.join("\n")}
-          </pre>
+          <div className="text-[13.5px] font-['Pretendard'] text-slate-700 leading-relaxed font-medium mt-2">
+            {modalHistory?.map((item: any, idx: number) => {
+              if (!item) return null;
+              if (typeof item === 'string') {
+                return <div key={idx} className="mb-1">{item}</div>;
+              }
+              if (item.isSimpleString) {
+                return <div key={idx} className="mb-1">{item.text}</div>;
+              }
+              return (
+                <div key={idx} className="mb-4 border-b border-slate-100 pb-4 last:border-0 last:mb-0 last:pb-0">
+                  <div className="font-bold text-blue-700 mb-1">
+                    {item.afterVersion} ({new Date(item.afterDate).toLocaleDateString()} 시행)
+                  </div>
+                  {item.note && <div className="text-slate-600 mb-2 text-xs">사유: {item.note}</div>}
+                  <div className="bg-slate-50 p-3 rounded text-[13px]">
+                    <div className="text-slate-500 text-xs mb-1 font-bold">변경 전</div>
+                    <div className="line-through opacity-70 mb-3 whitespace-pre-wrap">{item.beforeText || "(없음)"}</div>
+                    <div className="text-slate-500 text-xs mb-1 font-bold">변경 후</div>
+                    <div className="whitespace-pre-wrap">{item.afterText || "(삭제됨)"}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </DialogContent>
       </Dialog>
 
