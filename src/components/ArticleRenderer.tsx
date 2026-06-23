@@ -604,8 +604,56 @@ export default function ArticleRenderer({
 
   // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
   const formatGluedText = (text: string, isArticleBody: boolean = false): React.ReactNode => {
-    if (/<table|<tr|<td|<th/i.test(text)) {
-      return renderTextWithHistory(text);
+    // 만약 전체 텍스트 내에 테이블 태그가 포함되어 있다면, 분할(split('\n')) 시 테이블 태그가 깨지는 것을 방지해야 함.
+    // 하지만 텍스트가 제N조로 시작하는 경우 조문 제목과 뱃지는 추출해서 렌더링해야 함.
+    const hasTable = /<table|<tr|<td|<th/i.test(text);
+    
+    if (hasTable) {
+        // 테이블이 있지만 제N조로 시작하는 경우 제목을 먼저 추출
+        if (/^\s*제\d+(?:조|장|관|절)/.test(text)) {
+           const match2 = text.match(/^\s*(제\d+조(?:의|\s+)?\d*)\s*[\[〔(（]([^\]〕)）]+)[\]〕)）]([\s\S]*)/i) || text.match(/^\s*(제\d+조(?:의|\s+)?\d*)\s*([\s\S]*)/i);
+           if (match2) {
+               let articleNum = match2[1].replace(/\s/g, '');
+               if (articleNum.match(/^제\d+조\d+$/)) {
+                   articleNum = articleNum.replace(/조(\d+)$/, '조의$1');
+               }
+               
+               let titleText = "";
+               let bodyText = "";
+               
+               if (match2.length === 4) { // First regex matched
+                   titleText = `(${match2[2].trim()})`;
+                   bodyText = match2[3].trim();
+               } else { // Second regex matched
+                   titleText = "";
+                   bodyText = match2[2].trim();
+               }
+               
+               const fullTitle = articleNum + titleText;
+               const { historyDates, badgeType, badgeColor } = getBadgeInfo(text.split(/<table/i)[0]);
+               
+               return (
+                  <div key={`glued-table`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full group/text">
+                     {renderEditButton(true)}
+                     {!hideBadge && (
+                       <button 
+                         onClick={(e) => { e.stopPropagation(); handleOpenHistory(historyDates); }}
+                         className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
+                       >
+                         {badgeType}
+                       </button>
+                     )}
+                     <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
+                        <div className="w-full break-keep inline-block">
+                           <span className="font-bold mr-1 text-[#000080]">{fullTitle}</span>
+                           {bodyText && <span className="font-normal text-slate-800">{renderTextWithHistory(bodyText)}</span>}
+                        </div>
+                     </div>
+                  </div>
+               );
+           }
+        }
+        return renderTextWithHistory(text);
     }
 
     if (text.length < 50 && !/^\s*제\d+(?:조|장|관|절)/.test(text)) {

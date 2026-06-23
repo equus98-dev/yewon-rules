@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     const response = await fetch(targetUrl);
     
     if (!response.ok) {
-      return NextResponse.json({ error: "File not found on remote storage" }, { status: 404 });
+      return NextResponse.json({ error: "File not found on remote storage", targetUrl: targetUrl }, { status: 404 });
     }
 
     // 파일 이름 설정
