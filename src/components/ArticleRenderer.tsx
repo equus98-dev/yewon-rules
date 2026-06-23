@@ -669,7 +669,7 @@ export default function ArticleRenderer({
     if (hasTable) {
         // 테이블이 있지만 제N조로 시작하는 경우 제목을 먼저 추출
         if (/^\s*제\d+(?:조|장|관|절)/.test(text)) {
-           const match2 = text.match(/^\s*(제\d+조(?:의|\s+)?\d*)\s*[\[〔(（]([^\]〕)）]+)[\]〕)）]([\s\S]*)/i) || text.match(/^\s*(제\d+조(?:의|\s+)?\d*)\s*([\s\S]*)/i);
+           const match2 = text.match(/^\s*(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^()]*?(?:\([^()]*\)[^()]*?)*)[\]〕)）]([\s\S]*)/i) || text.match(/^\s*(제\d+조(?:의|\s+)?\d*)\s*([\s\S]*)/i);
            if (match2) {
                let articleNum = match2[1].replace(/\s/g, '');
                if (articleNum.match(/^제\d+조\d+$/)) {
@@ -955,14 +955,20 @@ export default function ArticleRenderer({
              }
              lineClass += " ml-4 block";
           } else if (/^제\d+조/.test(trimmed) && !/[『「]$/.test(trimmed.slice(0, trimmed.search(/제\d+조/)))) {
-             const match2 = trimmed.match(/^(제\d+조(?:의|\s+)?\d*)\s*(.*)/);
-             if (match2) {
-                 let articleNum = match2[1].replace(/\s/g, '');
+             const m = trimmed.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^()]*?(?:\([^()]*\)[^()]*?)*)[\]〕)）]([\s\S]*)/) || trimmed.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)(.*)/);
+             if (m) {
+                 let articleNum = m[1].replace(/\s/g, '');
                  if (articleNum.match(/^제\d+조\d+$/)) {
                      articleNum = articleNum.replace(/조(\d+)$/, '조의$1');
                  }
-                 const body = match2[2].trim();
-                 const fullTitle = articleNum;
+                 let titleText = "";
+                 let body = "";
+                 if (m.length === 4) {
+                     titleText = `(${m[2].trim()})`;
+                     body = m[3].trim();
+                 } else {
+                     body = m[2].trim();
+                 }
                  const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
                  return (
                     <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full group/text">
@@ -977,8 +983,9 @@ export default function ArticleRenderer({
                        )}
                        <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
                           <div className="w-full break-keep inline-block">
-                             <span className="font-bold mr-1 text-[#000080]">{fullTitle}</span>
-                             {body && <span className="font-normal text-slate-800">{renderTextWithHistory(body)}</span>}
+                             <span className="font-bold text-[#000080]">{articleNum}</span>
+                             {titleText && <span className="font-normal text-slate-800 ml-1 mr-1">{titleText}</span>}
+                             {body && <> {formatGluedText(body, true)}</>}
                           </div>
                        </div>
                     </div>
