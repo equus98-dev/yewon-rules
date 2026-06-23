@@ -54,12 +54,14 @@ export async function GET(request: Request) {
           (SELECT "versionName" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "latestVersionName",
           (SELECT "enactmentDate" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "enactmentDate",
           (SELECT "announcementNumber" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "announcementNumber",
-          (SELECT "revisionType" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "revisionType"
+          (SELECT "revisionType" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "revisionType",
+          (SELECT a."fileUrl" FROM "Attachment" a WHERE a."ruleId" = r.id AND (a."fileType" ILIKE '%hwp%' OR a.title ILIKE '%.hwp') AND a.title NOT ILIKE '%서식%' AND a.title NOT ILIKE '%별표%' AND a.title NOT ILIKE '%별지%' LIMIT 1) AS "hwpUrl",
+          (SELECT a."fileUrl" FROM "Attachment" a WHERE a."ruleId" = r.id AND (a."fileType" ILIKE '%pdf%' OR a.title ILIKE '%.pdf') AND a.title NOT ILIKE '%서식%' AND a.title NOT ILIKE '%별표%' AND a.title NOT ILIKE '%별지%' LIMIT 1) AS "pdfUrl"
          FROM "Rule" r
          LEFT JOIN "Category" c ON r."categoryId" = c.id
          LEFT JOIN "Department" d ON r."departmentId" = d.id
          ${finalWhereClause}
-         ORDER BY r.title ASC`,
+         ORDER BY string_to_array(r."ruleNumber", '-')::int[] ASC, r.title ASC`,
         [...values, ...revValues]
       );
       return NextResponse.json(res.rows);

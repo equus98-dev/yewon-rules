@@ -897,7 +897,7 @@ export default function Home() {
               </div>
 
               <div className="flex-1 p-8">
-                <div className="max-w-6xl mx-auto">
+                <div className="w-full h-full">
                   <div className="flex flex-col gap-4">
                     {/* 건수 및 페이지 표시 */}
                     <div className="flex items-center text-[15px] font-extrabold text-slate-700 select-none mb-3">
@@ -943,14 +943,29 @@ export default function Home() {
                                     }}
                                     className="text-slate-800 font-medium hover:text-blue-800 cursor-pointer text-[15.5px] transition-colors"
                                   >
-                                    {rule.title}
+                                    {rule.ruleNumber && `${rule.ruleNumber} `}{rule.title}
                                   </button>
                                 </td>
                                 <td className="py-4 px-4 text-center text-slate-600 font-medium text-[15px]">
                                   {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString() : "-"}
                                 </td>
                                 <td className="py-4 px-4 text-center">
-                                  <span className="text-[15px] text-slate-400 font-medium">-</span>
+                                  <div className="flex items-center justify-center gap-1.5">
+                                    {rule.hwpUrl ? (
+                                      <a href={`/api/download?fileUrl=${encodeURIComponent(rule.hwpUrl)}`} target="_blank" rel="noopener noreferrer" className="px-2 py-1 bg-white border border-slate-300 text-[12px] font-bold text-slate-600 rounded hover:bg-slate-50 transition-colors shadow-sm">
+                                        HWP
+                                      </a>
+                                    ) : (
+                                      <span className="text-[12px] text-slate-300 font-medium">-</span>
+                                    )}
+                                    {rule.pdfUrl ? (
+                                      <a href={`/api/download?fileUrl=${encodeURIComponent(rule.pdfUrl)}&inline=true`} target="_blank" rel="noopener noreferrer" className="px-2 py-1 bg-white border border-slate-300 text-[12px] font-bold text-slate-600 rounded hover:bg-slate-50 transition-colors shadow-sm">
+                                        PDF
+                                      </a>
+                                    ) : (
+                                      <span className="text-[12px] text-slate-300 font-medium">-</span>
+                                    )}
+                                  </div>
                                 </td>
                                 <td className="py-4 px-4 text-center">
                                   <button
