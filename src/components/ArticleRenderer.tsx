@@ -246,13 +246,16 @@ export default function ArticleRenderer({
     }
 
     if (cleanHtml) {
-      // 1. Addendum Keywords: Break unconditionally, even if there are HTML tags or zero-width spaces inside
+      // 1. Addendum Keywords: Break unconditionally only in Addendum Articles
       cleanHtml = cleanHtml.replace(/(\([^)]*(?:시행일|경과조치|적용례|적용범위|준용|폐지|예외|단서|특례|임기|존속기간|관련|시행|적용)[^)]*\))/g, (match, paren, offset, str) => {
         const before = str.slice(0, offset);
         if (before.match(/(?:<br\s*\/?>|<\/p>|<p>)\s*$/i)) return match;
         if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
         if (before.match(/제\d+조의?\d*\s*$/)) return match;
         if (before.match(/\d\s*$/)) return match;
+        
+        if (!isAddendumArticle) return match;
+        
         return '<br/>' + match;
       });
 
@@ -655,13 +658,16 @@ export default function ArticleRenderer({
       // 부칙 바로 뒤의 날짜 괄호/꺽쇠는 붙여두고, 그 뒤에 이어지는 시행일(숫자 또는 괄호) 앞에서 줄바꿈 수행
       .replace(/(부\s*칙\s*(?:\([^)]*\)|<[^>]*>|\[[^\]]*\]|〔[^〕]*〕)?)\s+(\d{1,2}\.|\([가-힣\s·]{2,}\))/gi, '$1\n$2');
 
-    // 1. Addendum Keywords: Break unconditionally
+    // 1. Addendum Keywords: Break unconditionally only in Addendum Articles
     formatted = formatted.replace(/(\([^)]*(?:시행일|경과조치|적용례|적용범위|준용|폐지|예외|단서|특례|임기|존속기간|관련|시행|적용)[^)]*\))/g, (match, paren, offset, str) => {
       const before = str.slice(0, offset);
       if (before.match(/\n\s*$/)) return match;
       if (!isAddendumArticle && before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
       if (before.match(/제\d+조의?\d*\s*$/)) return match;
       if (before.match(/\d\s*$/)) return match;
+      
+      if (!isAddendumArticle) return match;
+      
       return '\n' + match;
     });
 
