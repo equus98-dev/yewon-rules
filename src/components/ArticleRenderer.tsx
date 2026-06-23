@@ -282,6 +282,8 @@ export default function ArticleRenderer({
         const before = str.slice(0, offset);
         if (before.match(/(?:<br\s*\/?>|<\/p>|<p>|<div[^>]*>|<td[^>]*>|<th[^>]*>|<li[^>]*>)\s*$/i)) return match;
         if (before.match(/(?:^|\n)\s*$/)) return match;
+        // 조문 제목 바로 뒤에 나오는 ① 등은 줄바꿈하지 않음
+        if (before.match(/(?:^|<[^>]+>)*제\d+조(?:의\d+)?(?:<[^>]+>)*\s*(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*$/)) return match;
         return '<br/>' + match;
       });
 
@@ -645,7 +647,8 @@ export default function ArticleRenderer({
                      )}
                      <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
                         <div className="w-full break-keep inline-block">
-                           <span className="font-bold mr-1 text-[#000080]">{fullTitle}</span>
+                           <span className="font-bold text-[#000080]">{articleNum}</span>
+                           {titleText && <span className="font-normal text-slate-800 ml-1 mr-1">{titleText}</span>}
                            {bodyText && <span className="font-normal text-slate-800">{renderTextWithHistory(bodyText)}</span>}
                         </div>
                      </div>
@@ -676,6 +679,9 @@ export default function ArticleRenderer({
         // 이미 제일 앞이거나 줄바꿈이 있는 경우 생략
         if (offset === 0 || before.match(/(?:^|\n)\s*$/)) return match;
         
+        // 조문 제목 바로 뒤에 나오는 ① 등은 줄바꿈하지 않음
+        if (before.match(/(?:^|<[^>]+>)*제\d+조(?:의\d+)?(?:<[^>]+>)*\s*(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*$/)) return match;
+
         return '\n' + match;
       })
       .replace(/(\s|>|&nbsp;|<br\s*\/?>)(\d{1,2}(?:의\d+)?\.)\s*(?=[^\d])/g, (match, p1, p2, offset, string) => {
@@ -1423,8 +1429,17 @@ export default function ArticleRenderer({
                       <>
                         {(() => {
                           let articleTitleOverride = parsedTitle;
-                          let articleNumOverride = safeNum;
+                          let articleNumOverride = safeNum || "";
                           let actualBody = safeText;
+
+                          if (articleNumOverride) {
+                              const numMatch = articleNumOverride.match(/^(제\d+조(?:의\d+)?)\s*(\([^)]+\))$/);
+                              if (numMatch) {
+                                  articleNumOverride = numMatch[1];
+                                  articleTitleOverride = numMatch[2] + (articleTitleOverride || "");
+                              }
+                          }
+
                           if (parsedTitle) {
                              actualBody = actualBody.replace(parsedTitle, "").trim();
                           }
@@ -1452,7 +1467,8 @@ export default function ArticleRenderer({
 
                           return (
                             <>
-                              <span className="font-bold mr-1 text-[#000080]">{articleNumOverride}{articleTitleOverride}</span>
+                              <span className="font-bold text-[#000080]">{articleNumOverride}</span>
+                              {articleTitleOverride && <span className="font-normal text-slate-800 ml-1 mr-1">{articleTitleOverride}</span>}
                               {actualBody && <span className="font-normal">{formatGluedText(actualBody, true)}</span>}
                             </>
                           );
