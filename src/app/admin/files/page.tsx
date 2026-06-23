@@ -1,4 +1,5 @@
 "use client";
+import { compareAttachmentNames } from '@/lib/utils';
 
 import React, { useState, useEffect, useRef } from "react";
 import {
@@ -222,7 +223,7 @@ export default function AdminFilesManagement() {
   const mainFiles = attachments.filter(f => f.title.startsWith("[전문]"));
   const subFiles = attachments
     .filter(f => f.title.startsWith("[별표]") || f.title.startsWith("[별지]") || f.title.startsWith("[별첨]") || !f.title.startsWith("[전문]"))
-    .sort((a, b) => a.title.localeCompare(b.title, 'ko', { numeric: true }));
+    .sort((a, b) => compareAttachmentNames(a.title, b.title));
 
   const renderFileList = (files: any[], emptyMessage: string) => {
     if (files.length === 0) {

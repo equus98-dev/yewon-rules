@@ -475,7 +475,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       });
 
       const mainFiles = Array.from(uniqueBaseNames).filter((name: any) => name.includes("[전문]"));
-      const subFiles = Array.from(uniqueBaseNames).filter((name: any) => !name.includes("[전문]")).sort((a: any, b: any) => a.localeCompare(b, 'ko', { numeric: true }));
+import { compareAttachmentNames } from '@/lib/utils';
+
+      const subFiles = Array.from(uniqueBaseNames).filter((name: any) => !name.includes("[전문]")).sort(compareAttachmentNames);
 
       if (mainFiles.length > 0) {
          if (!toc.some((t: any) => t.id === "toc-main-files")) {
@@ -1457,7 +1459,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                               <h3 className="text-[20px] font-black text-[#004000] tracking-tight">규정 전문</h3>
                             </div>
                             <div className="space-y-4">
-                              {mainGroups.sort((a, b) => a.baseName.localeCompare(b.baseName)).map((g, i) => renderGroup(g, i, true))}
+                              {mainGroups.sort((a, b) => compareAttachmentNames(a.baseName, b.baseName)).map((g, i) => renderGroup(g, i, true))}
                             </div>
                           </div>
                         )}
@@ -1469,7 +1471,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                               <h3 className="text-[20px] font-black text-[#000080] tracking-tight">별표 및 별지 (별첨)</h3>
                             </div>
                             <div className="space-y-4">
-                              {otherGroups.sort((a, b) => a.baseName.localeCompare(b.baseName)).map((g, i) => renderGroup(g, i, false))}
+                              {otherGroups.sort((a, b) => compareAttachmentNames(a.baseName, b.baseName)).map((g, i) => renderGroup(g, i, false))}
                             </div>
                           </div>
                         )}
