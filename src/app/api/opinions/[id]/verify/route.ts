@@ -37,7 +37,13 @@ export async function POST(request: Request, { params }: { params: { id: string 
       return NextResponse.json({ valid: false, error: "비밀번호가 일치하지 않습니다." }, { status: 403 });
     }
 
-    return NextResponse.json({ valid: true });
+    const opinionRes = await pool.query(
+      `SELECT id, title, content, author, "attachmentUrl", "attachmentName", "createdAt", "updatedAt"
+       FROM "Opinion" WHERE id = $1`,
+      [id]
+    );
+
+    return NextResponse.json({ valid: true, data: opinionRes.rows[0] });
   } catch (error: any) {
     console.error("[Opinions API Verify Error]:", error);
     return NextResponse.json({ error: "내부 서버 오류가 발생했습니다." }, { status: 500 });

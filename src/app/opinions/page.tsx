@@ -21,7 +21,7 @@ export default function OpinionsPage() {
 
   // 비밀번호 확인용 상태
   const [verifyPassword, setVerifyPassword] = useState("");
-  const [verifyMode, setVerifyMode] = useState<"edit" | "delete" | null>(null);
+  const [verifyMode, setVerifyMode] = useState<"read" | "edit" | "delete" | null>(null);
 
   useEffect(() => {
     if (mode === "list") {
@@ -119,19 +119,10 @@ export default function OpinionsPage() {
     setUploading(false);
   };
 
-  const viewOpinion = async (id: string) => {
-    try {
-      const res = await fetch(`/api/opinions/${id}`);
-      const data = (await res.json()) as any;
-      if (data.error) {
-        alert(data.error);
-      } else {
-        setSelectedOpinion(data);
-        setMode("read");
-      }
-    } catch (e) {
-      console.error(e);
-    }
+  const viewOpinion = (op: any) => {
+    setSelectedOpinion({ id: op.id, title: op.title, author: op.author, createdAt: op.createdAt });
+    setVerifyMode("read");
+    setMode("read");
   };
 
   const handleVerifyPassword = async () => {
@@ -147,7 +138,12 @@ export default function OpinionsPage() {
       });
       const data = (await res.json()) as any;
       if (data.valid) {
-        if (verifyMode === "edit") {
+        if (verifyMode === "read") {
+          setSelectedOpinion(data.data);
+          setMode("read");
+          setVerifyMode(null);
+          setVerifyPassword("");
+        } else if (verifyMode === "edit") {
           setFormData({ title: selectedOpinion.title, content: selectedOpinion.content, author: selectedOpinion.author, password: verifyPassword });
           setMode("edit");
           setVerifyMode(null);
@@ -236,8 +232,11 @@ export default function OpinionsPage() {
                       <tr><td colSpan={4} className="text-center py-10 text-slate-500">등록된 의견이 없습니다.</td></tr>
                     ) : (
                       opinions.map(op => (
-                        <tr key={op.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => viewOpinion(op.id)}>
-                          <td className="py-3 px-4 text-slate-800 font-medium truncate">{op.title}</td>
+                        <tr key={op.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => viewOpinion(op)}>
+                          <td className="py-3 px-4 text-slate-800 font-medium truncate">
+                            <span className="mr-2 opacity-60" title="비밀글">🔒</span>
+                            {op.title}
+                          </td>
                           <td className="py-3 px-4 text-center text-slate-600 text-sm truncate">{op.author}</td>
                           <td className="py-3 px-4 text-center text-slate-500 text-sm">{formatDate(op.createdAt)}</td>
                           <td className="py-3 px-4 text-center text-slate-500 text-sm">{op.attachmentName ? '📎' : ''}</td>
@@ -307,25 +306,29 @@ export default function OpinionsPage() {
                 </div>
               </div>
               
-              <div className="min-h-[300px] whitespace-pre-wrap text-slate-800 leading-relaxed text-[16px]">
-                {selectedOpinion.content}
-              </div>
-              
-              {selectedOpinion.attachmentUrl && (
-                <div className="mt-8 p-4 bg-slate-50 rounded border border-slate-200 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <span>📎 첨부파일:</span>
-                    <span className="font-bold">{selectedOpinion.attachmentName}</span>
+              {verifyMode !== "read" && (
+                <>
+                  <div className="min-h-[300px] whitespace-pre-wrap text-slate-800 leading-relaxed text-[16px]">
+                    {selectedOpinion.content}
                   </div>
-                  <a href={selectedOpinion.attachmentUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-1.5 bg-white border border-slate-300 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded shadow-sm">
-                    다운로드
-                  </a>
-                </div>
+                  
+                  {selectedOpinion.attachmentUrl && (
+                    <div className="mt-8 p-4 bg-slate-50 rounded border border-slate-200 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-slate-700">
+                        <span>📎 첨부파일:</span>
+                        <span className="font-bold">{selectedOpinion.attachmentName}</span>
+                      </div>
+                      <a href={selectedOpinion.attachmentUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-1.5 bg-white border border-slate-300 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded shadow-sm">
+                        다운로드
+                      </a>
+                    </div>
+                  )}
+                </>
               )}
 
               {verifyMode && (
                 <div className="mt-8 p-6 bg-slate-100 rounded-lg border border-slate-300">
-                  <h3 className="font-bold text-slate-800 mb-3">{verifyMode === "edit" ? "게시물 수정" : "게시물 삭제"}</h3>
+                  <h3 className="font-bold text-slate-800 mb-3">{verifyMode === "read" ? "비밀글 확인" : verifyMode === "edit" ? "게시물 수정" : "게시물 삭제"}</h3>
                   <p className="text-sm text-slate-600 mb-3">작성 시 입력한 비밀번호를 입력해주세요.</p>
                   <div className="flex gap-2">
                     <input type="password" placeholder="비밀번호" value={verifyPassword} onChange={e => setVerifyPassword(e.target.value)} className="border border-slate-300 rounded px-3 py-2 flex-1 focus:outline-none focus:border-[#1668a6]" />
