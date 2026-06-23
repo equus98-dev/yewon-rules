@@ -702,7 +702,7 @@ export default function ArticleRenderer({
 
     const lines = formatted.split('\n').map(l => l.trim()).filter(l => l);
 
-    let hasSeenParagraph = false;
+    let hasSeenContent = false;
 
     return (
       <>
@@ -710,15 +710,20 @@ export default function ArticleRenderer({
           let trimmed = trimmedLine.replace(/__CITATION_(\d+)__/g, (_, i) => hiddenCitations[parseInt(i, 10)] || '');
           let lineClass = "break-keep text-slate-800";
           
-          let isParagraphLike = /^[①-⑳]/.test(trimmed) || /^\d{1,2}(?:의\d+)?\./.test(trimmed) || /^[가-하]\./.test(trimmed);
+          let isHoOrMok = /^\d{1,2}(?:의\d+)?\./.test(trimmed) || /^[가-하]\./.test(trimmed);
           let isInline = false;
+          
           if (isArticleBody) {
-             if (!hasSeenParagraph) {
+             if (!hasSeenContent && !isHoOrMok) {
                 isInline = true;
              }
           }
-          if (isParagraphLike) {
-             hasSeenParagraph = true;
+          
+          let textWithoutHistory = trimmed.replace(/<[^>]+>/g, '').replace(/\[[^\]]+\]/g, '').trim();
+          let isJustTitle = /^\(.*\)$/.test(textWithoutHistory);
+          
+          if (!isJustTitle) {
+             hasSeenContent = true;
           }
 
           let currentPath = baseArticlePath;
