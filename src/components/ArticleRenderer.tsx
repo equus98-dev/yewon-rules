@@ -394,10 +394,51 @@ export default function ArticleRenderer({
         }
         items[targetIndex].text = `${fullTitle}\n${originalText}`;
       } else {
-        items.unshift({ type: "text", num: "", text: fullTitle });
+        if (!alreadyHasTitle) {
+          items[0] = { ...items[0], num: fullTitle };
+        }
       }
     }
   }
+
+  // --- Normalization: Glue detached first paragraph to article text ---
+  // When users edit via the Admin Editor, the article text might be pushed to items[1] (as a paragraph)
+  // while items[0].text remains empty. This causes the first paragraph (e.g. ①) to break to a new line.
+  const normalizedItems: ContentItem[] = [];
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (item && item.type === "article") {
+       let articleText = String(item.text || "").replace(/<[^>]+>/g, '').trim();
+       let articleTitle = "";
+       const parts = item.num ? (item.num.match(/^(제\d+조(?:의\d+)?)\s*(.*)/) || ["", item.num, ""]) : ["", "", ""];
+       if (parts[2]) {
+         articleTitle = parts[2].trim();
+       }
+       if (articleTitle && articleText.startsWith(articleTitle)) {
+           articleText = articleText.substring(articleTitle.length).trim();
+       } else if (articleTitle && articleText.startsWith(`(${articleTitle})`)) {
+           articleText = articleText.substring(articleTitle.length + 2).trim();
+       } else if (articleTitle && articleText.startsWith(`[${articleTitle}]`)) {
+           articleText = articleText.substring(articleTitle.length + 2).trim();
+       }
+       
+       if (!articleText && i + 1 < items.length) {
+           const nextItem = items[i + 1];
+           if (nextItem && (nextItem.type === "paragraph" || nextItem.type === "text")) {
+               const nextTextPlain = String(nextItem.text || "").replace(/<[^>]+>/g, '').trim();
+               // Glue if it starts with ①~⑳ OR if it doesn't look like a numbered list (1. or 가.)
+               if (/^[①-⑳]/.test(nextTextPlain) || (!/^\d{1,2}(?:의\d+)?\./.test(nextTextPlain) && !/^[가-하]\./.test(nextTextPlain))) {
+                   item.text = (item.text || "") + " " + (nextItem.text || "");
+                   normalizedItems.push(item);
+                   i++; // Skip the next item
+                   continue;
+               }
+           }
+       }
+    }
+    normalizedItems.push(item);
+  }
+  items = normalizedItems;
 
   let textAttachments: ContentItem[] = [];
 
