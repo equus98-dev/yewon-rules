@@ -1,4 +1,5 @@
 "use client";
+import { compareAttachmentNames } from '@/lib/utils';
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { CircularProgress, Typography } from "@mui/material";
@@ -475,8 +476,6 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       });
 
       const mainFiles = Array.from(uniqueBaseNames).filter((name: any) => name.includes("[전문]"));
-import { compareAttachmentNames } from '@/lib/utils';
-
       const subFiles = Array.from(uniqueBaseNames).filter((name: any) => !name.includes("[전문]")).sort(compareAttachmentNames);
 
       if (mainFiles.length > 0) {
