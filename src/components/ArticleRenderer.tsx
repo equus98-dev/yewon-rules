@@ -1508,9 +1508,6 @@ export default function ArticleRenderer({
                               }
                           }
 
-                          if (!articleTitleOverride && articleItem.title) {
-                              articleTitleOverride = articleItem.title;
-                          }
                           if (articleTitleOverride) {
                               articleTitleOverride = articleTitleOverride.replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
                           }
