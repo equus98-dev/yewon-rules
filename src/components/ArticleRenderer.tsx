@@ -616,21 +616,18 @@ export default function ArticleRenderer({
       .replace(/(^|\s)[?•·○●\uF0B7]\s+(?=[가-하]\.|\d{1,2}(?:의\d+)?\.)/g, '$1')
       .replace(/([①-⑳])/g, (match, p1, offset, string) => {
         const before = string.slice(0, offset);
-        const after = string.slice(offset + 1);
-        if (/(?:^|\n)제\d+조(?:의\d+)?\s*(?:\[.*\]|\(.*\)|\〔.*\〕)?\s*$/.test(before)) return match;
-        if (/(?:제|\(|,|및|또는|와|과|이나|나)\s*$/.test(before)) return match;
-        if (/^\s*(?:항|호)/.test(after)) return match;
-        if (offset === 0 || before.endsWith('\n')) return match;
+        // 무조건 줄바꿈을 넣되, 제일 앞이거나 이미 줄바꿈이 있는 경우만 제외
+        if (offset === 0 || before.match(/(?:^|\n)\s*$/)) return match;
         return '\n' + match;
       })
       .replace(/(?<!\d+(?:의\d+)?\.\s*)(?<!\d)(\d{1,2}(?:의\d+)?\.)\s+(?=[^\d])/g, (match, p1, offset, string) => {
         const before = string.slice(0, offset);
-        if (offset === 0 || before.endsWith('\n')) return match;
+        if (offset === 0 || before.match(/(?:^|\n)\s*$/)) return match;
         return '\n' + p1 + ' ';
       })
       .replace(/(^|\s)([가-하]\.)[ \t]+/g, (match, p1, p2, offset, string) => {
         const before = string.slice(0, offset + p1.length);
-        if (offset === 0 || before.endsWith('\n')) return match;
+        if (offset === 0 || before.match(/(?:^|\n)\s*$/)) return match;
         return p1 + '\n' + p2 + ' ';
       })
       .replace(/(제\d+조의?\d*\s*[\[〔(（].*?[\]〕)）])\s*\n+(?=[^\n])/g, '$1 ')
@@ -753,7 +750,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
+                  <div key={`glued-${idx}`} className={`block w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      
