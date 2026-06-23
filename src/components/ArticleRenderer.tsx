@@ -246,8 +246,7 @@ export default function ArticleRenderer({
     }
 
     if (cleanHtml) {
-      // 1-6. Hos (1., 2. etc) should start on a new line
-      cleanHtml = cleanHtml.replace(/(^|[^0-9a-zA-Z가-힣])(\d{1,2}(?:의\d+)?\.)\s*(?=[^\d])/g, (match, p1, p2, offset, str) => {
+      cleanHtml = cleanHtml.replace(/(\s|>|&nbsp;|<br\s*\/?>)(\d{1,2}(?:의\d+)?\.)\s*(?=[^\d])/g, (match, p1, p2, offset, str) => {
         const before = str.slice(0, offset + p1.length);
         if (before.match(/(?:<br\s*\/?>|<\/p>|<p>|<div[^>]*>|<td[^>]*>|<th[^>]*>|<li[^>]*>)\s*$/i)) return match;
         if (before.match(/(?:^|\n)\s*$/)) return match;
@@ -255,10 +254,12 @@ export default function ArticleRenderer({
         if (before.match(/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/)) return match;
         // 날짜 내부 생략
         if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
-        // < > 내부 태그는 cleanHtml이므로 태그 자체일 수 있지만, 속성값 내부 방지용으로 추가
-        const openAngles = (before.match(/</g) || []).length;
-        const closeAngles = (before.match(/>/g) || []).length;
-        if (openAngles > closeAngles) return match;
+        // < > 내부 방지 (p1이 > 이면 태그 바깥이므로 예외)
+        if (p1 !== '>') {
+            const openAngles = (before.match(/</g) || []).length;
+            const closeAngles = (before.match(/>/g) || []).length;
+            if (openAngles > closeAngles) return match;
+        }
         
         return p1 + '<br/>' + p2 + ' ';
       });
@@ -647,17 +648,19 @@ export default function ArticleRenderer({
         
         return '\n' + match;
       })
-      .replace(/(^|[^0-9a-zA-Z가-힣])(\d{1,2}(?:의\d+)?\.)\s*(?=[^\d])/g, (match, p1, p2, offset, string) => {
+      .replace(/(\s|>|&nbsp;|<br\s*\/?>)(\d{1,2}(?:의\d+)?\.)\s*(?=[^\d])/g, (match, p1, p2, offset, string) => {
         const before = string.slice(0, offset + p1.length);
         if (offset === 0 || before.match(/(?:^|\n)\s*$/)) return match;
         // 인용구인 경우 생략
         if (before.match(/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/)) return match;
         // 날짜(예: 2008. 7.) 내부인 경우 생략
         if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
-        // < > 태그 내부인 경우 생략
-        const openAngles = (before.match(/</g) || []).length;
-        const closeAngles = (before.match(/>/g) || []).length;
-        if (openAngles > closeAngles) return match;
+        // < > 태그 내부인 경우 생략 (p1이 > 이면 태그가 끝난 직후이므로 줄바꿈 허용)
+        if (p1 !== '>') {
+            const openAngles = (before.match(/</g) || []).length;
+            const closeAngles = (before.match(/>/g) || []).length;
+            if (openAngles > closeAngles) return match;
+        }
         
         return p1 + '\n' + p2 + ' ';
       })
