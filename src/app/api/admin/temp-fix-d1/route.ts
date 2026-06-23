@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     // Get ALL Articles for this revision
     const artRes = await db.prepare(`SELECT id, articleNumber, contentJson FROM Article WHERE revisionId = ? ORDER BY sortOrder ASC`).bind(revRes.id).all();
     
-    let logs = [];
+    let logs: string[] = [];
     
     for (const art of artRes.results) {
         if (!art.contentJson) continue;
