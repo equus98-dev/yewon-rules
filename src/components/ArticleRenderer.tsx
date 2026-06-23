@@ -725,7 +725,14 @@ export default function ArticleRenderer({
         return <span className={isArticleBody ? "font-normal text-slate-800" : ""}>{renderTextWithHistory(text)}</span>;
     }
 
+    // 1. Convert block-level HTML tags (<p>, <br>) to newlines so that we can process lines accurately.
     let formatted = text
+      .replace(/<\/?p[^>]*>/gi, '\n')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/\n\s*\n/g, '\n')
+      .trim();
+
+    formatted = formatted
       .replace(/(^|\s)[?•·○●\uF0B7]\s+(?=[가-하]\.|\d{1,2}(?:의\d+)?\.)/g, '$1')
       .replace(/([①-⑳])/g, (match, p1, offset, string) => {
         const before = string.slice(0, offset);
