@@ -28,7 +28,16 @@ export async function GET(request: Request) {
 
       if (scope === "current") { conditions.push(`r.status = 'EFFECTIVE'`); }
       if (initialSound) { conditions.push(`r."initialSound" = $${idx++}`); values.push(initialSound); }
-      if (categoryId) { conditions.push(`r."categoryId" = $${idx++}`); values.push(categoryId); }
+      if (categoryId) {
+        if (categoryId.startsWith("virtual-")) {
+          const parentName = categoryId.replace("virtual-", "");
+          conditions.push(`c.name LIKE $${idx++}`);
+          values.push(`${parentName}%`);
+        } else {
+          conditions.push(`r."categoryId" = $${idx++}`);
+          values.push(categoryId);
+        }
+      }
       if (departmentId) { conditions.push(`r."departmentId" = $${idx++}`); values.push(departmentId); }
 
       const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -70,7 +79,11 @@ export async function GET(request: Request) {
     const optionList = options.split(",");
     const isAll = optionList.includes("all") || optionList.length === 0;
     const scopeCond = scope === "current" ? `AND r.status = 'EFFECTIVE'` : "";
-    const catCond = categoryId ? `AND r."categoryId" = '${categoryId.replace(/'/g, "''")}'` : "";
+    const catCond = categoryId 
+      ? (categoryId.startsWith("virtual-") 
+        ? `AND c.name LIKE '${categoryId.replace("virtual-", "").replace(/'/g, "''")}%'` 
+        : `AND r."categoryId" = '${categoryId.replace(/'/g, "''")}'`) 
+      : "";
     const deptCond = departmentId ? `AND r."departmentId" = '${departmentId.replace(/'/g, "''")}'` : "";
     const likeQuery = `%${query}%`;
 
