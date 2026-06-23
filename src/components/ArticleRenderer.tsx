@@ -729,6 +729,8 @@ export default function ArticleRenderer({
     let formatted = text
       .replace(/<\/?p[^>]*>/gi, '\n')
       .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/\n\s*①/g, ' ①')
       .replace(/\n\s*\n/g, '\n')
       .trim();
 
@@ -1504,6 +1506,13 @@ export default function ArticleRenderer({
                                   articleNumOverride = numMatch[1];
                                   articleTitleOverride = numMatch[2] + (articleTitleOverride || "");
                               }
+                          }
+
+                          if (!articleTitleOverride && articleItem.title) {
+                              articleTitleOverride = articleItem.title;
+                          }
+                          if (articleTitleOverride) {
+                              articleTitleOverride = articleTitleOverride.replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
                           }
 
                           if (parsedTitle) {
