@@ -672,7 +672,9 @@ export default function ArticleRenderer({
     
     if (hasTable) {
         // 테이블이 있지만 제N조로 시작하는 경우 제목을 먼저 추출
-        if (/^\s*제\d+(?:조|장|관|절)/.test(text)) {
+        const isRef = /^\s*제\d+조(?:의\d+)?(?:(?:\s|&nbsp;)*)(?:제\d+[항호목]|의|에|부터|까지|와|과|이나|나|를|을|은|는|이|가|,|등|관련|단서|본문|각\s*호)/.test(text.trim()) || 
+                      /^\s*제\d+조(?:의\d+)?\s*[\[〔(（][^\]〕)）]+[\]〕)）]\s*(?:의|에|부터|까지|와|과|이나|나|를|을|은|는|이|가|,|등|관련|단서|본문|각\s*호)/.test(text.trim());
+        if (/^\s*제\d+(?:조|장|관|절)/.test(text) && !isRef) {
            const match2 = text.match(/^\s*(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^()]*?(?:\([^()]*\)[^()]*?)*)[\]〕)）]([\s\S]*)/i) || text.match(/^\s*(제\d+조(?:의|\s+)?\d*)\s*([\s\S]*)/i);
            if (match2) {
                let articleNum = match2[1].replace(/\s/g, '');
@@ -958,7 +960,9 @@ export default function ArticleRenderer({
                );
              }
              lineClass += " ml-4 block";
-          } else if (/^제\d+조/.test(trimmed) && !/[『「]$/.test(trimmed.slice(0, trimmed.search(/제\d+조/)))) {
+          } else if (/^제\d+조/.test(trimmed) && !/[『「]$/.test(trimmed.slice(0, trimmed.search(/제\d+조/))) && 
+                     !/^제\d+조(?:의\d+)?(?:(?:\s|&nbsp;)*)(?:제\d+[항호목]|의|에|부터|까지|와|과|이나|나|를|을|은|는|이|가|,|등|관련|단서|본문|각\s*호)/.test(trimmed) && 
+                     !/^제\d+조(?:의\d+)?\s*[\[〔(（][^\]〕)）]+[\]〕)）]\s*(?:의|에|부터|까지|와|과|이나|나|를|을|은|는|이|가|,|등|관련|단서|본문|각\s*호)/.test(trimmed)) {
              const m = trimmed.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^()]*?(?:\([^()]*\)[^()]*?)*)[\]〕)）]([\s\S]*)/) || trimmed.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)(.*)/);
              if (m) {
                  let articleNum = m[1].replace(/\s/g, '');
