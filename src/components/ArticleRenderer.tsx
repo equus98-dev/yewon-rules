@@ -528,10 +528,10 @@ export default function ArticleRenderer({
     // 1-5. Hangs (①~⑳) should start on a new line if they are glued to previous text
     htmlText = htmlText.replace(/([①-⑳])/g, (match, p1, offset, str) => {
       const before = str.slice(0, offset);
-      if (before.match(/(?:<br\s*\/?>|<\/p>|<p>|<div[^>]*>|<td[^>]*>|<th[^>]*>|<li[^>]*>)\s*$/i)) return match;
-      if (before.match(/(?:^|\n)\s*$/)) return match;
       // 조문 제목 바로 뒤에 나오는 ① 등은 줄바꿈하지 않음
       if (before.match(/(?:^|<[^>]+>)*제\d+조(?:의\d+)?(?:<[^>]+>)*\s*(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*$/)) return match;
+      if (before.match(/(?:<br\s*\/?>|<\/p>|<p>|<div[^>]*>|<td[^>]*>|<th[^>]*>|<li[^>]*>)\s*$/i)) return match;
+      if (before.match(/(?:^|\n)\s*$/)) return '<br/>' + match;
       return '<br/>' + match;
     });
     
