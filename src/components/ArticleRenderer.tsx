@@ -1518,23 +1518,33 @@ export default function ArticleRenderer({
                           }
                           actualBody = actualBody.replace(/^(?:\s|&nbsp;|<br\s*\/?>|<\/?p[^>]*>)+/gi, '').trim();
 
-                          if (!safeNum && /^제\d+조/.test(plainText)) {
-                            const match = actualBody.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^\]〕)）]+)[\]〕)）](.*)/);
+                          if (/^제\d+조/.test(plainText)) {
+                            const match = plainText.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^()]*?(?:\([^()]*\)[^()]*?)*)[\]〕)）](.*)/);
                             if (match) {
                                articleNumOverride = match[1].replace(/\s/g, '');
                                if (articleNumOverride.match(/^제\d+조\d+$/)) {
                                    articleNumOverride = articleNumOverride.replace(/조(\d+)$/, '조의$1');
                                }
                                articleTitleOverride = `(${match[2]})`;
-                               actualBody = match[3].trim();
+                               const titlePart = plainText.substring(0, plainText.indexOf(match[3]));
+                               const regexPattern = titlePart.split('').map(c => 
+                                 c.trim() === '' ? '(?:\\s|&nbsp;|<[^>]+>)*' : c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\s|&nbsp;|<[^>]+>)*'
+                               ).join('');
+                               const remover = new RegExp('^(?:\\s|&nbsp;|<[^>]+>)*' + regexPattern, 'i');
+                               actualBody = actualBody.replace(remover, '').trim();
                             } else {
-                               const match2 = actualBody.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)(.*)/);
+                               const match2 = plainText.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)(.*)/);
                                if (match2) {
                                    articleNumOverride = match2[1].replace(/\s/g, '');
                                    if (articleNumOverride.match(/^제\d+조\d+$/)) {
                                        articleNumOverride = articleNumOverride.replace(/조(\d+)$/, '조의$1');
                                    }
-                                   actualBody = match2[2].trim();
+                                   const titlePart = plainText.substring(0, plainText.indexOf(match2[2]));
+                                   const regexPattern = titlePart.split('').map(c => 
+                                     c.trim() === '' ? '(?:\\s|&nbsp;|<[^>]+>)*' : c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\s|&nbsp;|<[^>]+>)*'
+                                   ).join('');
+                                   const remover = new RegExp('^(?:\\s|&nbsp;|<[^>]+>)*' + regexPattern, 'i');
+                                   actualBody = actualBody.replace(remover, '').trim();
                                }
                             }
                             // Clean actualBody again in case the match exposed a leading <br> or <p>
