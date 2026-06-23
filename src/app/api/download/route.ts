@@ -11,11 +11,13 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Missing fileUrl parameter" }, { status: 400 });
     }
 
-    // GitHub 레포지토리의 Raw URL 구성
-    const githubRawUrl = `https://raw.githubusercontent.com/equus98-dev/yewon-rules/main/public${fileUrl}`;
+    let targetUrl = fileUrl;
+    if (!fileUrl.startsWith('http')) {
+      targetUrl = `https://raw.githubusercontent.com/equus98-dev/yewon-rules/main/public${fileUrl}`;
+    }
     
-    // GitHub에서 파일 가져오기
-    const response = await fetch(githubRawUrl);
+    // 타겟 URL에서 파일 가져오기
+    const response = await fetch(targetUrl);
     
     if (!response.ok) {
       return NextResponse.json({ error: "File not found on remote storage" }, { status: 404 });
