@@ -702,12 +702,25 @@ export default function ArticleRenderer({
 
     const lines = formatted.split('\n').map(l => l.trim()).filter(l => l);
 
+    let hasSeenParagraph = false;
+
     return (
       <>
         {lines.map((trimmedLine, idx) => {
           let trimmed = trimmedLine.replace(/__CITATION_(\d+)__/g, (_, i) => hiddenCitations[parseInt(i, 10)] || '');
           let lineClass = "break-keep text-slate-800";
-          let isInline = (idx === 0 && isArticleBody);
+          
+          let isParagraphLike = /^[①-⑳]/.test(trimmed) || /^\d{1,2}(?:의\d+)?\./.test(trimmed) || /^[가-하]\./.test(trimmed);
+          let isInline = false;
+          if (isArticleBody) {
+             if (!hasSeenParagraph) {
+                isInline = true;
+             }
+          }
+          if (isParagraphLike) {
+             hasSeenParagraph = true;
+          }
+
           let currentPath = baseArticlePath;
 
           if (/^[①-⑳]/.test(trimmed)) {
@@ -857,8 +870,7 @@ export default function ArticleRenderer({
           } else if (/^제\d+(?:절|관)/.test(trimmed)) {
              lineClass += " mt-4 text-[16px] font-bold text-center text-[#000080] block";
           } else {
-             if (idx === 0 && isArticleBody) {
-                isInline = true;
+             if (isInline) {
                 lineClass += " font-normal text-slate-800";
              } else {
                 lineClass += " block mt-1";
@@ -1359,7 +1371,7 @@ export default function ArticleRenderer({
                           return (
                             <>
                               <span className="font-bold mr-1 text-[#000080]">{articleNumOverride}{articleTitleOverride}</span>
-                              {actualBody && <span className="font-normal">{renderTextWithHistory(actualBody)}</span>}
+                              {actualBody && <span className="font-normal">{formatGluedText(actualBody, true)}</span>}
                             </>
                           );
                         })()}
