@@ -435,8 +435,9 @@ export default function ArticleRenderer({
            const nextItem = items[i + 1];
            if (nextItem && (nextItem.type === "paragraph" || nextItem.type === "text")) {
                const nextTextPlain = String(nextItem.text || "").replace(/<[^>]+>/g, '').trim();
-               if (/^[①-⑳]/.test(nextTextPlain) || (!/^\d{1,2}(?:의\d+)?\./.test(nextTextPlain) && !/^[가-하]\./.test(nextTextPlain))) {
-                   item.text = (item.text || "") + " " + (nextItem.text || "");
+               const nextNumPlain = String(nextItem.num || "").trim();
+               if (/^[①-⑳]/.test(nextTextPlain) || /^[①-⑳]/.test(nextNumPlain) || (!/^\d{1,2}(?:의\d+)?\./.test(nextTextPlain) && !/^[가-하]\./.test(nextTextPlain))) {
+                   item.text = (item.text || "") + " " + (nextItem.num ? nextItem.num + " " : "") + (nextItem.text || "");
                    normalizedItems.push(item);
                    i++; // Skip the next item
                    continue;
