@@ -42,7 +42,15 @@ export async function GET(
     const reqFilename = url.searchParams.get("filename");
     
     // 파일명 추출 로직 (다운로드 시 필요)
-    const encodedFilename = reqFilename ? encodeURIComponent(reqFilename) : encodeURIComponent(key);
+    let filename = reqFilename || key;
+    const extMatch = key.split('?')[0].match(/\.([a-zA-Z0-9]+)$/);
+    if (extMatch) {
+      const ext = extMatch[1];
+      if (!filename.toLowerCase().endsWith(`.${ext.toLowerCase()}`)) {
+        filename += `.${ext}`;
+      }
+    }
+    const encodedFilename = encodeURIComponent(filename);
     
     // PDF일 경우 브라우저 인라인 미리보기 허용, 나머지는 다운로드 (단, 쿼리에 download=true가 있으면 강제 다운로드)
     const isPdf = key.toLowerCase().endsWith(".pdf") || object.httpMetadata?.contentType === "application/pdf";

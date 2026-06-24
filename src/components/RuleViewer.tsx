@@ -888,7 +888,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
               <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded shadow-lg py-1 z-50 flex flex-col w-[120px]">
                 {(() => {
                   const getDownloadUrl = (file: any) => {
-                    const encodedTitle = encodeURIComponent(file.title);
+                    let fullTitle = file.title || "download";
+                    if (file.fileType && !fullTitle.toLowerCase().endsWith(`.${file.fileType.toLowerCase()}`)) {
+                      fullTitle += `.${file.fileType}`;
+                    }
+                    const encodedTitle = encodeURIComponent(fullTitle);
                     if (file.fileUrl?.startsWith('/api/files/')) {
                       return `${file.fileUrl}?download=true&filename=${encodedTitle}`;
                     }
@@ -1392,7 +1396,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       const hwpFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp"));
                       
                       const getDownloadUrl = (file: any) => {
-                        const encodedTitle = encodeURIComponent(file.title);
+                        let fullTitle = file.title || "download";
+                        if (file.fileType && !fullTitle.toLowerCase().endsWith(`.${file.fileType.toLowerCase()}`)) {
+                          fullTitle += `.${file.fileType}`;
+                        }
+                        const encodedTitle = encodeURIComponent(fullTitle);
                         if (file.fileUrl.startsWith('/api/files/')) {
                           return `${file.fileUrl}?download=true&filename=${encodedTitle}`;
                         }

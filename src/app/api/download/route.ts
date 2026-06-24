@@ -25,7 +25,17 @@ export async function GET(request: Request) {
 
     // 파일 이름 설정
     const reqFilename = searchParams.get("filename");
-    const filename = reqFilename || (fileUrl.split('/').pop() || "download.file");
+    let filename = reqFilename || (fileUrl.split('/').pop() || "download.file");
+    
+    // 원본 fileUrl에서 확장자 추출 및 보완 (확장자가 누락된 경우)
+    const extMatch = fileUrl.split('?')[0].match(/\.([a-zA-Z0-9]+)$/);
+    if (extMatch) {
+      const ext = extMatch[1];
+      if (!filename.toLowerCase().endsWith(`.${ext.toLowerCase()}`)) {
+        filename += `.${ext}`;
+      }
+    }
+
     // 한글 깨짐 방지를 위해 encodeURIComponent 사용
     const encodedFilename = encodeURIComponent(decodeURIComponent(filename));
 
