@@ -186,7 +186,7 @@ export default function MobileHome() {
               <div className="w-8"></div>
             </div>
             <div className="flex-1 px-4 py-6 overflow-y-auto scrollbar">
-              <RuleViewer activeRuleId={activeRuleId} />
+              <RuleViewer ruleId={activeRuleId} />
             </div>
           </div>
         ) : activeNoticeId ? (
