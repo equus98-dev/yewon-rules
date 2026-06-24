@@ -1656,7 +1656,9 @@ export default function ArticleRenderer({
 
         } else if (item.type === "paragraph") {
           // 연혁 표기(예: 2008. 7. 16.)의 월/일이 호(1., 2.)로 오인되어 isGlued가 true가 되는 버그 완벽 방지!
-          const plainTextForGlued = String(item.text || "").replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').replace(/\((?:삭제|개정|신설|전문개정|본조신설|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)\s*[^)]*\)/gi, '').trim();
+          let decodedForGlued = String(item.text || "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&nbsp;/gi, ' ');
+          decodedForGlued = decodedForGlued.replace(HISTORY_REGEX, "");
+          const plainTextForGlued = decodedForGlued.replace(/<[^>]+>/g, '').replace(/\((?:삭제|개정|신설|전문개정|본조신설|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)\s*[^)]*\)/gi, '').trim();
           const isGlued = /^제\d+조/.test(plainTextForGlued) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(plainTextForGlued) || /(?<!^|\s)[①-⑳]/.test(plainTextForGlued);
           if (isGlued) {
             return (
@@ -1929,7 +1931,8 @@ export default function ArticleRenderer({
                     };
                   } else {
                     const newText = editItems.map(i => {
-                      if (i.type === 'article' || i.type === 'text') return i.text;
+                      if (i.type === 'article') return i.num ? `${i.num} ${i.text}` : i.text;
+                      if (i.type === 'text') return i.text;
                       if (i.type === 'paragraph') return i.num ? `${i.num} ${i.text}` : i.text;
                       return `${i.num} ${i.text}`;
                     }).join('\n');
