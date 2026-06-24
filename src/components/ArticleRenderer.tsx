@@ -612,6 +612,30 @@ export default function ArticleRenderer({
       });
 
       htmlText = htmlText.replace(/__NOCITE_(\d+)__/g, (_, i) => hiddenNoCites[parseInt(i)]);
+
+      if (/<table/i.test(htmlText)) {
+        // 1. 빈 p, div, span 태그 제거 (예: <p>&nbsp;</p>, <p><br/></p>)
+        let prev = '';
+        while (htmlText !== prev) {
+          prev = htmlText;
+          htmlText = htmlText.replace(/<(p|div|span)(?:\s[^>]*)?>([\s\S]*?)<\/\1>/gi, (match, tag, inner) => {
+            const stripped = inner.replace(/<[^>]+>/g, '').replace(/\s|&nbsp;/gi, '');
+            if (stripped === '') return ''; 
+            return match;
+          });
+        }
+        // 2. 표(table) 바로 앞에 연속된 <br/>, &nbsp;, 공백 모조리 제거
+        htmlText = htmlText.replace(/(?:<br\s*\/?>|\s|&nbsp;)+<table/gi, '<table');
+        // 3. table 자체의 margin-top 등 여백 스타일 제거
+        htmlText = htmlText.replace(/<table([^>]*)style="([^"]*)"/gi, (match, before, styleContent) => {
+          let newStyle = styleContent.replace(/margin-top\s*:\s*[^;]+;?/gi, '');
+          newStyle = newStyle.replace(/margin\s*:\s*[^;]+;?/gi, '');
+          return `<table${before}style="${newStyle}"`;
+        });
+        // 4. p 태그가 닫힌 직후 연속된 <br/> 제거
+        htmlText = htmlText.replace(/<\/p>(?:<br\s*\/?>|\s|&nbsp;)+/gi, '</p>');
+      }
+
       const wrapperCls = htmlText.includes('custom-rule-table')
         ? "html-content-inline"
         : "html-table-wrapper html-content-inline";
