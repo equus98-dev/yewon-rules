@@ -977,10 +977,10 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         </div>
 
         {/* TOC Toggle Tab - Attached to the right edge of TOC */}
-        <div className="relative z-30 flex items-center h-full w-0">
+        <div className="relative z-30 w-0 h-full">
           <button
             onClick={() => setIsTocOpen(!isTocOpen)}
-            className="absolute -left-px top-[260px] -translate-y-1/2 w-6 h-16 bg-[#007073] hover:bg-[#005a5c] text-white flex items-center justify-center rounded-r-lg shadow-lg cursor-pointer transition-colors border border-l-0 border-[#005a5c] active:scale-95 z-40"
+            className="sticky -left-px top-[45vh] -translate-y-1/2 w-6 h-16 bg-[#007073] hover:bg-[#005a5c] text-white flex items-center justify-center rounded-r-lg shadow-lg cursor-pointer transition-colors border border-l-0 border-[#005a5c] active:scale-95 z-40"
             title={isTocOpen ? "목차 닫기" : "목차 열기"}
           >
             {isTocOpen ? <KeyboardArrowLeftIcon sx={{ fontSize: 18 }} /> : <KeyboardArrowRightIcon sx={{ fontSize: 18 }} />}
