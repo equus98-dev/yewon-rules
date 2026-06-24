@@ -812,9 +812,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   return (
     <div className="flex flex-col h-full bg-white overflow-hidden relative border border-slate-200">
       {/* 1. 상단 타이틀 및 브레드크럼 */}
-      <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-6 py-4 shrink-0 flex items-center justify-between z-10 shadow-sm relative">
-        <h1 className="text-2xl font-black text-[#007073] tracking-tight ml-2">{ruleNumber ? `${ruleNumber} ` : ""}{cleanTitle}</h1>
-        <div className="text-[14px] text-slate-500 font-medium tracking-wider">
+      <div className="bg-[#009b9e]/[0.12] border-b border-slate-200 px-4 md:px-6 py-3.5 md:py-4 shrink-0 flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 md:gap-4 z-10 shadow-sm relative overflow-hidden">
+        <h1 className="text-lg md:text-2xl font-black text-[#007073] tracking-tight ml-1 md:ml-2 line-clamp-2 md:line-clamp-none">
+          {ruleNumber ? `${ruleNumber} ` : ""}{cleanTitle}
+        </h1>
+        <div className="text-[12px] md:text-[14px] text-slate-500 font-medium tracking-wider w-full md:w-auto overflow-hidden text-ellipsis whitespace-nowrap ml-1 md:ml-0">
           HOME &gt; 전자규정집 &gt; {category?.name || "분류"} &gt; <span className="font-bold text-slate-700">{cleanTitle}</span>
         </div>
       </div>
