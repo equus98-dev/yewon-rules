@@ -61,6 +61,37 @@ export default function MobileHome() {
         if (Array.isArray(noticesData)) {
           setNotices(noticesData);
         }
+
+        if (typeof window !== "undefined") {
+          const savedRuleId = sessionStorage.getItem("activeRuleId");
+          const savedCategoryId = sessionStorage.getItem("activeCategoryId");
+          const savedCategoryName = sessionStorage.getItem("activeCategoryName") || "카테고리 규정";
+          
+          if (savedRuleId) {
+            setActiveRuleId(savedRuleId);
+          } else if (savedCategoryId) {
+            setActiveTab("category");
+            setSelectedCategoryTitle(savedCategoryName);
+            setLoadingCategory(true);
+            
+            let url = `/api/rules/search?query=`;
+            if (savedCategoryId.startsWith("abc-")) {
+              url += `&initialSound=${encodeURIComponent(savedCategoryId.replace("abc-", ""))}`;
+            } else if (savedCategoryId.startsWith("dept-")) {
+              url += `&departmentId=${encodeURIComponent(savedCategoryId.replace("dept-", ""))}`;
+            } else {
+              url += `&categoryId=${encodeURIComponent(savedCategoryId)}`;
+            }
+            const catRes = await fetch(url);
+            const catData = await catRes.json() as any;
+            if (Array.isArray(catData)) {
+              setCategoryRules(catData);
+            } else {
+              setCategoryRules([]);
+            }
+            setLoadingCategory(false);
+          }
+        }
       } catch (error) {
         console.error("Failed to load initial mobile data:", error);
       } finally {

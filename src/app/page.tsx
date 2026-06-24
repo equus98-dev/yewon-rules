@@ -346,11 +346,43 @@ export default function Home() {
     handleSearch(undefined, tag);
   };
 
+  useEffect(() => {
+    if (activeCategoryId && !activeRuleId && !isSearching) {
+      setLoadingCategory(true);
+      const catName = typeof window !== "undefined" ? sessionStorage.getItem("activeCategoryName") : null;
+      if (catName) setActiveCategoryName(catName);
+      
+      let url = `/api/rules/search?query=`;
+      if (activeCategoryId.startsWith("abc-")) {
+        url += `&initialSound=${encodeURIComponent(activeCategoryId.replace("abc-", ""))}`;
+      } else if (activeCategoryId.startsWith("dept-")) {
+        url += `&departmentId=${encodeURIComponent(activeCategoryId.replace("dept-", ""))}`;
+      } else {
+        url += `&categoryId=${encodeURIComponent(activeCategoryId)}`;
+      }
+      fetch(url)
+        .then(res => res.json())
+        .then((data: any) => {
+          if (Array.isArray(data)) {
+            setCategoryRules(data);
+          } else {
+            setCategoryRules([]);
+          }
+        })
+        .catch(e => {
+          console.error(e);
+          setCategoryRules([]);
+        })
+        .finally(() => setLoadingCategory(false));
+    }
+  }, [activeCategoryId, activeRuleId, isSearching]);
+
   const handleCategorySelect = async (categoryId: string, categoryName: string) => {
     setActiveRuleId(null);
     setIsSearching(false);
     setActiveCategoryId(categoryId);
     setActiveCategoryName(categoryName);
+    if (typeof window !== "undefined") sessionStorage.setItem("activeCategoryName", categoryName);
     setActiveNoticeId(null);
     setLoadingCategory(true);
     try {

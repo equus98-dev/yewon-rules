@@ -829,7 +829,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           </button>
           <span>&gt;</span>
           <button 
-            onClick={() => { if (category?.id) { sessionStorage.setItem("activeCategoryId", category.id); sessionStorage.removeItem("activeRuleId"); window.location.href = "/"; } }}
+            onClick={() => { if (category?.id) { sessionStorage.setItem("activeCategoryId", category.id); sessionStorage.setItem("activeCategoryName", category.name || "분류"); sessionStorage.removeItem("activeRuleId"); window.location.href = "/"; } }}
             className="hover:text-blue-600 hover:underline cursor-pointer font-semibold transition-colors"
           >
             {category?.name || "분류"}
