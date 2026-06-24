@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CircularProgress, Dialog, Slide } from "@mui/material";
+import { CircularProgress, Dialog } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import LockIcon from "@mui/icons-material/Lock";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -14,10 +14,6 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import CloseIcon from "@mui/icons-material/Close";
 import RuleViewer from "@/components/RuleViewer";
 import SidebarTree from "@/components/SidebarTree";
-
-const Transition = React.forwardRef(function Transition(props: any, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 export default function MobileHome() {
   const [activeRuleId, setActiveRuleId] = useState<string | null>(null);
@@ -540,7 +536,7 @@ export default function MobileHome() {
       </nav>
 
       {/* ==================== 모달: 검색창 ==================== */}
-      <Dialog open={searchModalOpen} onClose={() => setSearchModalOpen(false)} fullWidth maxWidth="sm" TransitionComponent={Transition}>
+      <Dialog open={searchModalOpen} onClose={() => setSearchModalOpen(false)} fullWidth maxWidth="sm">
         <div className="bg-white p-6 flex flex-col gap-4">
           <div className="flex items-center justify-between border-b border-slate-200 pb-3">
             <h3 className="text-lg font-black text-slate-900 tracking-tight">모바일 규정 검색</h3>
@@ -580,7 +576,7 @@ export default function MobileHome() {
       </Dialog>
 
       {/* ==================== 모달: 북마크 (자주 찾는 규정) ==================== */}
-      <Dialog open={bookmarkOpen} onClose={() => setBookmarkOpen(false)} fullWidth maxWidth="sm" TransitionComponent={Transition}>
+      <Dialog open={bookmarkOpen} onClose={() => setBookmarkOpen(false)} fullWidth maxWidth="sm">
         <div className="bg-white p-6 flex flex-col gap-4">
           <div className="flex items-center justify-between border-b border-slate-200 pb-3">
             <h3 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-1.5">
@@ -616,7 +612,7 @@ export default function MobileHome() {
       </Dialog>
 
       {/* ==================== 모달: 햄버거 슬라이드 메뉴 ==================== */}
-      <Dialog open={drawerOpen} onClose={() => setDrawerOpen(false)} fullScreen TransitionComponent={Transition}>
+      <Dialog open={drawerOpen} onClose={() => setDrawerOpen(false)} fullScreen>
         <div className="flex flex-col h-screen bg-white">
           <div className="bg-[#0c3161] text-white p-4 flex items-center justify-between shrink-0 shadow-md">
             <span className="font-extrabold text-base tracking-wide">전체 규정 목차 (메뉴)</span>

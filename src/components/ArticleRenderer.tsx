@@ -34,6 +34,19 @@ const convertCircledNum = (char: string) => {
   return 1;
 };
 
+const mergeConsecutiveHistories = (text: string) => {
+  if (!text) return text;
+  let prev = "";
+  let cur = text;
+  const mergePattern = /((?:&lt;|[<(\[＜（])(?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)[^>\])＞）]*?)(?:&gt;|[>\])＞）])\s*[,･]?\s*(?:&lt;|[<(\[＜（])((?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)[^>\])＞）]*?(?:&gt;|[>\])＞）]))/gi;
+  
+  while (cur !== prev) {
+    prev = cur;
+    cur = cur.replace(mergePattern, "$1, $2");
+  }
+  return cur;
+};
+
 export default function ArticleRenderer({
   id,
   articleId,
@@ -130,6 +143,7 @@ export default function ArticleRenderer({
     const wrapperClass = isOrgChart ? "org-chart-wrapper" : "html-table-wrapper";
 
     let cleanHtml = contentHtml;
+    cleanHtml = mergeConsecutiveHistories(cleanHtml);
 
     // 특정 규정(학생생활관 등) 제12조 표 내의 빨간글씨 제거 요청 반영
     if (articleNumber === 12) {
@@ -558,6 +572,8 @@ export default function ArticleRenderer({
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'")
       .replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지');
+
+    decodedText = mergeConsecutiveHistories(decodedText);
 
     // 만약 테이블 태그가 없고 단순히 <p>나 </p> 등의 태그만 텍스트로 들어가 있다면 이를 정화해줍니다.
     if (!/<table/i.test(decodedText)) {
