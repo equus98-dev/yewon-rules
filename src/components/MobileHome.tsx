@@ -221,20 +221,28 @@ export default function MobileHome() {
           /* 2. 모바일 메인 대시보드 */
           <div className="w-full flex flex-col">
             {/* 비주얼 히어로 배너 (첨부 이미지 영감) */}
-            <div className="bg-gradient-to-br from-[#009b9e] via-[#0c3161] to-[#1e3a8a] text-white px-6 py-10 flex flex-col items-start justify-center relative overflow-hidden shadow-inner">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal-400/20 via-transparent to-transparent pointer-events-none"></div>
-              <span className="bg-teal-400/30 text-teal-100 border border-teal-300/40 text-[11px] font-black px-3 py-1 rounded-full mb-3 tracking-wider shadow-sm">
-                YEWON ARTS UNIVERSITY
-              </span>
-              <h1 className="text-3xl font-black tracking-tight leading-[1.25] mb-2 text-white drop-shadow-md">
-                입맛대로 손쉽게<br />규정 사이트 탐색
+            <div className="bg-gradient-to-br from-[#0c3161] via-[#11407a] to-[#1e3a8a] text-white px-6 py-11 flex flex-col items-center justify-center relative overflow-hidden shadow-inner text-center">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-400/20 via-transparent to-transparent pointer-events-none"></div>
+              
+              <h1 className="text-4xl font-black italic text-[#00d896] tracking-wider mb-2 drop-shadow-md">
+                YES, WE CAN!
               </h1>
-              <p className="text-[14px] text-teal-100 font-medium tracking-wide opacity-90 mb-4">
-                언제 어디서나 스마트하고 쾌적하게 모든 규정을 열람하세요.
-              </p>
-              <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center justify-between cursor-pointer shadow-lg active:scale-95 transition-all" onClick={() => setSearchModalOpen(true)}>
-                <span className="text-white/80 text-sm font-bold pl-2">규정명 또는 키워드를 검색하세요...</span>
-                <div className="w-8 h-8 bg-white text-[#0c3161] rounded-lg flex items-center justify-center font-bold shadow-md">
+              <h2 className="text-[20px] font-extrabold tracking-tight text-white mb-6 drop-shadow">
+                꿈을 현실로 우리는 예원인 예원예술대학교
+              </h2>
+              
+              <div className="flex flex-col items-center gap-1.5 w-full border-t border-white/10 pt-5 mb-6">
+                <p className="text-[15px] font-bold text-teal-100 tracking-wide">
+                  잠재된 젊음의 패기, 도전의 꿈
+                </p>
+                <p className="text-[12px] font-medium text-slate-200 tracking-wide opacity-95">
+                  문화예술 인재 양성의 요람인 예원예술대학교에서 마음껏 펼쳐보십시오
+                </p>
+              </div>
+
+              <div className="w-full max-w-md bg-white/15 backdrop-blur-md border border-white/20 rounded-2xl p-3 flex items-center justify-between cursor-pointer shadow-lg active:scale-95 transition-all" onClick={() => setSearchModalOpen(true)}>
+                <span className="text-white/90 text-sm font-bold pl-2">규정명 또는 키워드를 검색하세요...</span>
+                <div className="w-8 h-8 bg-white text-[#0c3161] rounded-xl flex items-center justify-center font-bold shadow-md">
                   <SearchIcon sx={{ fontSize: 18 }} />
                 </div>
               </div>
