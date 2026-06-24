@@ -16,6 +16,7 @@ import SidebarTree from "@/components/SidebarTree";
 import RuleViewer from "@/components/RuleViewer";
 import Link from "next/link";
 import FallingLeaves from "@/components/FallingLeaves";
+import MobileHome from "@/components/MobileHome";
 
 const HalftoneCircle = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -36,6 +37,7 @@ const HalftoneCircle = ({ className }: { className?: string }) => (
 );
 
 export default function Home() {
+  const [isMobile, setIsMobile] = useState(false);
   const [activeRuleId, setActiveRuleId] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -115,8 +117,12 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      // Wait to sync state in case of query params
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      checkMobile();
+      window.addEventListener("resize", checkMobile);
+      return () => window.removeEventListener("resize", checkMobile);
     }
   }, []);
 
@@ -372,6 +378,7 @@ export default function Home() {
   };
 
   if (!mounted) return null;
+  if (isMobile) return <MobileHome />;
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-slate-50 relative font-sans text-slate-800">
