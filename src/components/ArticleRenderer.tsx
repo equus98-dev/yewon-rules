@@ -1645,8 +1645,9 @@ export default function ArticleRenderer({
           })();
 
         } else if (item.type === "paragraph") {
-          const plainText = String(item.text || "").replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim();
-          const isGlued = /^제\d+조/.test(plainText) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(plainText) || /(?<!^|\s)[①-⑳]/.test(plainText);
+          // 연혁 표기(예: 2008. 7. 16.)의 월/일이 호(1., 2.)로 오인되어 isGlued가 true가 되는 버그 완벽 방지!
+          const plainTextForGlued = String(item.text || "").replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').replace(/\((?:삭제|개정|신설|전문개정|본조신설|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)\s*[^)]*\)/gi, '').trim();
+          const isGlued = /^제\d+조/.test(plainTextForGlued) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(plainTextForGlued) || /(?<!^|\s)[①-⑳]/.test(plainTextForGlued);
           if (isGlued) {
             return (
               <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 relative ${interactiveClass}`}>
