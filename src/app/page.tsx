@@ -18,6 +18,7 @@ import RuleViewer from "@/components/RuleViewer";
 import Link from "next/link";
 import FallingLeaves from "@/components/FallingLeaves";
 import MobileHome from "@/components/MobileHome";
+import SnailLoader from "@/components/SnailLoader";
 
 const HalftoneCircle = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -994,19 +995,7 @@ export default function Home() {
                   {/* 규정 목록 테이블 */}
                   <div className="bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden">
                     {loadingCategory ? (
-                      <div className="flex flex-col items-center justify-center py-24 gap-4 bg-[#f8f9fa]">
-                        <div className="w-16 h-16 bg-[#0c3161] text-[#00d896] rounded-full flex items-center justify-center shadow-xl animate-bounce border-4 border-white">
-                          <DirectionsRunIcon sx={{ fontSize: 38 }} className="animate-pulse" />
-                        </div>
-                        <div className="text-center">
-                          <h3 className="text-base font-black text-[#0c3161] tracking-wider animate-pulse">
-                            규정 데이터를 달려가서 가져오는 중...
-                          </h3>
-                          <p className="text-xs text-slate-400 font-bold mt-1">
-                            잠시만 기다려주세요! (Loading...)
-                          </p>
-                        </div>
-                      </div>
+                      <SnailLoader message="규정 목록을 가져오는 중..." />
                     ) : (
                       <table className="w-full text-sm border-collapse">
                         <thead>

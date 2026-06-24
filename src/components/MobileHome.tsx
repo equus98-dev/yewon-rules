@@ -12,9 +12,9 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import CloseIcon from "@mui/icons-material/Close";
-import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 import RuleViewer from "@/components/RuleViewer";
 import SidebarTree from "@/components/SidebarTree";
+import SnailLoader from "@/components/SnailLoader";
 
 export default function MobileHome() {
   const [activeRuleId, setActiveRuleId] = useState<string | null>(null);
@@ -223,19 +223,7 @@ export default function MobileHome() {
       {/* ==================== 본문 동적 라우팅 뷰 ==================== */}
       <main className="flex-1 w-full flex flex-col">
         {loadingInitial ? (
-          <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] gap-4 bg-[#f8f9fa] p-6">
-            <div className="w-20 h-20 bg-[#0c3161] text-[#00d896] rounded-full flex items-center justify-center shadow-2xl animate-bounce border-4 border-white">
-              <DirectionsRunIcon sx={{ fontSize: 48 }} className="animate-pulse" />
-            </div>
-            <div className="text-center">
-              <h3 className="text-lg font-black text-[#0c3161] tracking-wider animate-pulse">
-                규정 데이터를 달려가서 가져오는 중...
-              </h3>
-              <p className="text-xs text-slate-400 font-bold mt-1">
-                잠시만 기다려주세요! (Loading...)
-              </p>
-            </div>
-          </div>
+          <SnailLoader message="규정 데이터를 가져오는 중..." />
         ) : activeRuleId ? (
           /* 풀스크린 모바일 규정 뷰어 */
           <div className="flex-1 bg-white flex flex-col w-full min-h-screen">
