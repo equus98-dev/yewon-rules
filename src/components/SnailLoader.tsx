@@ -3,94 +3,92 @@
 import React from "react";
 
 /**
- * 🐌 SnailLoader - 귀여운 달팽이 로딩 애니메이션 컴포넌트
- * 순수 CSS 애니메이션으로 제작된 오리지널 달팽이 캐릭터가
- * 프로그레스 바 위를 천천히 이동하며 로딩 상태를 표시합니다.
+ * 🐌 SnailLoader - 손으로 그린 듯한 만화풍 달팽이 로딩 애니메이션
+ * SVG 아트로 제작된 스케치 스타일 달팽이 캐릭터 + 사선 줄무늬 프로그레스 바
  */
 export default function SnailLoader({ message = "규정 데이터를 가져오는 중..." }: { message?: string }) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center min-h-[55vh] gap-6 bg-gradient-to-b from-[#f0f9f4] to-[#e8f4f8] p-6 select-none">
-      {/* 달팽이 + 프로그레스 바 영역 */}
-      <div className="relative w-[260px] h-[120px]">
-        {/* 달팽이 캐릭터 - CSS로 직접 그린 오리지널 디자인 */}
-        <div className="absolute bottom-[38px] animate-snail-walk" style={{ left: '10%' }}>
-          {/* 달팽이 본체 */}
-          <div className="relative">
-            {/* 더듬이 2개 */}
-            <div className="absolute -top-[22px] left-[12px] flex gap-[8px]">
-              {/* 왼쪽 더듬이 */}
-              <div className="flex flex-col items-center animate-antenna-sway">
-                <div className="w-[7px] h-[7px] rounded-full bg-[#2d3436] shadow-sm" />
-                <div className="w-[2px] h-[14px] bg-[#636e72] rounded-full" />
-              </div>
-              {/* 오른쪽 더듬이 */}
-              <div className="flex flex-col items-center animate-antenna-sway-delay">
-                <div className="w-[7px] h-[7px] rounded-full bg-[#2d3436] shadow-sm" />
-                <div className="w-[2px] h-[14px] bg-[#636e72] rounded-full" />
-              </div>
-            </div>
+    <div className="flex-1 flex flex-col items-center justify-center min-h-[55vh] gap-5 bg-gradient-to-b from-[#f5f8f5] to-[#eaf3f0] p-6 select-none">
 
-            {/* 껍데기 (소라) */}
-            <div className="w-[42px] h-[42px] rounded-full bg-gradient-to-br from-[#74b9ff] via-[#0984e3] to-[#6c5ce7] shadow-lg border-[3px] border-[#dfe6e9] relative overflow-hidden">
-              {/* 소라 나선 무늬 */}
-              <div className="absolute inset-[5px] rounded-full border-[2.5px] border-[#a29bfe]/60" />
-              <div className="absolute inset-[11px] rounded-full border-[2px] border-[#dfe6e9]/50" />
-              <div className="absolute inset-[15px] rounded-full bg-[#6c5ce7]/30" />
-              {/* 하이라이트 */}
-              <div className="absolute top-[4px] left-[6px] w-[8px] h-[5px] bg-white/50 rounded-full rotate-[-30deg]" />
-            </div>
+      {/* 달팽이 + 프로그레스 바 전체 영역 */}
+      <div className="relative w-[280px] h-[150px]">
 
-            {/* 몸통 (머리 + 꼬리) */}
-            <div className="absolute bottom-0 -right-[18px] w-[28px] h-[16px] bg-[#ffeaa7] rounded-r-[12px] rounded-l-[4px] border-b-[2px] border-[#fdcb6e]">
-              {/* 눈 */}
-              <div className="absolute top-[2px] right-[6px] flex gap-[4px]">
-                <div className="w-[5px] h-[5px] rounded-full bg-[#2d3436] relative">
-                  <div className="absolute top-[0.5px] left-[1px] w-[2px] h-[2px] rounded-full bg-white" />
-                </div>
-                <div className="w-[5px] h-[5px] rounded-full bg-[#2d3436] relative">
-                  <div className="absolute top-[0.5px] left-[1px] w-[2px] h-[2px] rounded-full bg-white" />
-                </div>
-              </div>
-              {/* 뺨 홍조 */}
-              <div className="absolute bottom-[3px] right-[4px] w-[5px] h-[3px] rounded-full bg-[#fab1a0]/60" />
-              {/* 입 (미소) */}
-              <div className="absolute bottom-[2px] right-[10px] w-[4px] h-[2px] border-b-[1.5px] border-[#e17055] rounded-b-full" />
+        {/* 달팽이 SVG 캐릭터 (손그림 만화풍) */}
+        <div className="absolute bottom-[48px] animate-snail-walk" style={{ left: '5%' }}>
+          <svg width="90" height="85" viewBox="0 0 90 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* 왼쪽 눈 줄기 */}
+            <path d="M32 32 C30 22, 28 14, 26 6" stroke="#2d3436" strokeWidth="3" strokeLinecap="round" fill="none" className="animate-antenna-sway" style={{ transformOrigin: '32px 32px' }} />
+            {/* 왼쪽 눈알 */}
+            <circle cx="25" cy="5" r="6" fill="white" stroke="#2d3436" strokeWidth="2.5" className="animate-antenna-sway" style={{ transformOrigin: '32px 32px' }} />
+            <circle cx="26" cy="4" r="3" fill="#2d3436" />
+            <circle cx="27" cy="3" r="1.2" fill="white" />
+
+            {/* 오른쪽 눈 줄기 */}
+            <path d="M42 30 C42 20, 44 12, 45 4" stroke="#2d3436" strokeWidth="3" strokeLinecap="round" fill="none" className="animate-antenna-sway-r" style={{ transformOrigin: '42px 30px' }} />
+            {/* 오른쪽 눈알 */}
+            <circle cx="45" cy="3" r="6" fill="white" stroke="#2d3436" strokeWidth="2.5" className="animate-antenna-sway-r" style={{ transformOrigin: '42px 30px' }} />
+            <circle cx="46" cy="2" r="3" fill="#2d3436" />
+            <circle cx="47" cy="1" r="1.2" fill="white" />
+
+            {/* 껍데기 (소라) - 큰 원 */}
+            <ellipse cx="38" cy="48" rx="24" ry="23" fill="#81d4fa" stroke="#2d3436" strokeWidth="3" />
+            {/* 소라 나선 1 */}
+            <path d="M38 35 C48 35, 52 42, 50 50 C48 56, 42 58, 38 55" stroke="#4fc3f7" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+            {/* 소라 나선 2 */}
+            <path d="M38 42 C44 42, 46 46, 44 50" stroke="#29b6f6" strokeWidth="3" strokeLinecap="round" fill="none" />
+            {/* 소라 중심 */}
+            <circle cx="40" cy="47" r="3.5" fill="#4fc3f7" stroke="#29b6f6" strokeWidth="1.5" />
+            {/* 껍데기 하이라이트 */}
+            <path d="M24 38 C26 34, 30 32, 34 33" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.6" />
+
+            {/* 몸통 (머리 쪽) */}
+            <path d="M55 60 C60 52, 68 48, 75 50 C80 52, 82 58, 78 64 C74 68, 62 72, 55 72 Z" fill="#ffeaa7" stroke="#2d3436" strokeWidth="2.8" strokeLinejoin="round" />
+            {/* 몸통 (꼬리 쪽) */}
+            <path d="M20 62 C14 58, 10 60, 8 65 C6 70, 12 72, 20 72 Z" fill="#ffeaa7" stroke="#2d3436" strokeWidth="2.8" strokeLinejoin="round" />
+            {/* 몸통 아래 (배) */}
+            <path d="M8 68 C8 72, 20 76, 45 76 C65 76, 78 72, 78 66" stroke="#2d3436" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+
+            {/* 볼 홍조 */}
+            <ellipse cx="70" cy="58" rx="4" ry="2.5" fill="#fab1a0" opacity="0.7" />
+
+            {/* 입 (미소) */}
+            <path d="M66 60 C68 63, 72 63, 74 60" stroke="#2d3436" strokeWidth="2" strokeLinecap="round" fill="none" />
+          </svg>
+        </div>
+
+        {/* 점액 트레일 도트 */}
+        <div className="absolute bottom-[40px] left-[3%] flex gap-[14px] animate-trail-fade">
+          <div className="w-[5px] h-[5px] rounded-full bg-[#81ecec]/50 border border-[#636e72]/20" />
+          <div className="w-[4px] h-[4px] rounded-full bg-[#81ecec]/35 border border-[#636e72]/15" />
+          <div className="w-[3px] h-[3px] rounded-full bg-[#81ecec]/20" />
+        </div>
+
+        {/* 프로그레스 바 (손그림 스타일 - 둥글고 사선줄무늬) */}
+        <div className="absolute bottom-[14px] left-0 w-full">
+          <div className="w-full h-[26px] bg-[#dfe6e9] rounded-full overflow-hidden relative"
+               style={{ border: '3px solid #2d3436', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)' }}>
+            {/* 프로그레스 채우기 */}
+            <div className="h-full rounded-full bg-[#b2e6e8] animate-progress-fill relative overflow-hidden">
+              {/* 사선 줄무늬 패턴 (첨부이미지 스타일) */}
+              <div className="absolute inset-0" style={{
+                backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 5px, rgba(255,255,255,0.4) 5px, rgba(255,255,255,0.4) 10px)',
+                backgroundSize: '14px 14px'
+              }} />
             </div>
-            {/* 꼬리쪽 몸통 */}
-            <div className="absolute bottom-0 -left-[8px] w-[16px] h-[10px] bg-[#ffeaa7] rounded-l-[8px] border-b-[2px] border-[#fdcb6e]" />
           </div>
         </div>
 
-        {/* 달팽이 점액 트레일 (도트) */}
-        <div className="absolute bottom-[34px] left-[8%] flex gap-[12px] animate-trail-fade">
-          <div className="w-[4px] h-[4px] rounded-full bg-[#81ecec]/40" />
-          <div className="w-[3px] h-[3px] rounded-full bg-[#81ecec]/30" />
-          <div className="w-[2px] h-[2px] rounded-full bg-[#81ecec]/20" />
-        </div>
-
-        {/* 프로그레스 바 */}
-        <div className="absolute bottom-[18px] left-0 w-full">
-          <div className="w-full h-[22px] bg-[#dfe6e9] rounded-full overflow-hidden shadow-inner border border-[#b2bec3]/40 relative">
-            {/* 프로그레스 채우기 (무한 애니메이션) */}
-            <div className="h-full rounded-full bg-gradient-to-r from-[#00cec9] via-[#55efc4] to-[#81ecec] animate-progress-fill relative overflow-hidden">
-              {/* 반짝임 효과 */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-            </div>
-            {/* 프로그레스 바 위의 줄무늬 패턴 */}
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.1) 8px, rgba(0,0,0,0.1) 10px)' }} />
-          </div>
-        </div>
-
-        {/* "LOADING..." 텍스트 (프로그레스 바 아래 간격 넉넉히) */}
-        <div className="absolute -bottom-[8px] left-0 w-full text-center">
-          <span className="text-[11px] font-black tracking-[4px] text-[#636e72] uppercase animate-pulse">
-            loading...
+        {/* "LOADING..." 텍스트 (손글씨풍) */}
+        <div className="absolute -bottom-[6px] left-0 w-full text-center">
+          <span className="text-[15px] tracking-[5px] text-[#2d3436] animate-pulse"
+                style={{ fontFamily: "'Comic Neue', 'Gaegu', cursive", fontWeight: 700 }}>
+            LOADING...
           </span>
         </div>
       </div>
 
       {/* 메시지 */}
-      <div className="text-center mt-2">
+      <div className="text-center mt-3">
         <h3 className="text-[17px] font-black text-[#0c3161] tracking-tight leading-relaxed">
           {message}
         </h3>
@@ -100,53 +98,49 @@ export default function SnailLoader({ message = "규정 데이터를 가져오�
         </p>
       </div>
 
+      {/* Google Font 로드 (손글씨 폰트) */}
+      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+      <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&display=swap" rel="stylesheet" />
+
       {/* CSS 애니메이션 정의 */}
       <style jsx>{`
         @keyframes snailWalk {
           0% { transform: translateX(0); }
-          25% { transform: translateX(60px); }
-          50% { transform: translateX(110px); }
-          75% { transform: translateX(145px); }
-          100% { transform: translateX(160px); }
+          25% { transform: translateX(40px); }
+          50% { transform: translateX(90px); }
+          75% { transform: translateX(130px); }
+          100% { transform: translateX(155px); }
         }
         @keyframes antennaSway {
-          0%, 100% { transform: rotate(-8deg); }
-          50% { transform: rotate(8deg); }
+          0%, 100% { transform: rotate(-6deg); }
+          50% { transform: rotate(6deg); }
         }
-        @keyframes antennaSwayDelay {
-          0%, 100% { transform: rotate(5deg); }
-          50% { transform: rotate(-10deg); }
+        @keyframes antennaSwayR {
+          0%, 100% { transform: rotate(4deg); }
+          50% { transform: rotate(-8deg); }
         }
         @keyframes progressFill {
           0% { width: 8%; }
-          25% { width: 35%; }
-          50% { width: 55%; }
-          75% { width: 72%; }
-          100% { width: 88%; }
-        }
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(200%); }
+          25% { width: 30%; }
+          50% { width: 50%; }
+          75% { width: 68%; }
+          100% { width: 85%; }
         }
         @keyframes trailFade {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 0.15; }
+          0%, 100% { opacity: 0.7; }
+          50% { opacity: 0.1; }
         }
         .animate-snail-walk {
           animation: snailWalk 5s ease-in-out infinite alternate;
         }
         .animate-antenna-sway {
-          animation: antennaSway 1.2s ease-in-out infinite;
+          animation: antennaSway 1s ease-in-out infinite;
         }
-        .animate-antenna-sway-delay {
-          animation: antennaSwayDelay 1.4s ease-in-out infinite;
-          animation-delay: 0.2s;
+        .animate-antenna-sway-r {
+          animation: antennaSwayR 1.2s ease-in-out infinite;
         }
         .animate-progress-fill {
           animation: progressFill 5s ease-in-out infinite alternate;
-        }
-        .animate-shimmer {
-          animation: shimmer 2s ease-in-out infinite;
         }
         .animate-trail-fade {
           animation: trailFade 2s ease-in-out infinite, snailWalk 5s ease-in-out infinite alternate;
