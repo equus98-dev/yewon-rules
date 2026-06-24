@@ -46,14 +46,14 @@ export default function ComparePage() {
   }
 
   return (
-    <div className="h-screen w-full bg-slate-100 overflow-hidden flex flex-col">
-      <div className="h-14 bg-white border-b border-slate-200 flex items-center px-6 shrink-0 shadow-sm">
+    <div className="h-screen w-full bg-slate-100 flex flex-col">
+      <div className="h-14 bg-white border-b border-slate-200 flex items-center px-6 shrink-0 shadow-sm z-20">
         <h1 className="text-lg font-bold text-slate-800">
           <span className="text-purple-600 mr-2">[신구대비표]</span>
           {ruleData.title}
         </h1>
       </div>
-      <div className="flex-1 overflow-hidden relative">
+      <div className="flex-1 overflow-y-auto relative w-full bg-slate-50 scrollbar">
         <CompareView currentRevision={ruleData.currentRevision} allRevisions={ruleData.revisions} />
       </div>
     </div>

@@ -26,6 +26,11 @@ const CuteRobotIcon = ({ width = 24, height = 24, className = "" }) => (
 
 export default function ChatbotWidget() {
   const pathname = usePathname();
+  
+  if (pathname?.includes("/compare") || pathname?.includes("/select") || pathname?.includes("/popup")) {
+    return null;
+  }
+
   const [isOpen, setIsOpen] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const [messages, setMessages] = useState<Message[]>([

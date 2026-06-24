@@ -74,7 +74,7 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
   }
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar bg-slate-50 p-6 w-full">
+    <div className="bg-slate-50 p-6 w-full h-full">
       <div className="max-w-[1200px] mx-auto bg-white rounded-lg shadow-sm border border-slate-200">
         <div className="grid grid-cols-2 bg-[#eef3f8] border-b border-slate-300 sticky top-0 z-10">
           <div className="p-4 text-center font-bold text-slate-800 border-r border-slate-300">
