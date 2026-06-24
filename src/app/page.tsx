@@ -12,6 +12,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArticleIcon from "@mui/icons-material/Article";
 import LanguageIcon from "@mui/icons-material/Language";
+import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 import SidebarTree from "@/components/SidebarTree";
 import RuleViewer from "@/components/RuleViewer";
 import Link from "next/link";
@@ -993,9 +994,18 @@ export default function Home() {
                   {/* 규정 목록 테이블 */}
                   <div className="bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden">
                     {loadingCategory ? (
-                      <div className="flex flex-col items-center justify-center py-24 gap-4">
-                        <CircularProgress size={30} sx={{ color: "#0c3161" }} />
-                        <span className="text-slate-500 text-xs font-semibold">규정 목록 로드 중...</span>
+                      <div className="flex flex-col items-center justify-center py-24 gap-4 bg-[#f8f9fa]">
+                        <div className="w-16 h-16 bg-[#0c3161] text-[#00d896] rounded-full flex items-center justify-center shadow-xl animate-bounce border-4 border-white">
+                          <DirectionsRunIcon sx={{ fontSize: 38 }} className="animate-pulse" />
+                        </div>
+                        <div className="text-center">
+                          <h3 className="text-base font-black text-[#0c3161] tracking-wider animate-pulse">
+                            규정 데이터를 달려가서 가져오는 중...
+                          </h3>
+                          <p className="text-xs text-slate-400 font-bold mt-1">
+                            잠시만 기다려주세요! (Loading...)
+                          </p>
+                        </div>
                       </div>
                     ) : (
                       <table className="w-full text-sm border-collapse">
