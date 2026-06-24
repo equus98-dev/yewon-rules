@@ -890,10 +890,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                   const getDownloadUrl = (file: any) => {
                     const encodedTitle = encodeURIComponent(file.title);
                     if (file.fileUrl?.startsWith('/api/files/')) {
-                      return `${file.fileUrl}?filename=${encodedTitle}`;
-                    }
-                    if (file.fileUrl?.startsWith('http')) {
-                      return file.fileUrl;
+                      return `${file.fileUrl}?download=true&filename=${encodedTitle}`;
                     }
                     return `/api/download?fileUrl=${encodeURIComponent(file.fileUrl || "")}&filename=${encodedTitle}`;
                   };
@@ -1398,9 +1395,6 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         const encodedTitle = encodeURIComponent(file.title);
                         if (file.fileUrl.startsWith('/api/files/')) {
                           return `${file.fileUrl}?download=true&filename=${encodedTitle}`;
-                        }
-                        if (file.fileUrl.startsWith('http')) {
-                          return `${file.fileUrl}?download=${encodedTitle}`;
                         }
                         return `/api/download?fileUrl=${encodeURIComponent(file.fileUrl)}&filename=${encodedTitle}`;
                       };

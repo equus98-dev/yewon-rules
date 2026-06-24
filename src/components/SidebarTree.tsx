@@ -553,9 +553,6 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
                     if (file.fileUrl?.startsWith('/api/files/')) {
                       return `${file.fileUrl}?download=true&filename=${encodedTitle}`;
                     }
-                    if (file.fileUrl?.startsWith('http')) {
-                      return `${file.fileUrl}?download=${encodedTitle}`;
-                    }
                     return `/api/download?fileUrl=${encodeURIComponent(file.fileUrl || "")}&filename=${encodedTitle}`;
                   };
 
