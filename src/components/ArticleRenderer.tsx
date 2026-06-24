@@ -585,6 +585,11 @@ export default function ArticleRenderer({
       if (before.match(/^(?:<[^>]+>)*(?:제\d+조(?:의\d+)?(?:<[^>]+>)*\s*)?(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*$/)) return match;
       // 인용구인 경우 (예: 제①항, 제1항 및 ②항) 줄바꿈 생략
       if (/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/.test(before)) return match;
+      // 제규정 관리 규정 제5조 예외 처리 (④, ⑤ 본문 내의 기호 설명 부분)
+      const recentBefore = before.slice(-50);
+      if ((recentBefore.includes("④ 항은") || recentBefore.includes("부칙 조항의 표시는") || recentBefore.includes("연장 표시하지")) && p1 !== '④' && p1 !== '⑤') {
+        return match;
+      }
       // <br/>, </p>, <p> 등 블록 요소 뒤에는 이미 줄바꿈이 있으므로 추가하지 않음
       if (before.match(/(?:<br\s*\/?>|<\/p>|<p>|<div[^>]*>|<td[^>]*>|<th[^>]*>|<li[^>]*>)\s*$/i)) return match;
       return '<br/>' + match;
@@ -750,6 +755,11 @@ export default function ArticleRenderer({
         const before = string.slice(0, offset);
         const after = string.slice(offset + 1);
         
+        const recentBefore = before.slice(-50);
+        if ((recentBefore.includes("④ 항은") || recentBefore.includes("부칙 조항의 표시는") || recentBefore.includes("연장 표시하지")) && p1 !== '④' && p1 !== '⑤') {
+          return match;
+        }
+
         // 인용구인 경우 (예: 제①항, 제1항 및 ②항) 줄바꿈 생략
         if (/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/.test(before)) return match;
         if (/^\s*(?:항|호)/.test(after)) return match;
@@ -764,6 +774,10 @@ export default function ArticleRenderer({
       })
       .replace(/(\s|>|&nbsp;|<br\s*\/?>)(\d{1,2}(?:의\d+)?\.)\s*(?=[^\d])/g, (match, p1, p2, offset, string) => {
         const before = string.slice(0, offset + p1.length);
+        const recentBefore = before.slice(-50);
+        if (recentBefore.includes("④ 항은") || recentBefore.includes("부칙 조항의 표시는") || recentBefore.includes("연장 표시하지")) {
+          return match;
+        }
         if (offset === 0 || before.match(/(?:^|\n)\s*$/)) return match;
         // 인용구인 경우 생략
         if (before.match(/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/)) return match;
@@ -780,6 +794,10 @@ export default function ArticleRenderer({
       })
       .replace(/(^|\s)([가-하]\.)[ \t]+/g, (match, p1, p2, offset, string) => {
         const before = string.slice(0, offset + p1.length);
+        const recentBefore = before.slice(-50);
+        if (recentBefore.includes("④ 항은") || recentBefore.includes("부칙 조항의 표시는") || recentBefore.includes("연장 표시하지")) {
+          return match;
+        }
         if (offset === 0 || before.match(/(?:^|\n)\s*$/)) return match;
         return p1 + '\n' + p2 + ' ';
       })
@@ -906,7 +924,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className={`block w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
+                  <div key={`glued-${idx}`} className={`block w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '48px', textIndent: '-20px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      
@@ -931,7 +949,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '36px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '64px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      
@@ -955,7 +973,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '52px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '80px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      
@@ -1591,9 +1609,8 @@ export default function ArticleRenderer({
           const plainText = String(item.text || "").replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim();
           const isGlued = /^제\d+조/.test(plainText) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(plainText) || /(?<!^|\s)[①-⑳]/.test(plainText);
           if (isGlued) {
-            const isTopLevelArticle = /^제\d+조/.test(plainText);
             return (
-              <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${isTopLevelArticle ? '' : 'pl-[1.25rem]'} relative ${interactiveClass}`}>
+              <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 relative ${interactiveClass}`}>
                 <span className="font-normal mr-1">{safeNum}</span>
                 {formatGluedText(safeText, false)}
                 
@@ -1601,7 +1618,7 @@ export default function ArticleRenderer({
             );
           }
           return (
-            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: '20px', textIndent: '-20px' }}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: '48px', textIndent: '-20px' }}>
               {showEditBtn && renderEditButton(true)}
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
@@ -1613,7 +1630,7 @@ export default function ArticleRenderer({
 
           return (
             <React.Fragment key={index}>
-              <div className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '20px' : '36px', textIndent: isAddendum ? '-20px' : '-16px' }}>
+              <div className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '28px' : '64px', textIndent: isAddendum ? '-20px' : '-16px' }}>
                 {showEditBtn && renderEditButton(true)}
                 <span className="font-normal mr-1">{safeNum}</span>
                 <span className="font-normal">{renderTextWithHistory(safeText)}</span>
@@ -1623,7 +1640,7 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "subitem") {
           return (
-            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '52px', textIndent: '-16px' }}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '80px', textIndent: '-16px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
               
@@ -1655,10 +1672,9 @@ export default function ArticleRenderer({
               </div>
             );
           }
-          const isGluedArticle = /^\s*제\d+(?:조|장|관|절)/.test(safeText);
           const textToFormat = safeNum ? `${safeNum} ${safeText}` : safeText;
           return (
-            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full ${isGluedArticle ? '' : 'pl-[1.25rem]'} my-1.5 ${interactiveClass}`}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${interactiveClass}`}>
               {formatGluedText(textToFormat, false)}
               
             </div>
