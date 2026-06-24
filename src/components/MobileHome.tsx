@@ -85,20 +85,29 @@ export default function MobileHome() {
         url = `/api/rules/search?query=별지`;
       } else if (type === "recent") {
         url = `/api/rules/search?query=`;
+      } else if (type.startsWith("virtual-")) {
+        const keyword = type.replace("virtual-", "");
+        url = `/api/rules/search?query=${encodeURIComponent(keyword)}`;
       } else {
         url = `/api/rules/search?query=&categoryId=${encodeURIComponent(type)}`;
       }
       const res = await fetch(url);
       const data = await res.json() as any;
+      
+      let rulesList: any[] = [];
       if (Array.isArray(data)) {
-        if (type === "recent") {
-          const sorted = data.sort((a: any, b: any) => new Date(b.enactmentDate).getTime() - new Date(a.enactmentDate).getTime());
-          setCategoryRules(sorted.slice(0, 20));
-        } else {
-          setCategoryRules(data);
-        }
+        rulesList = data;
+      } else if (data && data.isGrouped) {
+        const combined = [...(data.titleMatches || []), ...(data.bodyMatches || [])];
+        const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+        rulesList = unique;
+      }
+
+      if (type === "recent") {
+        const sorted = rulesList.sort((a: any, b: any) => new Date(b.enactmentDate).getTime() - new Date(a.enactmentDate).getTime());
+        setCategoryRules(sorted.slice(0, 20));
       } else {
-        setCategoryRules([]);
+        setCategoryRules(rulesList);
       }
     } catch (error) {
       console.error(error);
@@ -116,11 +125,17 @@ export default function MobileHome() {
     try {
       const res = await fetch(`/api/rules/search?query=${encodeURIComponent(searchQuery)}&scope=current&options=all`);
       const data = await res.json() as any;
+      
+      let rulesList: any[] = [];
       if (Array.isArray(data)) {
-        setSearchResults(data);
-      } else {
-        setSearchResults([]);
+        rulesList = data;
+      } else if (data && data.isGrouped) {
+        const combined = [...(data.titleMatches || []), ...(data.bodyMatches || [])];
+        const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+        rulesList = unique;
       }
+      
+      setSearchResults(rulesList);
       setActiveTab("search");
       setSearchModalOpen(false);
       setActiveRuleId(null);

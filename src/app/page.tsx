@@ -378,7 +378,7 @@ export default function Home() {
   };
 
   if (!mounted) return null;
-  if (isMobile) return <MobileHome />;
+  if (isMobile && !showIntro) return <MobileHome />;
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-slate-50 relative font-sans text-slate-800">
@@ -392,9 +392,9 @@ export default function Home() {
             <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(12, 49, 97, 0.1) 1.5px, transparent 1.5px)', backgroundSize: '18px 18px' }} />
           </div>
 
-          {/* 좌측: 전경 이미지 (세련된 사선 컷팅 디자인 - clip-path 사용) */}
+          {/* 데스크톱 좌측 전경 이미지 (세련된 사선 컷팅 디자인 - clip-path 사용) */}
           <div 
-            className={`absolute left-0 top-0 h-full w-full lg:w-[65%] bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out z-20 ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}
+            className={`absolute left-0 top-0 h-full hidden lg:block lg:w-[65%] bg-[#0c3161] overflow-hidden transition-transform duration-1000 ease-in-out z-20 ${animateOut ? '-translate-x-full' : 'translate-x-0'}`}
             style={{ clipPath: 'polygon(0 0, 80% 0, 100% 100%, 0 100%)' }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161]/90 via-[#0c3161]/40 to-transparent z-10" />
@@ -411,13 +411,13 @@ export default function Home() {
               className="object-cover opacity-90 z-0"
             />
             
-            {/* 연두색 은은한 삼각형 (이미지 경계와 겹치도록 좌측 영역 내부에 배치) 약간 더 밝게 */}
+            {/* 연두색 은은한 삼각형 */}
             <div 
-              className="absolute inset-0 bg-[#2ee6d6]/50 backdrop-blur-[1px] mix-blend-multiply z-10 pointer-events-none hidden lg:block"
+              className="absolute inset-0 bg-[#2ee6d6]/50 backdrop-blur-[1px] mix-blend-multiply z-10 pointer-events-none"
               style={{ clipPath: 'polygon(30% 0, 100% 0, 100% 100%)' }}
             />
 
-            {/* 하단 좌측 영문 학교명을 흰색 로고 이미지로 대체 */}
+            {/* 하단 좌측 로고 */}
             <div className="absolute bottom-16 left-12 z-20 text-white select-none flex items-center gap-4 lg:gap-5">
               <Image 
                 src="/UI_white.png" 
@@ -429,14 +429,56 @@ export default function Home() {
               <span className="text-2xl text-white/50 mb-1 font-light">|</span>
               <p className="text-xl lg:text-2xl font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
             </div>
+          </div>
 
-            {/* 모바일용 입장 버튼 */}
-            <div className="lg:hidden absolute bottom-40 left-12 z-30">
+          {/* 모바일 전용 프리미엄 인트로 화면 (첨부이미지 완벽 재현) */}
+          <div className={`absolute inset-0 w-full h-full lg:hidden bg-[#0c3161] overflow-hidden flex flex-col justify-between p-6 z-30 transition-transform duration-1000 ease-in-out ${animateOut ? '-translate-y-full' : 'translate-y-0'}`}>
+            <div className="absolute inset-0 z-0">
+              <Image 
+                src="/yewon2.jpeg" 
+                alt="예원예술대학교 전경" 
+                fill 
+                priority 
+                className="object-cover opacity-80"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0c3161] via-[#0c3161]/75 to-[#0c3161]/40 z-10" />
+            </div>
+
+            <div className="z-20 pt-12 flex flex-col items-center text-center">
+              <h1 className="text-4xl font-black italic tracking-widest text-[#00d896] drop-shadow-md mb-2">
+                YES, WE CAN!
+              </h1>
+              <h2 className="text-xl font-extrabold tracking-tight text-white mb-6 drop-shadow">
+                꿈을 현실로 우리는 예원인 예원예술대학교
+              </h2>
+              <div className="flex flex-col items-center gap-1 w-full border-t border-white/10 pt-4">
+                <p className="text-base font-bold text-teal-100 drop-shadow">
+                  잠재된 젊음의 패기, 도전의 꿈
+                </p>
+                <p className="text-xs font-medium text-slate-200 mt-1 drop-shadow opacity-95">
+                  문화예술 인재 양성의 요람인 예원예술대학교에서 마음껏 펼쳐보십시오
+                </p>
+              </div>
+            </div>
+
+            <div className="z-20 pb-8 flex flex-col gap-6 w-full max-w-sm mx-auto">
+              <div className="flex items-center justify-center gap-3 text-white select-none">
+                <Image 
+                  src="/UI_white.png" 
+                  alt="예원예술대학교 로고" 
+                  width={140} 
+                  height={32} 
+                  className="object-contain w-[140px] drop-shadow-lg" 
+                />
+                <span className="text-xl text-white/50 mb-0.5 font-light">|</span>
+                <p className="text-lg font-bold text-blue-100 drop-shadow-md">규정관리시스템</p>
+              </div>
+
               <button 
                 onClick={handleEnterSystem} 
-                className="pointer-events-auto bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-xl font-black text-[14px] shadow-xl hover:bg-white/30 transition-all active:scale-95 flex items-center justify-center gap-2"
+                className="pointer-events-auto w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-2xl font-black text-[17px] shadow-xl hover:shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-2 border border-white/30 tracking-wide"
               >
-                시스템 입장하기 <ArrowForwardIosIcon sx={{fontSize:14}} />
+                규정관리시스템 입장하기 <ArrowForwardIosIcon sx={{fontSize:16}} />
               </button>
             </div>
           </div>

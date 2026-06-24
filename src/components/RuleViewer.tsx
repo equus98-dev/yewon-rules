@@ -84,7 +84,12 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const [ruleData, setRuleData] = useState<any>(null);
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
   const [hideHistory, setHideHistory] = useState(false);
-  const [isTocOpen, setIsTocOpen] = useState(true);
+  const [isTocOpen, setIsTocOpen] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth >= 768;
+    }
+    return true;
+  });
   const [expandedAttachments, setExpandedAttachments] = useState<Record<string, boolean>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
   const tocScrollRef = useRef<HTMLDivElement>(null);
@@ -973,10 +978,10 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         <div className="relative z-30 flex items-center h-full w-0">
           <button
             onClick={() => setIsTocOpen(!isTocOpen)}
-            className="absolute -left-px w-4 h-10 bg-[#007073] hover:bg-[#005a5c] text-white flex items-center justify-center rounded-r-lg shadow-md cursor-pointer transition-colors border border-l-0 border-[#005a5c] active:scale-95"
+            className="absolute -left-px top-1/3 -translate-y-1/2 w-6 h-16 bg-[#007073] hover:bg-[#005a5c] text-white flex items-center justify-center rounded-r-lg shadow-lg cursor-pointer transition-colors border border-l-0 border-[#005a5c] active:scale-95 z-40"
             title={isTocOpen ? "목차 닫기" : "목차 열기"}
           >
-            {isTocOpen ? <KeyboardArrowLeftIcon sx={{ fontSize: 13 }} /> : <KeyboardArrowRightIcon sx={{ fontSize: 13 }} />}
+            {isTocOpen ? <KeyboardArrowLeftIcon sx={{ fontSize: 18 }} /> : <KeyboardArrowRightIcon sx={{ fontSize: 18 }} />}
           </button>
         </div>
 
