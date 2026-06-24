@@ -576,6 +576,7 @@ export default function ArticleRenderer({
 
     // HTML에서 \n은 공백으로 처리되어 줄바꿈이 사라지므로, <br/>로 변환
     htmlText = htmlText.replace(/\n/g, '<br/>');
+    htmlText = htmlText.replace(/④\s*항은\s*(?:<br\s*\/?>)+\s*①/g, '④ 항은 ①');
 
     // 1-5. Hangs (①~⑳) should start on a new line if they are glued to previous text
     htmlText = htmlText.replace(/([①-⑳])/g, (match, p1, offset, str) => {
@@ -586,6 +587,7 @@ export default function ArticleRenderer({
       // 인용구인 경우 (예: 제①항, 제1항 및 ②항) 줄바꿈 생략
       if (/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/.test(before)) return match;
       // 제규정 관리 규정 제5조 예외 처리 (④, ⑤ 본문 내의 기호 설명 부분)
+      if (str.includes("①, ②, 호는") || str.includes("호는 1, 2") || str.includes("목은 가, 나")) return match;
       const recentBefore = before.slice(-50);
       if ((recentBefore.includes("④ 항은") || recentBefore.includes("부칙 조항의 표시는") || recentBefore.includes("연장 표시하지")) && p1 !== '④' && p1 !== '⑤') {
         return match;
@@ -747,6 +749,7 @@ export default function ArticleRenderer({
       .replace(/&nbsp;/gi, ' ')
       .replace(/\n\s*①/g, ' ①')
       .replace(/\n\s*\n/g, '\n')
+      .replace(/④\s*항은\s*\n+\s*①/g, '④ 항은 ①')
       .trim();
 
     formatted = formatted
@@ -755,6 +758,7 @@ export default function ArticleRenderer({
         const before = string.slice(0, offset);
         const after = string.slice(offset + 1);
         
+        if (string.includes("①, ②, 호는") || string.includes("호는 1, 2") || string.includes("목은 가, 나")) return match;
         const recentBefore = before.slice(-50);
         if ((recentBefore.includes("④ 항은") || recentBefore.includes("부칙 조항의 표시는") || recentBefore.includes("연장 표시하지")) && p1 !== '④' && p1 !== '⑤') {
           return match;
@@ -773,6 +777,7 @@ export default function ArticleRenderer({
         return '\n' + match;
       })
       .replace(/(\s|>|&nbsp;|<br\s*\/?>)(\d{1,2}(?:의\d+)?\.)\s*(?=[^\d])/g, (match, p1, p2, offset, string) => {
+        if (string.includes("①, ②, 호는") || string.includes("호는 1, 2") || string.includes("목은 가, 나")) return match;
         const before = string.slice(0, offset + p1.length);
         const recentBefore = before.slice(-50);
         if (recentBefore.includes("④ 항은") || recentBefore.includes("부칙 조항의 표시는") || recentBefore.includes("연장 표시하지")) {
@@ -793,6 +798,7 @@ export default function ArticleRenderer({
         return p1 + '\n' + p2 + ' ';
       })
       .replace(/(^|\s)([가-하]\.)[ \t]+/g, (match, p1, p2, offset, string) => {
+        if (string.includes("①, ②, 호는") || string.includes("호는 1, 2") || string.includes("목은 가, 나")) return match;
         const before = string.slice(0, offset + p1.length);
         const recentBefore = before.slice(-50);
         if (recentBefore.includes("④ 항은") || recentBefore.includes("부칙 조항의 표시는") || recentBefore.includes("연장 표시하지")) {
@@ -1091,7 +1097,7 @@ export default function ArticleRenderer({
       if (curr && (curr.type === "article" || curr.type === "paragraph" || curr.type === "text") && next && (next.type === "paragraph" || next.type === "text" || next.type === "item")) {
           const currTextPlain = String(curr.text || "").replace(/<[^>]+>/g, '').trim();
           const nextTextPlain = String(next.text || "").replace(/<[^>]+>/g, '').trim();
-          if (currTextPlain === "" || /^\([^)]+\)$/.test(currTextPlain) || /^제\d+조/.test(currTextPlain)) {
+          if (currTextPlain === "" || /^\([^)]+\)$/.test(currTextPlain) || /^제\d+조/.test(currTextPlain) || currTextPlain.endsWith("④ 항은") || currTextPlain.endsWith("④항은")) {
               if (!/^제\d+조/.test(nextTextPlain)) {
                   displayItems[i] = { ...curr, text: (curr.text ? curr.text + " " : "") + (next.num ? next.num + " " : "") + (next.text || "") };
                   displayItems.splice(i+1, 1);
