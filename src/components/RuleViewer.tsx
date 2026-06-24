@@ -232,14 +232,14 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         if (a.chapter && a.chapter !== lastChapter) {
             // 부칙 chapter는 가운데 장 헤더로 표시하지 않음 (ArticleRenderer에서 통합 처리)
             if (!/^부\s*칙/.test((a.chapter || '').replace(/\s+/g, ''))) {
-              const historyRegexPattern = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
+              const historyRegexPattern = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|전부개정|일부개정|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|본문이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
               const cleanChapter = a.chapter.replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지').replace(historyRegexPattern, '').trim();
               toc.push({ type: "chapter", id: `toc-${a.articleNumber}`, text: cleanChapter });
             }
             lastChapter = a.chapter;
         }
         if (a.section && a.section !== lastSection) {
-            const historyRegexPattern = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
+            const historyRegexPattern = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|전부개정|일부개정|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|본문이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
             const cleanSection = a.section.replace(historyRegexPattern, '').trim();
             toc.push({ type: "section", id: `toc-${a.articleNumber}`, text: cleanSection });
             lastSection = a.section;
@@ -440,7 +440,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           
           if (typeof item !== 'object') return;
           
-          const historyRegexPattern = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
+          const historyRegexPattern = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|전부개정|일부개정|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|본문이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
           if (item.type === "chapter") {
             const rawText = typeof item.text === 'string' ? item.text.replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지') : String(item.text || "");
             const chapterText = rawText.split('\n')[0].replace(historyRegexPattern, '').trim();
@@ -1088,7 +1088,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       {showChapter && (
                         <div id={`toc-${a.chapter.split('\n')[0].trim().replace(/\s/g, '-')}`} className="text-center w-full mt-8 mb-6 pt-2 flex flex-col items-center gap-1.5">
                           {(() => {
-                            const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
+                            const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|전부개정|일부개정|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|본문이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
                             const histories = a.chapter.match(historyRegex);
                             let mainTitle = a.chapter;
                             let historyPart = "";
@@ -1104,7 +1104,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                 let parts = inner.split(',').map(p => p.trim());
                                 let lastAction = '';
                                 let normParts = parts.map(part => {
-                                  let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)?\s*(.*)$/);
+                                  let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|전부개정|일부개정|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|본문이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동)?\s*(.*)$/);
                                   if (!match) return part;
                                   let action = match[1];
                                   let dateStr = match[2];
@@ -1133,7 +1133,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                       {showSection && (
                         <div id={`toc-${a.section.split('\n')[0].trim().replace(/\s/g, '-')}`} className="text-center w-full mt-6 mb-4 flex flex-col items-center gap-1">
                           {(() => {
-                            const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|장\s*변경|조\s*폐지|변경|폐지|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
+                            const historyRegex = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|전부개정|일부개정|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|본문이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
                             const histories = a.section.match(historyRegex);
                             let mainTitle = a.section;
                             let historyPart = "";
@@ -1149,7 +1149,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                                 let parts = inner.split(',').map(p => p.trim());
                                 let lastAction = '';
                                 let normParts = parts.map(part => {
-                                  let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|단서신설|후단신설|변경)?\s*(.*)$/);
+                                  let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|전부개정|일부개정|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|본문이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동)?\s*(.*)$/);
                                   if (!match) return part;
                                   let action = match[1];
                                   let dateStr = match[2];
