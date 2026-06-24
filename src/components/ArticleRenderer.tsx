@@ -1130,7 +1130,16 @@ export default function ArticleRenderer({
       if (curr && (curr.type === "article" || curr.type === "paragraph" || curr.type === "text") && next && (next.type === "paragraph" || next.type === "text" || next.type === "item")) {
           const currTextPlain = String(curr.text || "").replace(/<[^>]+>/g, '').trim();
           const nextTextPlain = String(next.text || "").replace(/<[^>]+>/g, '').trim();
-          if (currTextPlain === "" || /^\([^)]+\)$/.test(currTextPlain) || /^제\d+조/.test(currTextPlain) || currTextPlain.endsWith("④ 항은") || currTextPlain.endsWith("④항은")) {
+          
+          let isJustArticleTitle = false;
+          if (/^제\d+조/.test(currTextPlain)) {
+              const cleanTitleCheck = currTextPlain.replace(/^제\d+조(?:의\d+)?\s*(?:\([^)]*\))?/, '').trim();
+              if (cleanTitleCheck.length < 5) {
+                  isJustArticleTitle = true;
+              }
+          }
+
+          if (currTextPlain === "" || /^\([^)]+\)$/.test(currTextPlain) || isJustArticleTitle || currTextPlain.endsWith("④ 항은") || currTextPlain.endsWith("④항은")) {
               if (!/^제\d+조/.test(nextTextPlain)) {
                   displayItems[i] = { ...curr, text: (curr.text ? curr.text + " " : "") + (next.num ? next.num + " " : "") + (next.text || "") };
                   displayItems.splice(i+1, 1);
