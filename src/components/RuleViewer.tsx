@@ -1422,80 +1422,95 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         <div id={`toc-attach-${group.baseName}`} key={idx} className="border border-slate-300 rounded-lg overflow-hidden bg-white shadow-sm">
                           {/* Accordion Header */}
                           <div 
-                            className={`bg-slate-50 flex items-center justify-between px-4 py-3 select-none border-b border-slate-200 transition-colors ${isMain ? '' : 'hover:bg-slate-100 cursor-pointer'}`}
+                            className={`bg-[#f8fafc] hover:bg-white p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 select-none border-b border-slate-200 transition-all ${isMain ? '' : 'cursor-pointer'}`}
                             onClick={() => !isMain && setExpandedAttachments(prev => ({ ...prev, [group.baseName]: !isExpanded }))}
                           >
-                            <div className="flex items-center gap-2.5">
-                              {!isMain && (
-                                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-black border shadow-sm transition-all ${isExpanded ? 'bg-indigo-600 text-white border-indigo-700 shadow-md' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:border-slate-400'}`}>
-                                  <svg className="w-3.5 h-3.5 shrink-0 text-[#f43f5e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="11" cy="11" r="8"></circle>
-                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                  </svg>
-                                  <span>미리보기</span>
-                                  <span className="flex items-center justify-center opacity-80">
-                                    {isExpanded ? <KeyboardArrowUpIcon sx={{ fontSize: 14 }} /> : <KeyboardArrowDownIcon sx={{ fontSize: 14 }} />}
-                                  </span>
-                                </div>
-                              )}
-                              {(() => {
-                                // 제목 파싱: [타입] 1-0-4 [세부태그] 이름 형태 처리
-                                const raw = group.baseName;
-                                
-                                // 패턴 1: [별지] 1-0-4 [별지 제1-1호 서식] 확인서 → 배지: 별지 제1-1호 서식, 텍스트: 1-0-4 확인서
-                                const detailedMatch = raw.match(/^\[(?:별지|별표|별첨|서식)\]\s*([\d\-]+\s+)\[([^\]]+)\]\s*(.*)$/);
-                                if (detailedMatch) {
-                                  const ruleNum = detailedMatch[1].trim();
-                                  const badgeText = detailedMatch[2];
-                                  const fileName = detailedMatch[3];
-                                  const badgeColor = badgeText.includes('별표') ? 'bg-rose-600/80 text-white border-rose-600/20' : 'bg-sky-600/80 text-white border-sky-600/20';
-                                  return (
-                                    <div className="flex items-center gap-2">
-                                      <span className={`px-2 py-0.5 rounded text-[12px] font-black border whitespace-nowrap ${badgeColor}`}>
+                            <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 flex-1">
+                              {/* 모바일 1행: 미리보기 버튼 + 뱃지 */}
+                              <div className="flex items-center gap-3">
+                                {!isMain && (
+                                  <div className={`flex flex-col items-center justify-center shrink-0 w-16 h-16 rounded-full border shadow-sm transition-all ${isExpanded ? 'bg-indigo-600 text-white border-indigo-700 shadow-md' : 'bg-white text-slate-700 border-slate-300 hover:border-[#007073]'}`}>
+                                    <div className="flex items-center gap-0.5">
+                                      <svg className={`w-3 h-3 shrink-0 ${isExpanded ? 'text-white' : 'text-[#f43f5e]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                      </svg>
+                                      <span className="text-[11px] font-black tracking-tight leading-none">미리</span>
+                                    </div>
+                                    <div className="flex items-center gap-0.5 mt-1">
+                                      <span className="text-[11px] font-black tracking-tight leading-none">보기</span>
+                                      <span className="flex items-center justify-center opacity-80">
+                                        {isExpanded ? <KeyboardArrowUpIcon sx={{ fontSize: 13 }} /> : <KeyboardArrowDownIcon sx={{ fontSize: 13 }} />}
+                                      </span>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {(() => {
+                                  const raw = group.baseName;
+                                  const detailedMatch = raw.match(/^\[(?:별지|별표|별첨|서식)\]\s*([\d\-]+\s+)\[([^\]]+)\]\s*(.*)$/);
+                                  if (detailedMatch) {
+                                    const badgeText = detailedMatch[2];
+                                    const badgeColor = badgeText.includes('별표') ? 'bg-rose-600 text-white border-rose-600/20' : 'bg-[#3498db] text-white border-[#3498db]/20';
+                                    return (
+                                      <span className={`px-3 py-1.5 rounded-xl text-xs md:text-sm font-black border whitespace-nowrap shadow-sm ${badgeColor}`}>
                                         {badgeText}
                                       </span>
-                                      <span className="font-bold text-slate-800 text-[15px]">{ruleNum} {fileName}</span>
-                                    </div>
-                                  );
-                                }
-                                
-                                // 패턴 2: [전문] 1-0-4 교원 징계규정 (기본 [타입] 이름 형태)
-                                const basicMatch = raw.match(/^\[([^\]]+)\]\s*(.*)$/);
-                                if (basicMatch) {
-                                  const type = basicMatch[1];
-                                  const displayText = basicMatch[2];
-                                  return (
-                                    <div className="flex items-center gap-2">
-                                      <span className={`px-2 py-0.5 rounded text-[12px] font-black border whitespace-nowrap ${
-                                        type.includes('전문') ? 'bg-slate-600/80 text-white border-slate-600/20' :
-                                        type.includes('별표') ? 'bg-rose-600/80 text-white border-rose-600/20' :
-                                        'bg-sky-600/80 text-white border-sky-600/20'
+                                    );
+                                  }
+                                  const basicMatch = raw.match(/^\[([^\]]+)\]\s*(.*)$/);
+                                  if (basicMatch) {
+                                    const type = basicMatch[1];
+                                    return (
+                                      <span className={`px-3 py-1.5 rounded-xl text-xs md:text-sm font-black border whitespace-nowrap shadow-sm ${
+                                        type.includes('전문') ? 'bg-slate-600 text-white border-slate-600/20' :
+                                        type.includes('별표') ? 'bg-rose-600 text-white border-rose-600/20' :
+                                        'bg-[#3498db] text-white border-[#3498db]/20'
                                       }`}>
                                         {type}
                                       </span>
-                                      <span className="font-bold text-slate-800 text-[15px]">{displayText}</span>
-                                    </div>
-                                  );
-                                }
-                                return <span className="font-bold text-slate-800 text-[15px]">{raw}</span>;
-                              })()}
-                                <div className="flex items-center gap-1.5 ml-3" onClick={(e) => e.stopPropagation()}>
-                                  {hwpFile && (
-                                    <a href={getDownloadUrl(hwpFile)} download={true} target="_blank" className="bg-blue-50 border border-blue-200 text-blue-700 px-1.5 py-0.5 rounded text-[11px] font-black flex items-center gap-0.5 hover:bg-blue-100 transition-colors" title="HWP 다운로드">
-                                      <ArticleIcon sx={{ fontSize: 14 }} /> HWP
-                                    </a>
-                                  )}
-                                  {pdfFile && (
-                                    <a href={getDownloadUrl(pdfFile)} download={true} target="_blank" className="bg-red-50 border border-red-200 text-red-700 px-1.5 py-0.5 rounded text-[11px] font-black flex items-center gap-0.5 hover:bg-red-100 transition-colors" title="PDF 다운로드">
-                                      <PictureAsPdfIcon sx={{ fontSize: 14 }} /> PDF
-                                    </a>
-                                  )}
-                                  {pdfFile && (
-                                    <a href={getInlineUrl(pdfFile)} target="_blank" className="text-slate-400 hover:text-slate-600 transition-colors ml-1 flex items-center justify-center" title="새 창에서 열기">
-                                      <LaunchIcon sx={{ fontSize: 16 }} />
-                                    </a>
-                                  )}
-                                </div>
+                                    );
+                                  }
+                                  return null;
+                                })()}
+                              </div>
+
+                              {/* 모바일 2행 (엔터) / 데스크톱 이어지는 영역: 제목 */}
+                              <div className="font-extrabold text-slate-800 text-[16px] md:text-[17px] tracking-tight leading-snug break-keep flex-1 mt-1 md:mt-0">
+                                {(() => {
+                                  const raw = group.baseName;
+                                  const detailedMatch = raw.match(/^\[(?:별지|별표|별첨|서식)\]\s*([\d\-]+\s+)\[([^\]]+)\]\s*(.*)$/);
+                                  if (detailedMatch) {
+                                    const ruleNum = detailedMatch[1].trim();
+                                    const fileName = detailedMatch[3];
+                                    return `${ruleNum} ${fileName}`;
+                                  }
+                                  const basicMatch = raw.match(/^\[([^\]]+)\]\s*(.*)$/);
+                                  if (basicMatch) {
+                                    return basicMatch[2];
+                                  }
+                                  return raw;
+                                })()}
+                              </div>
+                            </div>
+
+                            {/* 하단 / 데스크톱 우측: 다운로드 버튼 및 새창 열기 그룹 */}
+                            <div className="flex items-center justify-end gap-2 shrink-0 border-t border-slate-200/80 md:border-t-0 pt-3 md:pt-0" onClick={(e) => e.stopPropagation()}>
+                              {hwpFile && (
+                                <a href={getDownloadUrl(hwpFile)} download={true} target="_blank" className="bg-blue-50 border border-blue-200 text-blue-700 px-2.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1 hover:bg-blue-100 transition-colors shadow-sm" title="HWP 다운로드">
+                                  <ArticleIcon sx={{ fontSize: 16 }} /> HWP
+                                </a>
+                              )}
+                              {pdfFile && (
+                                <a href={getDownloadUrl(pdfFile)} download={true} target="_blank" className="bg-red-50 border border-red-200 text-red-700 px-2.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1 hover:bg-red-100 transition-colors shadow-sm" title="PDF 다운로드">
+                                  <PictureAsPdfIcon sx={{ fontSize: 16 }} /> PDF
+                                </a>
+                              )}
+                              {pdfFile && (
+                                <a href={getInlineUrl(pdfFile)} target="_blank" className="text-slate-400 hover:text-slate-600 transition-colors ml-2 flex items-center justify-center p-1" title="새 창에서 열기">
+                                  <LaunchIcon sx={{ fontSize: 18 }} />
+                                </a>
+                              )}
                             </div>
                           </div>
 
