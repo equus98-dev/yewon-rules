@@ -581,8 +581,12 @@ export default function Home() {
         </div>
       )}
 
-      {/* ==================== 1. GNB 글로벌 네비게이션 헤더 ==================== */}
-      <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 z-25 shrink-0 shadow-sm">
+      {isMobile ? (
+        <MobileHome />
+      ) : (
+        <>
+          {/* ==================== 1. GNB 글로벌 네비게이션 헤더 ==================== */}
+          <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 z-25 shrink-0 shadow-sm">
         <div className="flex items-center gap-3 cursor-pointer" onClick={handleGoHome}>
           <Image
             src="/UI.png"
@@ -1854,6 +1858,8 @@ export default function Home() {
 
           </div>
         </div>
+      )}
+        </>
       )}
 
     </div>
