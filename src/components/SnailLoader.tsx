@@ -15,44 +15,43 @@ export default function SnailLoader({ message = "규정 데이터를 가져오�
 
         {/* 달팽이 SVG 캐릭터 (손그림 만화풍) */}
         <div className="absolute bottom-[48px] animate-snail-walk" style={{ left: '5%' }}>
-          <svg width="90" height="85" viewBox="0 0 90 85" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* 왼쪽 눈 줄기 */}
-            <path d="M32 32 C30 22, 28 14, 26 6" stroke="#2d3436" strokeWidth="3" strokeLinecap="round" fill="none" className="animate-antenna-sway" style={{ transformOrigin: '32px 32px' }} />
-            {/* 왼쪽 눈알 */}
-            <circle cx="25" cy="5" r="6" fill="white" stroke="#2d3436" strokeWidth="2.5" className="animate-antenna-sway" style={{ transformOrigin: '32px 32px' }} />
-            <circle cx="26" cy="4" r="3" fill="#2d3436" />
-            <circle cx="27" cy="3" r="1.2" fill="white" />
-
-            {/* 오른쪽 눈 줄기 */}
-            <path d="M42 30 C42 20, 44 12, 45 4" stroke="#2d3436" strokeWidth="3" strokeLinecap="round" fill="none" className="animate-antenna-sway-r" style={{ transformOrigin: '42px 30px' }} />
-            {/* 오른쪽 눈알 */}
-            <circle cx="45" cy="3" r="6" fill="white" stroke="#2d3436" strokeWidth="2.5" className="animate-antenna-sway-r" style={{ transformOrigin: '42px 30px' }} />
-            <circle cx="46" cy="2" r="3" fill="#2d3436" />
-            <circle cx="47" cy="1" r="1.2" fill="white" />
-
-            {/* 껍데기 (소라) - 큰 원 */}
-            <ellipse cx="38" cy="48" rx="24" ry="23" fill="#81d4fa" stroke="#2d3436" strokeWidth="3" />
+          <svg width="95" height="85" viewBox="0 0 95 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* 껍데기 (소라) - 큰 원 (뒤에 먼저 그림) */}
+            <ellipse cx="35" cy="48" rx="24" ry="23" fill="#81d4fa" stroke="#2d3436" strokeWidth="3" />
             {/* 소라 나선 1 */}
-            <path d="M38 35 C48 35, 52 42, 50 50 C48 56, 42 58, 38 55" stroke="#4fc3f7" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+            <path d="M35 35 C45 35, 49 42, 47 50 C45 56, 39 58, 35 55" stroke="#4fc3f7" strokeWidth="3.5" strokeLinecap="round" fill="none" />
             {/* 소라 나선 2 */}
-            <path d="M38 42 C44 42, 46 46, 44 50" stroke="#29b6f6" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path d="M35 42 C41 42, 43 46, 41 50" stroke="#29b6f6" strokeWidth="3" strokeLinecap="round" fill="none" />
             {/* 소라 중심 */}
-            <circle cx="40" cy="47" r="3.5" fill="#4fc3f7" stroke="#29b6f6" strokeWidth="1.5" />
+            <circle cx="37" cy="47" r="3.5" fill="#4fc3f7" stroke="#29b6f6" strokeWidth="1.5" />
             {/* 껍데기 하이라이트 */}
-            <path d="M24 38 C26 34, 30 32, 34 33" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.6" />
+            <path d="M21 38 C23 34, 27 32, 31 33" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.6" />
 
-            {/* 몸통 (머리 쪽) */}
-            <path d="M55 60 C60 52, 68 48, 75 50 C80 52, 82 58, 78 64 C74 68, 62 72, 55 72 Z" fill="#ffeaa7" stroke="#2d3436" strokeWidth="2.8" strokeLinejoin="round" />
             {/* 몸통 (꼬리 쪽) */}
-            <path d="M20 62 C14 58, 10 60, 8 65 C6 70, 12 72, 20 72 Z" fill="#ffeaa7" stroke="#2d3436" strokeWidth="2.8" strokeLinejoin="round" />
+            <path d="M17 62 C11 58, 7 60, 5 65 C3 70, 9 72, 17 72 Z" fill="#ffeaa7" stroke="#2d3436" strokeWidth="2.8" strokeLinejoin="round" />
+            {/* 몸통 (머리 쪽) - 껍데기 앞에 나온 머리 */}
+            <path d="M52 58 C57 48, 67 44, 76 47 C83 50, 86 57, 82 64 C78 69, 64 73, 52 72 Z" fill="#ffeaa7" stroke="#2d3436" strokeWidth="2.8" strokeLinejoin="round" />
             {/* 몸통 아래 (배) */}
-            <path d="M8 68 C8 72, 20 76, 45 76 C65 76, 78 72, 78 66" stroke="#2d3436" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+            <path d="M5 68 C5 72, 17 76, 42 76 C62 76, 82 72, 82 66" stroke="#2d3436" strokeWidth="2.5" strokeLinecap="round" fill="none" />
 
             {/* 볼 홍조 */}
-            <ellipse cx="70" cy="58" rx="4" ry="2.5" fill="#fab1a0" opacity="0.7" />
-
+            <ellipse cx="76" cy="56" rx="4" ry="2.5" fill="#fab1a0" opacity="0.7" />
             {/* 입 (미소) */}
-            <path d="M66 60 C68 63, 72 63, 74 60" stroke="#2d3436" strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path d="M70 59 C72 62, 76 62, 78 59" stroke="#2d3436" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+            {/* 왼쪽 눈 줄기 (머리 위에서 올라감) */}
+            <path d="M65 48 C63 38, 61 26, 59 14" stroke="#2d3436" strokeWidth="3" strokeLinecap="round" fill="none" className="animate-antenna-sway" style={{ transformOrigin: '65px 48px' }} />
+            {/* 왼쪽 눈알 */}
+            <circle cx="58" cy="12" r="6.5" fill="white" stroke="#2d3436" strokeWidth="2.5" className="animate-antenna-sway" style={{ transformOrigin: '65px 48px' }} />
+            <circle cx="59" cy="11" r="3.2" fill="#2d3436" className="animate-antenna-sway" style={{ transformOrigin: '65px 48px' }} />
+            <circle cx="60.5" cy="9.5" r="1.3" fill="white" className="animate-antenna-sway" style={{ transformOrigin: '65px 48px' }} />
+
+            {/* 오른쪽 눈 줄기 (머리 위에서 올라감) */}
+            <path d="M74 46 C74 36, 76 26, 77 12" stroke="#2d3436" strokeWidth="3" strokeLinecap="round" fill="none" className="animate-antenna-sway-r" style={{ transformOrigin: '74px 46px' }} />
+            {/* 오른쪽 눈알 */}
+            <circle cx="77" cy="10" r="6.5" fill="white" stroke="#2d3436" strokeWidth="2.5" className="animate-antenna-sway-r" style={{ transformOrigin: '74px 46px' }} />
+            <circle cx="78" cy="9" r="3.2" fill="#2d3436" className="animate-antenna-sway-r" style={{ transformOrigin: '74px 46px' }} />
+            <circle cx="79.5" cy="7.5" r="1.3" fill="white" className="animate-antenna-sway-r" style={{ transformOrigin: '74px 46px' }} />
           </svg>
         </div>
 
