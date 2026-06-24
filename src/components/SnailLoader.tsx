@@ -69,7 +69,7 @@ export default function SnailLoader({ message = "규정 데이터를 가져오�
         </div>
 
         {/* 프로그레스 바 */}
-        <div className="absolute bottom-[12px] left-0 w-full">
+        <div className="absolute bottom-[18px] left-0 w-full">
           <div className="w-full h-[22px] bg-[#dfe6e9] rounded-full overflow-hidden shadow-inner border border-[#b2bec3]/40 relative">
             {/* 프로그레스 채우기 (무한 애니메이션) */}
             <div className="h-full rounded-full bg-gradient-to-r from-[#00cec9] via-[#55efc4] to-[#81ecec] animate-progress-fill relative overflow-hidden">
@@ -81,8 +81,8 @@ export default function SnailLoader({ message = "규정 데이터를 가져오�
           </div>
         </div>
 
-        {/* "LOADING..." 텍스트 (프로그레스 바 아래) */}
-        <div className="absolute -bottom-[2px] left-0 w-full text-center">
+        {/* "LOADING..." 텍스트 (프로그레스 바 아래 간격 넉넉히) */}
+        <div className="absolute -bottom-[8px] left-0 w-full text-center">
           <span className="text-[11px] font-black tracking-[4px] text-[#636e72] uppercase animate-pulse">
             loading...
           </span>
@@ -104,6 +104,9 @@ export default function SnailLoader({ message = "규정 데이터를 가져오�
       <style jsx>{`
         @keyframes snailWalk {
           0% { transform: translateX(0); }
+          25% { transform: translateX(60px); }
+          50% { transform: translateX(110px); }
+          75% { transform: translateX(145px); }
           100% { transform: translateX(160px); }
         }
         @keyframes antennaSway {
@@ -115,10 +118,11 @@ export default function SnailLoader({ message = "규정 데이터를 가져오�
           50% { transform: rotate(-10deg); }
         }
         @keyframes progressFill {
-          0% { width: 5%; }
-          50% { width: 65%; }
-          80% { width: 85%; }
-          100% { width: 5%; }
+          0% { width: 8%; }
+          25% { width: 35%; }
+          50% { width: 55%; }
+          75% { width: 72%; }
+          100% { width: 88%; }
         }
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
@@ -129,7 +133,7 @@ export default function SnailLoader({ message = "규정 데이터를 가져오�
           50% { opacity: 0.15; }
         }
         .animate-snail-walk {
-          animation: snailWalk 6s ease-in-out infinite alternate;
+          animation: snailWalk 5s ease-in-out infinite alternate;
         }
         .animate-antenna-sway {
           animation: antennaSway 1.2s ease-in-out infinite;
@@ -139,13 +143,13 @@ export default function SnailLoader({ message = "규정 데이터를 가져오�
           animation-delay: 0.2s;
         }
         .animate-progress-fill {
-          animation: progressFill 6s ease-in-out infinite;
+          animation: progressFill 5s ease-in-out infinite alternate;
         }
         .animate-shimmer {
           animation: shimmer 2s ease-in-out infinite;
         }
         .animate-trail-fade {
-          animation: trailFade 2s ease-in-out infinite, snailWalk 6s ease-in-out infinite alternate;
+          animation: trailFade 2s ease-in-out infinite, snailWalk 5s ease-in-out infinite alternate;
           transform-origin: left;
         }
       `}</style>
