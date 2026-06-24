@@ -34,6 +34,45 @@ const convertCircledNum = (char: string) => {
   return 1;
 };
 
+const HISTORY_REGEX = /((?:&lt;|[<(\[＜（])(?:개정|제정|신설|삭제|본조신설|전문개정|전부개정|일부개정|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)(?:&gt;|[>\])＞）]))/gi;
+
+const normalizeHistoryDate = (str: string) => {
+  let inner = str.replace(/^(?:&lt;|[<(\[＜（])|(?:&gt;|[)>\])＞）])$/g, '').trim();
+  let parts = inner.split(',').map(p => p.trim());
+  let lastAction = '';
+  let normParts = parts.map(part => {
+    let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|전부개정|일부개정|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동)?\s*(.*)$/);
+    if (!match) return part;
+    let action = match[1];
+    let dateStr = match[2];
+    
+    if (action) {
+      lastAction = action;
+    } else {
+      action = lastAction || '개정';
+    }
+    
+    let dateMatch = dateStr.match(/^([\d.\s]+)(.*)$/);
+    let datePart = dateStr;
+    let restPart = '';
+    if (dateMatch && dateMatch[1].replace(/[^\d]/g, '').length >= 4) {
+      datePart = dateMatch[1];
+      restPart = dateMatch[2].trim();
+    } else {
+      dateMatch = null;
+    }
+
+    let dateNorm = datePart.replace(/[^\d.]/g, '').split('.').map(s => s.trim()).filter(s => s.length > 0).map(s => parseInt(s, 10)).join('. ');
+    if (dateNorm) dateNorm += '.';
+    else dateNorm = datePart.trim();
+    
+    let result = action + (dateNorm ? ' ' + dateNorm : '');
+    if (restPart) result += ' ' + restPart;
+    return result.trim();
+  });
+  return '<' + normParts.join(', ') + '>';
+};
+
 const mergeConsecutiveHistories = (text: string) => {
   if (!text) return text;
   let prev = "";
@@ -144,6 +183,15 @@ export default function ArticleRenderer({
 
     let cleanHtml = contentHtml;
     cleanHtml = mergeConsecutiveHistories(cleanHtml);
+
+    if (hideHistory) {
+      cleanHtml = cleanHtml.replace(HISTORY_REGEX, "");
+    } else {
+      cleanHtml = cleanHtml.replace(
+        HISTORY_REGEX,
+        (match) => `<span class="text-sky-700 font-medium text-[13px] ml-1">${normalizeHistoryDate(match).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`
+      );
+    }
 
     // 특정 규정(학생생활관 등) 제12조 표 내의 빨간글씨 제거 요청 반영
     if (articleNumber === 12) {
@@ -522,45 +570,6 @@ export default function ArticleRenderer({
 
   const isAddendumItem = (text: string) =>
     /^\(시행일\)|^\(폐지|^\(적용예외|^\(경과조치|^\(적용범위|^\(준용\)/.test(text.trim());
-
-  const HISTORY_REGEX = /([<(\[＜（](?:개정|제정|신설|삭제|본조신설|전문개정|전부개정|일부개정|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)(?:[^>\])＞）]*\d+[^>\])＞）]*|[\s]*)[>\])＞）])/gi;
-
-  const normalizeHistoryDate = (str: string) => {
-    let inner = str.replace(/^[<(\[]|[)>\]]$/g, '').trim();
-    let parts = inner.split(',').map(p => p.trim());
-    let lastAction = '';
-    let normParts = parts.map(part => {
-      let match = part.match(/^(개정|제정|신설|삭제|본조신설|전문개정|전부개정|일부개정|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동)?\s*(.*)$/);
-      if (!match) return part;
-      let action = match[1];
-      let dateStr = match[2];
-      
-      if (action) {
-        lastAction = action;
-      } else {
-        action = lastAction || '개정';
-      }
-      
-      let dateMatch = dateStr.match(/^([\d.\s]+)(.*)$/);
-      let datePart = dateStr;
-      let restPart = '';
-      if (dateMatch && dateMatch[1].replace(/[^\d]/g, '').length >= 4) {
-        datePart = dateMatch[1];
-        restPart = dateMatch[2].trim();
-      } else {
-        dateMatch = null;
-      }
-
-      let dateNorm = datePart.replace(/[^\d.]/g, '').split('.').map(s => s.trim()).filter(s => s.length > 0).map(s => parseInt(s, 10)).join('. ');
-      if (dateNorm) dateNorm += '.';
-      else dateNorm = datePart.trim();
-      
-      let result = action + (dateNorm ? ' ' + dateNorm : '');
-      if (restPart) result += ' ' + restPart;
-      return result.trim();
-    });
-    return '<' + normParts.join(', ') + '>';
-  };
 
   const renderTextWithHistory = (text: string) => {
     // DB에 &lt;table&gt; 과 같이 이스케이프되어 저장된 경우를 대비해 디코딩
