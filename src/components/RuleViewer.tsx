@@ -129,11 +129,15 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const handleScrollTop = () => {
     scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     tocScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.querySelectorAll(".overflow-y-auto").forEach(el => el.scrollTo({ top: 0, behavior: "smooth" }));
   };
 
   const handleScrollBottom = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current?.scrollHeight || 99999, behavior: "smooth" });
     tocScrollRef.current?.scrollTo({ top: tocScrollRef.current?.scrollHeight || 99999, behavior: "smooth" });
+    window.scrollTo({ top: document.body.scrollHeight || 99999, behavior: "smooth" });
+    document.querySelectorAll(".overflow-y-auto").forEach(el => el.scrollTo({ top: el.scrollHeight || 99999, behavior: "smooth" }));
   };
 
   const currentRevision = ruleData?.currentRevision;
@@ -816,8 +820,27 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         <h1 className="text-lg md:text-2xl font-black text-[#007073] tracking-tight ml-1 md:ml-2 line-clamp-2 md:line-clamp-none">
           {ruleNumber ? `${ruleNumber} ` : ""}{cleanTitle}
         </h1>
-        <div className="text-[12px] md:text-[14px] text-slate-500 font-medium tracking-wider w-full md:w-auto overflow-hidden text-ellipsis whitespace-nowrap ml-1 md:ml-0">
-          HOME &gt; 전자규정집 &gt; {category?.name || "분류"} &gt; <span className="font-bold text-slate-700">{cleanTitle}</span>
+        <div className="text-[13px] md:text-[14px] text-slate-500 font-medium tracking-wider w-full md:w-auto whitespace-normal break-keep leading-snug ml-1 md:ml-0 flex flex-wrap items-center gap-1.5">
+          <button 
+            onClick={() => { sessionStorage.removeItem("activeRuleId"); sessionStorage.removeItem("activeCategoryId"); window.location.href = "/"; }}
+            className="hover:text-blue-600 hover:underline cursor-pointer font-semibold transition-colors"
+          >
+            HOME
+          </button>
+          <span>&gt;</span>
+          <button 
+            onClick={() => { if (category?.id) { sessionStorage.setItem("activeCategoryId", category.id); sessionStorage.removeItem("activeRuleId"); window.location.href = "/"; } }}
+            className="hover:text-blue-600 hover:underline cursor-pointer font-semibold transition-colors"
+          >
+            {category?.name || "분류"}
+          </button>
+          <span>&gt;</span>
+          <button 
+            onClick={handleScrollTop}
+            className="font-bold text-slate-700 hover:text-blue-600 hover:underline cursor-pointer transition-colors text-left"
+          >
+            {cleanTitle}
+          </button>
         </div>
       </div>
 
@@ -980,7 +1003,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         <div className="relative z-30 w-0 h-full">
           <button
             onClick={() => setIsTocOpen(!isTocOpen)}
-            className="sticky -left-px top-[45vh] -translate-y-1/2 w-6 h-16 bg-[#007073] hover:bg-[#005a5c] text-white flex items-center justify-center rounded-r-lg shadow-lg cursor-pointer transition-colors border border-l-0 border-[#005a5c] active:scale-95 z-40"
+            className={`fixed top-[45vh] -translate-y-1/2 w-6 h-16 bg-[#007073] hover:bg-[#005a5c] text-white flex items-center justify-center rounded-r-lg shadow-lg cursor-pointer transition-all duration-300 border border-l-0 border-[#005a5c] active:scale-95 z-[60] ${isTocOpen ? 'left-[320px]' : 'left-0'} lg:absolute lg:top-[45vh] lg:-left-px`}
             title={isTocOpen ? "목차 닫기" : "목차 열기"}
           >
             {isTocOpen ? <KeyboardArrowLeftIcon sx={{ fontSize: 18 }} /> : <KeyboardArrowRightIcon sx={{ fontSize: 18 }} />}
