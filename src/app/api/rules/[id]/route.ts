@@ -120,6 +120,30 @@ export async function GET(
 
     const targetRevision = revisions.find((r) => r.id === targetRevisionId);
 
+    // 2-0-3 학업이수에 관한 규정 내 제25의2(특별학점인정) 오타 감지 및 독립 조문 완벽 분리
+    let processedArticles: any[] = [];
+    for (const art of articlesRes.rows) {
+      if (art.contentText && art.contentText.includes("제25의2(특별학점인정)")) {
+        const parts = art.contentText.split("제25의2(특별학점인정)");
+        const art1 = { ...art, contentText: parts[0].trim(), contentJson: null };
+        const art2 = {
+          ...art,
+          id: art.id + "_sub2",
+          articleNumber: 25,
+          title: "제25조의2(특별학점인정)",
+          contentText: "제25조의2(특별학점인정)" + parts[1],
+          contentJson: JSON.stringify([
+            { type: "article", num: "제25조의2", text: "제25조의2(특별학점인정)" },
+            { type: "text", num: "", text: parts[1].trim() }
+          ]),
+          sortOrder: art.sortOrder + 0.5
+        };
+        processedArticles.push(art1, art2);
+      } else {
+        processedArticles.push(art);
+      }
+    }
+
     const responseData = {
       id: ruleRow.id,
       title: ruleRow.title,
@@ -131,7 +155,7 @@ export async function GET(
       revisions,
       currentRevision: {
         ...targetRevision,
-        articles: articlesRes.rows,
+        articles: processedArticles,
         comparisons,
       },
     };

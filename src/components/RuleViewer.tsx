@@ -1427,22 +1427,17 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                           >
                             <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 flex-1">
                               {/* 모바일 1행: 미리보기 버튼 + 뱃지 */}
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2.5">
                                 {!isMain && (
-                                  <div className={`flex flex-col items-center justify-center shrink-0 w-16 h-16 rounded-full border shadow-sm transition-all ${isExpanded ? 'bg-indigo-600 text-white border-indigo-700 shadow-md' : 'bg-white text-slate-700 border-slate-300 hover:border-[#007073]'}`}>
-                                    <div className="flex items-center gap-0.5">
-                                      <svg className={`w-3 h-3 shrink-0 ${isExpanded ? 'text-white' : 'text-[#f43f5e]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <circle cx="11" cy="11" r="8"></circle>
-                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                      </svg>
-                                      <span className="text-[11px] font-black tracking-tight leading-none">미리</span>
-                                    </div>
-                                    <div className="flex items-center gap-0.5 mt-1">
-                                      <span className="text-[11px] font-black tracking-tight leading-none">보기</span>
-                                      <span className="flex items-center justify-center opacity-80">
-                                        {isExpanded ? <KeyboardArrowUpIcon sx={{ fontSize: 13 }} /> : <KeyboardArrowDownIcon sx={{ fontSize: 13 }} />}
-                                      </span>
-                                    </div>
+                                  <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-black border shadow-sm transition-all ${isExpanded ? 'bg-indigo-600 text-white border-indigo-700 shadow-md' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:border-slate-400'}`}>
+                                    <svg className="w-3.5 h-3.5 shrink-0 text-[#f43f5e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                      <circle cx="11" cy="11" r="8"></circle>
+                                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    <span>미리보기</span>
+                                    <span className="flex items-center justify-center opacity-80">
+                                      {isExpanded ? <KeyboardArrowUpIcon sx={{ fontSize: 14 }} /> : <KeyboardArrowDownIcon sx={{ fontSize: 14 }} />}
+                                    </span>
                                   </div>
                                 )}
 
