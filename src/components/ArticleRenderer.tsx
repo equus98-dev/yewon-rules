@@ -567,6 +567,15 @@ export default function ArticleRenderer({
       // 연혁 숨기기
       decodedText = decodedText.replace(HISTORY_REGEX, "");
     }
+
+    // 🚨 [핵심 버그 수정: Table Foster Parenting 방지]
+    // <table> 내부의 \n이 <br/>로 변환되면 브라우저가 이를 테이블 위로 몽땅 끄집어내어 거대한 여백(수백 개의 br)을 만듦!
+    // 따라서 <table> 태그 내부의 \n을 사전에 모조리 제거!
+    if (/<table/i.test(decodedText)) {
+      decodedText = decodedText.replace(/<table[\s\S]*?<\/table>/gi, (tableMatch) => {
+        return tableMatch.replace(/\n/g, '');
+      });
+    }
     
     // 연혁 표시: <개정 ...> 부분을 파란색으로 렌더링하기 위한 문자열 준비
     let htmlText = decodedText.replace(
