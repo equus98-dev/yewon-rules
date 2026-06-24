@@ -1395,11 +1395,18 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                             className={`bg-slate-50 flex items-center justify-between px-4 py-3 select-none border-b border-slate-200 transition-colors ${isMain ? '' : 'hover:bg-slate-100 cursor-pointer'}`}
                             onClick={() => !isMain && setExpandedAttachments(prev => ({ ...prev, [group.baseName]: !isExpanded }))}
                           >
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2.5">
                               {!isMain && (
-                                <span className="text-slate-500 flex items-center justify-center">
-                                  {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
-                                </span>
+                                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-black border shadow-sm transition-all ${isExpanded ? 'bg-indigo-600 text-white border-indigo-700 shadow-md' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:border-slate-400'}`}>
+                                  <svg className="w-3.5 h-3.5 shrink-0 text-[#f43f5e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                  </svg>
+                                  <span>미리보기</span>
+                                  <span className="flex items-center justify-center opacity-80">
+                                    {isExpanded ? <KeyboardArrowUpIcon sx={{ fontSize: 14 }} /> : <KeyboardArrowDownIcon sx={{ fontSize: 14 }} />}
+                                  </span>
+                                </div>
                               )}
                               {(() => {
                                 // 제목 파싱: [타입] 1-0-4 [세부태그] 이름 형태 처리
