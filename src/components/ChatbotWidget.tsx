@@ -26,11 +26,6 @@ const CuteRobotIcon = ({ width = 24, height = 24, className = "" }) => (
 
 export default function ChatbotWidget() {
   const pathname = usePathname();
-  
-  if (pathname?.includes("/compare") || pathname?.includes("/select") || pathname?.includes("/popup")) {
-    return null;
-  }
-
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -52,8 +47,6 @@ export default function ChatbotWidget() {
     }
   }, []);
 
-  if (isMobile) return null;
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -63,6 +56,10 @@ export default function ChatbotWidget() {
       scrollToBottom();
     }
   }, [messages, isOpen]);
+
+  if (pathname?.includes("/compare") || pathname?.includes("/select") || pathname?.includes("/popup") || isMobile) {
+    return null;
+  }
 
   const handleSend = async () => {
     if (!input.trim()) return;

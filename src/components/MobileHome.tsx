@@ -80,7 +80,7 @@ export default function MobileHome() {
     try {
       let url = `/api/rules/search?query=`;
       if (type === "dept") {
-        url = `/api/rules/search?query=&departmentId=1`; // 교무처 등 기본부서
+        url = `/api/rules/search?query=운영`; // 교무/기획/운영 등 주요 소관부서 관련 규정 로드
       } else if (type === "form") {
         url = `/api/rules/search?query=별지`;
       } else if (type === "recent") {
@@ -136,20 +136,22 @@ export default function MobileHome() {
   return (
     <div className="flex flex-col min-h-screen bg-[#f8f9fa] font-sans text-slate-800 select-none pb-16">
       {/* 1. 상단 스마트 헤더 */}
-      <header className="bg-white h-14 border-b border-slate-200 px-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
-        <button 
-          onClick={() => setDrawerOpen(true)}
-          className="p-1.5 text-slate-700 hover:bg-slate-100 rounded-full transition-colors active:scale-95"
-          aria-label="메뉴 열기"
-        >
-          <MenuIcon sx={{ fontSize: 26 }} />
-        </button>
+      <header className="bg-white h-14 border-b border-slate-200 px-3 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setDrawerOpen(true)}
+            className="p-1 text-slate-700 hover:bg-slate-100 rounded-full transition-colors active:scale-95"
+            aria-label="메뉴 열기"
+          >
+            <MenuIcon sx={{ fontSize: 26 }} />
+          </button>
 
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setActiveTab("main"); setActiveRuleId(null); setActiveNoticeId(null); }}>
-          <Image src="/UI.png" alt="로고" width={110} height={24} className="object-contain h-6 w-auto" />
-          <span className="text-blue-900 font-black text-[16px] tracking-tight border-l border-slate-300 pl-2">
-            규정관리
-          </span>
+          <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => { setActiveTab("main"); setActiveRuleId(null); setActiveNoticeId(null); }}>
+            <Image src="/UI.png" alt="로고" width={100} height={22} className="object-contain h-5 w-auto" />
+            <span className="text-blue-900 font-black text-[15px] tracking-tight border-l border-slate-300 pl-1.5">
+              규정관리시스템
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-1">
@@ -252,9 +254,9 @@ export default function MobileHome() {
             <div className="bg-white py-8 px-4 border-b border-slate-200 shadow-sm">
               <div className="grid grid-cols-4 gap-y-6 gap-x-2 max-w-md mx-auto">
                 {[
-                  { title: "학교법인", icon: "🏫", color: "from-amber-500 to-orange-500", id: "cat-1-0" },
-                  { title: "대학헌장", icon: "📖", color: "from-emerald-500 to-teal-600", id: "cat-2-0" },
-                  { title: "대학운영", icon: "⚖️", color: "from-blue-600 to-indigo-700", id: "cat-3-0" },
+                  { title: "학교법인", icon: "🏫", color: "from-amber-500 to-orange-500", id: "virtual-학교법인" },
+                  { title: "대학헌장", icon: "📖", color: "from-emerald-500 to-teal-600", id: "virtual-대학헌장" },
+                  { title: "대학운영", icon: "⚖️", color: "from-blue-600 to-indigo-700", id: "virtual-대학운영" },
                   { title: "최신규정", icon: "⚡", color: "from-violet-600 to-purple-700", type: "recent" },
                   { title: "소관부서", icon: "🏛️", color: "from-rose-500 to-red-600", type: "dept" },
                   { title: "각종서식", icon: "📝", color: "from-cyan-500 to-blue-600", type: "form" },
