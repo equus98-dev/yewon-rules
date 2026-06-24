@@ -964,7 +964,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className={`block w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '48px', textIndent: '-20px' }}>
+                  <div key={`glued-${idx}`} className={`block w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: isArticleBody ? '20px' : '48px', textIndent: '-20px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      
@@ -989,7 +989,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '64px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: isArticleBody ? '36px' : '64px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      
@@ -1013,7 +1013,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: '80px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: isArticleBody ? '52px' : '80px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      
