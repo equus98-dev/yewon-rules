@@ -730,7 +730,8 @@ export default function ArticleRenderer({
     }
     const badgeType = historyDates.some(h => h.includes("개정")) ? "개" : "연";
     const badgeColor = badgeType === "개" ? "bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100" : "bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100";
-    return { historyDates, badgeType, badgeColor };
+    const badgeTitle = badgeType === "개" ? "개정 이력 보기" : "연혁 정보 보기";
+    return { historyDates, badgeType, badgeColor, badgeTitle };
   };
 
   // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
@@ -766,7 +767,7 @@ export default function ArticleRenderer({
                bodyText = bodyText.replace(/^(?:<br\s*\/?>\s*)+/i, '');
                
                const fullTitle = articleNum + titleText;
-               const { historyDates, badgeType, badgeColor } = getBadgeInfo(text.split(/<table/i)[0]);
+               const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(text.split(/<table/i)[0]);
                
                return (
                   <div key={`glued-table`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full group/text">
@@ -774,6 +775,7 @@ export default function ArticleRenderer({
                      {!hideBadge && (
                        <button 
                          onClick={(e) => { e.stopPropagation(); handleOpenHistory(historyDates); }}
+                         title={badgeTitle}
                          className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
                        >
                          {badgeType}
@@ -1063,13 +1065,14 @@ export default function ArticleRenderer({
                  } else {
                      body = m[2].trim();
                  }
-                 const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
+                 const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(trimmed);
                  return (
                     <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full group/text">
                        {renderEditButton(true)}
                        {!hideBadge && (
                          <button 
                            onClick={() => handleOpenHistory(historyDates)}
+                           title={badgeTitle}
                            className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
                          >
                            {badgeType}
@@ -1101,12 +1104,13 @@ export default function ArticleRenderer({
                          body = body.substring(titleDateMatch[1].length).trim();
                      }
                  }
-                 const { historyDates, badgeType, badgeColor } = getBadgeInfo(trimmed);
+                 const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(trimmed);
                  return (
                     <div key={`glued-${idx}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
                        {!hideBadge && (
                          <button 
                            onClick={() => handleOpenHistory(historyDates)}
+                           title={badgeTitle}
                            className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
                          >
                            {badgeType}
@@ -1560,7 +1564,7 @@ export default function ArticleRenderer({
             const safeText = String(articleItem.text || "").trim();
             const plainText = safeText.replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim();
             const isAddendum = /^부\s*칙/.test(plainText) || plainText.replace(/\s+/g, "").startsWith("부칙");
-            const { historyDates, badgeType, badgeColor } = getBadgeInfo(plainText);
+            const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(plainText);
             
             if (plainText.startsWith("(") && !/^\((삭제|개정|신설|전문개정|본조신설)/.test(plainText)) {
               const match = plainText.match(/^(\([^)]+\))(.*)/);
@@ -1575,6 +1579,7 @@ export default function ArticleRenderer({
                 {!hideBadge && !isAddendum && (
                   <button 
                     onClick={(e) => { e.stopPropagation(); handleOpenHistory(historyDates); }}
+                    title={badgeTitle}
                     className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
                   >
                     {badgeType}
