@@ -11,6 +11,19 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Missing fileUrl parameter" }, { status: 400 });
     }
 
+    if (fileUrl.startsWith('/api/files/')) {
+      const redirectUrl = new URL(fileUrl, request.url);
+      if (searchParams.get("inline") === "true") {
+        redirectUrl.searchParams.set("inline", "true");
+      } else {
+        redirectUrl.searchParams.set("download", "true");
+      }
+      if (searchParams.get("filename")) {
+        redirectUrl.searchParams.set("filename", searchParams.get("filename")!);
+      }
+      return NextResponse.redirect(redirectUrl);
+    }
+
     let targetUrl = fileUrl;
     if (!fileUrl.startsWith('http')) {
       targetUrl = `https://raw.githubusercontent.com/equus98-dev/yewon-rules/main/public${fileUrl}`;

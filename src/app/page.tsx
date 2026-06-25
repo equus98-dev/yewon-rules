@@ -1015,56 +1015,62 @@ export default function Home() {
                               </td>
                             </tr>
                           ) : (
-                            categoryRules.map((rule, idx) => (
-                              <tr key={rule.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors">
-                                <td className="py-4 px-4 text-center text-slate-500 font-extrabold text-[16px]">{idx + 1}</td>
-                                <td className="py-4 px-4">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setActiveRuleId(rule.id);
-                                      setActiveCategoryId(null);
-                                    }}
-                                    className="text-slate-800 font-medium hover:text-blue-800 cursor-pointer text-[15.5px] transition-colors"
-                                  >
-                                    {rule.ruleNumber && `${rule.ruleNumber} `}{rule.title}
-                                  </button>
-                                </td>
-                                <td className="py-4 px-4 text-center text-slate-600 font-medium text-[15px]">
-                                  {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString() : "-"}
-                                </td>
-                                <td className="py-4 px-4 text-center">
-                                  <div className="flex items-center justify-center gap-1.5">
-                                    {rule.hwpUrl ? (
-                                      <a href={`/api/download?fileUrl=${encodeURIComponent(rule.hwpUrl)}`} target="_blank" rel="noopener noreferrer" className="px-2 py-1 bg-white border border-slate-300 text-[12px] font-bold text-slate-600 rounded hover:bg-slate-50 transition-colors shadow-sm">
-                                        HWP
-                                      </a>
-                                    ) : (
-                                      <span className="text-[12px] text-slate-300 font-medium">-</span>
-                                    )}
-                                    {rule.pdfUrl ? (
-                                      <a href={`/api/download?fileUrl=${encodeURIComponent(rule.pdfUrl)}&inline=true`} target="_blank" rel="noopener noreferrer" className="px-2 py-1 bg-white border border-slate-300 text-[12px] font-bold text-slate-600 rounded hover:bg-slate-50 transition-colors shadow-sm">
-                                        PDF
-                                      </a>
-                                    ) : (
-                                      <span className="text-[12px] text-slate-300 font-medium">-</span>
-                                    )}
-                                  </div>
-                                </td>
-                                <td className="py-4 px-4 text-center">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setActiveRuleId(rule.id);
-                                      setActiveCategoryId(null);
-                                    }}
-                                    className="text-[14px] font-medium text-slate-500 hover:text-blue-700 hover:underline cursor-pointer"
-                                  >
-                                    전체보기
-                                  </button>
-                                </td>
-                              </tr>
-                            ))
+                            categoryRules.map((rule, idx) => {
+                              const hwpTitle = encodeURIComponent((rule.title || "rule") + (rule.title?.toLowerCase().endsWith(".hwp") ? "" : ".hwp"));
+                              const pdfTitle = encodeURIComponent((rule.title || "rule") + (rule.title?.toLowerCase().endsWith(".pdf") ? "" : ".pdf"));
+                              const hwpHref = rule.hwpUrl?.startsWith('/api/files/') ? `${rule.hwpUrl}?download=true&filename=${hwpTitle}` : `/api/download?fileUrl=${encodeURIComponent(rule.hwpUrl || "")}&filename=${hwpTitle}`;
+                              const pdfHref = rule.pdfUrl?.startsWith('/api/files/') ? `${rule.pdfUrl}?inline=true&filename=${pdfTitle}` : `/api/download?fileUrl=${encodeURIComponent(rule.pdfUrl || "")}&inline=true&filename=${pdfTitle}`;
+                              return (
+                                <tr key={rule.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                                  <td className="py-4 px-4 text-center text-slate-500 font-extrabold text-[16px]">{idx + 1}</td>
+                                  <td className="py-4 px-4">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setActiveRuleId(rule.id);
+                                        setActiveCategoryId(null);
+                                      }}
+                                      className="text-slate-800 font-medium hover:text-blue-800 cursor-pointer text-[15.5px] transition-colors"
+                                    >
+                                      {rule.ruleNumber && `${rule.ruleNumber} `}{rule.title}
+                                    </button>
+                                  </td>
+                                  <td className="py-4 px-4 text-center text-slate-600 font-medium text-[15px]">
+                                    {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString() : "-"}
+                                  </td>
+                                  <td className="py-4 px-4 text-center">
+                                    <div className="flex items-center justify-center gap-1.5">
+                                      {rule.hwpUrl ? (
+                                        <a href={hwpHref} target="_blank" rel="noopener noreferrer" className="px-2 py-1 bg-white border border-slate-300 text-[12px] font-bold text-slate-600 rounded hover:bg-slate-50 transition-colors shadow-sm">
+                                          HWP
+                                        </a>
+                                      ) : (
+                                        <span className="text-[12px] text-slate-300 font-medium">-</span>
+                                      )}
+                                      {rule.pdfUrl ? (
+                                        <a href={pdfHref} target="_blank" rel="noopener noreferrer" className="px-2 py-1 bg-white border border-slate-300 text-[12px] font-bold text-slate-600 rounded hover:bg-slate-50 transition-colors shadow-sm">
+                                          PDF
+                                        </a>
+                                      ) : (
+                                        <span className="text-[12px] text-slate-300 font-medium">-</span>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="py-4 px-4 text-center">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setActiveRuleId(rule.id);
+                                        setActiveCategoryId(null);
+                                      }}
+                                      className="text-[14px] font-medium text-slate-500 hover:text-blue-700 hover:underline cursor-pointer"
+                                    >
+                                      전체보기
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })
                           )}
                         </tbody>
                       </table>
