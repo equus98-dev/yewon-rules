@@ -64,7 +64,7 @@ export async function PATCH(
   let pool;
   try {
     const { id: revisionId } = await params;
-    const body = await request.json();
+    const body = await request.json() as { description?: string };
     const { description } = body;
 
     pool = createPool();
