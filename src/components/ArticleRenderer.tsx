@@ -773,19 +773,27 @@ export default function ArticleRenderer({
     });
   };
 
-  const getBadgeInfo = (text: string) => {
+  const getBadgeInfo = (text: string, fullContentText?: string) => {
     let historyDates: string[] = [];
-    const datesMatches = text.match(/\((?:삭제|개정|제정|신설|전문개정|전부개정|일부개정|본조신설|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|본문이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)\s*[^)]*\)/g);
+    const targetText = fullContentText ? `${text} ${fullContentText}` : text;
+    const datesMatches = targetText.match(/\((?:삭제|개정|제정|신설|전문개정|전부개정|일부개정|본조신설|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|본문이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)\s*[^)]*\)/g);
     if (datesMatches) {
       datesMatches.forEach(match => {
         const cleaned = match.replace(/[()]/g, '').trim();
         historyDates.push(cleaned);
       });
     }
-    if (text.includes("<개정")) {
-      const match = text.match(/<개정(.*?)>/);
-      if (match) historyDates.push(`개정 ${match[1].trim()}`);
+    if (targetText.includes("<개정")) {
+      const matches = targetText.match(/<개정[^>]*>/g);
+      if (matches) {
+        matches.forEach(m => {
+          const match = m.match(/<개정(.*?)>/);
+          if (match) historyDates.push(`개정 ${match[1].trim()}`);
+        });
+      }
     }
+    // 중복 제거
+    historyDates = Array.from(new Set(historyDates));
     const badgeType = historyDates.some(h => h.includes("개정")) ? "개" : "연";
     const badgeColor = badgeType === "개" ? "bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100" : "bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100";
     const badgeTitle = badgeType === "개" ? "개정 이력 보기" : "연혁 정보 보기";
@@ -1649,7 +1657,7 @@ export default function ArticleRenderer({
             const safeText = String(articleItem.text || "").trim();
             const plainText = safeText.replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim();
             const isAddendum = /^부\s*칙/.test(plainText) || plainText.replace(/\s+/g, "").startsWith("부칙");
-            const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(plainText);
+            const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(plainText, contentText);
             
             if (plainText.startsWith("(") && !/^\((삭제|개정|신설|전문개정|본조신설)/.test(plainText)) {
               const match = plainText.match(/^(\([^)]+\))(.*)/);
