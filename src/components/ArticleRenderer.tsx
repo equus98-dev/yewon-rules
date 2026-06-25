@@ -1720,7 +1720,7 @@ export default function ArticleRenderer({
                     </button>
                   </div>
                 )}
-                <div className={`flex-1 w-full group/text text-[16px] text-slate-800 leading-[1.7] ${(!hideBadge && !isAddendum) ? "" : "ml-[28px]"}`}>
+                <div className={`flex-1 w-full group/text text-[16px] text-slate-800 leading-[1.7] ${(!hideBadge && !isAddendum) ? "" : "ml-[52px]"}`}>
                   <div id={`toc-${safeNum}`} className="w-full break-keep inline-block">
                     {isAddendum ? (
                       <>
@@ -1827,7 +1827,7 @@ export default function ArticleRenderer({
           const isGlued = /^제\d+조/.test(plainTextForGlued) || /(?<!\d+\.\s*)(?<!\d)(\d{1,2}\.)\s+(?=[^\d])/.test(plainTextForGlued) || /(?<!^|\s)[①-⑳]/.test(plainTextForGlued);
           if (isGlued) {
             return (
-              <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 relative ${interactiveClass}`}>
+              <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 relative ${interactiveClass}`} style={{ paddingLeft: '52px' }}>
                 <span className="font-normal mr-1">{safeNum}</span>
                 {formatGluedText(safeText, false)}
                 
@@ -1835,7 +1835,7 @@ export default function ArticleRenderer({
             );
           }
           return (
-            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: '48px', textIndent: '-20px' }}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: '72px', textIndent: '-20px' }}>
               {showEditBtn && renderEditButton(true)}
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
@@ -1847,7 +1847,7 @@ export default function ArticleRenderer({
 
           return (
             <React.Fragment key={index}>
-              <div className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '28px' : '64px', textIndent: isAddendum ? '-20px' : '-16px' }}>
+              <div className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '72px' : '88px', textIndent: isAddendum ? '-20px' : '-16px' }}>
                 {showEditBtn && renderEditButton(true)}
                 <span className="font-normal mr-1">{safeNum}</span>
                 <span className="font-normal">{renderTextWithHistory(safeText)}</span>
@@ -1857,7 +1857,7 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "subitem") {
           return (
-            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '80px', textIndent: '-16px' }}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '104px', textIndent: '-16px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
               
@@ -1878,7 +1878,7 @@ export default function ArticleRenderer({
                 }
             }
             return (
-              <div key={index} className={`mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full ${interactiveClass}`}>
+              <div key={index} className={`mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full ${interactiveClass}`} style={{ paddingLeft: '52px' }}>
                 <div className="flex-1 w-full group/text text-[16px] text-slate-800 leading-[1.7]">
                   <div className="w-full break-keep inline-block">
                     <span className="font-bold mr-1 text-[#000080]">{title || "부칙"}</span>
@@ -1891,7 +1891,7 @@ export default function ArticleRenderer({
           }
           const textToFormat = safeNum ? `${safeNum} ${safeText}` : safeText;
           return (
-            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${interactiveClass}`}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${interactiveClass}`} style={{ paddingLeft: '52px' }}>
               {formatGluedText(textToFormat, false)}
               
             </div>
