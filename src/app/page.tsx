@@ -899,7 +899,7 @@ export default function Home() {
               </div>
 
               <div className="flex-1 p-8">
-                <div className="max-w-6xl mx-auto">
+                <div className="w-full">
                   <div className="bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden flex flex-col">
                     {loadingRecent ? (
                       <div className="flex justify-center items-center py-40">
