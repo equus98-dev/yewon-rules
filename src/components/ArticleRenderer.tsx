@@ -25,6 +25,7 @@ interface ArticleRendererProps {
   trailingTitles?: string[];
   isBundleChild?: boolean;
   seenAddendumCoreTexts?: Set<string>;
+  ruleTitle?: string;
 }
 
 const convertCircledNum = (char: string) => {
@@ -102,6 +103,7 @@ export default function ArticleRenderer({
   trailingTitles = [],
   isBundleChild = false,
   seenAddendumCoreTexts,
+  ruleTitle = "",
 }: ArticleRendererProps) {
   const isAddendumArticle =
     title === "부칙" ||
@@ -110,6 +112,62 @@ export default function ArticleRenderer({
     (chapter || "").replace(/\s+/g, "").startsWith("부칙") ||
     // title/chapter가 없어도 contentText가 부칙으로 시작하는 경우 (예: 1-0-1 정관)
     (!title && !chapter && /^부\s*칙/.test((contentText || "").trim()));
+
+  const handlePrintArticle = (specificContentText?: string) => {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    // 인쇄용 내용 구성
+    const ruleName = ruleTitle || "규정명 미상";
+    const chapterName = chapter ? chapter : "";
+    
+    // 출력할 조문 내용 결정
+    let bodyHtml = "";
+    if (contentHtml && contentHtml.trim().length > 0) {
+      bodyHtml = contentHtml;
+    } else if (specificContentText) {
+      bodyHtml = specificContentText.replace(/\n/g, "<br/>");
+    } else if (contentText) {
+      bodyHtml = contentText.replace(/\n/g, "<br/>");
+    } else {
+      bodyHtml = title || `제${articleNumber}조`;
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${ruleName} - 조문 인쇄</title>
+          <style>
+            @media print {
+              body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; color: #000; padding: 20px; line-height: 1.6; }
+              .rule-title { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+              .chapter-title { font-size: 18px; font-weight: bold; color: #000080; margin-bottom: 15px; }
+              .article-content { font-size: 16px; margin-top: 10px; }
+              .btn-print { display: none; }
+            }
+            body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; color: #333; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+            .rule-title { font-size: 26px; font-weight: bold; text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; color: #0c3161; }
+            .chapter-title { font-size: 18px; font-weight: bold; color: #000080; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
+            .article-content { font-size: 16px; margin-top: 10px; }
+            .btn-print { display: block; width: 120px; margin: 0 auto 30px auto; padding: 10px; text-align: center; background: #0c3161; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+          </style>
+        </head>
+        <body>
+          <button class="btn-print" onclick="window.print()">인쇄하기</button>
+          <div class="rule-title">${ruleName}</div>
+          ${chapterName ? `<div class="chapter-title">${chapterName}</div>` : ""}
+          <div class="article-content">${bodyHtml}</div>
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
 
   const hideBadge = hideHistory || isAddendumArticle;
   const [modalHistory, setModalHistory] = useState<any[] | null>(null);
@@ -773,13 +831,22 @@ export default function ArticleRenderer({
                   <div key={`glued-table`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full group/text">
                      {renderEditButton(true)}
                      {!hideBadge && (
-                       <button 
-                         onClick={(e) => { e.stopPropagation(); handleOpenHistory(historyDates); }}
-                         title={badgeTitle}
-                         className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
-                       >
-                         {badgeType}
-                       </button>
+                       <div className="flex items-center gap-1 mt-0.5 z-10">
+                         <button 
+                           onClick={(e) => { e.stopPropagation(); handleOpenHistory(historyDates); }}
+                           title={badgeTitle}
+                           className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold cursor-pointer transition-colors border ${badgeColor}`}
+                         >
+                           {badgeType}
+                         </button>
+                         <button 
+                           onClick={(e) => { e.stopPropagation(); handlePrintArticle(text); }}
+                           title="해당 조문 인쇄하기"
+                           className="w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold cursor-pointer transition-colors border bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100"
+                         >
+                           인
+                         </button>
+                       </div>
                      )}
                      <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
                         <div className="w-full break-keep inline-block">
@@ -1070,13 +1137,22 @@ export default function ArticleRenderer({
                     <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full group/text">
                        {renderEditButton(true)}
                        {!hideBadge && (
-                         <button 
-                           onClick={() => handleOpenHistory(historyDates)}
-                           title={badgeTitle}
-                           className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
-                         >
-                           {badgeType}
-                         </button>
+                         <div className="flex items-center gap-1 mt-0.5 z-10">
+                           <button 
+                             onClick={() => handleOpenHistory(historyDates)}
+                             title={badgeTitle}
+                             className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold cursor-pointer transition-colors border ${badgeColor}`}
+                           >
+                             {badgeType}
+                           </button>
+                           <button 
+                             onClick={(e) => { e.stopPropagation(); handlePrintArticle(trimmed); }}
+                             title="해당 조문 인쇄하기"
+                             className="w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold cursor-pointer transition-colors border bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100"
+                           >
+                             인
+                           </button>
+                         </div>
                        )}
                        <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
                           <div className="w-full break-keep inline-block">
@@ -1108,13 +1184,22 @@ export default function ArticleRenderer({
                  return (
                     <div key={`glued-${idx}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
                        {!hideBadge && (
-                         <button 
-                           onClick={() => handleOpenHistory(historyDates)}
-                           title={badgeTitle}
-                           className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
-                         >
-                           {badgeType}
-                         </button>
+                         <div className="flex items-center gap-1 mt-0.5 z-10">
+                           <button 
+                             onClick={() => handleOpenHistory(historyDates)}
+                             title={badgeTitle}
+                             className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold cursor-pointer transition-colors border ${badgeColor}`}
+                           >
+                             {badgeType}
+                           </button>
+                           <button 
+                             onClick={(e) => { e.stopPropagation(); handlePrintArticle(trimmed); }}
+                             title="해당 조문 인쇄하기"
+                             className="w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold cursor-pointer transition-colors border bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100"
+                           >
+                             인
+                           </button>
+                         </div>
                        )}
                        <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
                           <div className="w-full break-keep inline-block">
@@ -1577,13 +1662,22 @@ export default function ArticleRenderer({
               <div className={`mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full ${interactiveClass}`}>
                 {showEditBtn && renderEditButton(true)}
                 {!hideBadge && !isAddendum && (
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleOpenHistory(historyDates); }}
-                    title={badgeTitle}
-                    className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold mt-0.5 cursor-pointer transition-colors border ${badgeColor}`}
-                  >
-                    {badgeType}
-                  </button>
+                  <div className="flex items-center gap-1 mt-0.5 z-10">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleOpenHistory(historyDates); }}
+                      title={badgeTitle}
+                      className={`w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold cursor-pointer transition-colors border ${badgeColor}`}
+                    >
+                      {badgeType}
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handlePrintArticle(safeText); }}
+                      title="해당 조문 인쇄하기"
+                      className="w-5 h-5 shrink-0 flex items-center justify-center rounded text-[11px] font-bold cursor-pointer transition-colors border bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100"
+                    >
+                      인
+                    </button>
+                  </div>
                 )}
                 <div className={`flex-1 w-full group/text text-[16px] text-slate-800 leading-[1.7] ${(!hideBadge && !isAddendum) ? "" : "ml-[28px]"}`}>
                   <div id={`toc-${safeNum}`} className="w-full break-keep inline-block">

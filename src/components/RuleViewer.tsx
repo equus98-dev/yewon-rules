@@ -1363,6 +1363,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         trailingTitles={trailingTitles}
                         isBundleChild={isBundleChild}
                         seenAddendumCoreTexts={cumulativeSeenSets[idx]}
+                        ruleTitle={cleanTitle || ruleData?.title || ""}
                       />
                     );
                   })()}
