@@ -1940,10 +1940,13 @@ export default function ArticleRenderer({
         ));
       })()}
 
-      <Dialog open={modalHistory !== null} onClose={() => setModalHistory(null)} maxWidth="sm" fullWidth>
+      <Dialog open={modalHistory !== null} onClose={() => setModalHistory(null)} maxWidth="md" fullWidth>
         <DialogTitle sx={{ p: 0 }}>
           <div className="flex justify-between items-center bg-slate-50 border-b border-slate-200 px-4 py-3">
-            <span className="text-[15px] font-bold text-slate-800">개정 이력</span>
+            <span className="text-[16px] font-bold text-[#0c3161] flex items-center gap-2">
+              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              [조항 연혁] {ruleTitle || ""} {articleNumber < 9000 ? `제${articleNumber}조` : "부칙"} {title && title !== "부칙" ? `(${title})` : ""}
+            </span>
             <IconButton size="small" onClick={() => setModalHistory(null)} sx={{ p: 0.5 }}>
               <CloseIcon fontSize="small" />
             </IconButton>
@@ -1954,23 +1957,86 @@ export default function ArticleRenderer({
             {modalHistory?.map((item: any, idx: number) => {
               if (!item) return null;
               if (typeof item === 'string') {
-                return <div key={idx} className="mb-1">{item}</div>;
+                return (
+                  <div key={idx} className="mb-6 last:mb-0">
+                    <div className="font-bold text-[#0c3161] mb-2 text-[15px] flex items-center gap-1.5">
+                      <span className="inline-block w-2 h-2 rounded-full bg-blue-600"></span>
+                      {item}
+                    </div>
+                    <table className="w-full border-collapse border border-slate-300 text-[14px]">
+                      <thead>
+                        <tr>
+                          <th className="bg-slate-100 border border-slate-300 px-4 py-2.5 text-center font-bold text-[#0c3161] w-1/2">변경 전 (이전 조문)</th>
+                          <th className="bg-slate-100 border border-slate-300 px-4 py-2.5 text-center font-bold text-[#0c3161] w-1/2">변경 후 ({item})</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border border-slate-300 p-4 align-top bg-slate-50 text-slate-500 text-center py-8">
+                            {item.includes("제정") || item.includes("신설") ? "(신설 조문)" : "(이전 판본 데이터 미구축)"}
+                          </td>
+                          <td className="border border-slate-300 p-4 align-top bg-white text-slate-800 whitespace-pre-wrap leading-relaxed font-medium">
+                            {contentText || "(본문 없음)"}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                );
               }
               if (item.isSimpleString) {
-                return <div key={idx} className="mb-1">{item.text}</div>;
+                return (
+                  <div key={idx} className="mb-6 last:mb-0">
+                    <div className="font-bold text-[#0c3161] mb-2 text-[15px] flex items-center gap-1.5">
+                      <span className="inline-block w-2 h-2 rounded-full bg-blue-600"></span>
+                      {item.text}
+                    </div>
+                    <table className="w-full border-collapse border border-slate-300 text-[14px]">
+                      <thead>
+                        <tr>
+                          <th className="bg-slate-100 border border-slate-300 px-4 py-2.5 text-center font-bold text-[#0c3161] w-1/2">변경 전 (이전 조문)</th>
+                          <th className="bg-slate-100 border border-slate-300 px-4 py-2.5 text-center font-bold text-[#0c3161] w-1/2">변경 후 ({item.text})</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border border-slate-300 p-4 align-top bg-slate-50 text-slate-500 text-center py-8">
+                            {item.text.includes("제정") || item.text.includes("신설") ? "(신설 조문)" : "(이전 판본 데이터 미구축)"}
+                          </td>
+                          <td className="border border-slate-300 p-4 align-top bg-white text-slate-800 whitespace-pre-wrap leading-relaxed font-medium">
+                            {contentText || "(본문 없음)"}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                );
               }
               return (
-                <div key={idx} className="mb-4 border-b border-slate-100 pb-4 last:border-0 last:mb-0 last:pb-0">
-                  <div className="font-bold text-blue-700 mb-1">
+                <div key={idx} className="mb-6 last:mb-0">
+                  <div className="font-bold text-[#0c3161] mb-2 text-[15px] flex items-center gap-1.5">
+                    <span className="inline-block w-2 h-2 rounded-full bg-blue-600"></span>
                     {item.afterVersion} ({new Date(item.afterDate).toLocaleDateString()} 시행)
+                    {item.note && <span className="text-slate-500 font-normal text-[13px] ml-2">[사유: {item.note}]</span>}
                   </div>
-                  {item.note && <div className="text-slate-600 mb-2 text-xs">사유: {item.note}</div>}
-                  <div className="bg-slate-50 p-3 rounded text-[13px]">
-                    <div className="text-slate-500 text-xs mb-1 font-bold">변경 전</div>
-                    <div className="line-through opacity-70 mb-3 whitespace-pre-wrap">{item.beforeText || "(없음)"}</div>
-                    <div className="text-slate-500 text-xs mb-1 font-bold">변경 후</div>
-                    <div className="whitespace-pre-wrap">{item.afterText || "(삭제됨)"}</div>
-                  </div>
+                  <table className="w-full border-collapse border border-slate-300 text-[14px]">
+                    <thead>
+                      <tr>
+                        <th className="bg-slate-100 border border-slate-300 px-4 py-2.5 text-center font-bold text-[#0c3161] w-1/2">변경 전 ({item.beforeVersion || '이전 조문'})</th>
+                        <th className="bg-slate-100 border border-slate-300 px-4 py-2.5 text-center font-bold text-[#0c3161] w-1/2">변경 후 ({item.afterVersion || '개정 조문'})</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="border border-slate-300 p-4 align-top bg-slate-50 text-slate-600 line-through whitespace-pre-wrap leading-relaxed">
+                          {item.beforeText || "(없음)"}
+                        </td>
+                        <td className="border border-slate-300 p-4 align-top bg-white text-slate-800 whitespace-pre-wrap leading-relaxed font-medium">
+                          {item.afterText || "(삭제됨)"}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               );
             })}
