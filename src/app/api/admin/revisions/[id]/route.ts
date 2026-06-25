@@ -55,3 +55,38 @@ export async function DELETE(
     try { if (pool) await pool.end(); } catch (e) { console.error("Pool end error:", e); }
   }
 }
+
+// 개정내용(description) 수정 API
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  let pool;
+  try {
+    const { id: revisionId } = await params;
+    const body = await request.json();
+    const { description } = body;
+
+    pool = createPool();
+
+    // Check if revision exists
+    const revRes = await pool.query(`SELECT id FROM "Revision" WHERE id = $1`, [revisionId]);
+    if (revRes.rows.length === 0) {
+      return NextResponse.json({ error: "해당 개정 내역을 찾을 수 없습니다." }, { status: 404 });
+    }
+
+    // Update description
+    await pool.query(
+      `UPDATE "Revision" SET description = $1 WHERE id = $2`,
+      [description || null, revisionId]
+    );
+
+    return NextResponse.json({ success: true, message: "개정내용이 저장되었습니다." });
+  } catch (error: any) {
+    console.error("[Patch Revision Error]:", error);
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+  } finally {
+    if (pool) await pool.end();
+  }
+}
+
