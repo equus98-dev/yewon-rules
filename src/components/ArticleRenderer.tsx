@@ -122,16 +122,31 @@ export default function ArticleRenderer({
     const chapterName = chapter ? chapter : "";
     
     // 출력할 조문 내용 결정
-    let bodyHtml = "";
+    let rawText = "";
     if (contentHtml && contentHtml.trim().length > 0) {
-      bodyHtml = contentHtml;
+      rawText = contentHtml;
     } else if (specificContentText) {
-      bodyHtml = specificContentText.replace(/\n/g, "<br/>");
+      rawText = specificContentText;
     } else if (contentText) {
-      bodyHtml = contentText.replace(/\n/g, "<br/>");
+      rawText = contentText;
     } else {
-      bodyHtml = title || `제${articleNumber}조`;
+      rawText = title || `제${articleNumber}조`;
     }
+
+    // 🚨 [Table Foster Parenting 방지]: <table> 내부의 \n을 사전에 모조리 제거하여 표 위로 거대한 공백이 생기는 버그 완벽 해결
+    if (/<table/i.test(rawText)) {
+      rawText = rawText.replace(/<table[\s\S]*?<\/table>/gi, (tableMatch) => {
+        return tableMatch.replace(/\n/g, '');
+      });
+    }
+
+    // 인쇄 화면에서 표 위아래로 불필요한 공백 태그나 다량의 br 태그 제거
+    let bodyHtml = rawText.replace(/\n/g, "<br/>");
+    bodyHtml = bodyHtml.replace(/(?:<br\s*\/?>|\s|&nbsp;)+<table/gi, '<table');
+    bodyHtml = bodyHtml.replace(/<\/table>(?:<br\s*\/?>|\s|&nbsp;)+/gi, '</table>');
+
+    const isOrgChart = title.includes("조직도") || title.includes("기구표") || bodyHtml.includes("조직도");
+    const wrapperClass = isOrgChart ? "org-chart-wrapper" : "html-table-wrapper";
 
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -145,19 +160,37 @@ export default function ArticleRenderer({
               .chapter-title { font-size: 18px; font-weight: bold; color: #000080; margin-bottom: 15px; }
               .article-content { font-size: 16px; margin-top: 10px; }
               .btn-print { display: none; }
+              /* 프린트 시 표 스타일 */
+              .html-table-wrapper table { border-collapse: collapse !important; width: 100% !important; margin: 15px 0 !important; font-size: 11pt !important; background-color: white !important; }
+              .html-table-wrapper th, .html-table-wrapper td { border: 1px solid #aaa !important; padding: 8px 12px !important; color: #000 !important; vertical-align: middle !important; word-break: break-word !important; }
+              .html-table-wrapper th { background-color: #eee !important; font-weight: bold !important; text-align: center !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .html-table-wrapper tr:first-child td { background-color: #eee !important; font-weight: bold !important; text-align: center !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             }
-            body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; color: #333; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+            body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; color: #333; padding: 40px; max-width: 900px; margin: 0 auto; line-height: 1.6; }
             .rule-title { font-size: 26px; font-weight: bold; text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; color: #0c3161; }
             .chapter-title { font-size: 18px; font-weight: bold; color: #000080; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
             .article-content { font-size: 16px; margin-top: 10px; }
             .btn-print { display: block; width: 120px; margin: 0 auto 30px auto; padding: 10px; text-align: center; background: #0c3161; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+            /* 웹 팝업 창 표(Table) 프리미엄 스타일 */
+            .html-table-wrapper { width: 100%; overflow-x: auto; padding: 10px 0; }
+            .html-table-wrapper table { border-collapse: collapse !important; width: 100% !important; margin: 20px 0 !important; font-size: 14px !important; background-color: white !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            .html-table-wrapper th, .html-table-wrapper td { border: 1px solid #e2e8f0 !important; padding: 12px 16px !important; color: #334155 !important; vertical-align: middle !important; word-break: break-word !important; }
+            .html-table-wrapper th { background-color: #f3f4f6 !important; font-weight: 700 !important; color: #0f172a !important; text-align: center !important; }
+            .html-table-wrapper tr:first-child td { background-color: #e5e7eb !important; font-weight: 700 !important; color: #0f172a !important; text-align: center !important; }
+
+            /* 조직도 전용 스타일 */
+            .org-chart-wrapper { width: 100%; overflow-x: auto; padding: 20px 0; }
+            .org-chart-wrapper table { width: 100% !important; max-width: 1000px; margin: 0 auto !important; border-collapse: collapse !important; table-layout: fixed !important; background-color: transparent !important; }
+            .org-chart-wrapper td, .org-chart-wrapper th { padding: 0 !important; font-family: 'Malgun Gothic', sans-serif !important; vertical-align: middle !important; }
+            .org-chart-wrapper td[style*="border-left: #000000 0.425250pt solid"][style*="border-right: #000000 0.425250pt solid"] { background-color: #ffffff !important; border-radius: 4px; }
           </style>
         </head>
         <body>
           <button class="btn-print" onclick="window.print()">인쇄하기</button>
           <div class="rule-title">${ruleName}</div>
           ${chapterName ? `<div class="chapter-title">${chapterName}</div>` : ""}
-          <div class="article-content">${bodyHtml}</div>
+          <div class="article-content ${wrapperClass}">${bodyHtml}</div>
           <script>
             window.onload = function() {
               window.print();
