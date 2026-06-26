@@ -41,7 +41,7 @@ export async function GET(
     const revisions = revisionsRes.rows;
 
     const attachmentsRes = await pool.query(
-      `SELECT id, title, "fileUrl", "fileType", "createdAt" FROM "Attachment" WHERE "ruleId" = $1 ORDER BY "createdAt" ASC`,
+      `SELECT id, title, "fileUrl", "fileType", "createdAt", "revisionId" FROM "Attachment" WHERE "ruleId" = $1 ORDER BY "createdAt" ASC`,
       [id]
     );
 

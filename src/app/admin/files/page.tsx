@@ -27,12 +27,14 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 export default function AdminFilesManagement() {
   const [activeRule, setActiveRule] = useState<{ id: string; name: string } | null>(null);
+  const [activeRuleRevisions, setActiveRuleRevisions] = useState<any[]>([]);
   const [attachments, setAttachments] = useState<any[]>([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   
   // Upload state
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadType, setUploadType] = useState<"전문" | "별표" | "별지" | "별첨">("전문");
+  const [selectedRevisionId, setSelectedRevisionId] = useState<string>("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState<string | null>(null);
@@ -40,8 +42,6 @@ export default function AdminFilesManagement() {
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
 
   const handleSelectRule = (ruleId: string) => {
-    // In SidebarTree we don't have the rule name directly from onSelectRule, 
-    // but we can just set "선택된 규정" and it will load. Or we could fetch it.
     setActiveRule({ id: ruleId, name: "선택된 규정" });
     loadAttachments(ruleId);
   };
@@ -49,14 +49,27 @@ export default function AdminFilesManagement() {
   const loadAttachments = async (ruleId: string) => {
     setLoadingAttachments(true);
     try {
-      const res = await fetch(`/api/admin/files?ruleId=${ruleId}`);
-      if (!res.ok) throw new Error("Failed to load");
-      const data = (await res.json()) as any;
-      setAttachments(data);
+      const [filesRes, ruleRes] = await Promise.all([
+        fetch(`/api/admin/files?ruleId=${ruleId}`),
+        fetch(`/api/rules/${ruleId}`)
+      ]);
+      if (!filesRes.ok) throw new Error("Failed to load files");
+      const filesData = (await filesRes.json()) as any;
+      setAttachments(filesData);
       setSelectedFileIds([]);
+
+      if (ruleRes.ok) {
+        const ruleData = (await ruleRes.json()) as any;
+        const revs = ruleData.revisions || [];
+        setActiveRuleRevisions(revs);
+        if (revs.length > 0) {
+          setSelectedRevisionId(revs[0].id);
+        }
+      }
     } catch (e) {
       console.error(e);
       setAttachments([]);
+      setActiveRuleRevisions([]);
     } finally {
       setLoadingAttachments(false);
     }
@@ -66,6 +79,18 @@ export default function AdminFilesManagement() {
     setTargetAttachmentId(attachmentId);
     setSelectedFiles([]);
     setUploadType("전문");
+    if (activeRuleRevisions.length > 0) {
+      if (attachmentId) {
+        const existing = attachments.find(a => a.id === attachmentId);
+        if (existing && existing.revisionId) {
+          setSelectedRevisionId(existing.revisionId);
+        } else {
+          setSelectedRevisionId(activeRuleRevisions[0].id);
+        }
+      } else {
+        setSelectedRevisionId(activeRuleRevisions[0].id);
+      }
+    }
     setUploadModalOpen(true);
   };
 
@@ -125,7 +150,7 @@ export default function AdminFilesManagement() {
 
     for (const file of selectedFiles) {
       const originalName = file.name;
-      let cleanName = originalName; // 파일명 원본 그대로 유지 (규정번호 제거하지 않음)
+      let cleanName = originalName;
       let newFileName = cleanName;
       
       const bracketMatch = cleanName.match(/^\[([^\]]+)\]\s*(.*)$/);
@@ -146,6 +171,9 @@ export default function AdminFilesManagement() {
       const formData = new FormData();
       formData.append("file", modifiedFile);
       formData.append("ruleId", activeRule.id);
+      if (selectedRevisionId) {
+        formData.append("revisionId", selectedRevisionId);
+      }
       if (targetAttachmentId) {
         formData.append("attachmentId", targetAttachmentId);
       }
@@ -159,7 +187,7 @@ export default function AdminFilesManagement() {
         if (res.ok) {
           successCount++;
         } else {
-          const data = await res.json() as any;
+          const data = (await res.json()) as any;
           console.error(data.error);
         }
       } catch (error: any) {
@@ -238,6 +266,7 @@ export default function AdminFilesManagement() {
       <div className="space-y-3 mb-6">
         {files.map((file) => {
           const isPdf = file.fileType?.toLowerCase() === 'pdf' || file.title.toLowerCase().endsWith('.pdf');
+          const matchedRev = activeRuleRevisions.find(r => r.id === file.revisionId);
           
           return (
             <div key={file.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-blue-200 transition-colors">
@@ -252,7 +281,18 @@ export default function AdminFilesManagement() {
                   <span className="font-black text-xs">{isPdf ? 'PDF' : 'HWP'}</span>
                 </div>
                 <div className="min-w-0">
-                  <h4 className="font-bold text-slate-800 text-[15px] truncate">{file.title}</h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-slate-800 text-[15px] truncate">{file.title}</h4>
+                    {matchedRev ? (
+                      <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-bold rounded border border-emerald-200 shrink-0">
+                        {matchedRev.enactmentDate ? `${new Date(matchedRev.enactmentDate).toLocaleDateString()} (${matchedRev.revisionType === 'ENACTMENT' ? '제정' : '개정'})` : '연혁연결'}
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[11px] font-bold rounded border border-slate-200 shrink-0">
+                        공통/최신
+                      </span>
+                    )}
+                  </div>
                   <p className="text-[13px] text-slate-500 mt-1 truncate">
                     {decodeURIComponent(file.fileUrl.split("/").pop() || "")}
                   </p>
@@ -416,6 +456,21 @@ export default function AdminFilesManagement() {
         <DialogTitle sx={{ fontWeight: 'bold', color: '#0c3161', pb: 1 }}>파일 첨부 / 교체</DialogTitle>
         <Divider />
         <DialogContent sx={{ pt: 3 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: 'text.secondary' }}>
+            연혁(제개정일별) 매칭 선택
+          </Typography>
+          <select
+            value={selectedRevisionId}
+            onChange={(e) => setSelectedRevisionId(e.target.value)}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer font-medium shadow-sm mb-6"
+          >
+            {activeRuleRevisions.map((rev: any) => (
+              <option key={rev.id} value={rev.id}>
+                {rev.enactmentDate ? `${new Date(rev.enactmentDate).toLocaleDateString()} (${rev.revisionType === 'ENACTMENT' ? '제정' : '개정'})` : '최신 개정'} - {rev.versionName || `v${rev.version}`}
+              </option>
+            ))}
+          </select>
+
           <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: 'text.secondary' }}>
             첨부파일 유형 선택
           </Typography>

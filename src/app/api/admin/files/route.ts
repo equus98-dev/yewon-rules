@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     }
 
     const res = await pool.query(
-      `SELECT id, title, "fileUrl", "fileSize", "fileType", "createdAt" 
+      `SELECT id, title, "fileUrl", "fileSize", "fileType", "createdAt", "revisionId" 
        FROM "Attachment" 
        WHERE "ruleId" = $1
        ORDER BY "createdAt" ASC`,
@@ -52,6 +52,7 @@ export async function POST(request: Request) {
     const file = formData.get("file") as File;
     const ruleId = formData.get("ruleId") as string;
     const attachmentId = formData.get("attachmentId") as string;
+    const revisionId = formData.get("revisionId") as string;
 
     if (!file || !ruleId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -78,15 +79,15 @@ export async function POST(request: Request) {
     if (attachmentId) {
       await pool.query(
         `UPDATE "Attachment" 
-         SET "fileUrl" = $1, "fileSize" = $2, "fileType" = $3, title = $4
-         WHERE id = $5`,
-        [publicUrl, file.size, ext?.toUpperCase() || 'HWP', file.name, attachmentId]
+         SET "fileUrl" = $1, "fileSize" = $2, "fileType" = $3, title = $4, "revisionId" = $5
+         WHERE id = $6`,
+        [publicUrl, file.size, ext?.toUpperCase() || 'HWP', file.name, revisionId || null, attachmentId]
       );
     } else {
       await pool.query(
-        `INSERT INTO "Attachment" (id, "ruleId", title, "fileUrl", "fileSize", "fileType", "createdAt", "updatedAt")
-         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
-        [crypto.randomUUID(), ruleId, file.name, publicUrl, file.size, ext?.toUpperCase() || 'HWP']
+        `INSERT INTO "Attachment" (id, "ruleId", title, "fileUrl", "fileSize", "fileType", "createdAt", "updatedAt", "revisionId")
+         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW(), $7)`,
+        [crypto.randomUUID(), ruleId, file.name, publicUrl, file.size, ext?.toUpperCase() || 'HWP', revisionId || null]
       );
     }
 

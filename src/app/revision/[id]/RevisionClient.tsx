@@ -134,11 +134,15 @@ export default function RevisionClient({ id }: { id: string }) {
     }
   };
 
-  // 원문파일 필터링 (별표, 별지, 서식, 별첨, 첨부 등을 제외하고 본문/전문 파일만 표시)
+  // 원문파일 필터링 (선택한 연혁에 매칭되는 파일만 표시, revisionId가 없으면 최신 개정에 매칭)
+  // 별표, 별지, 서식, 별첨, 첨부 등을 철저히 제외하고 본문/전문 파일만 표시
   const allAttachments = ruleData.attachments || [];
+  const currentRevId = selectedRev?.id;
+  const isLatestRev = selectedRev?.id === revisions[0]?.id;
   const mainAttachments = allAttachments.filter((att: any) => {
+    const matchRevision = att.revisionId ? att.revisionId === currentRevId : isLatestRev;
     const title = att.title || "";
-    return !title.includes("별표") && !title.includes("별지") && !title.includes("서식") && !title.includes("별첨") && !title.includes("첨부");
+    return matchRevision && !title.includes("별표") && !title.includes("별지") && !title.includes("서식") && !title.includes("별첨") && !title.includes("첨부");
   });
 
   return (
