@@ -149,7 +149,7 @@ export default function OpinionsPage() {
     if (isAdmin) {
       try {
         const res = await fetch(`/api/opinions/${op.id}?admin=true`);
-        const data = await res.json();
+        const data = (await res.json()) as any;
         if (data.error) {
           alert(data.error);
           return;
@@ -245,7 +245,7 @@ export default function OpinionsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isCommentUpdate: true, adminComment: adminCommentText })
       });
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (data.success) {
         alert("관리자 답변이 등록/수정되었습니다.");
         setSelectedOpinion({ ...selectedOpinion, adminComment: adminCommentText, adminCommentAt: new Date().toISOString() });
