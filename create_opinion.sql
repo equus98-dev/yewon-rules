@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS "Opinion" (
   "password" TEXT NOT NULL,
   "attachmentUrl" TEXT,
   "attachmentName" TEXT,
+  "adminComment" TEXT,
+  "adminCommentAt" DATETIME,
   "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

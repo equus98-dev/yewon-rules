@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     let countParams: any[] = [];
     
     let query = `
-      SELECT id, title, author, "attachmentName", "createdAt"
+      SELECT id, title, author, "attachmentName", "adminComment", "createdAt"
       FROM "Opinion"
     `;
     let params: any[] = [];

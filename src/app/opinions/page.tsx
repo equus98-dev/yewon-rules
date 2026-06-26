@@ -23,6 +23,32 @@ export default function OpinionsPage() {
   const [verifyPassword, setVerifyPassword] = useState("");
   const [verifyMode, setVerifyMode] = useState<"read" | "edit" | "delete" | null>(null);
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminCommentText, setAdminCommentText] = useState("");
+  const [isEditingComment, setIsEditingComment] = useState(false);
+
+  useEffect(() => {
+    // 관리자 세션 체크
+    const checkAdminSession = () => {
+      const session = localStorage.getItem("yewon_admin_session");
+      if (session === "authorized") {
+        setIsAdmin(true);
+      } else if (session && session !== "authorized") {
+        const time = parseInt(session, 10);
+        if (Date.now() - time < 1800 * 1000) {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+    };
+    checkAdminSession();
+    const timer = setInterval(checkAdminSession, 2000);
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     if (mode === "list") {
       fetchOpinions();
@@ -65,7 +91,7 @@ export default function OpinionsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.content || !formData.author || !formData.password) {
+    if (!formData.title || !formData.content || !formData.author || (!isAdmin && !formData.password)) {
       alert("모든 필수 항목을 입력해주세요.");
       return;
     }
@@ -96,7 +122,7 @@ export default function OpinionsPage() {
 
     const payload = { ...formData, attachmentUrl, attachmentName };
     const method = mode === "edit" ? "PUT" : "POST";
-    const url = mode === "edit" ? `/api/opinions/${selectedOpinion.id}` : "/api/opinions";
+    const url = mode === "edit" ? `/api/opinions/${selectedOpinion.id}${isAdmin ? "?admin=true" : ""}` : "/api/opinions";
 
     try {
       const res = await fetch(url, {
@@ -119,10 +145,28 @@ export default function OpinionsPage() {
     setUploading(false);
   };
 
-  const viewOpinion = (op: any) => {
-    setSelectedOpinion({ id: op.id, title: op.title, author: op.author, createdAt: op.createdAt });
-    setVerifyMode("read");
-    setMode("read");
+  const viewOpinion = async (op: any) => {
+    if (isAdmin) {
+      try {
+        const res = await fetch(`/api/opinions/${op.id}?admin=true`);
+        const data = await res.json();
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        setSelectedOpinion(data);
+        setVerifyMode(null);
+        setMode("read");
+        setAdminCommentText(data.adminComment || "");
+        setIsEditingComment(false);
+      } catch (e) {
+        alert("게시물 불러오기 중 오류가 발생했습니다.");
+      }
+    } else {
+      setSelectedOpinion({ id: op.id, title: op.title, author: op.author, createdAt: op.createdAt });
+      setVerifyMode("read");
+      setMode("read");
+    }
   };
 
   const handleVerifyPassword = async () => {
@@ -143,6 +187,8 @@ export default function OpinionsPage() {
           setMode("read");
           setVerifyMode(null);
           setVerifyPassword("");
+          setAdminCommentText(data.data.adminComment || "");
+          setIsEditingComment(false);
         } else if (verifyMode === "edit") {
           setFormData({ title: selectedOpinion.title, content: selectedOpinion.content, author: selectedOpinion.author, password: verifyPassword });
           setMode("edit");
@@ -170,6 +216,48 @@ export default function OpinionsPage() {
     }
   };
 
+  const handleAdminDelete = async () => {
+    if (confirm("정말로 삭제하시겠습니까? (관리자 권한)")) {
+      try {
+        const delRes = await fetch(`/api/opinions/${selectedOpinion.id}?admin=true`, { method: "DELETE" });
+        const delData = (await delRes.json()) as any;
+        if (delData.success) {
+          alert("삭제되었습니다.");
+          setMode("list");
+        } else {
+          alert(delData.error);
+        }
+      } catch (e) {
+        alert("오류가 발생했습니다.");
+      }
+    }
+  };
+
+  const handleAdminEdit = () => {
+    setFormData({ title: selectedOpinion.title, content: selectedOpinion.content, author: selectedOpinion.author, password: "admin_override" });
+    setMode("edit");
+  };
+
+  const handleSaveAdminComment = async () => {
+    try {
+      const res = await fetch(`/api/opinions/${selectedOpinion.id}?admin=true`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isCommentUpdate: true, adminComment: adminCommentText })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("관리자 답변이 등록/수정되었습니다.");
+        setSelectedOpinion({ ...selectedOpinion, adminComment: adminCommentText, adminCommentAt: new Date().toISOString() });
+        setIsEditingComment(false);
+      } else {
+        alert(data.error || "오류가 발생했습니다.");
+      }
+    } catch (e) {
+      alert("오류가 발생했습니다.");
+    }
+  };
+
   // 날짜 포맷
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -191,7 +279,9 @@ export default function OpinionsPage() {
         <div className="flex items-center gap-4">
           <button onClick={() => window.location.href = '/'} className="font-bold text-sm text-slate-700 hover:text-blue-900">홈으로</button>
           <span className="text-slate-300 font-bold select-none text-sm">|</span>
-          <button onClick={() => window.location.href = '/admin'} className="font-bold text-sm text-slate-700 hover:text-blue-900">관리자 로그인</button>
+          <button onClick={() => window.location.href = '/admin'} className="font-bold text-sm text-slate-700 hover:text-blue-900">
+            {isAdmin ? "관리자 모드 (활성)" : "관리자 로그인"}
+          </button>
         </div>
       </header>
 
@@ -201,7 +291,14 @@ export default function OpinionsPage() {
         </div>
         <main className="flex-1 flex flex-col py-6 px-4 md:px-6 overflow-y-auto w-full bg-[#f3f4f6]">
           <div className="w-full bg-white p-8 rounded-2xl shadow-sm border border-slate-200 min-h-full">
-            <h1 className="text-3xl font-black text-[#0c3161] mb-8 border-b-2 border-[#1668a6] pb-4">의견수렴</h1>
+            <div className="flex justify-between items-center mb-8 border-b-2 border-[#1668a6] pb-4">
+              <h1 className="text-3xl font-black text-[#0c3161]">의견수렴</h1>
+              {isAdmin && (
+                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-extrabold border border-blue-300">
+                  🛡️ 관리자 권한 활성화됨
+                </span>
+              )}
+            </div>
           
           {mode === "list" && (
             <>
@@ -219,17 +316,18 @@ export default function OpinionsPage() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-slate-100 text-slate-700 text-sm border-b border-slate-200">
-                      <th className="py-3 px-4 font-bold w-[60%]">제목</th>
+                      <th className="py-3 px-4 font-bold w-[50%]">제목</th>
                       <th className="py-3 px-4 font-bold text-center w-[15%]">작성자</th>
                       <th className="py-3 px-4 font-bold text-center w-[15%]">등록일</th>
                       <th className="py-3 px-4 font-bold text-center w-[10%]">첨부</th>
+                      <th className="py-3 px-4 font-bold text-center w-[10%]">답변</th>
                     </tr>
                   </thead>
                   <tbody>
                     {loading ? (
-                      <tr><td colSpan={4} className="text-center py-10 text-slate-500">불러오는 중...</td></tr>
+                      <tr><td colSpan={5} className="text-center py-10 text-slate-500">불러오는 중...</td></tr>
                     ) : opinions.length === 0 ? (
-                      <tr><td colSpan={4} className="text-center py-10 text-slate-500">등록된 의견이 없습니다.</td></tr>
+                      <tr><td colSpan={5} className="text-center py-10 text-slate-500">등록된 의견이 없습니다.</td></tr>
                     ) : (
                       opinions.map(op => (
                         <tr key={op.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => viewOpinion(op)}>
@@ -240,6 +338,13 @@ export default function OpinionsPage() {
                           <td className="py-3 px-4 text-center text-slate-600 text-sm truncate">{op.author}</td>
                           <td className="py-3 px-4 text-center text-slate-500 text-sm">{formatDate(op.createdAt)}</td>
                           <td className="py-3 px-4 text-center text-slate-500 text-sm">{op.attachmentName ? '📎' : ''}</td>
+                          <td className="py-3 px-4 text-center text-sm">
+                            {op.adminComment ? (
+                              <span className="px-2 py-0.5 bg-green-100 text-green-800 font-bold text-xs rounded border border-green-300">답변완료</span>
+                            ) : (
+                              <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs rounded border border-slate-200">대기중</span>
+                            )}
+                          </td>
                         </tr>
                       ))
                     )}
@@ -268,8 +373,8 @@ export default function OpinionsPage() {
                   <input type="text" value={formData.author} onChange={e => setFormData({...formData, author: e.target.value})} className="w-full border border-slate-300 rounded px-3 py-2 focus:outline-none focus:border-[#1668a6]" required />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1">비밀번호 <span className="text-red-500">*</span></label>
-                  <input type="password" placeholder="수정/삭제 시 필요합니다." value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full border border-slate-300 rounded px-3 py-2 focus:outline-none focus:border-[#1668a6]" required />
+                  <label className="block text-sm font-bold text-slate-700 mb-1">비밀번호 {isAdmin ? "(관리자 권한으로 생략 가능)" : <span className="text-red-500">*</span>}</label>
+                  <input type="password" placeholder={isAdmin ? "관리자는 입력하지 않아도 됩니다." : "수정/삭제 시 필요합니다."} value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full border border-slate-300 rounded px-3 py-2 focus:outline-none focus:border-[#1668a6]" required={!isAdmin} disabled={isAdmin && mode === "edit"} />
                 </div>
               </div>
               <div>
@@ -308,12 +413,12 @@ export default function OpinionsPage() {
               
               {verifyMode !== "read" && (
                 <>
-                  <div className="min-h-[300px] whitespace-pre-wrap text-slate-800 leading-relaxed text-[16px]">
+                  <div className="min-h-[250px] whitespace-pre-wrap text-slate-800 leading-relaxed text-[16px]">
                     {selectedOpinion.content}
                   </div>
                   
                   {selectedOpinion.attachmentUrl && (
-                    <div className="mt-8 p-4 bg-slate-50 rounded border border-slate-200 flex items-center justify-between">
+                    <div className="mt-6 p-4 bg-slate-50 rounded border border-slate-200 flex items-center justify-between">
                       <div className="flex items-center gap-2 text-slate-700">
                         <span>📎 첨부파일:</span>
                         <span className="font-bold">{selectedOpinion.attachmentName}</span>
@@ -323,6 +428,42 @@ export default function OpinionsPage() {
                       </a>
                     </div>
                   )}
+
+                  {/* 관리자 답변 영역 */}
+                  <div className="mt-8 border border-blue-200 bg-blue-50/50 rounded-xl p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-4 border-b border-blue-200 pb-3">
+                      <h3 className="font-extrabold text-blue-900 flex items-center gap-2 text-lg">
+                        <span>💬</span> 관리자 답변
+                      </h3>
+                      {isAdmin && !isEditingComment && (
+                        <button onClick={() => setIsEditingComment(true)} className="px-3 py-1.5 bg-[#1668a6] hover:bg-[#0c3161] text-white text-xs font-bold rounded shadow transition-colors">
+                          {selectedOpinion.adminComment ? "답변 수정" : "답변 작성"}
+                        </button>
+                      )}
+                    </div>
+
+                    {isEditingComment ? (
+                      <div className="space-y-4">
+                        <textarea
+                          rows={5}
+                          placeholder="관리자 답변 내용을 입력해주세요."
+                          value={adminCommentText}
+                          onChange={e => setAdminCommentText(e.target.value)}
+                          className="w-full border border-blue-300 bg-white rounded-lg p-3 text-sm focus:outline-none focus:border-[#1668a6] text-slate-800 resize-y"
+                        />
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => setIsEditingComment(false)} className="px-4 py-1.5 bg-white border border-slate-300 text-slate-600 text-sm font-bold rounded hover:bg-slate-50">취소</button>
+                          <button onClick={handleSaveAdminComment} className="px-4 py-1.5 bg-[#1668a6] hover:bg-[#0c3161] text-white text-sm font-bold rounded shadow">답변 저장</button>
+                        </div>
+                      </div>
+                    ) : selectedOpinion.adminComment ? (
+                      <div className="text-slate-800 whitespace-pre-wrap leading-relaxed text-[15px]">
+                        {selectedOpinion.adminComment}
+                      </div>
+                    ) : (
+                      <p className="text-slate-500 text-sm italic">아직 등록된 관리자 답변이 없습니다.</p>
+                    )}
+                  </div>
                 </>
               )}
 
@@ -344,8 +485,17 @@ export default function OpinionsPage() {
                     목록으로
                   </button>
                   <div className="flex gap-2">
-                    <button onClick={() => setVerifyMode("edit")} className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-sm font-bold transition-colors">수정</button>
-                    <button onClick={() => setVerifyMode("delete")} className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded text-sm font-bold transition-colors">삭제</button>
+                    {isAdmin ? (
+                      <>
+                        <button onClick={handleAdminEdit} className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 border border-blue-300 rounded text-sm font-bold transition-colors">수정 (관리자)</button>
+                        <button onClick={handleAdminDelete} className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 border border-red-300 rounded text-sm font-bold transition-colors">삭제 (관리자)</button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={() => setVerifyMode("edit")} className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-sm font-bold transition-colors">수정</button>
+                        <button onClick={() => setVerifyMode("delete")} className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded text-sm font-bold transition-colors">삭제</button>
+                      </>
+                    )}
                   </div>
                 </div>
               )}

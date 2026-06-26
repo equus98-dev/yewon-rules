@@ -20,7 +20,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     const id = params.id;
 
     const res = await pool.query(
-      `SELECT id, title, content, author, "attachmentUrl", "attachmentName", "createdAt", "updatedAt"
+      `SELECT id, title, content, author, "attachmentUrl", "attachmentName", "adminComment", "adminCommentAt", "createdAt", "updatedAt"
        FROM "Opinion" WHERE id = $1`,
       [id]
     );
@@ -43,24 +43,41 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   try {
     pool = createPool();
     const id = params.id;
+    const { searchParams } = new URL(request.url);
+    const isAdminOverride = searchParams.get("admin") === "true";
     const body = (await request.json()) as any;
+
+    if (isAdminOverride && body.isCommentUpdate) {
+      const { adminComment } = body;
+      await pool.query(
+        `UPDATE "Opinion" SET "adminComment" = $1, "adminCommentAt" = NOW() WHERE id = $2`,
+        [adminComment || null, id]
+      );
+      return NextResponse.json({ success: true });
+    }
+
     const { title, content, author, password, attachmentUrl, attachmentName } = body;
 
-    if (!title || !content || !author || !password) {
+    if (!title || !content || !author) {
       return NextResponse.json({ error: "필수 항목을 모두 입력해주세요." }, { status: 400 });
     }
 
-    // 비밀번호 검증
-    const res = await pool.query(`SELECT password FROM "Opinion" WHERE id = $1`, [id]);
-    if (res.rows.length === 0) {
-      return NextResponse.json({ error: "게시물을 찾을 수 없습니다." }, { status: 404 });
-    }
+    // 관리자가 아닌 경우에만 비밀번호 검증
+    if (!isAdminOverride) {
+      if (!password) {
+        return NextResponse.json({ error: "비밀번호를 입력해주세요." }, { status: 400 });
+      }
+      const res = await pool.query(`SELECT password FROM "Opinion" WHERE id = $1`, [id]);
+      if (res.rows.length === 0) {
+        return NextResponse.json({ error: "게시물을 찾을 수 없습니다." }, { status: 404 });
+      }
 
-    const savedPassword = res.rows[0].password as string;
-    const hashedPassword = await hashPassword(password);
+      const savedPassword = res.rows[0].password as string;
+      const hashedPassword = await hashPassword(password);
 
-    if (savedPassword !== hashedPassword) {
-      return NextResponse.json({ error: "비밀번호가 일치하지 않습니다." }, { status: 403 });
+      if (savedPassword !== hashedPassword) {
+        return NextResponse.json({ error: "비밀번호가 일치하지 않습니다." }, { status: 403 });
+      }
     }
 
     // HTML 제거

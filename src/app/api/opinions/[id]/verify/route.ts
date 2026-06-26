@@ -38,7 +38,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }
 
     const opinionRes = await pool.query(
-      `SELECT id, title, content, author, "attachmentUrl", "attachmentName", "createdAt", "updatedAt"
+      `SELECT id, title, content, author, "attachmentUrl", "attachmentName", "adminComment", "adminCommentAt", "createdAt", "updatedAt"
        FROM "Opinion" WHERE id = $1`,
       [id]
     );
