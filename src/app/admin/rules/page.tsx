@@ -759,7 +759,7 @@ export default function AdminRulesManagement() {
                       <td className="py-3 px-4 text-center flex items-center justify-center gap-1.5">
                         <button
                           type="button"
-                          onClick={() => window.open(`/revision/${historySelectedRuleId}?admin=true&revId=${rev.id}`, '_blank', 'width=720,height=780,scrollbars=yes,resizable=yes')}
+                          onClick={() => window.open(`/revision/${historyRuleId}?admin=true&revId=${rev.id}`, '_blank', 'width=720,height=780,scrollbars=yes,resizable=yes')}
                           className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1.5 rounded border border-indigo-200 text-xs font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
                         >
                           📋 개정정보 관리
