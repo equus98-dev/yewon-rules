@@ -30,7 +30,7 @@ export default function RevisionClient({ id }: { id: string }) {
       try {
         const res = await fetch(`/api/rules/${id}`);
         if (!res.ok) throw new Error("규정을 불러오는데 실패했습니다.");
-        const data = await res.json();
+        const data = (await res.json()) as any;
         setRuleData(data);
 
         // 최신 연혁이 위로 오도록 정렬 (공포일/버전 내림차순)
