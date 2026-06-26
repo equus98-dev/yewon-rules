@@ -94,10 +94,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const tocScrollRef = useRef<HTMLDivElement>(null);
   const [activeTocId, setActiveTocId] = useState<string>("");
+  // 클릭으로 스크롤 중엔 scroll spy가 엉뚱한 항목을 활성화하지 않도록 잠금
+  const scrollLockTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [popupState, setPopupState] = useState<{ isOpen: boolean; title: string; isLoading?: boolean; error?: string | null; articleData?: any; url?: string }>({ isOpen: false, title: "" });
   
   const [isDownloadPopupOpen, setIsDownloadPopupOpen] = useState(false);
-  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const downloadRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -561,19 +562,26 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   useEffect(() => {
     const handleScroll = () => {
       if (!scrollRef.current) return;
-      const scrollY = scrollRef.current.scrollTop;
+      // 클릭으로 인한 smooth scroll 중엔 scroll spy 비활성화
+      if (scrollLockTimer.current !== null) return;
+
+      const scrollContainer = scrollRef.current;
+      const scrollY = scrollContainer.scrollTop;
+      const containerRect = scrollContainer.getBoundingClientRect();
       
       let currentActiveId = "";
       for (let i = 0; i < tocItems.length; i++) {
         const item = tocItems[i];
         const el = document.getElementById(item.id);
         if (el) {
-          // Adjust offset to trigger slightly before the element hits the top
-          const offsetTop = el.offsetTop - 150; 
+          // el의 scrollContainer 내부 상대 위치 계산
+          const elRect = el.getBoundingClientRect();
+          const elRelTop = elRect.top - containerRect.top + scrollY;
+          const offsetTop = elRelTop - 15;
           if (scrollY >= offsetTop) {
             currentActiveId = item.id;
           } else {
-            // Since tocItems are in order, we can break early once we find an element below the scroll position
+            // tocItems는 순서대로 정렬돼 있으므로 이후는 건너뜀
             break;
           }
         }
@@ -930,7 +938,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           </div>
           
           <button 
-            onClick={() => setIsHistoryModalOpen(true)}
+            onClick={() => window.open(`/revision/${ruleId}`, "_blank", "width=720,height=780,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes")}
             className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer"
           >
             <InfoIcon sx={{ fontSize: 14 }} className="text-blue-500" /> 개정정보
@@ -990,6 +998,13 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
               <li key={idx} id={`li-${item.id}`} className={itemClass}>
                 <a href={`#${item.id}`} className="block w-full truncate" title={item.text} onClick={(e) => {
                   e.preventDefault();
+                  // 클릭 즉시 해당 항목을 활성화
+                  setActiveTocId(item.id);
+                  // smooth scroll 중 scroll spy가 다른 항목을 활성화하지 않도록 잠금
+                  if (scrollLockTimer.current !== null) clearTimeout(scrollLockTimer.current);
+                  scrollLockTimer.current = setTimeout(() => {
+                    scrollLockTimer.current = null;
+                  }, 900);
                   document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}>
                   {item.text}
@@ -1587,319 +1602,6 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         </div>
       </div>
     </div>
-
-      {/* 4. 개정정보 모달 */}
-      {isHistoryModalOpen && (
-        <RevisionInfoModal
-          ruleData={ruleData}
-          isAdmin={isAdmin}
-          onClose={() => setIsHistoryModalOpen(false)}
-        />
-      )}
-    </div>
-  );
-}
-
-// 개정정보 모달 별도 컴포넌트 (React Hooks 규칙 준수)
-function RevisionInfoModal({ ruleData, isAdmin, onClose }: { ruleData: any; isAdmin?: boolean; onClose: () => void }) {
-  const revisions = ruleData?.revisions || [];
-  const [historySelectedRevId, setHistorySelectedRevId] = React.useState<string>(
-    ruleData?.currentRevision?.id || (revisions.length > 0 ? revisions[0].id : "")
-  );
-  const [isEditingDesc, setIsEditingDesc] = React.useState(false);
-  const [editDescText, setEditDescText] = React.useState("");
-  const [isSavingDesc, setIsSavingDesc] = React.useState(false);
-
-  const selectedRev = revisions.find((r: any) => r.id === historySelectedRevId) || revisions[0];
-  
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return "—";
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return "—";
-    return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
-  };
-
-  const getTypeLabel = (type: string) => {
-    switch(type) {
-      case "ENACTMENT": return "제정";
-      case "AMENDMENT": return "일부개정";
-      case "TOTAL_AMENDMENT": return "전부개정";
-      case "FULL_REVISION": return "전부개정";
-      case "ABOLITION": return "폐지";
-      default: return type || "개정";
-    }
-  };
-
-  const handleSaveDescription = async () => {
-    if (!selectedRev) return;
-    setIsSavingDesc(true);
-    try {
-      const res = await fetch(`/api/admin/revisions/${selectedRev.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: editDescText }),
-      });
-      if (res.ok) {
-        selectedRev.description = editDescText;
-        setIsEditingDesc(false);
-        window.dispatchEvent(new CustomEvent('rule-updated'));
-      } else {
-        alert("저장에 실패했습니다.");
-      }
-    } catch (e) {
-      alert("저장 중 오류가 발생했습니다.");
-    } finally {
-      setIsSavingDesc(false);
-    }
-  };
-
-  // 첨부파일 목록
-  const attachments = ruleData?.attachments || [];
-
-  return (
-    <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-[680px] max-h-[85vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
-        {/* 헤더 */}
-        <div className="bg-gradient-to-r from-[#1e3a5f] to-[#2a5298] px-5 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-              <InfoIcon sx={{ fontSize: 18 }} className="text-white" />
-            </div>
-            <div>
-              <h2 className="text-white font-black text-[16px] tracking-tight">개정정보</h2>
-              <p className="text-blue-200 text-[11px] font-medium mt-0.5">예원예술대학교 규정관리시스템</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => {
-                const printWin = window.open("", "_blank", "width=700,height=600");
-                if (!printWin || !selectedRev) return;
-                const typeLabel = getTypeLabel(selectedRev.revisionType);
-                const enactDate = formatDate(selectedRev.enactmentDate);
-                const effectDate = formatDate(selectedRev.effectiveDate);
-                printWin.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>개정정보 - ${ruleData?.title || ""}</title>
-                  <style>
-                    body { font-family: 'Malgun Gothic', sans-serif; padding: 30px; color: #333; }
-                    h1 { font-size: 18px; color: #1e3a5f; border-bottom: 2px solid #1e3a5f; padding-bottom: 10px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th { background: #f0f4f8; text-align: left; padding: 10px 14px; border: 1px solid #d1d5db; width: 30%; font-size: 13px; }
-                    td { padding: 10px 14px; border: 1px solid #d1d5db; font-size: 13px; }
-                    .footer { margin-top: 30px; text-align: center; color: #999; font-size: 11px; }
-                    @media print { body { padding: 20px; } }
-                  </style></head><body>
-                  <h1>개정정보</h1>
-                  <table>
-                    <tr><th>제목</th><td>${ruleData?.ruleNumber || ""} ${ruleData?.title || ""}</td></tr>
-                    <tr><th>제개정유형</th><td>${typeLabel}</td></tr>
-                    <tr><th>개정일</th><td>${enactDate}</td></tr>
-                    <tr><th>시행일</th><td>${effectDate}</td></tr>
-                    ${selectedRev.description ? `<tr><th>개정내용</th><td>${selectedRev.description.replace(/\n/g, '<br/>')}</td></tr>` : ""}
-                  </table>
-                  <div class="footer">예원예술대학교 규정관리시스템</div>
-                  </body></html>`);
-                printWin.document.close();
-                setTimeout(() => printWin.print(), 300);
-              }}
-              className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center hover:bg-white/30 transition-colors cursor-pointer"
-              title="인쇄"
-            >
-              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-            </button>
-            <button 
-              onClick={onClose} 
-              className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center hover:bg-white/30 transition-colors cursor-pointer"
-              title="닫기"
-            >
-              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-          </div>
-        </div>
-
-        {/* 본문 */}
-        <div className="flex-1 overflow-y-auto p-5">
-          <table className="w-full border-collapse text-[13px]">
-            <colgroup>
-              <col style={{ width: '28%' }} />
-              <col style={{ width: '72%' }} />
-            </colgroup>
-            <tbody>
-              {/* 연혁 선택 */}
-              <tr>
-                <th className="bg-slate-50 text-left px-4 py-3 border border-slate-200 font-bold text-slate-700 align-middle">연혁 선택</th>
-                <td className="px-4 py-3 border border-slate-200">
-                  <select 
-                    value={historySelectedRevId}
-                    onChange={(e) => { setHistorySelectedRevId(e.target.value); setIsEditingDesc(false); }}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-                  >
-                    {revisions.map((rev: any) => (
-                      <option key={rev.id} value={rev.id}>
-                        {formatDate(rev.enactmentDate)} ({getTypeLabel(rev.revisionType)})
-                      </option>
-                    ))}
-                  </select>
-                </td>
-              </tr>
-              
-              {/* 제목 */}
-              <tr>
-                <th className="bg-slate-50 text-left px-4 py-3 border border-slate-200 font-bold text-slate-700 align-middle">제목</th>
-                <td className="px-4 py-3 border border-slate-200 font-medium text-slate-800">
-                  <span className="text-blue-600 mr-2">{ruleData?.ruleNumber || ""}</span>
-                  {ruleData?.title || ""}
-                </td>
-              </tr>
-
-              {/* 제개정유형 */}
-              {selectedRev && (
-                <tr>
-                  <th className="bg-slate-50 text-left px-4 py-3 border border-slate-200 font-bold text-slate-700 align-middle">제개정유형</th>
-                  <td className="px-4 py-3 border border-slate-200">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-bold ${
-                      selectedRev.revisionType === 'ENACTMENT' ? 'bg-emerald-100 text-emerald-700' :
-                      selectedRev.revisionType === 'TOTAL_AMENDMENT' || selectedRev.revisionType === 'FULL_REVISION' ? 'bg-red-100 text-red-700' :
-                      selectedRev.revisionType === 'ABOLITION' ? 'bg-gray-100 text-gray-700' :
-                      'bg-blue-100 text-blue-700'
-                    }`}>
-                      {getTypeLabel(selectedRev.revisionType)}
-                    </span>
-                  </td>
-                </tr>
-              )}
-
-              {/* 개정일 */}
-              {selectedRev && (
-                <tr>
-                  <th className="bg-slate-50 text-left px-4 py-3 border border-slate-200 font-bold text-slate-700 align-middle">개정일</th>
-                  <td className="px-4 py-3 border border-slate-200 text-slate-800">
-                    {formatDate(selectedRev.enactmentDate)}
-                  </td>
-                </tr>
-              )}
-
-              {/* 시행일 */}
-              {selectedRev && (
-                <tr>
-                  <th className="bg-slate-50 text-left px-4 py-3 border border-slate-200 font-bold text-slate-700 align-middle">시행일</th>
-                  <td className="px-4 py-3 border border-slate-200 text-slate-800">
-                    {formatDate(selectedRev.effectiveDate)}
-                  </td>
-                </tr>
-              )}
-
-              {/* 소관부서 */}
-              {ruleData?.department && (
-                <tr>
-                  <th className="bg-slate-50 text-left px-4 py-3 border border-slate-200 font-bold text-slate-700 align-middle">소관부서</th>
-                  <td className="px-4 py-3 border border-slate-200 text-slate-800">
-                    {ruleData.department.name}
-                  </td>
-                </tr>
-              )}
-
-              {/* 원문파일 */}
-              {attachments.length > 0 && (
-                <tr>
-                  <th className="bg-slate-50 text-left px-4 py-3 border border-slate-200 font-bold text-slate-700 align-middle">원문파일</th>
-                  <td className="px-4 py-3 border border-slate-200">
-                    <div className="flex flex-wrap gap-2">
-                      {attachments.map((att: any, idx: number) => {
-                        const isHwp = att.fileUrl?.toLowerCase().endsWith('.hwp') || att.title?.toLowerCase().endsWith('.hwp');
-                        const isPdf = att.fileUrl?.toLowerCase().endsWith('.pdf') || att.title?.toLowerCase().endsWith('.pdf');
-                        const fileUrl = att.fileUrl?.startsWith('http') 
-                          ? `/api/files/download?url=${encodeURIComponent(att.fileUrl)}&filename=${encodeURIComponent(att.title || 'file')}`
-                          : att.fileUrl;
-                        return (
-                          <a
-                            key={idx}
-                            href={fileUrl}
-                            download
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-blue-50 hover:border-blue-300 transition-colors text-[12px] font-medium text-blue-700 cursor-pointer"
-                          >
-                            {isHwp && <span className="bg-blue-100 text-blue-700 px-1 rounded text-[9px] font-bold">HWP</span>}
-                            {isPdf && <span className="bg-red-100 text-red-700 px-1 rounded text-[9px] font-bold">PDF</span>}
-                            {!isHwp && !isPdf && <span className="bg-gray-100 text-gray-700 px-1 rounded text-[9px] font-bold">FILE</span>}
-                            {att.title || "다운로드"}
-                          </a>
-                        );
-                      })}
-                    </div>
-                  </td>
-                </tr>
-              )}
-
-              {/* 개정내용 */}
-              {selectedRev && (
-                <tr>
-                  <th className="bg-slate-50 text-left px-4 py-3 border border-slate-200 font-bold text-slate-700 align-top">
-                    개정내용
-                    {isAdmin && !isEditingDesc && (
-                      <button 
-                        onClick={() => { setIsEditingDesc(true); setEditDescText(selectedRev.description || ""); }}
-                        className="ml-2 text-[10px] text-blue-500 hover:text-blue-700 cursor-pointer font-medium"
-                        title="개정내용 편집"
-                      >
-                        ✏️ 편집
-                      </button>
-                    )}
-                  </th>
-                  <td className="px-4 py-3 border border-slate-200 text-slate-800">
-                    {isEditingDesc ? (
-                      <div className="flex flex-col gap-2">
-                        <textarea
-                          value={editDescText}
-                          onChange={(e) => setEditDescText(e.target.value)}
-                          placeholder="개정내용을 입력하세요. (예: 제5조 제2항 삭제, 제10조 신설 등)"
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[13px] min-h-[120px] resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          autoFocus
-                        />
-                        <div className="flex justify-end gap-2">
-                          <button 
-                            onClick={() => setIsEditingDesc(false)}
-                            className="px-3 py-1.5 text-[12px] text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer font-medium"
-                          >
-                            취소
-                          </button>
-                          <button 
-                            onClick={handleSaveDescription}
-                            disabled={isSavingDesc}
-                            className="px-3 py-1.5 text-[12px] text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer font-bold disabled:opacity-50"
-                          >
-                            {isSavingDesc ? "저장 중..." : "💾 저장"}
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      selectedRev.description ? (
-                        <div className="whitespace-pre-wrap leading-relaxed text-[13px]">{selectedRev.description}</div>
-                      ) : (
-                        <div className="text-slate-400 text-[13px] italic">
-                          등록된 개정내용이 없습니다.
-                          {isAdmin && <span className="ml-1 text-blue-500 not-italic">위 편집 버튼을 클릭하여 입력해 주세요.</span>}
-                        </div>
-                      )
-                    )}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* 하단 */}
-        <div className="px-5 py-3 border-t border-slate-200 bg-slate-50 flex justify-between items-center rounded-b-xl">
-          <p className="text-[11px] text-slate-400 font-medium">
-            전체 {revisions.length}건의 연혁 정보
-          </p>
-          <button 
-            onClick={onClose}
-            className="px-4 py-1.5 text-[12px] font-bold text-slate-600 border border-slate-300 rounded-lg hover:bg-white transition-colors cursor-pointer"
-          >
-            닫기
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

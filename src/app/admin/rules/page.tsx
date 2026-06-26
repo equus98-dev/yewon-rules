@@ -756,20 +756,25 @@ export default function AdminRulesManagement() {
                       <td className="py-3 px-4 text-center text-slate-500">
                         {rev.effectiveDate ? new Date(rev.effectiveDate).toLocaleDateString() : '-'}
                       </td>
-                      <td className="py-3 px-4 text-center">
+                      <td className="py-3 px-4 text-center flex items-center justify-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => window.open(`/revision/${historySelectedRuleId}?admin=true&revId=${rev.id}`, '_blank', 'width=720,height=780,scrollbars=yes,resizable=yes')}
+                          className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1.5 rounded border border-indigo-200 text-xs font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
+                        >
+                          📋 개정정보 관리
+                        </button>
                         {idx === 0 && rev.version > 1 ? (
                           <button
                             type="button"
                             onClick={() => handleDeleteRevision(rev.id, rev.versionName)}
-                            className="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded border border-red-200 text-xs font-bold transition-colors whitespace-nowrap"
+                            className="bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1.5 rounded border border-red-200 text-xs font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
                           >
                             <DeleteIcon sx={{ fontSize: 14, mr: 0.5 }} />최신 롤백(삭제)
                           </button>
                         ) : idx === 0 && rev.version === 1 ? (
-                           <span className="text-xs text-slate-400">제정 삭제 불가</span>
-                        ) : (
-                           <span className="text-xs text-slate-400">-</span>
-                        )}
+                           <span className="text-xs text-slate-400 px-2 py-1">제정 삭제 불가</span>
+                        ) : null}
                       </td>
                     </tr>
                   ))}
