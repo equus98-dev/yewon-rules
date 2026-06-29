@@ -67,14 +67,14 @@ export default function RevisionClient({ id }: { id: string }) {
         alert("원문파일이 성공적으로 업로드되었습니다.");
         const ruleRes = await fetch(`/api/rules/${id}`);
         if (ruleRes.ok) {
-          const newRuleData = await ruleRes.json();
+          const newRuleData = (await ruleRes.json()) as any;
           setRuleData(newRuleData);
         }
         if (window.opener) {
           window.opener.dispatchEvent(new CustomEvent('rule-updated'));
         }
       } else {
-        const errorData = await res.json();
+        const errorData = (await res.json()) as any;
         alert(`업로드 실패: ${errorData.error || '알 수 없는 오류'}`);
       }
     } catch (err) {
@@ -94,7 +94,7 @@ export default function RevisionClient({ id }: { id: string }) {
       alert("삭제되었습니다.");
       const ruleRes = await fetch(`/api/rules/${id}`);
       if (ruleRes.ok) {
-        const newRuleData = await ruleRes.json();
+        const newRuleData = (await ruleRes.json()) as any;
         setRuleData(newRuleData);
       }
       if (window.opener) {
