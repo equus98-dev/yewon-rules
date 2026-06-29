@@ -1110,7 +1110,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className={`block w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: isArticleBody ? '20px' : '72px', textIndent: '-20px' }}>
+                  <div key={`glued-${idx}`} className={`block w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: isArticleBody ? '40px' : '72px', textIndent: '-20px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      
@@ -1135,7 +1135,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: isArticleBody ? '36px' : '88px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: isArticleBody ? '56px' : '88px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      
@@ -1159,7 +1159,7 @@ export default function ArticleRenderer({
                  );
                }
                return (
-                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: isArticleBody ? '52px' : '104px', textIndent: '-16px' }}>
+                  <div key={`glued-${idx}`} className={`w-full break-keep text-slate-800 py-0.5 ${interactiveClass}`} style={{ paddingLeft: isArticleBody ? '72px' : '104px', textIndent: '-16px' }}>
                      <span className="font-normal mr-1">{numMatch[1]}</span>
                      <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
                      
@@ -1811,6 +1811,8 @@ export default function ArticleRenderer({
                             }
                             // Clean actualBody again in case the match exposed a leading <br> or <p>
                             actualBody = actualBody.replace(/^(?:\s|&nbsp;|<br\s*\/?>|<\/?p[^>]*>)+/gi, '').trim();
+                            // 조문 제목 바로 옆에 <개정 ...>이 있고, 본문(①항 등) 뒤에 또 <개정 ...>이 있는 경우 조문 제목 옆의 중복 연혁 제거
+                            actualBody = actualBody.replace(/^([<(\[＜（]\s*개정[^>\])＞）]*[>\])＞）])\s*(?=[①-⑳][\s\S]*?[<(\[＜（]\s*개정)/i, '').trim();
                           }
 
                           return (
@@ -1846,7 +1848,7 @@ export default function ArticleRenderer({
             );
           }
           return (
-            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: '72px', textIndent: '-20px' }}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: '92px', textIndent: '-20px' }}>
               {showEditBtn && renderEditButton(true)}
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
@@ -1858,7 +1860,7 @@ export default function ArticleRenderer({
 
           return (
             <React.Fragment key={index}>
-              <div className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '72px' : '88px', textIndent: isAddendum ? '-20px' : '-16px' }}>
+              <div className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '72px' : '108px', textIndent: isAddendum ? '-20px' : '-16px' }}>
                 {showEditBtn && renderEditButton(true)}
                 <span className="font-normal mr-1">{safeNum}</span>
                 <span className="font-normal">{renderTextWithHistory(safeText)}</span>
@@ -1868,7 +1870,7 @@ export default function ArticleRenderer({
           );
         } else if (item.type === "subitem") {
           return (
-            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '104px', textIndent: '-16px' }}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '124px', textIndent: '-16px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
               <span className="font-normal">{renderTextWithHistory(safeText)}</span>
               

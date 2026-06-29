@@ -938,7 +938,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           </div>
           
           <button 
-            onClick={() => window.open(`/revision/${ruleId}`, "_blank", "width=720,height=780,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes")}
+            onClick={() => window.open(`/revision/${ruleId}${isAdmin ? "?admin=true" : ""}`, "_blank", "width=720,height=780,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes")}
             className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer"
           >
             <InfoIcon sx={{ fontSize: 14 }} className="text-blue-500" /> 개정정보

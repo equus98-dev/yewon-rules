@@ -107,8 +107,9 @@ export default function RevisionClient({ id }: { id: string }) {
 
   useEffect(() => {
     // 관리자 여부 확인
-    const token = localStorage.getItem("admin_token");
-    if (token || queryAdmin) {
+    const token = localStorage.getItem("admin_token") || localStorage.getItem("token") || localStorage.getItem("admin");
+    const hasAdminCookie = typeof document !== 'undefined' && (document.cookie.includes("admin") || document.cookie.includes("token"));
+    if (token || hasAdminCookie || queryAdmin) {
       setIsAdmin(true);
     }
 
