@@ -21,6 +21,57 @@ export default function RevisionClient({ id }: { id: string }) {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  const [isCreatingRev, setIsCreatingRev] = useState(false);
+  const [newRevType, setNewRevType] = useState("AMENDMENT");
+  const [newRevDate, setNewRevDate] = useState("");
+  const [newRevDesc, setNewRevDesc] = useState("");
+  const [isSubmittingRev, setIsSubmittingRev] = useState(false);
+
+  const handleCreateRevision = async () => {
+    if (!newRevDate) {
+      alert("개정일자를 입력해주세요.");
+      return;
+    }
+    setIsSubmittingRev(true);
+    try {
+      const payload = {
+        ruleId: id,
+        versionName: newRevType === 'AMENDMENT' ? '일부개정본' : newRevType === 'TOTAL_AMENDMENT' ? '전부개정본' : '제정본',
+        revisionType: newRevType,
+        enactmentDate: newRevDate,
+        effectiveDate: newRevDate,
+        description: newRevDesc || `${newRevDate} 개정 사항 반영`,
+        articles: []
+      };
+      const res = await fetch("/api/admin/revisions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "연혁 생성 실패");
+      }
+      alert("새로운 연혁이 성공적으로 추가되었습니다.");
+      setIsCreatingRev(false);
+      setNewRevDate("");
+      setNewRevDesc("");
+      
+      const ruleRes = await fetch(`/api/rules/${id}`);
+      if (ruleRes.ok) {
+        const newRuleData = (await ruleRes.json()) as any;
+        setRuleData(newRuleData);
+      }
+      if (window.opener) {
+        window.opener.dispatchEvent(new CustomEvent('rule-updated'));
+      }
+    } catch (error: any) {
+      alert(error.message || "연혁 생성 중 오류가 발생했습니다.");
+    } finally {
+      setIsSubmittingRev(false);
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0 || !selectedRev) return;
@@ -318,7 +369,18 @@ export default function RevisionClient({ id }: { id: string }) {
           <tbody>
             {/* 연혁 선택 */}
             <tr>
-              <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">연혁 선택</th>
+              <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">
+                연혁 선택
+                {isAdmin && (
+                  <button
+                    onClick={() => setIsCreatingRev(true)}
+                    className="ml-2 text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
+                    title="새로운 연혁(과거 개정 이력) 추가"
+                  >
+                    ➕ 연혁 추가
+                  </button>
+                )}
+              </th>
               <td className="px-4 py-3.5 border-b border-slate-200 bg-white">
                 <select 
                   value={historySelectedRevId}
@@ -529,6 +591,83 @@ export default function RevisionClient({ id }: { id: string }) {
           창 닫기
         </button>
       </div>
+
+      {/* 연혁 추가 모달 */}
+      {isCreatingRev && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-slate-200 w-full max-w-md overflow-hidden animate-fade-in">
+            <div className="bg-[#0c3161] px-6 py-4 flex justify-between items-center">
+              <h3 className="text-white font-bold text-[16px] flex items-center gap-2">
+                <span>➕</span> 과거 개정 연혁 추가
+              </h3>
+              <button 
+                onClick={() => !isSubmittingRev && setIsCreatingRev(false)}
+                className="text-slate-300 hover:text-white transition-colors text-lg font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6 space-y-4 text-[13px]">
+              <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg text-blue-900 font-medium leading-relaxed">
+                💡 규정 본문(부칙)에만 존재하고 시스템 연혁에 누락된 과거 개정 일자(예: 2020. 8. 5.)를 손쉽게 DB에 적재할 수 있습니다.
+              </div>
+              
+              <div>
+                <label className="block font-bold text-slate-700 mb-1.5">제개정유형</label>
+                <select 
+                  value={newRevType} 
+                  onChange={(e) => setNewRevType(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-800 bg-white focus:outline-none focus:border-blue-500 shadow-sm font-medium"
+                >
+                  <option value="AMENDMENT">일부개정</option>
+                  <option value="TOTAL_AMENDMENT">전부개정</option>
+                  <option value="ENACTMENT">제정</option>
+                  <option value="ABOLITION">폐지</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1.5">개정일자 (공포일/시행일)</label>
+                <input 
+                  type="date" 
+                  value={newRevDate} 
+                  onChange={(e) => setNewRevDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-800 bg-white focus:outline-none focus:border-blue-500 shadow-sm font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1.5">개정내용 요약 (선택)</label>
+                <textarea 
+                  value={newRevDesc} 
+                  onChange={(e) => setNewRevDesc(e.target.value)}
+                  placeholder="예: 제11조 및 부칙 개정 반영"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-800 bg-white min-h-[80px] resize-y focus:outline-none focus:border-blue-500 shadow-sm font-medium leading-relaxed"
+                />
+              </div>
+            </div>
+            
+            <div className="bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => !isSubmittingRev && setIsCreatingRev(false)}
+                className="px-4 py-2 border border-slate-300 bg-white text-slate-700 font-bold rounded-lg hover:bg-slate-100 transition-colors shadow-sm"
+                disabled={isSubmittingRev}
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateRevision}
+                disabled={isSubmittingRev}
+                className="px-4 py-2 bg-[#0c3161] text-white font-bold rounded-lg hover:bg-blue-800 transition-colors shadow-sm flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {isSubmittingRev ? "생성 중..." : "🚀 연혁 추가하기"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
