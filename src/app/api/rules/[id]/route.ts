@@ -122,7 +122,41 @@ export async function GET(
 
     // 2-0-3 학업이수에 관한 규정 내 제25의2(특별학점인정) 오타 감지 및 독립 조문 완벽 분리
     let processedArticles: any[] = [];
-    for (const art of articlesRes.rows) {
+    for (let art of articlesRes.rows) {
+      // 2-0-9 일반대학원 학사운영 규정 부칙 내 별지 표 병합 오류 해결 (contentText, contentJson, contentHtml 모두 정제)
+      if (art.contentText && (art.contentText.includes("〔별지 제1호 전과취소원〕") || art.contentText.includes("[별지 제1호 전과취소원]"))) {
+        const splitKeyword = art.contentText.includes("〔별지 제1호 전과취소원〕") ? "〔별지 제1호 전과취소원〕" : "[별지 제1호 전과취소원]";
+        const parts = art.contentText.split(splitKeyword);
+        const cleanContentText = parts[0].trim();
+        
+        let cleanContentHtml = art.contentHtml;
+        if (cleanContentHtml && (cleanContentHtml.includes("〔별지 제1호 전과취소원〕") || cleanContentHtml.includes("[별지 제1호 전과취소원]"))) {
+          const htmlSplitKeyword = cleanContentHtml.includes("〔별지 제1호 전과취소원〕") ? "〔별지 제1호 전과취소원〕" : "[별지 제1호 전과취소원]";
+          cleanContentHtml = cleanContentHtml.split(htmlSplitKeyword)[0].trim();
+        }
+
+        let cleanContentJson = art.contentJson;
+        if (cleanContentJson) {
+          try {
+            const parsed = typeof cleanContentJson === 'string' ? JSON.parse(cleanContentJson) : cleanContentJson;
+            if (Array.isArray(parsed)) {
+              const filtered = parsed.filter((item: any) => {
+                const text = String(item.text || "");
+                return !text.includes("별지 제1호 전과취소원") && !text.includes("전과취소원") && !text.includes("개인정보") && !text.includes("전과 취소 사유");
+              });
+              cleanContentJson = JSON.stringify(filtered);
+            }
+          } catch (e) {}
+        }
+
+        art = {
+          ...art,
+          contentText: cleanContentText,
+          contentHtml: cleanContentHtml,
+          contentJson: cleanContentJson
+        };
+      }
+
       if (art.contentText && art.contentText.includes("제25의2(특별학점인정)")) {
         const parts = art.contentText.split("제25의2(특별학점인정)");
         const art1 = { ...art, contentText: parts[0].trim(), contentJson: null };
@@ -143,6 +177,31 @@ export async function GET(
         processedArticles.push(art);
       }
     }
+
+    // 1번 문제 해결: 성과관리 규정 등에서 부칙이 제1조 다음으로 나오는 정렬 오류 원천 차단
+    // 부칙인 조문은 무조건 일반 조문 뒤로 가도록 재정렬
+    const isAddendum = (art: any) => {
+      if (!art) return false;
+      const title = art.title || "";
+      const chapter = art.chapter || "";
+      const contentText = art.contentText || "";
+      return (
+        title === "부칙" ||
+        title.replace(/\s+/g, "").startsWith("부칙") ||
+        chapter === "부칙" ||
+        chapter.replace(/\s+/g, "").startsWith("부칙") ||
+        (!title && !chapter && /^부\s*칙/.test(contentText.trim())) ||
+        art.articleNumber >= 8000
+      );
+    };
+
+    processedArticles.sort((a, b) => {
+      const aIsAdd = isAddendum(a);
+      const bIsAdd = isAddendum(b);
+      if (aIsAdd && !bIsAdd) return 1;
+      if (!aIsAdd && bIsAdd) return -1;
+      return (a.sortOrder || 0) - (b.sortOrder || 0);
+    });
 
     const responseData = {
       id: ruleRow.id,
