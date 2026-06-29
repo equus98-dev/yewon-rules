@@ -545,6 +545,12 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 toc.push({ type: "article", id: `toc-${articleNum}`, text: fullTitle });
               }
             }
+            
+            if (/(?:^|\n)\s*\d+\.\s*(?:\(시행일\))?\s*이\s*규정은.*시행한다/i.test(safeText) || /(?:^|\n)\s*\d+\.\s*\((?:시행일|경과조치|적용례|준용|폐지)\)/i.test(safeText)) {
+              if (!toc.some(t => t.text === '부칙')) {
+                toc.push({ type: 'chapter', id: 'toc-addendum-glued', text: '부칙' });
+              }
+            }
           }
         });
     });

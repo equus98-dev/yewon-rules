@@ -1156,6 +1156,18 @@ export default function ArticleRenderer({
                curMok = "";
                currentPath = `${baseArticlePath} ${curHang} ${curHo}`.replace(/\s+/g, ' ').trim();
                const interactiveClass = "";
+               const isGluedAddendum = /^(?:\(시행일\))?\s*이\s*규정은.*시행한다/i.test(numMatch[2].trim()) || /^\((?:시행일|경과조치|적용례|준용|폐지)\)/i.test(numMatch[2].trim());
+               if (isGluedAddendum) {
+                 return (
+                   <div key={`glued-${idx}`} id="toc-addendum-glued" className="mt-12 mb-2 w-full pt-4 border-t border-slate-200">
+                     <p className="font-bold text-[16px] text-slate-900 mb-2">부칙</p>
+                     <div className="w-full break-keep text-[16px] text-slate-800 leading-[1.8] pl-4" style={{ textIndent: '-16px' }}>
+                       <span className="font-normal mr-1">{numMatch[1]}</span>
+                       <span className="font-normal">{renderTextWithHistory(numMatch[2])}</span>
+                     </div>
+                   </div>
+                 );
+               }
                if (isInline) {
                  return (
                    <span key={`glued-${idx}`} className={`font-normal text-slate-800 break-keep inline ${interactiveClass}`}>
