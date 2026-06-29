@@ -26,11 +26,21 @@ export async function POST(request: Request) {
     const previousRevision = prevRes.rows[0] || null;
     const nextVersion = previousRevision ? previousRevision.version + 1 : 1;
 
+    // 조문 복사(Deep Copy)를 위한 소스로는 조문(Article)이 존재하는 판본 중 가장 최신 판본을 선택 (조문이 비어있는 비정상 판본 방단)
+    const prevValidRes = await client.query(
+      `SELECT r.id, r.version 
+       FROM "Revision" r
+       WHERE r."ruleId" = $1 AND EXISTS (SELECT 1 FROM "Article" a WHERE a."revisionId" = r.id)
+       ORDER BY r.version DESC LIMIT 1`,
+      [ruleId]
+    );
+    const validSourceRevision = prevValidRes.rows[0] || previousRevision;
+
     let oldArticles: any[] = [];
-    if (previousRevision) {
+    if (validSourceRevision) {
       const oldArtRes = await client.query(
         `SELECT id, "articleNumber", "contentText", part, chapter, section, "subSection" FROM "Article" WHERE "revisionId" = $1`,
-        [previousRevision.id]
+        [validSourceRevision.id]
       );
       oldArticles = oldArtRes.rows;
     }
@@ -53,6 +63,15 @@ export async function POST(request: Request) {
         );
         createdNewArticles.push({ id: artId, articleNumber: parseInt(art.articleNumber) || 1, contentText: art.contentText || "", part: art.part || null, chapter: art.chapter || null, section: art.section || null, subSection: art.subSection || null });
       }
+    } else if (validSourceRevision) {
+      // 사용자 제안 반영: 입안/연혁 추가 시 명시적 조문 목록이 주어지지 않은 경우, 직전 유효 연혁의 모든 조문(Article)을 고스란히 복제(Deep Copy)하여 새 연혁에 적재
+      await client.query(
+        `INSERT INTO "Article" (id, "revisionId", part, chapter, section, "subSection", "articleNumber", title, "contentJson", "contentText", "sortOrder", "createdAt", "updatedAt")
+         SELECT gen_random_uuid(), $1, part, chapter, section, "subSection", "articleNumber", title, "contentJson", "contentText", "sortOrder", NOW(), NOW()
+         FROM "Article" 
+         WHERE "revisionId" = $2`,
+        [newRevisionId, validSourceRevision.id]
+      );
     }
 
     if (oldArticles.length > 0 && createdNewArticles.length > 0) {
