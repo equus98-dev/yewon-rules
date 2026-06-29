@@ -27,6 +27,8 @@ interface ArticleRendererProps {
   seenAddendumCoreTexts?: Set<string>;
   ruleTitle?: string;
   searchKeyword?: string;
+  isSelectedForPrint?: boolean;
+  onTogglePrintSelect?: (id: string, checked: boolean) => void;
 }
 
 const convertCircledNum = (char: string) => {
@@ -106,6 +108,8 @@ export default function ArticleRenderer({
   seenAddendumCoreTexts,
   ruleTitle = "",
   searchKeyword = "",
+  isSelectedForPrint = false,
+  onTogglePrintSelect,
 }: ArticleRendererProps) {
   const isAddendumArticle =
     title === "부칙" ||
@@ -928,6 +932,16 @@ export default function ArticleRenderer({
                return (
                   <div key={`glued-table`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full group/text">
                      {renderEditButton(true)}
+                     {onTogglePrintSelect && articleId && (
+                       <div className="flex items-center mr-1 mt-0.5">
+                         <input 
+                           type="checkbox" 
+                           checked={isSelectedForPrint} 
+                           onChange={(e) => onTogglePrintSelect(articleId, e.target.checked)} 
+                           className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
+                         />
+                       </div>
+                     )}
                      {!hideBadge && (
                        <div className="flex items-center gap-1 mt-0.5 z-10">
                          <button 
@@ -1247,6 +1261,16 @@ export default function ArticleRenderer({
                  return (
                     <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-[calc(100%+52px)] -ml-[52px] group/text">
                        {renderEditButton(true)}
+                       {onTogglePrintSelect && articleId && (
+                         <div className="flex items-center mr-1 mt-0.5">
+                           <input 
+                             type="checkbox" 
+                             checked={isSelectedForPrint} 
+                             onChange={(e) => onTogglePrintSelect(articleId, e.target.checked)} 
+                             className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
+                           />
+                         </div>
+                       )}
                        {!hideBadge && (
                          <div className="flex items-center gap-1 mt-0.5 z-10">
                            <button 
@@ -1294,6 +1318,16 @@ export default function ArticleRenderer({
                  const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(trimmed);
                  return (
                     <div key={`glued-${idx}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-[calc(100%+52px)] -ml-[52px]">
+                       {onTogglePrintSelect && articleId && (
+                         <div className="flex items-center mr-1 mt-0.5">
+                           <input 
+                             type="checkbox" 
+                             checked={isSelectedForPrint} 
+                             onChange={(e) => onTogglePrintSelect(articleId, e.target.checked)} 
+                             className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
+                           />
+                         </div>
+                       )}
                        {!hideBadge && (
                          <div className="flex items-center gap-1 mt-0.5 z-10">
                            <button 
@@ -1772,6 +1806,16 @@ export default function ArticleRenderer({
             return (
               <div className={`mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full ${interactiveClass}`}>
                 {showEditBtn && renderEditButton(true)}
+                {onTogglePrintSelect && articleId && (
+                  <div className="flex items-center mr-1 mt-0.5">
+                    <input 
+                      type="checkbox" 
+                      checked={isSelectedForPrint} 
+                      onChange={(e) => onTogglePrintSelect(articleId, e.target.checked)} 
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
+                    />
+                  </div>
+                )}
                 {!hideBadge && !isAddendum && (
                   <div className="flex items-center gap-1 mt-0.5 z-10">
                     <button 

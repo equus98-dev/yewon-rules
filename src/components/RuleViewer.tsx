@@ -16,6 +16,7 @@ import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import LaunchIcon from "@mui/icons-material/Launch";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import PrintIcon from "@mui/icons-material/Print";
 
 
 interface RuleViewerProps {
@@ -110,6 +111,121 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const [selectedArticlesForPrint, setSelectedArticlesForPrint] = useState<Set<string>>(new Set());
+  const [isPrintPopupOpen, setIsPrintPopupOpen] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutsidePrint(event: MouseEvent) {
+      if (printRef.current && !printRef.current.contains(event.target as Node)) {
+        setIsPrintPopupOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutsidePrint);
+    return () => document.removeEventListener("mousedown", handleClickOutsidePrint);
+  }, []);
+
+  const handlePrintMultiple = (isAll: boolean) => {
+    if (!ruleData?.currentRevision || !ruleData.currentRevision.articles) {
+      alert("출력할 조문 데이터가 없습니다.");
+      return;
+    }
+    let targetArticles = ruleData.currentRevision.articles;
+    if (!isAll) {
+      targetArticles = targetArticles.filter((a: any) => selectedArticlesForPrint.has(a.id));
+      if (targetArticles.length === 0) {
+        alert("선택된 조문이 없습니다.");
+        return;
+      }
+    }
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      alert("팝업 차단이 설정되어 있습니다. 팝업 차단을 해제해주세요.");
+      return;
+    }
+
+    const ruleName = ruleData?.title || "규정명 미상";
+
+    let combinedHtml = "";
+    targetArticles.forEach((a: any) => {
+      let rawText = "";
+      if (a.contentHtml && a.contentHtml.trim().length > 0) {
+        rawText = a.contentHtml;
+      } else if (a.contentText) {
+        rawText = a.contentText;
+      } else {
+        rawText = a.title || `제${a.articleNumber}조`;
+      }
+      
+      if (/<table/i.test(rawText)) {
+        rawText = rawText.replace(/<table[\s\S]*?<\/table>/gi, (tableMatch: string) => tableMatch.replace(/\n/g, ''));
+      }
+      
+      let bodyHtml = rawText.replace(/\n/g, "<br/>");
+      bodyHtml = bodyHtml.replace(/(?:<br\s*\/?>|\s|&nbsp;)+<table/gi, '<table');
+      bodyHtml = bodyHtml.replace(/<\/table>(?:<br\s*\/?>|\s|&nbsp;)+/gi, '</table>');
+      
+      const isOrgChart = (a.title && (a.title.includes("조직도") || a.title.includes("기구표"))) || bodyHtml.includes("조직도");
+      const wrapperClass = isOrgChart ? "org-chart-wrapper" : "html-table-wrapper";
+      
+      const chapterName = a.chapter ? `<div class="chapter-title">${a.chapter}</div>` : "";
+      combinedHtml += `
+        ${chapterName}
+        <div class="article-content ${wrapperClass}">${bodyHtml}</div>
+        <hr style="border: 0; border-bottom: 1px dashed #ccc; margin: 30px 0;" />
+      `;
+    });
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${ruleName} - 조문 인쇄</title>
+          <style>
+            @media print {
+              body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; color: #000; padding: 20px; line-height: 1.6; }
+              .rule-title { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+              .chapter-title { font-size: 18px; font-weight: bold; color: #000080; margin-bottom: 15px; }
+              .article-content { font-size: 16px; margin-top: 10px; }
+              .btn-print { display: none; }
+              .html-table-wrapper table { border-collapse: collapse !important; width: 100% !important; margin: 15px 0 !important; font-size: 11pt !important; background-color: white !important; }
+              .html-table-wrapper th, .html-table-wrapper td { border: 1px solid #aaa !important; padding: 8px 12px !important; color: #000 !important; vertical-align: middle !important; word-break: break-word !important; }
+              .html-table-wrapper th { background-color: #eee !important; font-weight: bold !important; text-align: center !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .html-table-wrapper tr:first-child td { background-color: #eee !important; font-weight: bold !important; text-align: center !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            }
+            body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; color: #333; padding: 40px; max-width: 900px; margin: 0 auto; line-height: 1.6; }
+            .rule-title { font-size: 26px; font-weight: bold; text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; color: #0c3161; }
+            .chapter-title { font-size: 18px; font-weight: bold; color: #000080; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
+            .article-content { font-size: 16px; margin-top: 10px; }
+            .btn-print { display: block; width: 120px; margin: 0 auto 30px auto; padding: 10px; text-align: center; background: #0c3161; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+            .html-table-wrapper { width: 100%; overflow-x: auto; padding: 10px 0; }
+            .html-table-wrapper table { border-collapse: collapse !important; width: 100% !important; margin: 20px 0 !important; font-size: 14px !important; background-color: white !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            .html-table-wrapper th, .html-table-wrapper td { border: 1px solid #e2e8f0 !important; padding: 12px 16px !important; color: #334155 !important; vertical-align: middle !important; word-break: break-word !important; }
+            .html-table-wrapper th { background-color: #f3f4f6 !important; font-weight: 700 !important; color: #0f172a !important; text-align: center !important; }
+            .html-table-wrapper tr:first-child td { background-color: #e5e7eb !important; font-weight: 700 !important; color: #0f172a !important; text-align: center !important; }
+            .org-chart-wrapper { width: 100%; overflow-x: auto; padding: 20px 0; }
+            .org-chart-wrapper table { width: 100% !important; max-width: 1000px; margin: 0 auto !important; border-collapse: collapse !important; table-layout: fixed !important; background-color: transparent !important; }
+            .org-chart-wrapper td, .org-chart-wrapper th { padding: 0 !important; font-family: 'Malgun Gothic', sans-serif !important; vertical-align: middle !important; }
+            .org-chart-wrapper td[style*="border-left: #000000 0.425250pt solid"][style*="border-right: #000000 0.425250pt solid"] { background-color: #ffffff !important; border-radius: 4px; }
+          </style>
+        </head>
+        <body>
+          <button class="btn-print" onclick="window.print()">인쇄하기</button>
+          <div class="rule-title">${ruleName}</div>
+          ${combinedHtml}
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    setIsPrintPopupOpen(false);
+  };
 
   const [manualCitationData, setManualCitationData] = useState<{
     selectedText: string;
@@ -1065,6 +1181,32 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             )}
           </div>
           
+          <div className="relative" ref={printRef}>
+            <button 
+              onClick={() => setIsPrintPopupOpen(!isPrintPopupOpen)}
+              className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer"
+            >
+              <PrintIcon sx={{ fontSize: 14 }} className="text-slate-600" /> 인쇄
+            </button>
+            {isPrintPopupOpen && (
+              <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded shadow-lg py-1 z-50 flex flex-col w-[120px]">
+                <button
+                  onClick={() => handlePrintMultiple(false)}
+                  disabled={selectedArticlesForPrint.size === 0}
+                  className={`px-3 py-2 text-[11px] font-bold text-left ${selectedArticlesForPrint.size > 0 ? "text-slate-700 hover:bg-slate-50 cursor-pointer" : "text-slate-300 cursor-not-allowed"}`}
+                >
+                  선택조문 인쇄
+                </button>
+                <button
+                  onClick={() => handlePrintMultiple(true)}
+                  className="px-3 py-2 text-[11px] font-bold text-left text-slate-700 hover:bg-slate-50 cursor-pointer"
+                >
+                  전체인쇄
+                </button>
+              </div>
+            )}
+          </div>
+          
           <button 
             onClick={() => window.open(`/revision/${ruleId}${isAdmin ? "?admin=true" : ""}`, "_blank", "width=720,height=780,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes")}
             className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer"
@@ -1508,6 +1650,15 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         seenAddendumCoreTexts={cumulativeSeenSets[idx]}
                         ruleTitle={cleanTitle || ruleData?.title || ""}
                         searchKeyword={activeSearchKeyword}
+                        isSelectedForPrint={selectedArticlesForPrint.has(a.id)}
+                        onTogglePrintSelect={(id, checked) => {
+                          setSelectedArticlesForPrint(prev => {
+                            const newSet = new Set(prev);
+                            if (checked) newSet.add(id);
+                            else newSet.delete(id);
+                            return newSet;
+                          });
+                        }}
                       />
                     );
                   })()}
