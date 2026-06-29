@@ -191,14 +191,33 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
   const addendumDates = useMemo(() => {
     if (!currentRevision || !currentRevision.articles || !Array.isArray(currentRevision.articles)) {
-      return { oldestDate: null, latestDate: null };
+      return { enactmentDateStr: null, effectiveDateStr: null };
     }
-    const addenda = currentRevision.articles.filter(isAddendumArticle);
-    let oldestDate: Date | null = null;
-    let latestDate: Date | null = null;
-    const dateRegex = /(19|20)\d{2}\s*(?:년|\.)\s*\d{1,2}\s*(?:월|\.)\s*\d{1,2}\s*(?:일|\.)?/g;
+    // 별표/별지 서식 조문은 제외하고 순수 부칙만 필터링
+    const addenda = currentRevision.articles.filter((a: any) => 
+      isAddendumArticle(a) && !a.title?.includes("별표") && !a.title?.includes("별지") && !a.contentText?.startsWith("별표")
+    );
 
-    for (const a of addenda) {
+    let explicitEnactmentDateStr: string | null = null;
+    let firstEffectiveDateStr: string | null = null;
+    let lastEffectiveDateStr: string | null = null;
+
+    const parseDateStr = (raw: string) => {
+      const cleaned = raw.replace(/[년월일\s]/g, '.');
+      const parts = cleaned.split('.').filter(p => p.length > 0).map(Number);
+      if (parts.length >= 3) {
+        const d = new Date(parts[0], parts[1] - 1, parts[2]);
+        if (!isNaN(d.getTime())) {
+          return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
+        }
+      }
+      return null;
+    };
+
+    const dateRegex = /(?:19|20)\d{2}\s*(?:년|\.)\s*\d{1,2}\s*(?:월|\.)\s*\d{1,2}\s*(?:일|\.)?/g;
+    const enactmentRegex = /제정\s*((?:19|20)\d{2}\s*(?:년|\.)\s*\d{1,2}\s*(?:월|\.)\s*\d{1,2}\s*(?:일|\.)?)/;
+
+    addenda.forEach((a) => {
       let textToScan = a.contentText || "";
       if (!textToScan && a.contentJson) {
         try {
@@ -211,70 +230,69 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
         } catch (e) {}
       }
 
+      // 1. 명시적 제정일 탐지
+      const enactMatch = textToScan.match(enactmentRegex);
+      if (enactMatch && !explicitEnactmentDateStr) {
+        const parsed = parseDateStr(enactMatch[1]);
+        if (parsed) explicitEnactmentDateStr = parsed;
+      }
+
+      // 2. 해당 부칙 내 모든 날짜 탐지 (시행일 추출)
       let match;
+      let lastMatchInAddendum: string | null = null;
+      let firstMatchInAddendum: string | null = null;
       while ((match = dateRegex.exec(textToScan)) !== null) {
-        const rawMatch = match[0].replace(/[년월일\s]/g, '.');
-        const parts = rawMatch.split('.').filter(p => p.length > 0).map(Number);
-        if (parts.length >= 3) {
-          const d = new Date(parts[0], parts[1] - 1, parts[2]);
-          if (!isNaN(d.getTime())) {
-            if (!oldestDate || d < oldestDate) {
-              oldestDate = d;
-            }
-            if (!latestDate || d > latestDate) {
-              latestDate = d;
-            }
-          }
+        const parsed = parseDateStr(match[0]);
+        if (parsed) {
+          if (!firstMatchInAddendum) firstMatchInAddendum = parsed;
+          lastMatchInAddendum = parsed;
         }
       }
-    }
-    return { oldestDate, latestDate };
+
+      if (firstMatchInAddendum && !firstEffectiveDateStr) {
+        firstEffectiveDateStr = firstMatchInAddendum;
+      }
+      if (lastMatchInAddendum) {
+        lastEffectiveDateStr = lastMatchInAddendum;
+      }
+    });
+
+    // 제정일 대원칙: 부칙에 별도로 제정일이 지정안되어 있으면, 제일 처음 부칙의 시행일
+    const enactmentDateStr = explicitEnactmentDateStr || firstEffectiveDateStr || null;
+    // 시행일 대원칙: 부칙의 가장 맨 마지막 시행일
+    const effectiveDateStr = lastEffectiveDateStr || null;
+
+    return { enactmentDateStr, effectiveDateStr };
   }, [currentRevision]);
 
   const calculatedEnactmentDateStr = useMemo(() => {
     if (!ruleData) return "미정";
-
-    // 1. 부칙(Addendum) 본문에 기재된 최초 부칙 일자를 최우선 제정일로 적용
-    if (addendumDates.oldestDate) {
-      return addendumDates.oldestDate.toLocaleDateString('ko-KR');
+    if (addendumDates.enactmentDateStr) {
+      return addendumDates.enactmentDateStr;
     }
-
-    // 2. 부칙에 명시적 날짜가 없을 경우, DB 리비전 이력 중 ENACTMENT 리비전의 날짜를 사용
     if (ruleData.revisions && Array.isArray(ruleData.revisions)) {
       const enactmentRev = ruleData.revisions.find((r: any) => r.revisionType === 'ENACTMENT');
       if (enactmentRev && enactmentRev.enactmentDate) {
         const d = new Date(enactmentRev.enactmentDate);
-        if (!isNaN(d.getTime())) return d.toLocaleDateString('ko-KR');
+        if (!isNaN(d.getTime())) return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
       }
     }
-
     return "미정";
   }, [ruleData, addendumDates]);
 
   const calculatedEffectiveDateStr = useMemo(() => {
     if (!ruleData) return "미정";
-
-    // 1. 부칙(Addendum) 본문에 기재된 가장 최근 부칙의 시행일을 최우선 시행일로 적용
-    if (addendumDates.latestDate) {
-      if (currentRevision?.effectiveDate) {
-        const revEff = new Date(currentRevision.effectiveDate);
-        if (!isNaN(revEff.getTime()) && revEff > addendumDates.latestDate) {
-          return revEff.toLocaleDateString('ko-KR');
-        }
-      }
-      return addendumDates.latestDate.toLocaleDateString('ko-KR');
+    if (addendumDates.effectiveDateStr) {
+      return addendumDates.effectiveDateStr;
     }
-
-    // 2. 부칙에 날짜가 없을 경우 기존처럼 DB 리비전 정보 사용
     if (currentRevision?.effectiveDate) {
       const d = new Date(currentRevision.effectiveDate);
-      if (!isNaN(d.getTime())) return d.toLocaleDateString('ko-KR');
+      if (!isNaN(d.getTime())) return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
     }
     if (currentRevision?.enactmentDate) {
       const d = new Date(currentRevision.enactmentDate);
-      if (!isNaN(d.getTime())) return d.toLocaleDateString('ko-KR');
+      if (!isNaN(d.getTime())) return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
     }
-
     return "미정";
   }, [ruleData, currentRevision, addendumDates]);
 
