@@ -304,6 +304,43 @@ export async function GET(
       });
     }
 
+    // [부칙 내 별표/별지 분리 시스템]
+    // 3-1-24 대학발전기금 관리 및 운영 규정 등에서 부칙 조문의 본문 텍스트 내부에 별표/별지가 통째로 딸려들어간 현상 정리
+    const extraStars: any[] = [];
+    processedArticles.forEach((art: any) => {
+      if (art && (art.articleNumber >= 8000 || art.title === "부칙" || art.title?.includes("부칙"))) {
+        const content = art.contentText || "";
+        const match = content.match(/(?:\r?\n)(별표#\d+|\[별표[^\]]*\]|\[별지[^\]]*\]|<별표[^>]*>|<별지[^>]*>|별표\s*\d+|별지\s*제\d+호)/);
+        if (match && match.index !== undefined && match.index > 0) {
+          const matchIdx = match.index;
+          const starText = content.substring(matchIdx).trim();
+          art.contentText = content.substring(0, matchIdx).trim();
+          art.contentJson = JSON.stringify([{ type: "article", num: "", text: art.contentText }]);
+          
+          let starTitle = match[1] ? match[1].replace(/[\[\]<>#]/g, " ").trim() : "별표";
+          if (!starTitle.startsWith("별")) starTitle = "별표 1";
+
+          extraStars.push({
+            id: art.id + "-star",
+            part: null,
+            chapter: null,
+            section: null,
+            subSection: null,
+            articleNumber: 9001,
+            title: starTitle,
+            contentText: starText,
+            contentJson: JSON.stringify([{ type: "article", num: "", text: starText }]),
+            contentHtml: null,
+            sortOrder: (art.sortOrder || 8011) + 100,
+            revisionId: targetRevisionId
+          });
+        }
+      }
+    });
+    if (extraStars.length > 0) {
+      processedArticles.push(...extraStars);
+    }
+
     // 1번 문제 해결: 성과관리 규정 등에서 부칙이 제1조 다음으로 나오는 정렬 오류 원천 차단
     // 부칙인 조문은 무조건 일반 조문 뒤로 가도록 재정렬
     const isAddendum = (art: any) => {
