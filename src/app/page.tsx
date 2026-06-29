@@ -1500,7 +1500,7 @@ export default function Home() {
           ) : (
             /* CASE B: 대형 중앙 검색창이 있는 메인 대시보드 레이아웃 */
             <div className="flex-1 flex flex-col overflow-y-auto scrollbar bg-slate-50 relative">
-              <div className="max-w-[1400px] w-full mx-auto p-6 md:p-8 flex flex-col gap-8 min-h-0">
+              <div className="w-full p-6 md:p-8 flex flex-col gap-8 min-h-0">
                 
                 {/* [파트 1] 상단 검색 배너 (전면 중앙 - 파란색 그라데이션 및 꽉 찬 배경 이미지) */}
                 <div className="bg-gradient-to-r from-[#1668a6] via-[#248fd6] to-[#1668a6] rounded-2xl text-left text-white shadow-xl relative overflow-hidden flex flex-col shrink-0 min-h-[260px] justify-center">
