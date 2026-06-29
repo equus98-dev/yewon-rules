@@ -1175,7 +1175,7 @@ export default function ArticleRenderer({
                const isGluedAddendum = /^(?:\(시행일\))?\s*이\s*규정은.*시행한다/i.test(numMatch[2].trim()) || /^\((?:시행일|경과조치|적용례|준용|폐지)\)/i.test(numMatch[2].trim());
                if (isGluedAddendum) {
                  return (
-                   <div key={`glued-${idx}`} id="toc-addendum-glued" className="mt-12 mb-2 w-full pt-4 border-t border-slate-200">
+                   <div key={`glued-${idx}`} id="toc-addendum-glued" className="mt-12 mb-2 w-[calc(100%+52px)] -ml-[52px] pt-4 border-t border-slate-200">
                      <p className="font-bold text-[16px] text-slate-900 mb-2">부칙</p>
                      <div className="w-full break-keep text-[16px] text-slate-800 leading-[1.8] pl-4" style={{ textIndent: '-16px' }}>
                        <span className="font-normal mr-1">{numMatch[1]}</span>
@@ -1245,7 +1245,7 @@ export default function ArticleRenderer({
                  }
                  const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(trimmed);
                  return (
-                    <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full group/text">
+                    <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-[calc(100%+52px)] -ml-[52px] group/text">
                        {renderEditButton(true)}
                        {!hideBadge && (
                          <div className="flex items-center gap-1 mt-0.5 z-10">
@@ -1293,7 +1293,7 @@ export default function ArticleRenderer({
                  }
                  const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(trimmed);
                  return (
-                    <div key={`glued-${idx}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full">
+                    <div key={`glued-${idx}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-[calc(100%+52px)] -ml-[52px]">
                        {!hideBadge && (
                          <div className="flex items-center gap-1 mt-0.5 z-10">
                            <button 
