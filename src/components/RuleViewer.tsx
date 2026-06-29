@@ -907,9 +907,19 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                     return `/api/download?fileUrl=${encodeURIComponent(file.fileUrl || "")}&filename=${encodedTitle}`;
                   };
                   
+                  // 최신 연혁(현행 규정) 추출
+                  const sortedRevisions = [...(ruleData?.revisions || [])].sort((a: any, b: any) => {
+                    const dateA = new Date(a.enactmentDate || 0).getTime();
+                    const dateB = new Date(b.enactmentDate || 0).getTime();
+                    if (dateB !== dateA) return dateB - dateA;
+                    return (b.version || 0) - (a.version || 0);
+                  });
+                  const latestRevId = sortedRevisions[0]?.id;
+                  
+                  // 메인 화면 다운로드 파일은 최신 연혁(latestRevId)과 일치하거나, revisionId가 명시되지 않은 최초 파일만 해당 (과거 연혁 파일 완벽 분리)
                   const isMainFile = (title: string) => title.includes("[전문]") || (!title.includes("[별표") && !title.includes("[별지") && !title.includes("[서식") && !title.includes("[별첨"));
-                  const mainRuleHwp = ruleData?.attachments?.find((f: any) => isMainFile(f.title) && (f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp")));
-                  const mainRulePdf = ruleData?.attachments?.find((f: any) => isMainFile(f.title) && (f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf")));
+                  const mainRuleHwp = ruleData?.attachments?.find((f: any) => (!f.revisionId || f.revisionId === latestRevId) && isMainFile(f.title) && (f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp")));
+                  const mainRulePdf = ruleData?.attachments?.find((f: any) => (!f.revisionId || f.revisionId === latestRevId) && isMainFile(f.title) && (f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf")));
                   return (
                     <>
                       <a
