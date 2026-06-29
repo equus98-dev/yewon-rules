@@ -18,6 +18,92 @@ export default function RevisionClient({ id }: { id: string }) {
   const [isEditingDesc, setIsEditingDesc] = useState(false);
   const [editDescText, setEditDescText] = useState("");
   const [isSavingDesc, setIsSavingDesc] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0 || !selectedRev) return;
+
+    const file = files[0];
+    const valid = file.name.toLowerCase().endsWith(".hwp") || file.name.toLowerCase().endsWith(".pdf");
+    if (!valid) {
+      alert("HWP 또는 PDF 파일만 업로드할 수 있습니다.");
+      e.target.value = "";
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const originalName = file.name;
+      let cleanName = originalName;
+      let newFileName = cleanName;
+      
+      const bracketMatch = cleanName.match(/^\[([^\]]+)\]\s*(.*)$/);
+      if (bracketMatch) {
+        const bracketText = bracketMatch[1];
+        const restName = bracketMatch[2];
+        if (bracketText.includes("전문") || bracketText.includes('별지') || bracketText.includes('별표') || bracketText.includes('별첨') || bracketText.includes('서식')) {
+          newFileName = cleanName;
+        } else {
+          newFileName = `[전문] ${restName}`;
+        }
+      } else {
+        newFileName = `[전문] ${cleanName}`;
+      }
+
+      const modifiedFile = new File([file], newFileName, { type: file.type });
+      const formData = new FormData();
+      formData.append("file", modifiedFile);
+      formData.append("ruleId", id);
+      formData.append("revisionId", selectedRev.id);
+
+      const res = await fetch("/api/admin/files", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        alert("원문파일이 성공적으로 업로드되었습니다.");
+        const ruleRes = await fetch(`/api/rules/${id}`);
+        if (ruleRes.ok) {
+          const newRuleData = await ruleRes.json();
+          setRuleData(newRuleData);
+        }
+        if (window.opener) {
+          window.opener.dispatchEvent(new CustomEvent('rule-updated'));
+        }
+      } else {
+        const errorData = await res.json();
+        alert(`업로드 실패: ${errorData.error || '알 수 없는 오류'}`);
+      }
+    } catch (err) {
+      console.error("File upload error:", err);
+      alert("파일 업로드 중 오류가 발생했습니다.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    if (!confirm("이 원문파일을 삭제하시겠습니까?")) return;
+    try {
+      const res = await fetch(`/api/admin/files?id=${attachmentId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("삭제 실패");
+      alert("삭제되었습니다.");
+      const ruleRes = await fetch(`/api/rules/${id}`);
+      if (ruleRes.ok) {
+        const newRuleData = await ruleRes.json();
+        setRuleData(newRuleData);
+      }
+      if (window.opener) {
+        window.opener.dispatchEvent(new CustomEvent('rule-updated'));
+      }
+    } catch (error: any) {
+      alert(error.message || "삭제 중 오류가 발생했습니다.");
+    }
+  };
 
   useEffect(() => {
     // 관리자 여부 확인
@@ -182,6 +268,7 @@ export default function RevisionClient({ id }: { id: string }) {
               const typeLabel = getTypeLabel(selectedRev.revisionType);
               const enactDate = formatDate(selectedRev.enactmentDate);
               const effectDate = formatDate(selectedRev.effectiveDate);
+              const dateLabel = selectedRev.revisionType === 'ENACTMENT' ? '제정일' : '개정일';
               printWin.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>개정정보 - ${ruleData?.title || ""}</title>
                 <style>
                   body { font-family: 'Malgun Gothic', sans-serif; padding: 30px; color: #333; }
@@ -196,7 +283,7 @@ export default function RevisionClient({ id }: { id: string }) {
                 <table>
                   <tr><th>제목</th><td>${ruleData?.ruleNumber || ""} ${ruleData?.title || ""}</td></tr>
                   <tr><th>제개정유형</th><td>${typeLabel}</td></tr>
-                  <tr><th>개정일</th><td>${enactDate}</td></tr>
+                  <tr><th>${dateLabel}</th><td>${enactDate}</td></tr>
                   <tr><th>시행일</th><td>${effectDate}</td></tr>
                   ${selectedRev.description ? `<tr><th>개정내용</th><td>${selectedRev.description.replace(/\n/g, '<br/>')}</td></tr>` : ""}
                 </table>
@@ -272,10 +359,12 @@ export default function RevisionClient({ id }: { id: string }) {
               </tr>
             )}
 
-            {/* 개정일 */}
+            {/* 개정일/제정일 */}
             {selectedRev && (
               <tr>
-                <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">개정일</th>
+                <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">
+                  {selectedRev.revisionType === 'ENACTMENT' ? '제정일' : '개정일'}
+                </th>
                 <td className="px-4 py-3.5 border-b border-slate-200 text-slate-800 font-medium bg-white">
                   {formatDate(selectedRev.enactmentDate)}
                 </td>
@@ -304,7 +393,28 @@ export default function RevisionClient({ id }: { id: string }) {
 
             {/* 원문파일 (본문/전문만 표시) */}
             <tr>
-              <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">원문파일</th>
+              <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">
+                원문파일
+                {isAdmin && (
+                  <>
+                    <input 
+                      type="file" 
+                      ref={fileInputRef}
+                      onChange={handleFileUpload}
+                      accept=".hwp,.pdf"
+                      className="hidden" 
+                    />
+                    <button 
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                      className="ml-2 text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200 hover:bg-amber-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1 disabled:opacity-50"
+                      title="원문파일 업로드"
+                    >
+                      {isUploading ? "업로드 중..." : "📤 파일 첨부"}
+                    </button>
+                  </>
+                )}
+              </th>
               <td className="px-4 py-3.5 border-b border-slate-200 bg-white">
                 {mainAttachments.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
@@ -315,24 +425,34 @@ export default function RevisionClient({ id }: { id: string }) {
                         ? `/api/files/download?url=${encodeURIComponent(att.fileUrl)}&filename=${encodeURIComponent(att.title || 'file')}`
                         : att.fileUrl;
                       return (
-                        <a
-                          key={idx}
-                          href={fileUrl}
-                          download
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-blue-50 hover:border-blue-300 transition-all text-[12px] font-bold text-blue-700 cursor-pointer shadow-sm"
-                        >
-                          {isHwp && <span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[9px] font-black border border-blue-200">HWP</span>}
-                          {isPdf && <span className="bg-red-100 text-red-700 px-1.5 py-0.5 rounded text-[9px] font-black border border-red-200">PDF</span>}
-                          {!isHwp && !isPdf && <span className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded text-[9px] font-black border border-gray-200">FILE</span>}
-                          {att.title || "전문 다운로드"}
-                        </a>
+                        <div key={idx} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-blue-50 hover:border-blue-300 transition-all shadow-sm">
+                          <a
+                            href={fileUrl}
+                            download
+                            className="inline-flex items-center gap-1.5 text-[12px] font-bold text-blue-700 cursor-pointer"
+                          >
+                            {isHwp && <span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[9px] font-black border border-blue-200">HWP</span>}
+                            {isPdf && <span className="bg-red-100 text-red-700 px-1.5 py-0.5 rounded text-[9px] font-black border border-red-200">PDF</span>}
+                            {!isHwp && !isPdf && <span className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded text-[9px] font-black border border-gray-200">FILE</span>}
+                            {att.title || "전문 다운로드"}
+                          </a>
+                          {isAdmin && (
+                            <button
+                              onClick={() => handleDeleteAttachment(att.id)}
+                              className="ml-1 text-slate-400 hover:text-red-600 font-bold text-[11px] px-1 cursor-pointer transition-colors"
+                              title="파일 삭제"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
                       );
                     })}
                   </div>
                 ) : (
                   <div className="text-slate-400 text-[13px] italic font-medium">
                     등록된 전문 파일이 없습니다.
-                    {isAdmin && <span className="ml-1 text-blue-500 not-italic font-bold">상단의 '전문 파일 업로드 관리' 버튼을 통해 등록해 주세요.</span>}
+                    {isAdmin && <span className="ml-1 text-blue-500 not-italic font-bold">상단의 '파일 첨부' 버튼을 통해 즉시 등록해 주세요.</span>}
                   </div>
                 )}
               </td>
