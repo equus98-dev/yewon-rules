@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Button } from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import Link from "next/link";
 import SidebarTree from "@/components/SidebarTree";
 
 export default function OpinionsPage() {
@@ -24,30 +27,52 @@ export default function OpinionsPage() {
   const [verifyMode, setVerifyMode] = useState<"read" | "edit" | "delete" | null>(null);
 
   const [isAdmin, setIsAdmin] = useState(false);
+  const [sessionTimeLeft, setSessionTimeLeft] = useState<number>(1800);
   const [adminCommentText, setAdminCommentText] = useState("");
   const [isEditingComment, setIsEditingComment] = useState(false);
 
   useEffect(() => {
-    // 관리자 세션 체크
-    const checkAdminSession = () => {
-      const session = localStorage.getItem("yewon_admin_session");
-      if (session === "authorized") {
-        setIsAdmin(true);
-      } else if (session && session !== "authorized") {
-        const time = parseInt(session, 10);
-        if (Date.now() - time < 1800 * 1000) {
+    let timerId: any;
+    const checkSession = () => {
+      const sessionTime = localStorage.getItem("yewon_admin_session");
+      if (sessionTime && sessionTime !== "authorized") {
+        const time = parseInt(sessionTime, 10);
+        const elapsed = Math.floor((Date.now() - time) / 1000);
+        const remaining = 1800 - elapsed;
+        if (remaining > 0) {
           setIsAdmin(true);
+          setSessionTimeLeft(remaining);
         } else {
+          localStorage.removeItem("yewon_admin_session");
           setIsAdmin(false);
+          window.location.reload();
         }
+      } else if (sessionTime === "authorized") {
+        localStorage.setItem("yewon_admin_session", Date.now().toString());
+        setIsAdmin(true);
+        setSessionTimeLeft(1800);
       } else {
         setIsAdmin(false);
       }
     };
-    checkAdminSession();
-    const timer = setInterval(checkAdminSession, 2000);
-    return () => clearInterval(timer);
+
+    checkSession();
+    timerId = setInterval(checkSession, 1000);
+
+    return () => clearInterval(timerId);
   }, []);
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem("yewon_admin_session");
+    setIsAdmin(false);
+    window.location.reload();
+  };
+
+  const handleExtendSession = () => {
+    localStorage.setItem("yewon_admin_session", Date.now().toString());
+    setSessionTimeLeft(1800);
+  };
+
 
   useEffect(() => {
     if (mode === "list") {
@@ -277,17 +302,90 @@ export default function OpinionsPage() {
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <button onClick={() => window.location.href = '/'} className="font-bold text-sm text-slate-700 hover:text-blue-900">홈으로</button>
+          <Button
+            variant="text"
+            color="primary"
+            startIcon={<HomeIcon />}
+            onClick={() => window.location.href = '/'}
+            className="font-bold text-sm text-slate-700 hover:text-blue-900"
+          >
+            홈으로
+          </Button>
+
           <span className="text-slate-300 font-bold select-none text-sm">|</span>
-          <button onClick={() => window.location.href = '/admin'} className="font-bold text-sm text-slate-700 hover:text-blue-900">
-            {isAdmin ? "관리자 모드 (활성)" : "관리자 로그인"}
-          </button>
+
+          {isAdmin ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 mr-1">
+                <span className="text-sm font-bold text-[#0c3161] select-none">
+                  관리자님 안녕하세요!
+                </span>
+                <div className="flex items-center bg-slate-100 rounded-full px-2 py-0.5 border border-slate-200 shadow-inner">
+                  <span className="text-[11px] font-black text-rose-600 mr-1.5 font-mono w-[34px] text-center">
+                    {Math.floor(sessionTimeLeft / 60)}:{String(sessionTimeLeft % 60).padStart(2, "0")}
+                  </span>
+                  <button
+                    onClick={handleExtendSession}
+                    className="text-[10px] font-bold bg-white text-slate-600 border border-slate-300 rounded px-1.5 py-0.5 hover:bg-slate-50 hover:text-blue-700 transition-colors cursor-pointer active:scale-95"
+                    title="세션 시간 30분으로 연장"
+                  >
+                    연장
+                  </button>
+                </div>
+              </div>
+              <Button
+                component={Link}
+                href="/admin"
+                variant="contained"
+                sx={{
+                  bgcolor: "#0c3161",
+                  "&:hover": { bgcolor: "#092244" },
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                  fontSize: "0.775rem",
+                  px: 1.5,
+                  py: 0.5,
+                  minHeight: "32px",
+                }}
+                className="font-bold text-xs active:scale-95 transition-all text-white font-sans"
+              >
+                관리자 페이지
+              </Button>
+              <Button
+                onClick={handleAdminLogout}
+                variant="outlined"
+                sx={{
+                  borderColor: "#cbd5e1",
+                  color: "#64748b",
+                  "&:hover": { borderColor: "#94a3b8", bgcolor: "#f1f5f9" },
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                  fontSize: "0.775rem",
+                  px: 1.5,
+                  py: 0.5,
+                  minHeight: "32px",
+                }}
+                className="font-bold text-xs active:scale-95 transition-all font-sans"
+              >
+                로그아웃
+              </Button>
+            </div>
+          ) : (
+            <Button
+              component={Link}
+              href="/admin"
+              variant="text"
+              className="font-bold text-sm text-slate-700 hover:text-blue-900 active:scale-95 transition-all font-sans"
+            >
+              관리자 로그인
+            </Button>
+          )}
         </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden relative">
-        <div className="w-[375px] shrink-0 h-full border-r border-slate-200 z-10 hidden lg:block bg-white">
-          <SidebarTree onSelectRule={() => {}} />
+        <div className="w-[75px] shrink-0 h-full border-r border-slate-200 z-10 hidden lg:block bg-white">
+          <SidebarTree onSelectRule={() => {}} onlyVerticalMenu={true} />
         </div>
         <main className="flex-1 flex flex-col py-6 px-4 md:px-6 overflow-y-auto w-full bg-[#f3f4f6]">
           <div className="w-full bg-white p-8 rounded-2xl shadow-sm border border-slate-200 min-h-full">

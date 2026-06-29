@@ -32,6 +32,7 @@ interface SidebarTreeProps {
   activeRuleId?: string | null;
   onSelectNotice?: (noticeId: string) => void;
   hideVerticalMenu?: boolean;
+  onlyVerticalMenu?: boolean;
 }
 
 const ClosedIcon = () => (
@@ -41,7 +42,7 @@ const OpenedIcon = () => (
   <span className="text-[10px] text-slate-500 font-bold select-none mr-0.5">▼</span>
 );
 
-export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCategory, onTabChange, onSelectNotice, hideVerticalMenu = false }: SidebarTreeProps) {
+export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCategory, onTabChange, onSelectNotice, hideVerticalMenu = false, onlyVerticalMenu = false }: SidebarTreeProps) {
   // 1단 세로 메뉴 탭 상태: "규정" | "최신 제·개정" | "서식" | "공지사항" | "조직도" | "의견수렴"
   const [verticalTab, setVerticalTab] = useState<"규정" | "최신 제·개정" | "서식" | "공지사항" | "조직도" | "의견수렴">(() => {
     if (typeof window !== "undefined") {
@@ -336,7 +337,8 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
       )}
 
       {/* ==================== 2단계: 카테고리 & 데이터 이너 패널 ==================== */}
-      <div className="flex-1 h-full flex flex-col overflow-hidden bg-white">
+      {!onlyVerticalMenu && verticalTab !== "의견수렴" && (
+        <div className="flex-1 h-full flex flex-col overflow-hidden bg-white">
         
         {/* 이너 패널 헤더 */}
         <div className={`h-14 border-b border-slate-200 flex items-center justify-center px-4 shrink-0 select-none relative overflow-hidden ${verticalTab === '규정' ? 'text-white' : 'bg-slate-50 text-slate-800'}`}>
@@ -711,6 +713,7 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
         </Dialog>
 
       </div>
+      )}
     </div>
   );
 }
