@@ -17,6 +17,8 @@ export default function RevisionClient({ id }: { id: string }) {
   const [historySelectedRevId, setHistorySelectedRevId] = useState<string>("");
   const [isEditingDesc, setIsEditingDesc] = useState(false);
   const [editDescText, setEditDescText] = useState("");
+  const [editEnactDate, setEditEnactDate] = useState("");
+  const [editEffDate, setEditEffDate] = useState("");
   const [isSavingDesc, setIsSavingDesc] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -250,15 +252,28 @@ export default function RevisionClient({ id }: { id: string }) {
     if (!selectedRev) return;
     setIsSavingDesc(true);
     try {
+      const payload = {
+        description: editDescText,
+        enactmentDate: editEnactDate || undefined,
+        effectiveDate: editEffDate || undefined,
+      };
       const res = await fetch(`/api/admin/revisions/${selectedRev.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: editDescText }),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         selectedRev.description = editDescText;
+        if (editEnactDate) selectedRev.enactmentDate = new Date(editEnactDate).toISOString();
+        if (editEffDate) selectedRev.effectiveDate = new Date(editEffDate).toISOString();
         setIsEditingDesc(false);
-        alert("개정내용이 성공적으로 저장되었습니다.");
+        alert("개정정보가 성공적으로 저장되었습니다.");
+        
+        const ruleRes = await fetch(`/api/rules/${id}`);
+        if (ruleRes.ok) {
+          const newRuleData = (await ruleRes.json()) as any;
+          setRuleData(newRuleData);
+        }
         if (window.opener) {
           window.opener.dispatchEvent(new CustomEvent('rule-updated'));
         }
@@ -429,7 +444,16 @@ export default function RevisionClient({ id }: { id: string }) {
                   {selectedRev.revisionType === 'ENACTMENT' ? '제정일' : '개정일'}
                 </th>
                 <td className="px-4 py-3.5 border-b border-slate-200 text-slate-800 font-medium bg-white">
-                  {formatDate(selectedRev.enactmentDate)}
+                  {isEditingDesc ? (
+                    <input 
+                      type="date" 
+                      value={editEnactDate} 
+                      onChange={(e) => setEditEnactDate(e.target.value)}
+                      className="px-3 py-1.5 border border-slate-300 rounded-lg text-[13px] bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm font-medium"
+                    />
+                  ) : (
+                    formatDate(selectedRev.enactmentDate)
+                  )}
                 </td>
               </tr>
             )}
@@ -439,7 +463,16 @@ export default function RevisionClient({ id }: { id: string }) {
               <tr>
                 <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">시행일</th>
                 <td className="px-4 py-3.5 border-b border-slate-200 text-slate-800 font-medium bg-white">
-                  {formatDate(selectedRev.effectiveDate)}
+                  {isEditingDesc ? (
+                    <input 
+                      type="date" 
+                      value={editEffDate} 
+                      onChange={(e) => setEditEffDate(e.target.value)}
+                      className="px-3 py-1.5 border border-slate-300 rounded-lg text-[13px] bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm font-medium"
+                    />
+                  ) : (
+                    formatDate(selectedRev.effectiveDate)
+                  )}
                 </td>
               </tr>
             )}
@@ -528,9 +561,14 @@ export default function RevisionClient({ id }: { id: string }) {
                   개정내용
                   {isAdmin && !isEditingDesc && (
                     <button 
-                      onClick={() => { setIsEditingDesc(true); setEditDescText(selectedRev.description || ""); }}
+                      onClick={() => { 
+                        setIsEditingDesc(true); 
+                        setEditDescText(selectedRev.description || ""); 
+                        setEditEnactDate(selectedRev.enactmentDate ? new Date(selectedRev.enactmentDate).toISOString().split('T')[0] : "");
+                        setEditEffDate(selectedRev.effectiveDate ? new Date(selectedRev.effectiveDate).toISOString().split('T')[0] : "");
+                      }}
                       className="ml-2 text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
-                      title="개정내용 편집"
+                      title="개정내용 및 날짜 편집"
                     >
                       ✏️ 편집
                     </button>

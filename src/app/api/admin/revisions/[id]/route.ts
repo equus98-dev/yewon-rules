@@ -56,7 +56,7 @@ export async function DELETE(
   }
 }
 
-// 개정내용(description) 수정 API
+// 개정내용(description) 및 제정일/시행일 수정 API
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -64,24 +64,28 @@ export async function PATCH(
   let pool;
   try {
     const { id: revisionId } = await params;
-    const body = await request.json() as { description?: string };
-    const { description } = body;
+    const body = await request.json() as { description?: string; enactmentDate?: string; effectiveDate?: string };
+    const { description, enactmentDate, effectiveDate } = body;
 
     pool = createPool();
 
     // Check if revision exists
-    const revRes = await pool.query(`SELECT id FROM "Revision" WHERE id = $1`, [revisionId]);
+    const revRes = await pool.query(`SELECT id, "enactmentDate", "effectiveDate", description FROM "Revision" WHERE id = $1`, [revisionId]);
     if (revRes.rows.length === 0) {
       return NextResponse.json({ error: "해당 개정 내역을 찾을 수 없습니다." }, { status: 404 });
     }
+    const current = revRes.rows[0];
 
-    // Update description
+    const newEnactmentDate = enactmentDate ? new Date(enactmentDate) : current.enactmentDate;
+    const newEffectiveDate = effectiveDate ? new Date(effectiveDate) : current.effectiveDate;
+
+    // Update description and dates
     await pool.query(
-      `UPDATE "Revision" SET description = $1 WHERE id = $2`,
-      [description || null, revisionId]
+      `UPDATE "Revision" SET description = $1, "enactmentDate" = $2, "effectiveDate" = $3, "updatedAt" = NOW() WHERE id = $4`,
+      [description !== undefined ? description : current.description, newEnactmentDate, newEffectiveDate, revisionId]
     );
 
-    return NextResponse.json({ success: true, message: "개정내용이 저장되었습니다." });
+    return NextResponse.json({ success: true, message: "개정 정보가 성공적으로 저장되었습니다." });
   } catch (error: any) {
     console.error("[Patch Revision Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
