@@ -415,7 +415,7 @@ export default function RevisionClient({ id }: { id: string }) {
 
       {/* 본문 */}
       <div className="flex-1 p-5 overflow-y-auto">
-        <table className="w-full border-collapse text-[13px] shadow-sm rounded-lg overflow-hidden border border-slate-200">
+        <table className="w-full border-collapse text-[15px] shadow-sm rounded-lg overflow-hidden border border-slate-200">
           <colgroup>
             <col style={{ width: '28%' }} />
             <col style={{ width: '72%' }} />
@@ -423,13 +423,13 @@ export default function RevisionClient({ id }: { id: string }) {
           <tbody>
             {/* 연혁 선택 */}
             <tr>
-              <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">
+              <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-middle">
                 연혁 선택
                 {isAdmin && (
                   <div className="inline-flex items-center gap-1 ml-2">
                     <button
                       onClick={() => setIsCreatingRev(true)}
-                      className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
+                      className="text-[12px] bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
                       title="새로운 연혁(과거 개정 이력) 추가"
                     >
                       ➕ 연혁 추가
@@ -437,7 +437,7 @@ export default function RevisionClient({ id }: { id: string }) {
                     {revisions.length > 1 && selectedRev?.id === revisions[0]?.id && (
                       <button
                         onClick={handleDeleteRevision}
-                        className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded border border-red-200 hover:bg-red-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
+                        className="text-[12px] bg-red-50 text-red-600 px-2.5 py-1 rounded border border-red-200 hover:bg-red-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
                         title="최신 연혁 삭제 (개정 취소)"
                       >
                         🗑️ 연혁 삭제
@@ -446,11 +446,11 @@ export default function RevisionClient({ id }: { id: string }) {
                   </div>
                 )}
               </th>
-              <td className="px-4 py-3.5 border-b border-slate-200 bg-white">
+              <td className="px-4 py-4 border-b border-slate-200 bg-white">
                 <select 
                   value={historySelectedRevId}
                   onChange={(e) => { setHistorySelectedRevId(e.target.value); setIsEditingDesc(false); }}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer font-medium shadow-sm"
+                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-[15px] bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer font-medium shadow-sm"
                 >
                   {revisions.map((rev: any) => (
                     <option key={rev.id} value={rev.id}>
@@ -463,8 +463,8 @@ export default function RevisionClient({ id }: { id: string }) {
             
             {/* 제목 */}
             <tr>
-              <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">제목</th>
-              <td className="px-4 py-3.5 border-b border-slate-200 font-bold text-slate-800 bg-white">
+              <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-middle">제목</th>
+              <td className="px-4 py-4 border-b border-slate-200 font-bold text-slate-800 bg-white text-[15px]">
                 <span className="text-blue-600 mr-2">{ruleData?.ruleNumber || ""}</span>
                 {ruleData?.title || ""}
               </td>
@@ -473,9 +473,9 @@ export default function RevisionClient({ id }: { id: string }) {
             {/* 제개정유형 */}
             {selectedRev && (
               <tr>
-                <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">제개정유형</th>
-                <td className="px-4 py-3.5 border-b border-slate-200 bg-white">
-                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-bold shadow-sm ${
+                <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-middle">제개정유형</th>
+                <td className="px-4 py-4 border-b border-slate-200 bg-white">
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-[14px] font-bold shadow-sm ${
                     selectedRev.revisionType === 'ENACTMENT' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' :
                     selectedRev.revisionType === 'TOTAL_AMENDMENT' || selectedRev.revisionType === 'FULL_REVISION' ? 'bg-red-100 text-red-700 border border-red-200' :
                     selectedRev.revisionType === 'ABOLITION' ? 'bg-gray-100 text-gray-700 border border-gray-200' :
@@ -490,16 +490,16 @@ export default function RevisionClient({ id }: { id: string }) {
             {/* 개정일/제정일 */}
             {selectedRev && (
               <tr>
-                <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">
+                <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-middle">
                   {selectedRev.revisionType === 'ENACTMENT' ? '제정일' : '개정일'}
                 </th>
-                <td className="px-4 py-3.5 border-b border-slate-200 text-slate-800 font-medium bg-white">
+                <td className="px-4 py-4 border-b border-slate-200 text-slate-800 font-medium bg-white text-[15px]">
                   {isEditingDesc ? (
                     <input 
                       type="date" 
                       value={editEnactDate} 
                       onChange={(e) => setEditEnactDate(e.target.value)}
-                      className="px-3 py-1.5 border border-slate-300 rounded-lg text-[13px] bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm font-medium"
+                      className="px-3 py-2 border border-slate-300 rounded-lg text-[15px] bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm font-medium"
                     />
                   ) : (
                     formatDate(selectedRev.enactmentDate)
@@ -511,14 +511,14 @@ export default function RevisionClient({ id }: { id: string }) {
             {/* 시행일 */}
             {selectedRev && (
               <tr>
-                <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">시행일</th>
-                <td className="px-4 py-3.5 border-b border-slate-200 text-slate-800 font-medium bg-white">
+                <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-middle">시행일</th>
+                <td className="px-4 py-4 border-b border-slate-200 text-slate-800 font-medium bg-white text-[15px]">
                   {isEditingDesc ? (
                     <input 
                       type="date" 
                       value={editEffDate} 
                       onChange={(e) => setEditEffDate(e.target.value)}
-                      className="px-3 py-1.5 border border-slate-300 rounded-lg text-[13px] bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm font-medium"
+                      className="px-3 py-2 border border-slate-300 rounded-lg text-[15px] bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm font-medium"
                     />
                   ) : (
                     formatDate(selectedRev.effectiveDate)
@@ -530,8 +530,8 @@ export default function RevisionClient({ id }: { id: string }) {
             {/* 소관부서 */}
             {ruleData?.department && (
               <tr>
-                <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">소관부서</th>
-                <td className="px-4 py-3.5 border-b border-slate-200 text-slate-800 font-medium bg-white">
+                <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-middle">소관부서</th>
+                <td className="px-4 py-4 border-b border-slate-200 text-slate-800 font-medium bg-white text-[15px]">
                   {ruleData.department.name}
                 </td>
               </tr>
@@ -539,7 +539,7 @@ export default function RevisionClient({ id }: { id: string }) {
 
             {/* 원문파일 (본문/전문만 표시) */}
             <tr>
-              <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">
+              <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-middle">
                 원문파일
                 {isAdmin && (
                   <>
@@ -553,7 +553,7 @@ export default function RevisionClient({ id }: { id: string }) {
                     <button 
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
-                      className="ml-2 text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200 hover:bg-amber-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1 disabled:opacity-50"
+                      className="ml-2 text-[12px] bg-amber-50 text-amber-700 px-2.5 py-1 rounded border border-amber-200 hover:bg-amber-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1 disabled:opacity-50"
                       title="원문파일 업로드"
                     >
                       {isUploading ? "업로드 중..." : "📤 파일 첨부"}
@@ -561,7 +561,7 @@ export default function RevisionClient({ id }: { id: string }) {
                   </>
                 )}
               </th>
-              <td className="px-4 py-3.5 border-b border-slate-200 bg-white">
+              <td className="px-4 py-4 border-b border-slate-200 bg-white">
                 {mainAttachments.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {mainAttachments.map((att: any, idx: number) => {
@@ -571,21 +571,21 @@ export default function RevisionClient({ id }: { id: string }) {
                         ? `/api/files/download?url=${encodeURIComponent(att.fileUrl)}&filename=${encodeURIComponent(att.title || 'file')}`
                         : att.fileUrl;
                       return (
-                        <div key={idx} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-blue-50 hover:border-blue-300 transition-all shadow-sm">
+                        <div key={idx} className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-200 bg-white hover:bg-blue-50 hover:border-blue-300 transition-all shadow-sm">
                           <a
                             href={fileUrl}
                             download
-                            className="inline-flex items-center gap-1.5 text-[12px] font-bold text-blue-700 cursor-pointer"
+                            className="inline-flex items-center gap-2 text-[14px] font-bold text-blue-700 cursor-pointer"
                           >
-                            {isHwp && <span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[9px] font-black border border-blue-200">HWP</span>}
-                            {isPdf && <span className="bg-red-100 text-red-700 px-1.5 py-0.5 rounded text-[9px] font-black border border-red-200">PDF</span>}
-                            {!isHwp && !isPdf && <span className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded text-[9px] font-black border border-gray-200">FILE</span>}
+                            {isHwp && <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[11px] font-black border border-blue-200">HWP</span>}
+                            {isPdf && <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded text-[11px] font-black border border-red-200">PDF</span>}
+                            {!isHwp && !isPdf && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-[11px] font-black border border-gray-200">FILE</span>}
                             {att.title || "전문 다운로드"}
                           </a>
                           {isAdmin && (
                             <button
                               onClick={() => handleDeleteAttachment(att.id)}
-                              className="ml-1 text-slate-400 hover:text-red-600 font-bold text-[11px] px-1 cursor-pointer transition-colors"
+                              className="ml-1 text-slate-400 hover:text-red-600 font-bold text-[13px] px-1 cursor-pointer transition-colors"
                               title="파일 삭제"
                             >
                               ✕
@@ -596,7 +596,7 @@ export default function RevisionClient({ id }: { id: string }) {
                     })}
                   </div>
                 ) : (
-                  <div className="text-slate-400 text-[13px] italic font-medium">
+                  <div className="text-slate-400 text-[15px] italic font-medium">
                     등록된 전문 파일이 없습니다.
                     {isAdmin && <span className="ml-1 text-blue-500 not-italic font-bold">상단의 '파일 첨부' 버튼을 통해 즉시 등록해 주세요.</span>}
                   </div>
@@ -607,7 +607,7 @@ export default function RevisionClient({ id }: { id: string }) {
             {/* 개정내용 */}
             {selectedRev && (
               <tr>
-                <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-top">
+                <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-top">
                   개정내용
                   {isAdmin && !isEditingDesc && (
                     <button 
@@ -617,34 +617,34 @@ export default function RevisionClient({ id }: { id: string }) {
                         setEditEnactDate(selectedRev.enactmentDate ? new Date(selectedRev.enactmentDate).toISOString().split('T')[0] : "");
                         setEditEffDate(selectedRev.effectiveDate ? new Date(selectedRev.effectiveDate).toISOString().split('T')[0] : "");
                       }}
-                      className="ml-2 text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
+                      className="ml-2 text-[12px] bg-blue-50 text-blue-600 px-2.5 py-1 rounded border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
                       title="개정내용 및 날짜 편집"
                     >
                       ✏️ 편집
                     </button>
                   )}
                 </th>
-                <td className="px-4 py-3.5 border-b border-slate-200 text-slate-800 bg-white">
+                <td className="px-4 py-4 border-b border-slate-200 text-slate-800 bg-white">
                   {isEditingDesc ? (
                     <div className="flex flex-col gap-2.5">
                       <textarea
                         value={editDescText}
                         onChange={(e) => setEditDescText(e.target.value)}
                         placeholder="개정내용을 입력하세요. (예: 제5조 제2항 삭제, 제10조 신설 등)"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[13px] min-h-[140px] resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm leading-relaxed"
+                        className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-[15px] min-h-[160px] resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm leading-relaxed"
                         autoFocus
                       />
                       <div className="flex justify-end gap-2">
                         <button 
                           onClick={() => setIsEditingDesc(false)}
-                          className="px-4 py-1.5 text-[12px] text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer font-bold shadow-sm"
+                          className="px-4 py-2 text-[14px] text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer font-bold shadow-sm"
                         >
                           취소
                         </button>
                         <button 
                           onClick={handleSaveDescription}
                           disabled={isSavingDesc}
-                          className="px-4 py-1.5 text-[12px] text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer font-bold shadow-sm disabled:opacity-50 flex items-center gap-1"
+                          className="px-4 py-2 text-[14px] text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer font-bold shadow-sm disabled:opacity-50 flex items-center gap-1"
                         >
                           {isSavingDesc ? "저장 중..." : "💾 저장"}
                         </button>
@@ -652,9 +652,9 @@ export default function RevisionClient({ id }: { id: string }) {
                     </div>
                   ) : (
                     selectedRev.description ? (
-                      <div className="whitespace-pre-wrap leading-relaxed text-[13px] font-medium">{selectedRev.description}</div>
+                      <div className="whitespace-pre-wrap leading-relaxed text-[15px] font-medium">{selectedRev.description}</div>
                     ) : (
-                      <div className="text-slate-400 text-[13px] italic font-medium">
+                      <div className="text-slate-400 text-[15px] italic font-medium">
                         등록된 개정내용이 없습니다.
                         {isAdmin && <span className="ml-1 text-blue-500 not-italic font-bold">위 편집 버튼을 클릭하여 개정내용을 관리해 주세요.</span>}
                       </div>
