@@ -188,21 +188,21 @@ export async function GET(
       }
     }
 
-    // 4-0-27 생명윤리위원회 운영 규정 부칙 누락 해결 (제정/시행일 2026. 6. 1.)
+    // 4-0-27 생명윤리위원회 운영 규정 부칙 누락 해결 (제정/시행일 2024. 1. 11.)
     if (targetRevisionId === "e1b535b7-e48a-491d-af47-f2e7451a2965" || ruleRow.title?.includes("생명윤리위원회")) {
       const hasAddendum = processedArticles.some((art: any) => art.articleNumber >= 8000);
       if (!hasAddendum) {
         processedArticles.push({
-          id: "addendum-bioethics-2026-06-01",
+          id: "addendum-bioethics-2024-01-11",
           part: null,
           chapter: null,
           section: null,
           subSection: null,
           articleNumber: 8011,
           title: "부칙",
-          contentText: "부 칙(2026. 6. 1)\n1. (시행일) 이 규정은 2026년 6월 1일부터 시행한다.",
+          contentText: "부 칙(2024. 1. 11)\n1. (시행일) 이 규정은 2024년 1월 11일부터 시행한다.",
           contentJson: JSON.stringify([
-            { type: "article", num: "", text: "부 칙(2026. 6. 1)\n1. (시행일) 이 규정은 2026년 6월 1일부터 시행한다." }
+            { type: "article", num: "", text: "부 칙(2024. 1. 11)\n1. (시행일) 이 규정은 2024년 1월 11일부터 시행한다." }
           ]),
           contentHtml: null,
           sortOrder: 8011,
