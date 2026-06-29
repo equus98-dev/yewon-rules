@@ -569,6 +569,22 @@ export default function ArticleRenderer({
     }
   }
 
+  // 제1조, 제3조 등이 일반 text나 paragraph로 잘못 분류되어 조문 제목 및 연/인 버튼 인식이 안 되는 문제 완벽 해결
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (item && (item.type === "text" || item.type === "paragraph")) {
+      const textStr = String(item.text || "").trim();
+      const numStr = String(item.num || "").trim();
+      if (/^제\d+조/.test(textStr) || /^제\d+조/.test(numStr)) {
+        item.type = "article";
+        if (!item.num && /^제\d+조(?:의\d+)?/.test(textStr)) {
+          const m = textStr.match(/^제\d+조(?:의\d+)?/);
+          if (m) item.num = m[0];
+        }
+      }
+    }
+  }
+
   // --- Normalization: Glue detached first paragraph to article text ---
   const normalizedItems: ContentItem[] = [];
   for (let i = 0; i < items.length; i++) {

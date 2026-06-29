@@ -1160,17 +1160,17 @@ export default function Home() {
                   </select>
 
                   {/* 검색어 인풋 및 버튼 */}
-                  <div className="flex items-center flex-1 min-w-[200px]">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center flex-1 min-w-[200px] gap-1 sm:gap-0">
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="검색어를 입력하십시오..."
-                      className="flex-1 border border-slate-300 rounded-l px-3 py-1 text-xs font-bold h-[28px] focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="flex-1 border border-slate-300 rounded sm:rounded-r-none px-3 py-1 text-xs font-bold h-[28px] focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                     <button
                       type="submit"
-                      className="bg-[#3b82f6] hover:bg-[#2563eb] text-white text-xs font-black px-4 h-[28px] rounded-r cursor-pointer active:scale-95 transition-all shrink-0 whitespace-nowrap"
+                      className="bg-[#3b82f6] hover:bg-[#2563eb] text-white text-xs font-black px-4 h-[28px] rounded sm:rounded-l-none cursor-pointer active:scale-95 transition-all shrink-0 whitespace-nowrap w-full sm:w-auto"
                     >
                       검색
                     </button>
@@ -1596,9 +1596,9 @@ export default function Home() {
                           {/* 3열: 검색어 */}
                           <form onSubmit={handleSearch} className="flex items-center gap-3 w-full mt-1">
                             <label className="font-extrabold text-white/80 text-[13px] lg:text-[14px] w-[60px] shrink-0">검색어</label>
-                            <div className="flex flex-1 items-center shadow-md">
-                              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="flex-1 bg-white text-slate-800 rounded-l px-3 lg:px-4 py-2 focus:outline-none font-bold text-sm h-9 lg:h-10 w-full" />
-                              <button type="submit" className="bg-[#fbcc14] hover:bg-[#eab308] text-slate-800 font-black text-[14px] lg:text-[15px] px-6 lg:px-8 h-9 lg:h-10 rounded-r transition-colors whitespace-nowrap">검색</button>
+                            <div className="flex flex-col sm:flex-row flex-1 items-stretch sm:items-center shadow-md gap-1.5 sm:gap-0">
+                              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="flex-1 bg-white text-slate-800 rounded sm:rounded-r-none px-3 lg:px-4 py-2 focus:outline-none font-bold text-sm h-9 lg:h-10 w-full" />
+                              <button type="submit" className="bg-[#fbcc14] hover:bg-[#eab308] text-slate-800 font-black text-[14px] lg:text-[15px] px-6 lg:px-8 h-9 lg:h-10 rounded sm:rounded-l-none transition-colors whitespace-nowrap w-full sm:w-auto">검색</button>
                             </div>
                           </form>
                         </div>

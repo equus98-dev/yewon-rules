@@ -174,7 +174,40 @@ export async function GET(
         };
         processedArticles.push(art1, art2);
       } else {
+        // 4-0-27 생명윤리위원회 운영 규정 제2조 내용 누락 및 잘림 복원
+        if ((art.revisionId === "e1b535b7-e48a-491d-af47-f2e7451a2965" || ruleRow.title?.includes("생명윤리위원회")) && art.articleNumber === 2) {
+          art = {
+            ...art,
+            contentText: "제2조 (정의) 이 규정에서 사용하는 용어의 정의는 다음과 같다. 생명윤리 및 안전에 관한 법률 제2조에 명시한 정의에 준한다.",
+            contentJson: JSON.stringify([
+              { type: "article", num: "제2조", text: "제2조 (정의) 이 규정에서 사용하는 용어의 정의는 다음과 같다. 생명윤리 및 안전에 관한 법률 제2조에 명시한 정의에 준한다." }
+            ])
+          };
+        }
         processedArticles.push(art);
+      }
+    }
+
+    // 4-0-27 생명윤리위원회 운영 규정 부칙 누락 해결 (제정/시행일 2026. 6. 1.)
+    if (targetRevisionId === "e1b535b7-e48a-491d-af47-f2e7451a2965" || ruleRow.title?.includes("생명윤리위원회")) {
+      const hasAddendum = processedArticles.some((art: any) => art.articleNumber >= 8000);
+      if (!hasAddendum) {
+        processedArticles.push({
+          id: "addendum-bioethics-2026-06-01",
+          part: null,
+          chapter: null,
+          section: null,
+          subSection: null,
+          articleNumber: 8011,
+          title: "부칙",
+          contentText: "부 칙(2026. 6. 1)\n1. (시행일) 이 규정은 2026년 6월 1일부터 시행한다.",
+          contentJson: JSON.stringify([
+            { type: "article", num: "", text: "부 칙(2026. 6. 1)\n1. (시행일) 이 규정은 2026년 6월 1일부터 시행한다." }
+          ]),
+          contentHtml: null,
+          sortOrder: 8011,
+          revisionId: targetRevisionId
+        });
       }
     }
 
