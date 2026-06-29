@@ -211,6 +211,29 @@ export async function GET(
       }
     }
 
+    // 3-4-17 IR센터운영규정 부칙 누락 해결 (제정/시행일 2024. 1. 11.)
+    if (targetRevisionId === "b58806fa-9ea3-4c43-9a6a-1e946cbe0703" || ruleRow.title?.includes("IR센터")) {
+      const hasAddendum = processedArticles.some((art: any) => art.articleNumber >= 8000);
+      if (!hasAddendum) {
+        processedArticles.push({
+          id: "addendum-ircenter-2024-01-11",
+          part: null,
+          chapter: null,
+          section: null,
+          subSection: null,
+          articleNumber: 8011,
+          title: "부칙",
+          contentText: "부 칙(2024. 1. 11)\n1. (시행일) 이 규정은 2024년 1월 11일부터 시행한다.",
+          contentJson: JSON.stringify([
+            { type: "article", num: "", text: "부 칙(2024. 1. 11)\n1. (시행일) 이 규정은 2024년 1월 11일부터 시행한다." }
+          ]),
+          contentHtml: null,
+          sortOrder: 8011,
+          revisionId: targetRevisionId
+        });
+      }
+    }
+
     // 1번 문제 해결: 성과관리 규정 등에서 부칙이 제1조 다음으로 나오는 정렬 오류 원천 차단
     // 부칙인 조문은 무조건 일반 조문 뒤로 가도록 재정렬
     const isAddendum = (art: any) => {

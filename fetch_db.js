@@ -1,3 +1,5 @@
 const db = require('better-sqlite3')('dev.db');
-const rows = db.prepare(`SELECT * FROM Article WHERE contentJson LIKE '%학부(과) 장%' OR title LIKE '%학부(과) 장%' OR contentJson LIKE '%학부(과)장%' LIMIT 10`).all();
-console.log(JSON.stringify(rows, null, 2));
+const ruleRows = db.prepare(`SELECT * FROM Rule WHERE title LIKE '%IR%'`).all();
+const revRows = db.prepare(`SELECT * FROM Revision WHERE id = 'b58806fa-9ea3-4c43-9a6a-1e946cbe0703'`).all();
+console.log("Rule:", JSON.stringify(ruleRows, null, 2));
+console.log("Revision:", JSON.stringify(revRows, null, 2));
