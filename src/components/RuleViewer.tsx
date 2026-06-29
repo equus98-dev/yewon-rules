@@ -120,6 +120,52 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
   const [isManualModalSaving, setIsManualModalSaving] = useState(false);
   const [isSelectMode, setIsSelectMode] = useState(false);
 
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [activeSearchKeyword, setActiveSearchKeyword] = useState("");
+  const [searchMatchIndex, setSearchMatchIndex] = useState(0);
+  const [totalSearchMatches, setTotalSearchMatches] = useState(0);
+
+  const handleExecuteSearch = (keyword?: string) => {
+    const targetKeyword = keyword !== undefined ? keyword : searchKeyword;
+    if (!targetKeyword.trim()) {
+      setActiveSearchKeyword("");
+      setSearchMatchIndex(0);
+      setTotalSearchMatches(0);
+      return;
+    }
+    setActiveSearchKeyword(targetKeyword);
+    setSearchMatchIndex(0);
+    // DOM 렌더링 후 하이라이트 마크 검색 및 이동
+    setTimeout(() => {
+      const marks = document.querySelectorAll('.highlight-mark');
+      setTotalSearchMatches(marks.length);
+      if (marks.length > 0) {
+        marks.forEach((m) => m.classList.remove('bg-orange-400', 'text-white'));
+        marks[0].classList.add('bg-orange-400', 'text-white');
+        marks[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        alert("검색어와 일치하는 내용이 없습니다.");
+      }
+    }, 150);
+  };
+
+  const handleNavigateSearch = (direction: 'prev' | 'next') => {
+    const marks = document.querySelectorAll('.highlight-mark');
+    if (marks.length === 0) return;
+    
+    let newIndex = searchMatchIndex;
+    if (direction === 'prev') {
+      newIndex = (searchMatchIndex - 1 + marks.length) % marks.length;
+    } else {
+      newIndex = (searchMatchIndex + 1) % marks.length;
+    }
+    setSearchMatchIndex(newIndex);
+    
+    marks.forEach((m) => m.classList.remove('bg-orange-400', 'text-white'));
+    marks[newIndex].classList.add('bg-orange-400', 'text-white');
+    marks[newIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -875,11 +921,14 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             <input 
               type="text" 
               placeholder="전자규정집 내용 검색" 
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleExecuteSearch(); }}
               className="px-2 py-1 text-xs outline-none w-[160px]"
             />
-            <button className="px-2 py-1 text-blue-700 bg-slate-50 border-l border-slate-300 hover:bg-slate-100 font-black cursor-pointer text-xs">Q</button>
-            <button className="px-1.5 py-1 text-slate-500 bg-slate-50 border-l border-slate-300 hover:bg-slate-100 text-xs font-black cursor-pointer">&lt;</button>
-            <button className="px-1.5 py-1 text-slate-500 bg-slate-50 border-l border-slate-300 hover:bg-slate-100 text-xs font-black cursor-pointer">&gt;</button>
+            <button onClick={() => handleExecuteSearch()} className="px-2 py-1 text-blue-700 bg-slate-50 border-l border-slate-300 hover:bg-slate-100 font-black cursor-pointer text-xs">Q</button>
+            <button onClick={() => handleNavigateSearch('prev')} className="px-1.5 py-1 text-slate-500 bg-slate-50 border-l border-slate-300 hover:bg-slate-100 text-xs font-black cursor-pointer">&lt;</button>
+            <button onClick={() => handleNavigateSearch('next')} className="px-1.5 py-1 text-slate-500 bg-slate-50 border-l border-slate-300 hover:bg-slate-100 text-xs font-black cursor-pointer">&gt;</button>
           </div>
         </div>
 
@@ -1389,6 +1438,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         isBundleChild={isBundleChild}
                         seenAddendumCoreTexts={cumulativeSeenSets[idx]}
                         ruleTitle={cleanTitle || ruleData?.title || ""}
+                        searchKeyword={activeSearchKeyword}
                       />
                     );
                   })()}

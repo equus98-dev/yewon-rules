@@ -26,6 +26,7 @@ interface ArticleRendererProps {
   isBundleChild?: boolean;
   seenAddendumCoreTexts?: Set<string>;
   ruleTitle?: string;
+  searchKeyword?: string;
 }
 
 const convertCircledNum = (char: string) => {
@@ -104,6 +105,7 @@ export default function ArticleRenderer({
   isBundleChild = false,
   seenAddendumCoreTexts,
   ruleTitle = "",
+  searchKeyword = "",
 }: ArticleRendererProps) {
   const isAddendumArticle =
     title === "부칙" ||
@@ -469,6 +471,12 @@ export default function ArticleRenderer({
       cleanHtml = cleanHtml.replace(/<p>(\s*부\s*칙\s*)<\/p>/i, '<p class="font-bold text-[16px]">$1</p>');
     }
 
+    if (cleanHtml && searchKeyword && searchKeyword.trim().length > 0) {
+      const keyword = searchKeyword.trim();
+      const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})(?![^<]*>)`, 'gi');
+      cleanHtml = cleanHtml.replace(regex, `<mark class="highlight-mark bg-yellow-300 font-bold px-1 rounded shadow-sm">$1</mark>`);
+    }
+
     return (
       <div id={id} className="animate-fade-in rule-viewer-content font-['Pretendard'] w-full relative group">
         {renderEditButton()}
@@ -776,6 +784,12 @@ export default function ArticleRenderer({
         ? "html-content-inline"
         : "html-table-wrapper html-content-inline";
 
+      if (searchKeyword && searchKeyword.trim().length > 0) {
+        const keyword = searchKeyword.trim();
+        const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})(?![^<]*>)`, 'gi');
+        htmlText = htmlText.replace(regex, `<mark class="highlight-mark bg-yellow-300 font-bold px-1 rounded shadow-sm">$1</mark>`);
+      }
+
       return (
         <span 
           className={wrapperCls}
@@ -810,6 +824,23 @@ export default function ArticleRenderer({
              </a>
           );
         }
+      }
+      
+      if (searchKeyword && searchKeyword.trim().length > 0) {
+        const keyword = searchKeyword.trim();
+        const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        const subParts = part.split(regex);
+        return (
+          <React.Fragment key={i}>
+            {subParts.map((sub, subIdx) => 
+              sub.toLowerCase() === keyword.toLowerCase() ? (
+                <mark key={subIdx} className="highlight-mark bg-yellow-300 font-bold px-1 rounded shadow-sm">{sub}</mark>
+              ) : (
+                sub
+              )
+            )}
+          </React.Fragment>
+        );
       }
       
       return <React.Fragment key={i}>{part}</React.Fragment>;
