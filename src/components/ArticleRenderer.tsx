@@ -409,7 +409,7 @@ export default function ArticleRenderer({
         if (before.match(/(?:<br\s*\/?>|<\/p>|<p>|<div[^>]*>|<td[^>]*>|<th[^>]*>|<li[^>]*>)\s*$/i)) return match;
         if (before.match(/(?:^|\n)\s*$/)) return match;
         // 인용구 생략
-        if (before.match(/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/)) return match;
+        if (before.match(/(?:제|전|\(|,|및|또는|와|과|이나|나|에|의|구분은|경우에|때에는|\(거\))\s*$/)) return match;
         // 날짜 내부 생략
         if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
         // < > 내부 방지 (p1이 > 이면 태그 바깥이므로 예외)
@@ -441,7 +441,7 @@ export default function ArticleRenderer({
         if (before.match(/(?:<br\s*\/?>|<\/p>|<p>|<div[^>]*>|<td[^>]*>|<th[^>]*>|<li[^>]*>)\s*$/i)) return match;
         if (before.match(/(?:^|\n)\s*$/)) return match;
         // 인용구인 경우 (예: 제①항, 제1항 및 ②항) 줄바꿈 생략
-        if (/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/.test(before)) return match;
+        if (/(?:제|전|\(|,|및|또는|와|과|이나|나|에|의|구분은|경우에|때에는|\(거\))\s*$/.test(before)) return match;
         // 조문 제목 바로 뒤에 나오는 ① 등은 줄바꿈하지 않음
         if (before.match(/^(?:<[^>]+>)*(?:제\d+조(?:의\d+)?(?:<[^>]+>)*\s*)?(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*(?:[<(\[＜（][^>\])＞）]*[>\])＞）]\s*)*(?:<span[^>]*>[\s\S]*?<\/span>\s*)*$/)) return match;
         return '<br/>' + match;
@@ -721,7 +721,7 @@ export default function ArticleRenderer({
       // 조문 제목 바로 뒤에 나오는 ① 등은 줄바꿈하지 않음
       if (before.match(/^(?:<[^>]+>)*(?:제\d+조(?:의\d+)?(?:<[^>]+>)*\s*)?(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*(?:[<(\[＜（][^>\])＞）]*[>\])＞）]\s*)*(?:<span[^>]*>[\s\S]*?<\/span>\s*)*$/)) return match;
       // 인용구인 경우 (예: 제①항, 제1항 및 ②항) 줄바꿈 생략
-      if (/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/.test(before)) return match;
+      if (/(?:제|전|\(|,|및|또는|와|과|이나|나|에|의|구분은|경우에|때에는|\(거\))\s*$/.test(before)) return match;
       // 제규정 관리 규정 제5조 예외 처리 (④, ⑤ 본문 내의 기호 설명 부분)
       if (str.includes("①, ②, 호는") || str.includes("호는 1, 2") || str.includes("목은 가, 나")) return match;
       const recentBefore = before.slice(-50);
@@ -944,7 +944,7 @@ export default function ArticleRenderer({
         }
 
         // 인용구인 경우 (예: 제①항, 제1항 및 ②항) 줄바꿈 생략
-        if (/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/.test(before)) return match;
+        if (/(?:제|전|\(|,|및|또는|와|과|이나|나|에|의|구분은|경우에|때에는|\(거\))\s*$/.test(before)) return match;
         if (/^\s*(?:항|호)/.test(after)) return match;
 
         // 이미 제일 앞이거나 줄바꿈이 있는 경우 생략
@@ -964,7 +964,7 @@ export default function ArticleRenderer({
         }
         if (offset === 0 || before.match(/(?:^|\n)\s*$/)) return match;
         // 인용구인 경우 생략
-        if (before.match(/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/)) return match;
+        if (before.match(/(?:제|전|\(|,|및|또는|와|과|이나|나|에|의|구분은|경우에|때에는|\(거\))\s*$/)) return match;
         // 날짜(예: 2008. 7.) 내부인 경우 생략
         if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
         // < > 태그 내부인 경우 생략 (p1이 > 이면 태그가 끝난 직후이므로 줄바꿈 허용)
@@ -984,6 +984,7 @@ export default function ArticleRenderer({
           return match;
         }
         if (offset === 0 || before.match(/(?:^|\n)\s*$/)) return match;
+        if (before.match(/(?:제|전|\(|,|및|또는|와|과|이나|나|에|의|구분은|경우에|때에는|\(거\))\s*$/)) return match;
         return p1 + '\n' + p2 + ' ';
       })
       .replace(/(제\d+조의?\d*\s*[\[〔(（].*?[\]〕)）])\s*\n+(?=[^\n])/g, '$1 ')
