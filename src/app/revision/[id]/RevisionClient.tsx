@@ -49,7 +49,7 @@ export default function RevisionClient({ id }: { id: string }) {
         body: JSON.stringify(payload)
       });
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
+        const errorData = (await res.json().catch(() => ({}))) as any;
         throw new Error(errorData.error || "연혁 생성 실패");
       }
       alert("새로운 연혁이 성공적으로 추가되었습니다.");
