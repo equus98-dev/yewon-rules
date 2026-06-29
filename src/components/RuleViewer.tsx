@@ -17,6 +17,8 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import LaunchIcon from "@mui/icons-material/Launch";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import PrintIcon from "@mui/icons-material/Print";
+import FactCheckIcon from "@mui/icons-material/FactCheck";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 
 
 interface RuleViewerProps {
@@ -1193,14 +1195,16 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 <button
                   onClick={() => handlePrintMultiple(false)}
                   disabled={selectedArticlesForPrint.size === 0}
-                  className={`px-3 py-2 text-[11px] font-bold text-left ${selectedArticlesForPrint.size > 0 ? "text-slate-700 hover:bg-slate-50 cursor-pointer" : "text-slate-300 cursor-not-allowed"}`}
+                  className={`px-3 py-2 text-[11px] font-bold text-left flex items-center gap-1.5 ${selectedArticlesForPrint.size > 0 ? "text-slate-700 hover:bg-slate-50 cursor-pointer" : "text-slate-300 cursor-not-allowed"}`}
                 >
+                  <FactCheckIcon sx={{ fontSize: 14 }} className={selectedArticlesForPrint.size > 0 ? "text-blue-500" : "text-slate-300"} />
                   선택조문 인쇄
                 </button>
                 <button
                   onClick={() => handlePrintMultiple(true)}
-                  className="px-3 py-2 text-[11px] font-bold text-left text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  className="px-3 py-2 text-[11px] font-bold text-left text-slate-700 hover:bg-slate-50 cursor-pointer flex items-center gap-1.5"
                 >
+                  <LibraryBooksIcon sx={{ fontSize: 14 }} className="text-orange-500" />
                   전체인쇄
                 </button>
               </div>
