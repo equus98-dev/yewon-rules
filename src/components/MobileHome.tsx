@@ -258,15 +258,17 @@ export default function MobileHome() {
               const notice = notices.find((n: any) => n.id === activeNoticeId);
               if (!notice) return <div className="p-10 text-center">공지사항을 찾을 수 없습니다.</div>;
               return (
-                <div className="p-6 flex flex-col flex-1">
-                  <h3 className="text-xl font-black text-slate-900 tracking-tight mb-3">
-                    {notice.title}
-                  </h3>
-                  <div className="flex items-center gap-4 text-xs font-bold text-slate-500 pb-4 border-b border-slate-200">
-                    <span>작성부서: <span className="text-slate-700">{notice.dept}</span></span>
-                    <span>작성일: <span className="text-slate-700">{notice.date}</span></span>
+                <div className="flex flex-col flex-1">
+                  <div className="px-6 py-5 border-b border-slate-300 bg-slate-100">
+                    <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2">
+                      {notice.title}
+                    </h3>
+                    <div className="flex items-center gap-4 text-xs font-bold text-slate-500">
+                      <span>작성부서: <span className="text-slate-700">{notice.dept}</span></span>
+                      <span>작성일: <span className="text-slate-700">{notice.date}</span></span>
+                    </div>
                   </div>
-                  <div className="py-6 text-[15px] text-slate-800 leading-relaxed font-medium whitespace-pre-wrap flex-1">
+                  <div className="p-6 text-[15px] text-slate-800 leading-relaxed font-medium whitespace-pre-wrap flex-1">
                     {notice.content}
                   </div>
                 </div>

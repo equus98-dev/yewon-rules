@@ -794,7 +794,7 @@ export default function Home() {
                     if (!notice) return null;
                     return (
                       <div className="bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden flex flex-col min-h-[500px]">
-                        <div className="px-8 py-6 border-b border-slate-200">
+                        <div className="px-8 py-6 border-b border-slate-300 bg-slate-100">
                           <h3 className="text-[22px] font-black text-slate-900 tracking-tight mb-2">
                             {notice.title}
                           </h3>
