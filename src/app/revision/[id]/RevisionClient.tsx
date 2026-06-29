@@ -74,6 +74,45 @@ export default function RevisionClient({ id }: { id: string }) {
     }
   };
 
+  const handleDeleteRevision = async () => {
+    if (!selectedRev) return;
+    if (revisions.length <= 1) {
+      alert("최초 제정본(유일한 연혁)은 삭제할 수 없습니다.");
+      return;
+    }
+    if (selectedRev.id !== revisions[0].id) {
+      alert("안전을 위해 가장 최신 개정 연혁만 삭제(취소)할 수 있습니다.");
+      return;
+    }
+    if (!confirm(`정말 '${selectedRev.versionName || "해당 연혁"}'을(를) 삭제하시겠습니까?\n해당 연혁에 속한 조문과 비교 내역이 모두 삭제됩니다.`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/revisions/${selectedRev.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const err = (await res.json().catch(() => ({}))) as any;
+        throw new Error(err.error || "연혁 삭제 실패");
+      }
+      alert("연혁이 성공적으로 삭제되었습니다.");
+      
+      const ruleRes = await fetch(`/api/rules/${id}`);
+      if (ruleRes.ok) {
+        const newRuleData = (await ruleRes.json()) as any;
+        setRuleData(newRuleData);
+        if (newRuleData.revisions?.length > 0) {
+          setHistorySelectedRevId(newRuleData.revisions[0].id);
+        }
+      }
+      if (window.opener) {
+        window.opener.dispatchEvent(new CustomEvent('rule-updated'));
+      }
+    } catch (e: any) {
+      alert(e.message || "연혁 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0 || !selectedRev) return;
@@ -387,13 +426,24 @@ export default function RevisionClient({ id }: { id: string }) {
               <th className="bg-slate-50 text-left px-4 py-3.5 border-b border-slate-200 font-bold text-slate-700 align-middle">
                 연혁 선택
                 {isAdmin && (
-                  <button
-                    onClick={() => setIsCreatingRev(true)}
-                    className="ml-2 text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
-                    title="새로운 연혁(과거 개정 이력) 추가"
-                  >
-                    ➕ 연혁 추가
-                  </button>
+                  <div className="inline-flex items-center gap-1 ml-2">
+                    <button
+                      onClick={() => setIsCreatingRev(true)}
+                      className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
+                      title="새로운 연혁(과거 개정 이력) 추가"
+                    >
+                      ➕ 연혁 추가
+                    </button>
+                    {revisions.length > 1 && selectedRev?.id === revisions[0]?.id && (
+                      <button
+                        onClick={handleDeleteRevision}
+                        className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded border border-red-200 hover:bg-red-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
+                        title="최신 연혁 삭제 (개정 취소)"
+                      >
+                        🗑️ 연혁 삭제
+                      </button>
+                    )}
+                  </div>
                 )}
               </th>
               <td className="px-4 py-3.5 border-b border-slate-200 bg-white">
