@@ -608,16 +608,16 @@ export default function MobileHome() {
               <CloseIcon />
             </button>
           </div>
-          <form onSubmit={handleSearchSubmit} className="flex gap-2">
+          <form onSubmit={handleSearchSubmit} className="flex flex-col gap-2.5">
             <input 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="검색어를 입력하세요..."
-              className="flex-1 bg-slate-100 border border-slate-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0c3161]"
+              className="w-full bg-slate-100 border border-slate-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0c3161]"
               autoFocus
             />
-            <button type="submit" className="bg-[#0c3161] text-white px-6 py-3 rounded-xl font-bold text-sm shadow active:scale-95 transition-all">
+            <button type="submit" className="w-full bg-[#0c3161] text-white py-3 rounded-xl font-bold text-sm shadow active:scale-95 transition-all">
               검색
             </button>
           </form>

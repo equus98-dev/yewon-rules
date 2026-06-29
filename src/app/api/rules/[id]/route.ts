@@ -205,7 +205,7 @@ export async function GET(
 
     const responseData = {
       id: ruleRow.id,
-      title: ruleRow.title,
+      title: ruleRow.title?.replace(/\s*개정전문사항\s*$/, ""),
       ruleNumber: ruleRow.ruleNumber,
       status: ruleRow.status,
       category: { id: ruleRow.catId, name: ruleRow.categoryName },
@@ -219,8 +219,8 @@ export async function GET(
       },
     };
 
-    // HWP 등에서 변환 시 깨진 특수기호(󰂛)를 중간 점(·)으로 일괄 치환
-    const cleanData = JSON.parse(JSON.stringify(responseData).replace(/󰂛/g, '·'));
+    // HWP 등에서 변환 시 깨진 특수기호(󰂛)를 중간 점(·)으로 일괄 치환 및 규정명 뒤의 불필요한 '개정전문사항' 문구 완벽 제거
+    const cleanData = JSON.parse(JSON.stringify(responseData).replace(/󰂛/g, '·').replace(/\s*개정전문사항/g, ''));
 
     return NextResponse.json(cleanData);
   } catch (error: any) {

@@ -105,7 +105,8 @@ export async function GET(request: Request) {
         }
       });
 
-      return NextResponse.json(groupedNodes);
+      const cleanGroupedNodes = JSON.parse(JSON.stringify(groupedNodes).replace(/\s*개정전문사항/g, ''));
+      return NextResponse.json(cleanGroupedNodes);
     }
 
     if (type === "dept") {
@@ -190,7 +191,8 @@ export async function GET(request: Request) {
         })
         .filter(Boolean);
 
-      return NextResponse.json(treeData);
+      const cleanTreeData = JSON.parse(JSON.stringify(treeData).replace(/\s*개정전문사항/g, ''));
+      return NextResponse.json(cleanTreeData);
     }
 
     if (type === "abc") {
@@ -236,7 +238,8 @@ export async function GET(request: Request) {
         });
       }
 
-      return NextResponse.json(treeData);
+      const cleanTreeData = JSON.parse(JSON.stringify(treeData).replace(/\s*개정전문사항/g, ''));
+      return NextResponse.json(cleanTreeData);
     }
 
     return NextResponse.json({ error: "Invalid type parameter" }, { status: 400 });

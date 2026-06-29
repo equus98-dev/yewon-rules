@@ -181,8 +181,8 @@ export async function GET(request: Request) {
     }
 
     const responseData = { isGrouped: true, titleMatches, bodyMatches, attachmentMatches };
-    // HWP 특수문자 깨짐(󰂛) 방지를 위해 응답 전 일괄 중간 점(·)으로 치환
-    const cleanData = JSON.parse(JSON.stringify(responseData).replace(/󰂛/g, '·'));
+    // HWP 특수문자 깨짐(󰂛) 방지 및 불필요한 '개정전문사항' 문구 완벽 제거
+    const cleanData = JSON.parse(JSON.stringify(responseData).replace(/󰂛/g, '·').replace(/\s*개정전문사항/g, ''));
     return NextResponse.json(cleanData);
   } catch (error: any) {
     console.error("[Search API Error]:", error);
