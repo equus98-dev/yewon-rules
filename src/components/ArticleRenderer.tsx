@@ -275,6 +275,11 @@ export default function ArticleRenderer({
     let cleanHtml = contentHtml;
     cleanHtml = mergeConsecutiveHistories(cleanHtml);
 
+    // 조문 제목 바로 옆에 <개정 ...>이 있고 바로 뒤이어 ①항이 나오는 경우 조문 제목 옆의 <개정 ...>을 일괄 제거
+    cleanHtml = cleanHtml.replace(/^(제\d+조(?:의\d+)?\s*(?:\([^)]*\)|\[[^\]]*\]|〔[^〕]*〕|（[^）]*）)?)\s*([<(\[＜（]\s*개정[^>\])＞）]*[>\])＞）])\s*(?=[①])/gi, (match, titlePart) => {
+      return titlePart + " ";
+    });
+
     if (hideHistory) {
       cleanHtml = cleanHtml.replace(HISTORY_REGEX, "");
     } else {
@@ -438,7 +443,7 @@ export default function ArticleRenderer({
         // 인용구인 경우 (예: 제①항, 제1항 및 ②항) 줄바꿈 생략
         if (/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/.test(before)) return match;
         // 조문 제목 바로 뒤에 나오는 ① 등은 줄바꿈하지 않음
-        if (before.match(/^(?:<[^>]+>)*(?:제\d+조(?:의\d+)?(?:<[^>]+>)*\s*)?(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*$/)) return match;
+        if (before.match(/^(?:<[^>]+>)*(?:제\d+조(?:의\d+)?(?:<[^>]+>)*\s*)?(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*(?:[<(\[＜（][^>\])＞）]*[>\])＞）]\s*)*(?:<span[^>]*>[\s\S]*?<\/span>\s*)*$/)) return match;
         return '<br/>' + match;
       });
 
@@ -675,6 +680,11 @@ export default function ArticleRenderer({
 
     decodedText = mergeConsecutiveHistories(decodedText);
 
+    // 조문 제목 바로 옆에 <개정 ...>이 있고 바로 뒤이어 ①항이 나오는 경우 조문 제목 옆의 <개정 ...>을 일괄 제거
+    decodedText = decodedText.replace(/^(제\d+조(?:의\d+)?\s*(?:\([^)]*\)|\[[^\]]*\]|〔[^〕]*〕|（[^）]*）)?)\s*([<(\[＜（]\s*개정[^>\])＞）]*[>\])＞）])\s*(?=[①])/gi, (match, titlePart) => {
+      return titlePart + " ";
+    });
+
     // 만약 테이블 태그가 없고 단순히 <p>나 </p> 등의 태그만 텍스트로 들어가 있다면 이를 정화해줍니다.
     if (!/<table/i.test(decodedText)) {
       decodedText = decodedText.replace(/<\/?[pP](?:\s[^>]*)?>/g, "");
@@ -709,7 +719,7 @@ export default function ArticleRenderer({
       if (offset === 0) return match;
       const before = str.slice(0, offset);
       // 조문 제목 바로 뒤에 나오는 ① 등은 줄바꿈하지 않음
-      if (before.match(/^(?:<[^>]+>)*(?:제\d+조(?:의\d+)?(?:<[^>]+>)*\s*)?(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*$/)) return match;
+      if (before.match(/^(?:<[^>]+>)*(?:제\d+조(?:의\d+)?(?:<[^>]+>)*\s*)?(?:\[[^\]]*\]|〔[^〕]*〕|\([^)]*\)|（[^）]*）)?\s*(?:<[^>]+>)*\s*(?:[<(\[＜（][^>\])＞）]*[>\])＞）]\s*)*(?:<span[^>]*>[\s\S]*?<\/span>\s*)*$/)) return match;
       // 인용구인 경우 (예: 제①항, 제1항 및 ②항) 줄바꿈 생략
       if (/(?:제|\(|,|및|또는|와|과|이나|나|에|의)\s*$/.test(before)) return match;
       // 제규정 관리 규정 제5조 예외 처리 (④, ⑤ 본문 내의 기호 설명 부분)
