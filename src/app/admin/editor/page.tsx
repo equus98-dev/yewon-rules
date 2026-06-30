@@ -95,7 +95,7 @@ function EditorContent() {
     if (!isAddendumEdited && revisionPopupOpen) {
       const effDate = new Date(revisionEffectiveDate || new Date());
       const effStr = !isNaN(effDate.getTime()) ? `${effDate.getFullYear()}년 ${effDate.getMonth() + 1}월 ${effDate.getDate()}일` : "";
-      setRevisionAddendumContent(`부칙 (${revisionAnnounceDate || ""})\n제1조(시행일) 이 규정은 ${effStr}부터 시행한다.`);
+      setRevisionAddendumContent(`부칙\n1. (시행일) 이 규정은 ${effStr}부터 시행한다.`);
     }
   }, [revisionAnnounceDate, revisionEffectiveDate, revisionPopupOpen, isAddendumEdited]);
 
@@ -698,7 +698,8 @@ function EditorContent() {
 
     setSaving(true);
     try {
-      const formattedDate = enactmentDate.replace(/-/g, '.');
+      const eDateObj = new Date(enactmentDate);
+      const formattedDate = !isNaN(eDateObj.getTime()) ? `${eDateObj.getFullYear()}. ${eDateObj.getMonth() + 1}. ${eDateObj.getDate()}.` : enactmentDate.replace(/-/g, '.');
 
       // 삭제된 항목은 필터링하여 저장할 조항 리스트 구성
       const articlesToSave = draftArticles
@@ -710,14 +711,26 @@ function EditorContent() {
 
           if (art.isNew) {
             const tag = ` <신설 ${formattedDate}>`;
-            if (!updatedContentText.includes(tag)) {
+            if (updatedContentText.startsWith("부칙")) {
+              const lines = updatedContentText.split('\n');
+              if (!lines[0].includes(tag)) {
+                lines[0] += tag;
+              }
+              updatedContentText = lines.join('\n');
+            } else if (!updatedContentText.includes(tag)) {
               updatedContentText += tag;
             }
             finalContentJson = { paragraphs: [updatedContentText.split(") ").slice(1).join(") ") || updatedContentText] };
             finalContentHtml = null;
           } else if (art.isModified) {
             const tag = ` <개정 ${formattedDate}>`;
-            if (!updatedContentText.includes(tag)) {
+            if (updatedContentText.startsWith("부칙")) {
+              const lines = updatedContentText.split('\n');
+              if (!lines[0].includes(tag)) {
+                lines[0] += tag;
+              }
+              updatedContentText = lines.join('\n');
+            } else if (!updatedContentText.includes(tag)) {
               updatedContentText += tag;
             }
             finalContentJson = { paragraphs: [updatedContentText.split(") ").slice(1).join(") ") || updatedContentText] };

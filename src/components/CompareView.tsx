@@ -113,7 +113,6 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                 <div className="p-6 border-r border-slate-200 align-top">
                   {before ? (
                     <>
-                      <h4 className="font-bold text-blue-800 mb-2">{formatArticleTitle(before)}</h4>
                       <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
                         {renderDiff(beforeText, afterText, 'old')}
                       </div>
@@ -128,7 +127,6 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                 <div className="p-6 align-top">
                   {after ? (
                     <>
-                      <h4 className="font-bold text-blue-800 mb-2">{formatArticleTitle(after)}</h4>
                       <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
                         {renderDiff(beforeText, afterText, 'new')}
                       </div>
