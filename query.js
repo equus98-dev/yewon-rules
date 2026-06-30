@@ -1,3 +1,5 @@
-const sqlite3 = require('sqlite3'); 
-const db = new sqlite3.Database('prisma/dev.db'); 
-db.get("SELECT contentHtml, contentText FROM Article WHERE articleNumber = 19 AND ruleId = (SELECT id FROM Rule WHERE ruleName = '장학금지급규정') LIMIT 1", (err, row) => console.log(err || row));
+const { Client } = require('pg');
+const client = new Client({ connectionString: 'postgres://postgres:postgres@localhost:5432/yewon' });
+client.connect().then(() => client.query('SELECT * FROM "Revision" ORDER BY "createdAt" DESC LIMIT 5'))
+  .then(res => console.log(JSON.stringify(res.rows, null, 2)))
+  .finally(() => client.end());

@@ -1,15 +1,3 @@
-const html = '<p><span style="color: navy">제72조</span>&nbsp;&nbsp;&nbsp;(하부조직) ① 대학교에...</p>';
-const plainText = html.replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim();
-const match = plainText.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^()]*?(?:\([^()]*\)[^()]*?)*)[\]〕)）](.*)/);
-
-if (match) {
-  const titlePart = plainText.substring(0, plainText.indexOf(match[3]));
-  console.log('titlePart:', titlePart);
-  
-  const regexPattern = titlePart.split('').map(c => 
-    c.trim() === '' ? '(?:\\s|&nbsp;|<[^>]+>)*' : c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\s|&nbsp;|<[^>]+>)*'
-  ).join('');
-  
-  const remover = new RegExp('^(?:\\s|&nbsp;|<[^>]+>)*' + regexPattern, 'i');
-  console.log('result:', html.replace(remover, '').trim());
-}
+﻿const fullText = "1. (시행일) 이 정관은 2000년 12월 27일부터 시행한다.\n2. (교직원징계에 대한 경과조치) 이 정관 시행 당시 교직원징계원위원회에 계류중인 징계사건은 징계사유 발생 당시의 정관 규정에 의한다.";
+const clauseSplitter = /(?=(?<!(?:^|\\n|\\s)\\d{1,2}\\.\\s*|제\\d+조(?:의\\s*\\d+)?\\s*)\\((?:시행일|준용|경과|적용|폐지|시행|별칙|준칙|특례|위임)[^)]*\\)|(?:^|\\n)\\d{1,2}\\.\\s|(?:^|\\n)제\\d+조)/gm;
+console.log(fullText.split(clauseSplitter).map(s => s.trim()).filter(s => s));
