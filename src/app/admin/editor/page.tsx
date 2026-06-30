@@ -1238,10 +1238,10 @@ function EditorContent() {
                                 type="button"
                                 onClick={() => {
                                   setRevisionTargetIdx(idx);
-                                  const today = new Date().toISOString().split("T")[0];
-                                  setRevisionDate(today);
-                                  setRevisionAnnounceDate(today);
-                                  setRevisionEffectiveDate(today);
+                                  const defaultDate = enactmentDate || new Date().toISOString().split("T")[0];
+                                  setRevisionDate(defaultDate);
+                                  setRevisionAnnounceDate(defaultDate);
+                                  setRevisionEffectiveDate(effectiveDate || defaultDate);
                                   setRevisionPopupOpen(true);
                                 }}
                                 className="flex items-center gap-1.5 px-4 h-[38px] bg-gradient-to-b from-[#1a4b8c] to-[#0c3161] border border-[#0a274d] text-white rounded-lg text-[13px] font-black hover:from-[#15407a] hover:to-[#092244] transition-all cursor-pointer active:scale-95 shadow-md shadow-blue-900/20"
@@ -1380,10 +1380,10 @@ function EditorContent() {
                               type="button"
                               onClick={() => {
                                 setRevisionTargetIdx(idx);
-                                const today = new Date().toISOString().split("T")[0];
-                                setRevisionDate(today);
-                                setRevisionAnnounceDate(today);
-                                setRevisionEffectiveDate(today);
+                                const defaultDate = enactmentDate || new Date().toISOString().split("T")[0];
+                                setRevisionDate(defaultDate);
+                                setRevisionAnnounceDate(defaultDate);
+                                setRevisionEffectiveDate(effectiveDate || defaultDate);
                                 setRevisionPopupOpen(true);
                               }}
                               className="flex items-center gap-1.5 px-4 h-[38px] bg-gradient-to-b from-[#1a4b8c] to-[#0c3161] border border-[#0a274d] text-white rounded-lg text-[13px] font-black hover:from-[#15407a] hover:to-[#092244] transition-all cursor-pointer active:scale-95 shadow-md shadow-blue-900/20"
