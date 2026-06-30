@@ -638,71 +638,7 @@ export default function ArticleRenderer({
   }
   items = normalizedItems;
 
-  // --- Split items with glued text into separate items ---
-  const splitItems: ContentItem[] = [];
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    if (item && item.type === "item" && item.text && typeof item.text === 'string') {
-       let textStr = item.text.replace(/<br\s*\/?>/gi, '\n');
-       if (textStr.includes('\n')) {
-          const lines = textStr.split('\n');
-          let currentBaseItem = { ...item, text: "" };
-          let basePushed = false;
-          
-          for (let j = 0; j < lines.length; j++) {
-             const line = lines[j];
-             const trimmedLine = line.replace(/<[^>]+>/g, '').trim();
-             
-             let matchNum = "";
-             let matchType = "";
-             let content = line;
-             
-             if (/^[가-하]\./.test(trimmedLine)) {
-                const match = line.match(/^((?:<[^>]+>)*\s*)([가-하]\.)(\s*)(.*)/);
-                if (match) {
-                   matchNum = match[2];
-                   content = match[1] + match[4];
-                   matchType = "subitem";
-                }
-             } else if (/^\d{1,2}(?:의\d+)?\./.test(trimmedLine)) {
-                const match = line.match(/^((?:<[^>]+>)*\s*)(\d{1,2}(?:의\d+)?\.)(\s*)(.*)/);
-                if (match) {
-                   matchNum = match[2];
-                   content = match[1] + match[4];
-                   matchType = "item";
-                }
-             } else if (/^[①-⑳]/.test(trimmedLine)) {
-                const match = line.match(/^((?:<[^>]+>)*\s*)([①-⑳])(\s*)(.*)/);
-                if (match) {
-                   matchNum = match[2];
-                   content = match[1] + match[4];
-                   matchType = "paragraph";
-                }
-             }
-             
-             if (matchType) {
-                 if (!basePushed) {
-                     splitItems.push(currentBaseItem);
-                     basePushed = true;
-                 }
-                 currentBaseItem = { type: matchType as any, num: matchNum, text: content };
-             } else {
-                 if (currentBaseItem.text) {
-                     currentBaseItem.text += '\n' + line;
-                 } else {
-                     currentBaseItem.text = line;
-                 }
-             }
-          }
-          if (!basePushed || currentBaseItem.text) {
-              splitItems.push(currentBaseItem);
-          }
-          continue;
-       }
-    }
-    splitItems.push(item);
-  }
-  items = splitItems;
+
 
   let textAttachments: ContentItem[] = [];
 
