@@ -388,7 +388,8 @@ function EditorContent() {
       // 부칙에 뱃지가 없으면 추가
       if (!addendumContentText.includes(badgeStr) && !addendumContentText.includes("<신설 ")) {
         addendumContentText = `부칙 ${badgeStr}\n${cleanBody}`;
-        addendumContentHtml = `<p>부칙 ${badgeStr}</p><p>${cleanBody.replace(/\n/g, '</p><p>')}</p>`;
+        const escapedBadge = badgeStr.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        addendumContentHtml = `<p>부칙 ${escapedBadge}</p><p>${cleanBody.replace(/\n/g, '</p><p>')}</p>`;
       } else if (!plainText.startsWith("부칙")) {
         addendumContentText = `부칙 ${addendumContentText}`;
       }
@@ -400,35 +401,51 @@ function EditorContent() {
         newArticles[existingAddendumIndex].contentText = addendumContentText;
         newArticles[existingAddendumIndex].contentJson = addendumContentJson;
       } else {
-        const effDate = new Date(revisionEffectiveDate);
-        const effStr = `${effDate.getFullYear()}년 ${effDate.getMonth() + 1}월 ${effDate.getDate()}일`;
-        
-        // 부칙 번호 부여 (8000번대)
         const existingAddendums = newArticles.filter(a => a.articleNumber >= 8000 && a.articleNumber < 9000);
-        let nextAddendumNum = 8000;
-        let addendumChapter = "부칙";
-        if (existingAddendums.length > 0) {
-           nextAddendumNum = Math.max(...existingAddendums.map(a => a.articleNumber)) + 1;
-           addendumChapter = existingAddendums[existingAddendums.length - 1].chapter || "";
-        }
         
-        newArticles.push({
-          chapter: addendumChapter,
-          articleNumber: nextAddendumNum,
-          title: "부칙",
-          contentHtml: addendumContentHtml,
-          contentText: addendumContentText,
-          contentJson: addendumContentJson,
-          sortOrder: newArticles.length + 1,
-          isNew: true,
-          isModified: true
-        });
+        // 중복 부칙 확인 (내용이 완전히 동일한 경우 생성하지 않고 기존 것을 업데이트)
+        const dupIndex = newArticles.findIndex(a => a.articleNumber >= 8000 && a.articleNumber < 9000 && a.contentText.replace(/<[^>]+>/g, '').replace(/^(?:부\s*칙\s*)+/, '').trim() === cleanBody);
+        
+        if (dupIndex !== -1) {
+          newArticles[dupIndex].contentHtml = addendumContentHtml;
+          newArticles[dupIndex].contentText = addendumContentText;
+          newArticles[dupIndex].contentJson = addendumContentJson;
+          newArticles[dupIndex].isModified = true;
+        } else {
+          const effDate = new Date(revisionEffectiveDate);
+          const effStr = `${effDate.getFullYear()}년 ${effDate.getMonth() + 1}월 ${effDate.getDate()}일`;
+          
+          // 부칙 번호 부여 (8000번대)
+          let nextAddendumNum = 8000;
+          let addendumChapter = "부칙";
+          if (existingAddendums.length > 0) {
+             nextAddendumNum = Math.max(...existingAddendums.map(a => a.articleNumber)) + 1;
+             addendumChapter = existingAddendums[existingAddendums.length - 1].chapter || "";
+          }
+          
+          newArticles.push({
+            chapter: addendumChapter,
+            articleNumber: nextAddendumNum,
+            title: "부칙",
+            contentHtml: addendumContentHtml,
+            contentText: addendumContentText,
+            contentJson: addendumContentJson,
+            sortOrder: newArticles.length + 1,
+            isNew: true,
+            isModified: true
+          });
+        }
       }
       
       return newArticles;
     });
 
-    alert("개정 내용 및 부칙이 임시 반영되었습니다. (최종 배포 시 함께 저장됩니다.)");
+    alert("개정 내용 및 부칙이 임시 반영되었습니다. 좌측 패널의 공포일자와 시행일자도 선택한 날짜로 동기화되었습니다. (최종 배포 시 함께 저장됩니다.)");
+    
+    // 팝업에서 설정한 날짜를 좌측 메인 패널의 날짜와 동기화
+    if (revisionDate) setEnactmentDate(revisionDate);
+    if (revisionEffectiveDate) setEffectiveDate(revisionEffectiveDate);
+
     setRevisionPopupOpen(false);
     setIsAddendumEdited(false);
   };
@@ -728,31 +745,35 @@ function EditorContent() {
           let finalContentJson = art.contentJson;
           let finalContentHtml = art.contentHtml;
 
-          if (art.isNew) {
-            const tag = ` <신설 ${formattedDate}>`;
+          if (art.isNew && !art.isModified) {
+            const eDateObj = new Date(enactmentDate || new Date());
+            const eDateStr = !isNaN(eDateObj.getTime()) ? `${eDateObj.getFullYear()}. ${eDateObj.getMonth() + 1}. ${eDateObj.getDate()}.` : formattedDate;
+            const tag = ` <신설 ${eDateStr}>`;
             if (updatedContentText.startsWith("부칙")) {
               const lines = updatedContentText.split('\n');
-              if (!lines[0].includes(tag)) {
+              if (!lines[0].includes("<신설") && !lines[0].includes("[제정") && !lines[0].includes("[개정") && !lines[0].includes("[일부개정") && !lines[0].includes("[전부개정")) {
                 lines[0] += tag;
               }
               updatedContentText = lines.join('\n');
-            } else if (!updatedContentText.includes(tag)) {
+            } else if (!updatedContentText.includes(tag) && !updatedContentText.includes("[제정") && !updatedContentText.includes("[개정")) {
               updatedContentText += tag;
             }
-            finalContentJson = { paragraphs: [updatedContentText.split(") ").slice(1).join(") ") || updatedContentText] };
+            finalContentJson = { paragraphs: [updatedContentText] };
             finalContentHtml = null;
           } else if (art.isModified) {
-            const tag = ` <개정 ${formattedDate}>`;
+            const eDateObj = new Date(enactmentDate || new Date());
+            const eDateStr = !isNaN(eDateObj.getTime()) ? `${eDateObj.getFullYear()}. ${eDateObj.getMonth() + 1}. ${eDateObj.getDate()}.` : formattedDate;
+            const tag = ` <개정 ${eDateStr}>`;
             if (updatedContentText.startsWith("부칙")) {
               const lines = updatedContentText.split('\n');
-              if (!lines[0].includes(tag)) {
+              if (!lines[0].includes("<개정") && !lines[0].includes("[개정") && !lines[0].includes("[일부개정") && !lines[0].includes("[전부개정")) {
                 lines[0] += tag;
               }
               updatedContentText = lines.join('\n');
-            } else if (!updatedContentText.includes(tag)) {
+            } else if (!updatedContentText.includes(tag) && !updatedContentText.includes("[개정") && !updatedContentText.includes("[일부개정")) {
               updatedContentText += tag;
             }
-            finalContentJson = { paragraphs: [updatedContentText.split(") ").slice(1).join(") ") || updatedContentText] };
+            finalContentJson = { paragraphs: [updatedContentText] };
             finalContentHtml = null;
           }
 

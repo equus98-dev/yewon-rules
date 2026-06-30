@@ -489,10 +489,13 @@ export default function ArticleRenderer({
             <span className="text-[20px] font-black text-[#000080] tracking-tight">{title}</span>
           </div>
         )}
-        <div 
-          className={`mb-4 ql-editor ${wrapperClass} px-0 py-2 w-full`}
-          dangerouslySetInnerHTML={{ __html: cleanHtml }}
-        />
+        { (cleanHtml && !/<table/i.test(cleanHtml)) ? (
+             <div className={`mb-4 ql-editor ${wrapperClass} px-0 py-2 w-full`}>
+                 {formatGluedText(cleanHtml, true)}
+             </div>
+          ) : (
+             <div className={`mb-4 ql-editor ${wrapperClass} px-0 py-2 w-full`} dangerouslySetInnerHTML={{ __html: cleanHtml }} />
+          ) }
       </div>
     );
   }
@@ -635,6 +638,72 @@ export default function ArticleRenderer({
   }
   items = normalizedItems;
 
+  // --- Split items with glued text into separate items ---
+  const splitItems: ContentItem[] = [];
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (item && item.type === "item" && item.text && typeof item.text === 'string') {
+       let textStr = item.text.replace(/<br\s*\/?>/gi, '\n');
+       if (textStr.includes('\n')) {
+          const lines = textStr.split('\n');
+          let currentBaseItem = { ...item, text: "" };
+          let basePushed = false;
+          
+          for (let j = 0; j < lines.length; j++) {
+             const line = lines[j];
+             const trimmedLine = line.replace(/<[^>]+>/g, '').trim();
+             
+             let matchNum = "";
+             let matchType = "";
+             let content = line;
+             
+             if (/^[가-하]\./.test(trimmedLine)) {
+                const match = line.match(/^((?:<[^>]+>)*\s*)([가-하]\.)(\s*)(.*)/);
+                if (match) {
+                   matchNum = match[2];
+                   content = match[1] + match[4];
+                   matchType = "subitem";
+                }
+             } else if (/^\d{1,2}(?:의\d+)?\./.test(trimmedLine)) {
+                const match = line.match(/^((?:<[^>]+>)*\s*)(\d{1,2}(?:의\d+)?\.)(\s*)(.*)/);
+                if (match) {
+                   matchNum = match[2];
+                   content = match[1] + match[4];
+                   matchType = "item";
+                }
+             } else if (/^[①-⑳]/.test(trimmedLine)) {
+                const match = line.match(/^((?:<[^>]+>)*\s*)([①-⑳])(\s*)(.*)/);
+                if (match) {
+                   matchNum = match[2];
+                   content = match[1] + match[4];
+                   matchType = "paragraph";
+                }
+             }
+             
+             if (matchType) {
+                 if (!basePushed) {
+                     splitItems.push(currentBaseItem);
+                     basePushed = true;
+                 }
+                 currentBaseItem = { type: matchType as any, num: matchNum, text: content };
+             } else {
+                 if (currentBaseItem.text) {
+                     currentBaseItem.text += '\n' + line;
+                 } else {
+                     currentBaseItem.text = line;
+                 }
+             }
+          }
+          if (!basePushed || currentBaseItem.text) {
+              splitItems.push(currentBaseItem);
+          }
+          continue;
+       }
+    }
+    splitItems.push(item);
+  }
+  items = splitItems;
+
   let textAttachments: ContentItem[] = [];
 
   const attachmentStartIndex = items.findIndex((item) => {
@@ -695,7 +764,7 @@ export default function ArticleRenderer({
   const isAddendumItem = (text: string) =>
     /^\(시행일\)|^\(폐지|^\(적용예외|^\(경과조치|^\(적용범위|^\(준용\)/.test(text.trim());
 
-  const renderTextWithHistory = (text: string) => {
+  function renderTextWithHistory(text: string) {
     // DB에 &lt;table&gt; 과 같이 이스케이프되어 저장된 경우를 대비해 디코딩
     let decodedText = text
       .replace(/&lt;/g, "<")
@@ -895,7 +964,7 @@ export default function ArticleRenderer({
   };
 
   // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
-  const formatGluedText = (text: string, isArticleBody: boolean = false): React.ReactNode => {
+  function formatGluedText(text: string, isArticleBody: boolean = false): React.ReactNode {
     // 만약 전체 텍스트 내에 테이블 태그가 포함되어 있다면, 분할(split('\n')) 시 테이블 태그가 깨지는 것을 방지해야 함.
     // 하지만 텍스트가 제N조로 시작하는 경우 조문 제목과 뱃지는 추출해서 렌더링해야 함.
     const hasTable = /<table|<tr|<td|<th/i.test(text);
@@ -1105,6 +1174,7 @@ export default function ArticleRenderer({
     let curHang = "";
     let curHo = "";
     let curMok = "";
+    let currentIndent = isArticleBody ? "40px" : "0px";
     const baseArticlePath = `제${articleNumber}조`;
 
     const handleItemSelect = (e: React.MouseEvent, path: string) => {
@@ -1158,7 +1228,7 @@ export default function ArticleRenderer({
              const numMatch = trimmed.match(/^([①-⑳])\s*(.*)/);
              if (numMatch) {
                curHang = `제${convertCircledNum(numMatch[1])}항`;
-               curHo = ""; curMok = "";
+               curHo = ""; curMok = ""; currentIndent = isArticleBody ? "40px" : "72px";
                currentPath = `${baseArticlePath} ${curHang}`.trim();
                const interactiveClass = "";
                if (isInline) {
@@ -1183,7 +1253,7 @@ export default function ArticleRenderer({
              const numMatch = trimmed.match(/^(\d{1,2}(?:의\d+)?\.)\s*(.*)/);
              if (numMatch) {
                curHo = `제${numMatch[1].replace('.', '')}호`;
-               curMok = "";
+               curMok = ""; currentIndent = isArticleBody ? "56px" : "88px";
                currentPath = `${baseArticlePath} ${curHang} ${curHo}`.replace(/\s+/g, ' ').trim();
                const interactiveClass = "";
                const isGluedAddendum = /^(?:\(시행일\))?\s*이\s*규정은.*시행한다/i.test(numMatch[2].trim()) || /^\((?:시행일|경과조치|적용례|준용|폐지)\)/i.test(numMatch[2].trim());
@@ -1219,7 +1289,7 @@ export default function ArticleRenderer({
           } else if (/^[가-하]\./.test(trimmed)) {
              const numMatch = trimmed.match(/^([가-하]\.)\s*(.*)/);
              if (numMatch) {
-               curMok = `${numMatch[1].replace('.', '')}목`;
+               curMok = `${numMatch[1].replace('.', '')}목`; currentIndent = isArticleBody ? "72px" : "104px";
                currentPath = `${baseArticlePath} ${curHang} ${curHo} ${curMok}`.replace(/\s+/g, ' ').trim();
                const interactiveClass = "";
                if (isInline) {
@@ -1362,10 +1432,17 @@ export default function ArticleRenderer({
           } else if (/^제\d+(?:절|관)/.test(trimmed)) {
              lineClass += " mt-4 text-[16px] font-bold text-center text-[#000080] block";
           } else {
+             if (/^제\d+장/.test(trimmed) || /^제\d+(?:절|관)/.test(trimmed)) {
+                 currentIndent = '0px';
+             }
              if (isInline) {
                 lineClass += " font-normal text-slate-800";
              } else {
-                lineClass += " block mt-1";
+                return (
+                   <div key={`glued-${idx}`} className={`block w-full break-keep text-slate-800 py-0.5`} style={{ paddingLeft: currentIndent }}>
+                     {renderTextWithHistory(trimmed)}
+                   </div>
+                );
              }
           }
 
