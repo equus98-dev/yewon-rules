@@ -423,28 +423,8 @@ export default function RevisionClient({ id }: { id: string }) {
           <tbody>
             {/* 연혁 선택 */}
             <tr>
-              <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-top">
-                <div className="mb-2">연혁 선택</div>
-                {isAdmin && (
-                  <div className="flex flex-wrap items-center gap-1">
-                    <button
-                      onClick={() => setIsCreatingRev(true)}
-                      className="text-[13px] whitespace-nowrap bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
-                      title="새로운 연혁(과거 개정 이력) 추가"
-                    >
-                      ➕ 연혁 추가
-                    </button>
-                    {revisions.length > 1 && selectedRev?.id === revisions[0]?.id && (
-                      <button
-                        onClick={handleDeleteRevision}
-                        className="text-[13px] whitespace-nowrap bg-red-50 text-red-600 px-2.5 py-1 rounded border border-red-200 hover:bg-red-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
-                        title="최신 연혁 삭제 (개정 취소)"
-                      >
-                        🗑️ 연혁 삭제
-                      </button>
-                    )}
-                  </div>
-                )}
+              <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-middle">
+                연혁 선택
               </th>
               <td className="px-4 py-4 border-b border-slate-200 bg-white">
                 <select 
@@ -537,12 +517,28 @@ export default function RevisionClient({ id }: { id: string }) {
               </tr>
             )}
 
-            {/* 원문파일 (본문/전문만 표시) */}
-            <tr>
-              <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-top">
-                <div className="mb-2">원문파일</div>
-                {isAdmin && (
-                  <div className="flex flex-col gap-2 items-start">
+            {/* 관리자 도구 */}
+            {isAdmin && selectedRev && (
+              <tr>
+                <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-middle">관리자 도구</th>
+                <td className="px-4 py-4 border-b border-slate-200 bg-white">
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <button
+                      onClick={() => setIsCreatingRev(true)}
+                      className="text-[13px] flex-shrink-0 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1.5"
+                      title="새로운 연혁(과거 개정 이력) 추가"
+                    >
+                      ➕ 연혁 추가
+                    </button>
+                    {revisions.length > 1 && selectedRev?.id === revisions[0]?.id && (
+                      <button
+                        onClick={handleDeleteRevision}
+                        className="text-[13px] flex-shrink-0 bg-red-50 text-red-600 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1.5"
+                        title="최신 연혁 삭제 (개정 취소)"
+                      >
+                        🗑️ 연혁 삭제
+                      </button>
+                    )}
                     <input 
                       type="file" 
                       ref={fileInputRef}
@@ -553,13 +549,34 @@ export default function RevisionClient({ id }: { id: string }) {
                     <button 
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
-                      className="whitespace-nowrap text-[13px] bg-amber-50 text-amber-700 px-2.5 py-1 rounded border border-amber-200 hover:bg-amber-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1 disabled:opacity-50"
+                      className="text-[13px] flex-shrink-0 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-lg border border-amber-200 hover:bg-amber-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1.5 disabled:opacity-50"
                       title="원문파일 업로드"
                     >
                       {isUploading ? "업로드 중..." : "📤 파일 첨부"}
                     </button>
+                    {!isEditingDesc && (
+                      <button 
+                        onClick={() => { 
+                          setIsEditingDesc(true); 
+                          setEditDescText(selectedRev.description || ""); 
+                          setEditEnactDate(selectedRev.enactmentDate ? new Date(selectedRev.enactmentDate).toISOString().split('T')[0] : "");
+                          setEditEffDate(selectedRev.effectiveDate ? new Date(selectedRev.effectiveDate).toISOString().split('T')[0] : "");
+                        }}
+                        className="text-[13px] flex-shrink-0 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1.5"
+                        title="개정내용 및 날짜 편집"
+                      >
+                        ✏️ 편집
+                      </button>
+                    )}
                   </div>
-                )}
+                </td>
+              </tr>
+            )}
+
+            {/* 원문파일 (본문/전문만 표시) */}
+            <tr>
+              <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-middle">
+                원문파일
               </th>
               <td className="px-4 py-4 border-b border-slate-200 bg-white">
                 {mainAttachments.length > 0 ? (
@@ -608,23 +625,7 @@ export default function RevisionClient({ id }: { id: string }) {
             {selectedRev && (
               <tr>
                 <th className="bg-slate-50 text-left px-4 py-4 border-b border-slate-200 font-bold text-slate-700 align-top">
-                <div className="mb-2">개정내용</div>
-                {isAdmin && !isEditingDesc && (
-                  <div className="flex flex-col items-start gap-2">
-                    <button 
-                      onClick={() => { 
-                        setIsEditingDesc(true); 
-                        setEditDescText(selectedRev.description || ""); 
-                        setEditEnactDate(selectedRev.enactmentDate ? new Date(selectedRev.enactmentDate).toISOString().split('T')[0] : "");
-                        setEditEffDate(selectedRev.effectiveDate ? new Date(selectedRev.effectiveDate).toISOString().split('T')[0] : "");
-                      }}
-                      className="whitespace-nowrap text-[13px] bg-blue-50 text-blue-600 px-2.5 py-1 rounded border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1"
-                      title="개정내용 및 날짜 편집"
-                    >
-                      ✏️ 편집
-                    </button>
-                  </div>
-                )}
+                  개정내용
                 </th>
                 <td className="px-4 py-4 border-b border-slate-200 text-slate-800 bg-white">
                   {isEditingDesc ? (
