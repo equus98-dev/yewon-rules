@@ -1,0 +1,1 @@
+SELECT a.id, a."articleNumber", a.title, a."contentText", a."contentJson" FROM Article a JOIN Revision r ON a.revisionId = r.id WHERE r.ruleId = 'ba1e19c0-9eec-48cc-bd08-a20bc46b5158' AND r."versionName" LIKE '%2026. 6. 17.%' AND (a."articleNumber" = 19 OR a."articleNumber" >= 8000)

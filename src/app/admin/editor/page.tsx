@@ -376,10 +376,30 @@ function EditorContent() {
       target.isModified = true;
       target.isGroupModified = true;
       
-      // 부칙 조문이 이미 있는지 확인 후 없으면 추가
-      const hasAddendum = newArticles.some(a => a.title === "부칙" && (a.contentText || "").includes(`(${revisionAnnounceDate})`));
+      // 부칙 조문이 새로 생성된 것이 이미 있는지 확인
+      const existingAddendumIndex = newArticles.findIndex(a => a.title === "부칙" && a.isNew);
       
-      if (!hasAddendum) {
+      const plainText = revisionAddendumContent.replace(/<[^>]+>/g, '').trim();
+      let cleanBody = plainText.replace(/^(?:부\s*칙\s*)+/, '').trim();
+      
+      let addendumContentText = plainText;
+      let addendumContentHtml = revisionAddendumContent;
+      
+      // 부칙에 뱃지가 없으면 추가
+      if (!addendumContentText.includes(badgeStr) && !addendumContentText.includes("<신설 ")) {
+        addendumContentText = `부칙 ${badgeStr}\n${cleanBody}`;
+        addendumContentHtml = `<p>부칙 ${badgeStr}</p><p>${cleanBody.replace(/\n/g, '</p><p>')}</p>`;
+      } else if (!plainText.startsWith("부칙")) {
+        addendumContentText = `부칙 ${addendumContentText}`;
+      }
+      
+      const addendumContentJson = { paragraphs: addendumContentText.split('\n') };
+
+      if (existingAddendumIndex !== -1) {
+        newArticles[existingAddendumIndex].contentHtml = addendumContentHtml;
+        newArticles[existingAddendumIndex].contentText = addendumContentText;
+        newArticles[existingAddendumIndex].contentJson = addendumContentJson;
+      } else {
         const effDate = new Date(revisionEffectiveDate);
         const effStr = `${effDate.getFullYear()}년 ${effDate.getMonth() + 1}월 ${effDate.getDate()}일`;
         
@@ -392,14 +412,13 @@ function EditorContent() {
            addendumChapter = existingAddendums[existingAddendums.length - 1].chapter || "";
         }
         
-        const plainText = revisionAddendumContent.replace(/<[^>]+>/g, '').trim();
         newArticles.push({
           chapter: addendumChapter,
           articleNumber: nextAddendumNum,
           title: "부칙",
-          contentHtml: revisionAddendumContent,
-          contentText: plainText,
-          contentJson: { paragraphs: plainText ? plainText.split('\n') : [] },
+          contentHtml: addendumContentHtml,
+          contentText: addendumContentText,
+          contentJson: addendumContentJson,
           sortOrder: newArticles.length + 1,
           isNew: true,
           isModified: true
