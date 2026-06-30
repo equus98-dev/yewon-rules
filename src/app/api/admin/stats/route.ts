@@ -32,17 +32,29 @@ export async function GET(request: Request) {
       LIMIT 5
     `);
 
-    const revisionFeed = rRevs.rows.map((rev: any) => ({
-      id: rev.id,
-      ruleId: rev.ruleId,
-      title: rev.title,
-      ruleNumber: rev.ruleNumber,
-      departmentName: rev.departmentName,
-      versionName: rev.versionName,
-      enactmentDate: new Date(rev.enactmentDate).toISOString().split("T")[0],
-      effectiveDate: new Date(rev.effectiveDate).toISOString().split("T")[0],
-      announcementNumber: rev.announcementNumber,
-    }));
+    const revisionFeed = rRevs.rows.map((rev: any) => {
+      let safeEnact = "-";
+      let safeEffect = "-";
+      if (rev.enactmentDate) {
+        const d = new Date(rev.enactmentDate);
+        if (!isNaN(d.getTime())) safeEnact = d.toISOString().split("T")[0];
+      }
+      if (rev.effectiveDate) {
+        const d = new Date(rev.effectiveDate);
+        if (!isNaN(d.getTime())) safeEffect = d.toISOString().split("T")[0];
+      }
+      return {
+        id: rev.id,
+        ruleId: rev.ruleId,
+        title: rev.title,
+        ruleNumber: rev.ruleNumber,
+        departmentName: rev.departmentName,
+        versionName: rev.versionName,
+        enactmentDate: safeEnact,
+        effectiveDate: safeEffect,
+        announcementNumber: rev.announcementNumber,
+      };
+    });
 
     return NextResponse.json({
       counts: {

@@ -32,13 +32,22 @@ export async function GET(request: Request) {
       LEFT JOIN "Department" d ON r."departmentId" = d.id
       ORDER BY r.title ASC
     `);
-    return NextResponse.json(res.rows.map((r: any) => ({
-      id: r.id, title: r.title, ruleNumber: r.ruleNumber, initialSound: r.initialSound,
-      status: r.status, categoryId: r.categoryId, categoryName: r.categoryName || "미분류",
-      departmentId: r.departmentId, departmentName: r.departmentName || "미지정",
-      latestVersion: r.latestVersion || "제정",
-      enactmentDate: r.enactmentDate ? new Date(r.enactmentDate).toISOString().split("T")[0] : "-",
-    })));
+    return NextResponse.json(res.rows.map((r: any) => {
+      let safeDate = "-";
+      if (r.enactmentDate) {
+        const d = new Date(r.enactmentDate);
+        if (!isNaN(d.getTime())) {
+          safeDate = d.toISOString().split("T")[0];
+        }
+      }
+      return {
+        id: r.id, title: r.title, ruleNumber: r.ruleNumber, initialSound: r.initialSound,
+        status: r.status, categoryId: r.categoryId, categoryName: r.categoryName || "미분류",
+        departmentId: r.departmentId, departmentName: r.departmentName || "미지정",
+        latestVersion: r.latestVersion || "제정",
+        enactmentDate: safeDate,
+      };
+    }));
   } catch (error: any) {
     console.error("[Admin Rules GET Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
