@@ -872,7 +872,7 @@ export default function ArticleRenderer({
     });
   };
 
-  const getBadgeInfo = (text: string, fullContentText?: string) => {
+  function getBadgeInfo(text: string, fullContentText?: string) {
     let historyDates: string[] = [];
     const targetText = fullContentText ? `${text} ${fullContentText}` : text;
     const datesMatches = targetText.match(/\((?:삭제|개정|제정|신설|전문개정|전부개정|일부개정|본조신설|단서신설|후단신설|단서삭제|장\s*변경|조\s*폐지|변경|폐지|표개정|조이동|조신설|항신설|호신설|목신설|표이동|본문이동|캠퍼스명칭변경|명칭변경|서식개정|서식신설|별표개정|별지개정|[가-힣\s,･]+개정|[가-힣\s,･]+신설|[가-힣\s,･]+이동|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?)\s*[^)]*\)/g);
@@ -897,7 +897,7 @@ export default function ArticleRenderer({
     const badgeColor = badgeType === "개" ? "bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100" : "bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100";
     const badgeTitle = badgeType === "개" ? "개정 이력 보기" : "연혁 정보 보기";
     return { historyDates, badgeType, badgeColor, badgeTitle };
-  };
+  }
 
   // 파서 오류로 하나로 뭉쳐진 장/조/호 배열 텍스트를 정규식으로 동적 분할 및 포맷팅해주는 헬퍼
   function formatGluedText(text: string, isArticleBody: boolean = false): React.ReactNode {
