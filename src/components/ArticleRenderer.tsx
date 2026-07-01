@@ -1077,7 +1077,7 @@ export default function ArticleRenderer({
     formatted = formatted.replace(/(\([^)]*(?:시행일|경과조치|적용례|적용범위|준용|폐지|예외|단서|특례|임기|존속기간|관련|시행|적용)[^)]*\))/g, (match, paren, offset, str) => {
       const before = str.slice(0, offset);
       if (before.match(/\n\s*$/)) return match;
-      if (!isAddendumArticle && before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+      if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
       if (before.match(/제\d+조의?\d*\s*$/)) return match;
       if (before.match(/\d\s*$/)) return match;
       
@@ -1090,7 +1090,7 @@ export default function ArticleRenderer({
     formatted = formatted.replace(/(\((?:<[^>]+>)*[가-힣A-Za-z0-9\s·,\u200B-\u200D\uFEFF]{2,}[^)]*\))/g, (match, paren, offset, str) => {
       const before = str.slice(0, offset);
       if (before.match(/\n\s*$/)) return match;
-      if (!isAddendumArticle && before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
+      if (before.match(/\d+(?:의\d+)?\.\s*$/)) return match;
       if (before.match(/제\d+조의?\d*\s*$/)) return match;
       if (before.match(/\d\s*$/)) return match;
 
@@ -1194,7 +1194,7 @@ export default function ArticleRenderer({
                curMok = ""; currentIndent = isArticleBody ? "56px" : "88px";
                currentPath = `${baseArticlePath} ${curHang} ${curHo}`.replace(/\s+/g, ' ').trim();
                const interactiveClass = "";
-               const isGluedAddendum = /^(?:\(시행일\))?\s*이\s*규정은.*시행한다/i.test(numMatch[2].trim()) || /^\((?:시행일|경과조치|적용례|준용|폐지)\)/i.test(numMatch[2].trim());
+               const isGluedAddendum = !isAddendumArticle && (/^(?:\(시행일\))?\s*이\s*규정은.*시행한다/i.test(numMatch[2].trim()) || /^\((?:시행일|경과조치|적용례|준용|폐지)\)/i.test(numMatch[2].trim()));
                if (isGluedAddendum) {
                  return (
                    <div key={`glued-${idx}`} id="toc-addendum-glued" className="mt-12 mb-2 w-[calc(100%+52px)] -ml-[52px] pt-4 border-t border-slate-200 pl-[52px]">
