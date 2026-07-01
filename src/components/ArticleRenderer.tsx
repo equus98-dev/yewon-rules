@@ -1810,7 +1810,7 @@ export default function ArticleRenderer({
             
             const safeText = String(articleItem.text || "").trim();
             const plainText = safeText.replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim();
-            const isAddendum = /^부\s*칙/.test(plainText) || plainText.replace(/\s+/g, "").startsWith("부칙");
+            const isAddendum = /^부\s*칙/.test(plainText) || plainText.replace(/\s+/g, "").startsWith("부칙") || (title && ["부칙", "부", "부 ", "칙", "칙 "].includes(title));
             const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(plainText, contentText);
             
             if (plainText.startsWith("(") && !/^\((삭제|개정|신설|전문개정|본조신설)/.test(plainText)) {
@@ -1857,13 +1857,14 @@ export default function ArticleRenderer({
                       <>
                         {(() => {
                           let titlePart = title || "부칙";
-                          if (titlePart === "부" || titlePart === "부 ") titlePart = "부칙";
+                          if (["부", "부 ", "칙", "칙 "].includes(titlePart)) titlePart = "부칙";
 
                           let addendumBody = safeText;
                           if (titlePart && addendumBody.startsWith(titlePart)) {
                               addendumBody = addendumBody.substring(titlePart.length).trim();
                           } else {
                               addendumBody = addendumBody.replace(/^(?:부\s*칙\s*)+/, '').trim();
+                              addendumBody = addendumBody.replace(/^칙\s*/, '').trim();
                               const titleDateMatch = (title || "").match(/^부\s*칙\s*(\([^)]+\))/);
                               if (titleDateMatch && addendumBody.startsWith(titleDateMatch[1])) {
                                   addendumBody = addendumBody.substring(titleDateMatch[1].length).trim();
@@ -2000,17 +2001,19 @@ export default function ArticleRenderer({
             </div>
           );
         } else {
-          const isAddendum = safeText.replace(/\s+/g, "").startsWith("부칙");
+          const isAddendum = safeText.replace(/\s+/g, "").startsWith("부칙") || 
+                             (title && ["부칙", "부", "부 ", "칙", "칙 "].includes(title));
           if (isAddendum) {
             // 부칙을 article 타입처럼 렌더링 (부칙 중복 방지, 연 아이콘 제거)
             let titlePart = title || "부칙";
-            if (titlePart === "부" || titlePart === "부 ") titlePart = "부칙";
+            if (["부", "부 ", "칙", "칙 "].includes(titlePart)) titlePart = "부칙";
 
             let addendumBody = safeText;
             if (titlePart && addendumBody.startsWith(titlePart)) {
                 addendumBody = addendumBody.substring(titlePart.length).trim();
             } else {
                 addendumBody = addendumBody.replace(/^(?:부\s*칙\s*)+/, '').trim();
+                addendumBody = addendumBody.replace(/^칙\s*/, '').trim();
                 const titleDateMatch = (title || "").match(/^부\s*칙\s*(\([^)]+\))/);
                 if (titleDateMatch && addendumBody.startsWith(titleDateMatch[1])) {
                     addendumBody = addendumBody.substring(titleDateMatch[1].length).trim();
