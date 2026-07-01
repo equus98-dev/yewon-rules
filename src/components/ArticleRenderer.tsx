@@ -1602,7 +1602,7 @@ export default function ArticleRenderer({
         {/* 부칙 헤더: "부칙 <개정 날짜>" 한 줄 (자식 부칙이 아닌 경우에만 출력) */}
         {!isBundleChild && (
           <p className="font-bold text-[16px] text-slate-900 mb-1 mt-1">
-            <span style={{ color: 'blue' }}>부</span>칙
+            부칙
             {headerAnnotation && (
               <span className="font-normal text-[13px] text-sky-700 ml-2">
                 {renderTextWithHistory(headerAnnotation)}
