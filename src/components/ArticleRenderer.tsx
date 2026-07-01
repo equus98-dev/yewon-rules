@@ -113,6 +113,8 @@ export default function ArticleRenderer({
 }: ArticleRendererProps) {
   const isAddendumArticle =
     title === "부칙" ||
+    title === "부" ||
+    title === "칙" ||
     (title || "").replace(/\s+/g, "").startsWith("부칙") ||
     chapter === "부칙" ||
     (chapter || "").replace(/\s+/g, "").startsWith("부칙") ||
@@ -486,7 +488,7 @@ export default function ArticleRenderer({
         {renderEditButton()}
         {articleNumber >= 9000 && (
           <div className="mt-16 mb-8 border-t-2 border-slate-300 pt-10 text-left w-full">
-            <span className="text-[20px] font-black text-[#000080] tracking-tight">{title}</span>
+            <span className="text-[20px] font-black text-[#000080] tracking-tight">{["부", "부 ", "칙", "칙 "].includes(title) ? "부칙" : title}</span>
           </div>
         )}
         { (cleanHtml && !/<table/i.test(cleanHtml)) ? (
@@ -1307,12 +1309,12 @@ export default function ArticleRenderer({
              } else {
                  lineClass += " mt-4 mb-2 text-[16px] font-bold text-[#000080] block";
              }
-          } else if (/^부\s*칙/.test(trimmed)) {
-             const match = trimmed.match(/^(?:부\s*칙\s*)+/);
+          } else if (/^부\s*칙/.test(trimmed) || /^칙\s/.test(trimmed) || (isAddendumArticle && /^칙/.test(trimmed))) {
+             const match = trimmed.match(/^(?:부\s*칙\s*)+/) || trimmed.match(/^(칙)\s*/);
              if (match) {
                  let titlePart = title || "부칙";
-                 // DB에 "부"라고 잘못 저장된 경우 보정
-                 if (titlePart === "부" || titlePart === "부 ") {
+                 // DB에 "부" 또는 "칙"으로 잘못 저장된 경우 보정
+                 if (["부", "부 ", "칙", "칙 "].includes(titlePart)) {
                      titlePart = "부칙";
                  }
                  let body = trimmed;
@@ -1320,6 +1322,7 @@ export default function ArticleRenderer({
                      body = body.substring(titlePart.length).trim();
                  } else {
                      body = body.replace(/^(?:부\s*칙\s*)+/, '').trim();
+                     body = body.replace(/^칙\s*/, '').trim();
                      const titleDateMatch = (title || "").match(/^부\s*칙\s*(\([^)]+\))/);
                      if (titleDateMatch && body.startsWith(titleDateMatch[1])) {
                          body = body.substring(titleDateMatch[1].length).trim();

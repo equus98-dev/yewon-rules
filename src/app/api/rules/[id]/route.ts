@@ -350,6 +350,8 @@ export async function GET(
       const contentText = art.contentText || "";
       return (
         title === "부칙" ||
+        title === "부" ||
+        title === "칙" ||
         title.replace(/\s+/g, "").startsWith("부칙") ||
         chapter === "부칙" ||
         chapter.replace(/\s+/g, "").startsWith("부칙") ||
