@@ -1310,10 +1310,14 @@ export default function ArticleRenderer({
           } else if (/^부\s*칙/.test(trimmed)) {
              const match = trimmed.match(/^(?:부\s*칙\s*)+/);
              if (match) {
-                 const titlePart = title || "부칙";
+                 let titlePart = title || "부칙";
+                 // DB에 "부"라고 잘못 저장된 경우 보정
+                 if (titlePart === "부" || titlePart === "부 ") {
+                     titlePart = "부칙";
+                 }
                  let body = trimmed;
-                 if (title && body.startsWith(title.trim())) {
-                     body = body.substring(title.trim().length).trim();
+                 if (titlePart && body.startsWith(titlePart)) {
+                     body = body.substring(titlePart.length).trim();
                  } else {
                      body = body.replace(/^(?:부\s*칙\s*)+/, '').trim();
                      const titleDateMatch = (title || "").match(/^부\s*칙\s*(\([^)]+\))/);
@@ -1354,7 +1358,7 @@ export default function ArticleRenderer({
                        )}
                        <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
                           <div className="w-full break-keep inline-block">
-                             <span className="font-bold mr-1 text-[#000080]">{titlePart}</span>
+                             <span className="font-bold mr-1 text-slate-900">{titlePart}</span>
                              {body && <span className="font-normal text-slate-800">{renderTextWithHistory(body)}</span>}
                           </div>
                        </div>
