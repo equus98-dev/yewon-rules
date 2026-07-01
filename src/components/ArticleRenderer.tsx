@@ -1856,9 +1856,12 @@ export default function ArticleRenderer({
                     {isAddendum ? (
                       <>
                         {(() => {
+                          let titlePart = title || "부칙";
+                          if (titlePart === "부" || titlePart === "부 ") titlePart = "부칙";
+
                           let addendumBody = safeText;
-                          if (title && addendumBody.startsWith(title.trim())) {
-                              addendumBody = addendumBody.substring(title.trim().length).trim();
+                          if (titlePart && addendumBody.startsWith(titlePart)) {
+                              addendumBody = addendumBody.substring(titlePart.length).trim();
                           } else {
                               addendumBody = addendumBody.replace(/^(?:부\s*칙\s*)+/, '').trim();
                               const titleDateMatch = (title || "").match(/^부\s*칙\s*(\([^)]+\))/);
@@ -1869,7 +1872,7 @@ export default function ArticleRenderer({
                           const dateMatch = addendumBody.match(/^\(?([\d.\s]+)\.?\)?\s*/);
                           return (
                             <>
-                              <span className="font-bold mr-1 text-[#000080]">{title || "부칙"}</span>
+                              <span className="font-bold mr-1 text-slate-900">{titlePart}</span>
                               <span className="font-normal">{renderTextWithHistory(addendumBody)}</span>
                             </>
                           );
@@ -2000,9 +2003,12 @@ export default function ArticleRenderer({
           const isAddendum = safeText.replace(/\s+/g, "").startsWith("부칙");
           if (isAddendum) {
             // 부칙을 article 타입처럼 렌더링 (부칙 중복 방지, 연 아이콘 제거)
+            let titlePart = title || "부칙";
+            if (titlePart === "부" || titlePart === "부 ") titlePart = "부칙";
+
             let addendumBody = safeText;
-            if (title && addendumBody.startsWith(title.trim())) {
-                addendumBody = addendumBody.substring(title.trim().length).trim();
+            if (titlePart && addendumBody.startsWith(titlePart)) {
+                addendumBody = addendumBody.substring(titlePart.length).trim();
             } else {
                 addendumBody = addendumBody.replace(/^(?:부\s*칙\s*)+/, '').trim();
                 const titleDateMatch = (title || "").match(/^부\s*칙\s*(\([^)]+\))/);
@@ -2014,7 +2020,7 @@ export default function ArticleRenderer({
               <div key={index} className={`mt-8 mb-0 flex items-start gap-2 pt-2 relative w-full ${interactiveClass}`} style={{ paddingLeft: '52px' }}>
                 <div className="flex-1 w-full group/text text-[16px] text-slate-800 leading-[1.7]">
                   <div className="w-full break-keep inline-block">
-                    <span className="font-bold mr-1 text-[#000080]">{title || "부칙"}</span>
+                    <span className="font-bold mr-1 text-slate-900">{titlePart}</span>
                     {addendumBody && <span className="font-normal">{renderTextWithHistory(addendumBody)}</span>}
                   </div>
                 </div>
