@@ -1197,7 +1197,7 @@ export default function ArticleRenderer({
                const isGluedAddendum = /^(?:\(시행일\))?\s*이\s*규정은.*시행한다/i.test(numMatch[2].trim()) || /^\((?:시행일|경과조치|적용례|준용|폐지)\)/i.test(numMatch[2].trim());
                if (isGluedAddendum) {
                  return (
-                   <div key={`glued-${idx}`} id="toc-addendum-glued" className="mt-12 mb-2 w-[calc(100%+52px)] -ml-[52px] pt-4 border-t border-slate-200">
+                   <div key={`glued-${idx}`} id="toc-addendum-glued" className="mt-12 mb-2 w-[calc(100%+52px)] -ml-[52px] pt-4 border-t border-slate-200 pl-[52px]">
                      <p className="font-bold text-[16px] text-slate-900 mb-2">부칙</p>
                      <div className="w-full break-keep text-[16px] text-slate-800 leading-[1.8] pl-4" style={{ textIndent: '-16px' }}>
                        <span className="font-normal mr-1">{numMatch[1]}</span>
@@ -1297,7 +1297,7 @@ export default function ArticleRenderer({
                            </button>
                          </div>
                        )}
-                       <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
+                       <div className={`flex-1 w-full group text-[16px] text-slate-800 leading-[1.7] ${hideBadge ? 'ml-[52px]' : ''}`}>
                           <div className="w-full break-keep inline-block">
                              <span className="font-bold text-[#000080]">{articleNum}</span>
                              {titleText && <span className="font-normal text-slate-800 ml-1 mr-1">{titleText}</span>}
@@ -1359,7 +1359,7 @@ export default function ArticleRenderer({
                            </button>
                          </div>
                        )}
-                       <div className="flex-1 w-full group text-[16px] text-slate-800 leading-[1.7]">
+                       <div className={`flex-1 w-full group text-[16px] text-slate-800 leading-[1.7] ${hideBadge ? 'ml-[52px]' : ''}`}>
                           <div className="w-full break-keep inline-block">
                              <span className="font-bold mr-1 text-slate-900">{titlePart}</span>
                              {body && <span className="font-normal text-slate-800">{renderTextWithHistory(body)}</span>}
