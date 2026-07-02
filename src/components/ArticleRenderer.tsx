@@ -111,6 +111,11 @@ export default function ArticleRenderer({
   isSelectedForPrint = false,
   onTogglePrintSelect,
 }: ArticleRendererProps) {
+  // DB에서 넘어온 값에 하드코딩된 span 껍데기(과거 버그)가 묻어있을 수 있으므로 정리합니다.
+  if (title) title = title.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
+  if (contentText) contentText = contentText.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
+  if (contentHtml) contentHtml = contentHtml.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
+  if (typeof contentJson === 'string') contentJson = contentJson.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
   const isAddendumArticle =
     title === "부칙" ||
     title === "부" ||
@@ -712,6 +717,9 @@ export default function ArticleRenderer({
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'")
       .replace(/설치.{0,2}운영.{0,2}폐지/gu, '설치·운영·폐지');
+
+    // DB에 잘못 저장된 연혁 span 태그가 있다면 껍데기를 벗겨냅니다. (리액트가 그대로 문자로 렌더링하는 버그 방지)
+    decodedText = decodedText.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
 
     decodedText = mergeConsecutiveHistories(decodedText);
 

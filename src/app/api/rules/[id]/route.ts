@@ -123,6 +123,12 @@ export async function GET(
     // 2-0-3 학업이수에 관한 규정 내 제25의2(특별학점인정) 오타 감지 및 독립 조문 완벽 분리
     let processedArticles: any[] = [];
     for (let art of articlesRes.rows) {
+      // DB에 하드코딩된 연혁 span 껍데기가 묻어있는 경우 (과거 버그) 클라이언트로 가기 전에 모조리 벗겨냅니다.
+      if (art.title) art.title = art.title.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
+      if (art.contentText) art.contentText = art.contentText.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
+      if (art.contentHtml) art.contentHtml = art.contentHtml.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
+      if (typeof art.contentJson === 'string') art.contentJson = art.contentJson.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
+
       // 2-0-9 일반대학원 학사운영 규정 부칙 내 별지 표 병합 오류 해결 (contentText, contentJson, contentHtml 모두 정제)
       if (art.contentText && (art.contentText.includes("〔별지 제1호 전과취소원〕") || art.contentText.includes("[별지 제1호 전과취소원]"))) {
         const splitKeyword = art.contentText.includes("〔별지 제1호 전과취소원〕") ? "〔별지 제1호 전과취소원〕" : "[별지 제1호 전과취소원]";
