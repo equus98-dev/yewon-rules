@@ -617,22 +617,22 @@ export default function RevisionClient({ id }: { id: string }) {
 
       {/* 관리자 도구 (테이블 하단에 독립적으로 배치) */}
       {isAdmin && selectedRev && (
-        <div className="flex flex-wrap gap-2 items-center mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-          <span className="text-slate-600 font-black text-[13px] mr-2">⚙️ 관리자 도구</span>
+        <div className="flex flex-wrap gap-2 items-center mb-6 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+          <span className="text-slate-600 font-bold text-[13px] mr-2">관리자 도구</span>
           <button
             onClick={() => setIsCreatingRev(true)}
-            className="text-[13px] flex-shrink-0 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-lg border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1.5"
+            className="text-[12px] flex-shrink-0 bg-white text-slate-700 px-3 py-1.5 rounded border border-slate-300 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer font-medium shadow-sm"
             title="새로운 연혁(과거 개정 이력) 추가"
           >
-            ➕ 연혁 추가
+            연혁 추가
           </button>
           {revisions.length > 1 && selectedRev?.id === revisions[0]?.id && (
             <button
               onClick={handleDeleteRevision}
-              className="text-[13px] flex-shrink-0 bg-red-50 text-red-600 px-4 py-2 rounded-lg border border-red-200 hover:bg-red-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1.5"
+              className="text-[12px] flex-shrink-0 bg-white text-red-600 px-3 py-1.5 rounded border border-slate-300 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer font-medium shadow-sm"
               title="최신 연혁 삭제 (개정 취소)"
             >
-              🗑️ 연혁 삭제
+              연혁 삭제
             </button>
           )}
           <input 
@@ -645,10 +645,10 @@ export default function RevisionClient({ id }: { id: string }) {
           <button 
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="text-[13px] flex-shrink-0 bg-amber-50 text-amber-700 px-4 py-2 rounded-lg border border-amber-200 hover:bg-amber-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1.5 disabled:opacity-50"
+            className="text-[12px] flex-shrink-0 bg-white text-slate-700 px-3 py-1.5 rounded border border-slate-300 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer font-medium shadow-sm disabled:opacity-50"
             title="원문파일 업로드"
           >
-            {isUploading ? "업로드 중..." : "📤 파일 첨부"}
+            {isUploading ? "업로드 중..." : "파일 첨부"}
           </button>
           {!isEditingDesc && (
             <button 
@@ -658,10 +658,10 @@ export default function RevisionClient({ id }: { id: string }) {
                 setEditEnactDate(selectedRev.enactmentDate ? new Date(selectedRev.enactmentDate).toISOString().split('T')[0] : "");
                 setEditEffDate(selectedRev.effectiveDate ? new Date(selectedRev.effectiveDate).toISOString().split('T')[0] : "");
               }}
-              className="text-[13px] flex-shrink-0 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer font-bold shadow-sm inline-flex items-center gap-1.5"
+              className="text-[12px] flex-shrink-0 bg-white text-slate-700 px-3 py-1.5 rounded border border-slate-300 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer font-medium shadow-sm"
               title="개정내용 및 날짜 편집"
             >
-              ✏️ 편집
+              편집
             </button>
           )}
         </div>
