@@ -599,6 +599,40 @@ export default function ArticleRenderer({
     }
   }
 
+  // --- Pre-Normalization: Split glued items into multiple items ---
+  let splitItems: ContentItem[] = [];
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if ((item.type === "item" || item.type === "subitem" || item.type === "paragraph") && item.text && !/<table/i.test(item.text) && item.text.includes('\n')) {
+       const lines = item.text.split('\n');
+       let currentType = item.type;
+       let currentNum = item.num || "";
+       let currentText = lines[0];
+       splitItems.push({ ...item, type: currentType, num: currentNum, text: currentText });
+       
+       for (let j = 1; j < lines.length; j++) {
+          const line = lines[j].trim();
+          if (!line) continue;
+          
+          if (/^[가-하]\./.test(line)) {
+             const match = line.match(/^([가-하]\.)\s*(.*)/);
+             splitItems.push({ type: "subitem", num: match![1], text: match![2] });
+          } else if (/^\d{1,2}(?:의\d+)?\./.test(line)) {
+             const match = line.match(/^(\d{1,2}(?:의\d+)?\.)\s*(.*)/);
+             splitItems.push({ type: "item", num: match![1], text: match![2] });
+          } else if (/^[①-⑳]/.test(line)) {
+             const match = line.match(/^([①-⑳])\s*(.*)/);
+             splitItems.push({ type: "paragraph", num: match![1], text: match![2] });
+          } else {
+             splitItems[splitItems.length - 1].text += '\n' + line;
+          }
+       }
+    } else {
+       splitItems.push(item);
+    }
+  }
+  items = splitItems;
+
   // --- Normalization: Glue detached first paragraph to article text ---
   const normalizedItems: ContentItem[] = [];
   for (let i = 0; i < items.length; i++) {
