@@ -599,40 +599,6 @@ export default function ArticleRenderer({
     }
   }
 
-  // --- Pre-Normalization: Split glued items into multiple items ---
-  let splitItems: ContentItem[] = [];
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    if ((item.type === "item" || item.type === "subitem" || item.type === "paragraph") && item.text && !/<table/i.test(item.text) && item.text.includes('\n')) {
-       const lines = item.text.split('\n');
-       let currentType = item.type;
-       let currentNum = item.num || "";
-       let currentText = lines[0];
-       splitItems.push({ ...item, type: currentType, num: currentNum, text: currentText });
-       
-       for (let j = 1; j < lines.length; j++) {
-          const line = lines[j].trim();
-          if (!line) continue;
-          
-          if (/^[가-하]\./.test(line)) {
-             const match = line.match(/^([가-하]\.)\s*(.*)/);
-             splitItems.push({ type: "subitem", num: match![1], text: match![2] });
-          } else if (/^\d{1,2}(?:의\d+)?\./.test(line)) {
-             const match = line.match(/^(\d{1,2}(?:의\d+)?\.)\s*(.*)/);
-             splitItems.push({ type: "item", num: match![1], text: match![2] });
-          } else if (/^[①-⑳]/.test(line)) {
-             const match = line.match(/^([①-⑳])\s*(.*)/);
-             splitItems.push({ type: "paragraph", num: match![1], text: match![2] });
-          } else {
-             splitItems[splitItems.length - 1].text += '\n' + line;
-          }
-       }
-    } else {
-       splitItems.push(item);
-    }
-  }
-  items = splitItems;
-
   // --- Normalization: Glue detached first paragraph to article text ---
   const normalizedItems: ContentItem[] = [];
   for (let i = 0; i < items.length; i++) {
@@ -913,6 +879,31 @@ export default function ArticleRenderer({
       }
       
       return <React.Fragment key={i}>{part}</React.Fragment>;
+    });
+  };
+
+  const renderLinesWithIndentation = (text: string) => {
+    if (/<table/i.test(text) || !text.includes('\n')) {
+      return renderTextWithHistory(text);
+    }
+    return text.split('\n').map((line, i) => {
+      if (!line.trim() && i > 0) return null;
+      if (i === 0) {
+        return <React.Fragment key={i}>{renderTextWithHistory(line)}</React.Fragment>;
+      }
+      let indentStyle: React.CSSProperties = {};
+      if (/^\s*[가-하]\./.test(line)) {
+        indentStyle = { display: 'block', paddingLeft: '16px', textIndent: '-16px', marginTop: '4px' };
+      } else if (/^\s*\d{1,2}(?:의\d+)?\./.test(line)) {
+        indentStyle = { display: 'block', paddingLeft: '4px', textIndent: '-16px', marginTop: '4px' };
+      } else {
+        indentStyle = { display: 'block', marginTop: '4px' };
+      }
+      return (
+        <span key={i} style={indentStyle}>
+          {renderTextWithHistory(line)}
+        </span>
+      );
     });
   };
 
@@ -2021,7 +2012,7 @@ export default function ArticleRenderer({
             <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: '92px', textIndent: '-20px' }}>
               {showEditBtn && renderEditButton(true)}
               <span className="font-normal mr-1">{safeNum}</span>
-              <span className="font-normal">{renderTextWithHistory(safeText)}</span>
+              <span className="font-normal">{renderLinesWithIndentation(safeText)}</span>
               
             </div>
           );
@@ -2033,7 +2024,7 @@ export default function ArticleRenderer({
               <div className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full relative ${interactiveClass}`} style={{ paddingLeft: isAddendum ? '72px' : '108px', textIndent: isAddendum ? '-20px' : '-16px' }}>
                 {showEditBtn && renderEditButton(true)}
                 <span className="font-normal mr-1">{safeNum}</span>
-                <span className="font-normal">{renderTextWithHistory(safeText)}</span>
+                <span className="font-normal">{renderLinesWithIndentation(safeText)}</span>
                 
               </div>
             </React.Fragment>
@@ -2042,7 +2033,7 @@ export default function ArticleRenderer({
           return (
             <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] pr-4 break-keep w-full ${interactiveClass}`} style={{ paddingLeft: '124px', textIndent: '-16px' }}>
               <span className="font-normal mr-1">{safeNum}</span>
-              <span className="font-normal">{renderTextWithHistory(safeText)}</span>
+              <span className="font-normal">{renderLinesWithIndentation(safeText)}</span>
               
             </div>
           );
