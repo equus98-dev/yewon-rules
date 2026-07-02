@@ -2341,9 +2341,9 @@ export default function ArticleRenderer({
                     };
                   } else {
                     const newText = editItems.map(i => {
-                      if (i.type === 'article') return i.num ? `${i.num} ${i.text}` : i.text;
-                      if (i.type === 'text') return i.text;
-                      if (i.type === 'paragraph') return i.num ? `${i.num} ${i.text}` : i.text;
+                      if (!i.num) return i.text;
+                      const trimmedText = (i.text || "").trim();
+                      if (trimmedText.startsWith(i.num)) return i.text;
                       return `${i.num} ${i.text}`;
                     }).join('\n');
                     bodyPayload = {

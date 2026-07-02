@@ -107,6 +107,10 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                } catch (e) {}
             }
 
+            // 중복된 "제N조 제N조" 패턴 정리 (데이터베이스 오염 보정)
+            beforeText = beforeText.replace(/^(제\d+조(?:의\d+)?)\s+\1/, '$1');
+            afterText = afterText.replace(/^(제\d+조(?:의\d+)?)\s+\1/, '$1');
+
             return (
               <div key={comp.id} className="grid grid-cols-2">
                 {/* 왼쪽: 이전 연혁 */}
