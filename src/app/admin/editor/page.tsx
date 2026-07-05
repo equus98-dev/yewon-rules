@@ -755,7 +755,7 @@ function EditorContent() {
                 lines[0] += tag;
               }
               updatedContentText = lines.join('\n');
-            } else if (!updatedContentText.includes(tag) && !updatedContentText.includes("[제정") && !updatedContentText.includes("[개정")) {
+            } else if (!updatedContentText.includes(tag.trim()) && !updatedContentText.includes("[제정") && !updatedContentText.includes("[개정")) {
               updatedContentText += tag;
             }
             finalContentJson = { paragraphs: [updatedContentText] };
@@ -770,7 +770,7 @@ function EditorContent() {
                 lines[0] += tag;
               }
               updatedContentText = lines.join('\n');
-            } else if (!updatedContentText.includes(tag) && !updatedContentText.includes("[개정") && !updatedContentText.includes("[일부개정")) {
+            } else if (!updatedContentText.includes(tag.trim()) && !updatedContentText.includes("[개정") && !updatedContentText.includes("[일부개정")) {
               updatedContentText += tag;
             }
             finalContentJson = { paragraphs: [updatedContentText] };
@@ -784,25 +784,25 @@ function EditorContent() {
 
           if (art.isChapterModified) {
             const tag = `\n<개정 ${formattedDate}>`;
-            if (updatedChapter && !updatedChapter.includes(tag)) {
+            if (updatedChapter && !updatedChapter.includes(tag.trim())) {
               updatedChapter += tag;
             }
           }
           if (art.isPartModified) {
             const tag = `\n<개정 ${formattedDate}>`;
-            if (updatedPart && !updatedPart.includes(tag)) {
+            if (updatedPart && !updatedPart.includes(tag.trim())) {
               updatedPart += tag;
             }
           }
           if (art.isSectionModified) {
             const tag = `\n<개정 ${formattedDate}>`;
-            if (updatedSection && !updatedSection.includes(tag)) {
+            if (updatedSection && !updatedSection.includes(tag.trim())) {
               updatedSection += tag;
             }
           }
           if (art.isSubSectionModified) {
             const tag = `\n<개정 ${formattedDate}>`;
-            if (updatedSubSection && !updatedSubSection.includes(tag)) {
+            if (updatedSubSection && !updatedSubSection.includes(tag.trim())) {
               updatedSubSection += tag;
             }
           }
