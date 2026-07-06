@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { diffWords } from 'diff';
@@ -226,6 +226,19 @@ export default function ArticleRenderer({
   const [editHtml, setEditHtml] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [editHistory, setEditHistory] = useState<{ id: string, createdAt: string, beforeText: string }[]>([]);
+
+  const joditConfig = useMemo(() => ({
+    readonly: false,
+    placeholder: "내용을 입력하세요",
+    height: 500,
+    style: {
+      fontFamily: 'Pretendard'
+    },
+    toolbarButtonSize: "small" as const,
+    askBeforePasteHTML: false,
+    askBeforePasteFromWord: false,
+    defaultActionOnPaste: "insert_as_html"
+  }), []);
 
   const renderEditButton = (isItemRelative = false) => {
     if (!isAdmin) return null;
@@ -2286,15 +2299,7 @@ export default function ArticleRenderer({
             {editHtml !== null ? (
                <JoditEditor
                   value={editHtml}
-                  config={{
-                    readonly: false,
-                    placeholder: "내용을 입력하세요",
-                    height: 500,
-                    style: {
-                      fontFamily: 'Pretendard'
-                    },
-                    toolbarButtonSize: "small"
-                  }}
+                  config={joditConfig}
                   onBlur={(newContent) => setEditHtml(newContent)}
                   onChange={() => {}}
                 />
