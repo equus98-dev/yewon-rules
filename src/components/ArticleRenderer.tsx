@@ -1699,6 +1699,8 @@ export default function ArticleRenderer({
     );
   }
 
+  let hasRenderedArticleHeader = false;
+
   return (
     <div id={id} data-article-id={articleId} className="mb-2 animate-fade-in rule-viewer-content font-['Pretendard'] relative group">
       {displayItems.map((item, index) => {
@@ -1857,10 +1859,13 @@ export default function ArticleRenderer({
               }
             }
 
+            const isFirstArticleHeader = !hasRenderedArticleHeader;
+            hasRenderedArticleHeader = true;
+
             return (
-              <div className={`mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full ${interactiveClass}`}>
-                {showEditBtn && renderEditButton(true)}
-                {onTogglePrintSelect && articleId && (
+              <div className={isFirstArticleHeader ? `mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full ${interactiveClass}` : `w-full my-1.5 relative ${interactiveClass}`} style={!isFirstArticleHeader ? { paddingLeft: '52px' } : undefined}>
+                {isFirstArticleHeader && showEditBtn && renderEditButton(true)}
+                {isFirstArticleHeader && onTogglePrintSelect && articleId && (
                   <div className="flex items-center mr-1 mt-0.5">
                     <input 
                       type="checkbox" 
@@ -1870,7 +1875,7 @@ export default function ArticleRenderer({
                     />
                   </div>
                 )}
-                {!hideBadge && !isAddendum && (
+                {isFirstArticleHeader && !hideBadge && !isAddendum && (
                   <div className="flex items-center gap-1 mt-0.5 z-10">
                     <button 
                       onClick={(e) => { e.stopPropagation(); handleOpenHistory(historyDates); }}
@@ -1888,8 +1893,8 @@ export default function ArticleRenderer({
                     </button>
                   </div>
                 )}
-                <div className={`flex-1 w-full group/text text-[16px] text-slate-800 leading-[1.7] ${(!hideBadge && !isAddendum) ? "" : "ml-[52px]"}`}>
-                  <div id={`toc-${safeNum}`} className="w-full break-keep inline-block">
+                <div className={isFirstArticleHeader ? `flex-1 w-full group/text text-[16px] text-slate-800 leading-[1.7] ${(!hideBadge && !isAddendum) ? "" : "ml-[52px]"}` : `w-full text-[16px] text-slate-800 leading-[1.7] break-keep`}>
+                  <div id={isFirstArticleHeader ? `toc-${safeNum}` : undefined} className={isFirstArticleHeader ? "w-full break-keep inline-block" : "w-full"}>
                     {isAddendum ? (
                       <>
                         {(() => {
@@ -1910,7 +1915,7 @@ export default function ArticleRenderer({
                           const dateMatch = addendumBody.match(/^\(?([\d.\s]+)\.?\)?\s*/);
                           return (
                             <>
-                              <span className="font-bold mr-1 text-slate-900">{titlePart}</span>
+                              {isFirstArticleHeader && <span className="font-bold mr-1 text-slate-900">{titlePart}</span>}
                               <span className="font-normal">{renderTextWithHistory(addendumBody)}</span>
                             </>
                           );
@@ -1978,8 +1983,8 @@ export default function ArticleRenderer({
 
                           return (
                             <>
-                              <span className="font-bold text-[#000080]">{articleNumOverride}</span>
-                              {articleTitleOverride && <span className="font-normal text-slate-800 ml-1 mr-1">{articleTitleOverride}</span>}
+                              {isFirstArticleHeader && <span className="font-bold text-[#000080]">{articleNumOverride}</span>}
+                              {isFirstArticleHeader && articleTitleOverride && <span className="font-normal text-slate-800 ml-1 mr-1">{articleTitleOverride}</span>}
                               {actualBody && <> {formatGluedText(actualBody, true)}</>}
                             </>
                           );
