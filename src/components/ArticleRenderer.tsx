@@ -224,6 +224,7 @@ export default function ArticleRenderer({
   const [isEditing, setIsEditing] = useState(false);
   const [editItems, setEditItems] = useState<ContentItem[]>([]);
   const [editHtml, setEditHtml] = useState<string | null>(null);
+  const [originalHasHtml] = useState(!!(contentHtml && contentHtml.trim().length > 0));
   const [isSaving, setIsSaving] = useState(false);
   const [editHistory, setEditHistory] = useState<{ id: string, createdAt: string, beforeText: string }[]>([]);
 
@@ -2360,11 +2361,27 @@ export default function ArticleRenderer({
                 try {
                   let bodyPayload: any = {};
                   if (editHtml !== null) {
-                    bodyPayload = {
-                      contentText: contentText || "",
-                      contentJson: contentJson || {},
-                      contentHtml: editHtml
-                    };
+                    if (originalHasHtml) {
+                      bodyPayload = {
+                        contentText: contentText || "",
+                        contentJson: contentJson || {},
+                        contentHtml: editHtml
+                      };
+                    } else {
+                      let newText = editHtml;
+                      newText = newText.replace(/<\/p>\s*<p[^>]*>/gi, '\n');
+                      newText = newText.replace(/<\/?p[^>]*>/gi, '\n');
+                      newText = newText.replace(/<br\s*\/?>/gi, '\n');
+                      newText = newText.replace(/<\/div>\s*<div[^>]*>/gi, '\n');
+                      newText = newText.replace(/<\/?div[^>]*>/gi, '\n');
+                      newText = newText.replace(/\n\s*\n/g, '\n').trim();
+
+                      bodyPayload = {
+                        contentText: newText,
+                        contentHtml: null,
+                        contentJson: contentJson || {}
+                      };
+                    }
                   } else {
                     const newText = editItems.map(i => {
                       if (!i.num) return i.text;
