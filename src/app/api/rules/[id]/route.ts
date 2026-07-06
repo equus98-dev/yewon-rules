@@ -75,7 +75,7 @@ export async function GET(
 
     const comparisonsRes = await pool.query(
       `SELECT 
-        ac.id, ac."beforeArticleId", ac."afterArticleId", ac.note,
+        ac.id, ac."beforeArticleId", ac."afterArticleId", ac.note, ac."createdAt",
         ba.part AS "before_part", ba.chapter AS "before_chapter", ba.section AS "before_section", ba."subSection" AS "before_subSection", ba."articleNumber" AS "before_articleNumber",
         ba.title AS "before_title", ba."contentText" AS "before_contentText", ba."contentJson" AS "before_contentJson",
         aa.part AS "after_part", aa.chapter AS "after_chapter", aa.section AS "after_section", aa."subSection" AS "after_subSection", aa."articleNumber" AS "after_articleNumber",
@@ -83,40 +83,57 @@ export async function GET(
        FROM "ArticleComparison" ac
        LEFT JOIN "Article" ba ON ac."beforeArticleId" = ba.id
        LEFT JOIN "Article" aa ON ac."afterArticleId" = aa.id
-       WHERE ac."revisionId" = $1 AND (ac.note IS NULL OR ac.note NOT LIKE '[단순오타수정전본문]%')`,
+       WHERE ac."revisionId" = $1 ORDER BY ac."createdAt" ASC`,
       [targetRevisionId]
     );
 
-    const comparisons = comparisonsRes.rows.map((row) => ({
-      id: row.id,
-      note: row.note,
-      beforeArticleId: row.beforeArticleId,
-      afterArticleId: row.afterArticleId,
-      beforeArticle: row.before_articleNumber
-        ? {
-            part: row.before_part,
-            chapter: row.before_chapter,
-            section: row.before_section,
-            subSection: row.before_subSection,
-            articleNumber: row.before_articleNumber,
-            title: row.before_title,
-            contentText: row.before_contentText,
-            contentJson: row.before_contentJson,
-          }
-        : null,
-      afterArticle: row.after_articleNumber
-        ? {
+    const comparisons = comparisonsRes.rows.map((row) => {
+      const isTypo = row.note && row.note.startsWith('[단순오타수정전본문]');
+      let synthesizedBeforeArticle = null;
+      if (isTypo && row.after_articleNumber) {
+         synthesizedBeforeArticle = {
             part: row.after_part,
             chapter: row.after_chapter,
             section: row.after_section,
             subSection: row.after_subSection,
             articleNumber: row.after_articleNumber,
             title: row.after_title,
-            contentText: row.after_contentText,
-            contentJson: row.after_contentJson,
-          }
-        : null,
-    }));
+            contentText: row.note.replace('[단순오타수정전본문]', ''),
+            contentJson: null,
+         };
+      }
+
+      return {
+        id: row.id,
+        note: row.note,
+        beforeArticleId: row.beforeArticleId,
+        afterArticleId: row.afterArticleId,
+        beforeArticle: row.before_articleNumber
+          ? {
+              part: row.before_part,
+              chapter: row.before_chapter,
+              section: row.before_section,
+              subSection: row.before_subSection,
+              articleNumber: row.before_articleNumber,
+              title: row.before_title,
+              contentText: row.before_contentText,
+              contentJson: row.before_contentJson,
+            }
+          : synthesizedBeforeArticle,
+        afterArticle: row.after_articleNumber
+          ? {
+              part: row.after_part,
+              chapter: row.after_chapter,
+              section: row.after_section,
+              subSection: row.after_subSection,
+              articleNumber: row.after_articleNumber,
+              title: row.after_title,
+              contentText: row.after_contentText,
+              contentJson: row.after_contentJson,
+            }
+          : null,
+      };
+    });
 
     const targetRevision = revisions.find((r) => r.id === targetRevisionId);
 
