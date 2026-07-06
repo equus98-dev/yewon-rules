@@ -1843,7 +1843,7 @@ export default function ArticleRenderer({
             hasRenderedArticleHeader = true;
 
             return (
-              <div className={isFirstArticleHeader ? `mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full ${interactiveClass}` : `w-full my-1.5 relative ${interactiveClass}`} style={!isFirstArticleHeader ? { paddingLeft: '52px' } : undefined}>
+              <div className={`mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full ${interactiveClass}`} style={!isFirstArticleHeader ? { paddingLeft: '52px' } : undefined}>
                 {showEditBtn && renderEditButton(true)}
                 {onTogglePrintSelect && articleId && (
                   <div className="flex items-center mr-1 mt-0.5">
