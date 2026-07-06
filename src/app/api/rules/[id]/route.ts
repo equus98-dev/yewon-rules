@@ -259,43 +259,27 @@ export async function GET(
           sortOrder: art.sortOrder + 0.5
         };
         processedArticles.push(art1, art2);
-      } else if (art.articleNumber === 61 && art.contentText && art.contentText.match(/제\s*62\s*조?\s*\(\s*논문지도교수\s*변경\s*\)/)) {
-        const match = art.contentText.match(/제\s*62\s*조?\s*\(\s*논문지도교수\s*변경\s*\)/);
-        const parts = art.contentText.split(match![0]);
-        
-        let newContentJson1: string | null = null;
-        if (art.contentJson) {
-           try {
-             const parsed = typeof art.contentJson === 'string' ? JSON.parse(art.contentJson) : art.contentJson;
-             if (Array.isArray(parsed)) {
-                newContentJson1 = JSON.stringify(parsed.filter((item: any) => !String(item.text || "").includes("제62")));
-             }
-           } catch(e) {}
-        }
-        
-        const art1 = { ...art, contentText: parts[0].trim(), contentJson: newContentJson1 || null };
-        const art2 = {
-          ...art,
-          id: art.id + "_sub_62",
-          articleNumber: 62,
-          title: "제62조(논문지도교수 변경)",
-          contentText: "제62조(논문지도교수 변경) " + parts[1].trim(),
-          contentJson: JSON.stringify([
-            { type: "article", num: "제62조", text: "제62조(논문지도교수 변경) " + parts[1].trim() }
-          ]),
-          sortOrder: art.sortOrder + 0.5
-        };
-        processedArticles.push(art1, art2);
       } else if (art.articleNumber === 63 && art.title?.includes("공동지도교수")) {
-        // 제63조 사용자가 수동 편집 중 망가뜨린 서식 복구
+        // 제63조 사용자가 수동 편집 중 망가뜨린 서식 복구 및 실수로 삽입된 62조 텍스트 완벽 제거
         if (art.contentText) {
            art.contentText = art.contentText
+             .replace(/제\s*62\s*조?\s*\(\s*논문지도교수\s*변경\s*\)[\s\S]*?(?=제\s*63\s*조)/, "")
              .replace(/①\s*논문지도교수가\s*연구년/g, "① 논문지도교수가 연구년")
              .replace(/①\s*논문지도교수가연구년/g, "① 논문지도교수가 연구년")
              .replace(/\n\s*④\s*논문에는/g, "\n  ④ 논문에는")
              .replace(/^④\s*논문에는/gm, "  ④ 논문에는");
+           
+           if (art.contentJson) {
+              try {
+                const parsed = typeof art.contentJson === 'string' ? JSON.parse(art.contentJson) : art.contentJson;
+                if (Array.isArray(parsed)) {
+                   art.contentJson = JSON.stringify(parsed.filter((item: any) => !String(item.text || "").includes("제62")));
+                }
+              } catch(e) {}
+           }
         }
         processedArticles.push(art);
+
       } else {
         // 일반대학원 학사운영 규정 제57조 ①항 누락 복원
         if (art.articleNumber === 57 && ruleRow.title?.includes("일반대학원 학사운영 규정")) {
