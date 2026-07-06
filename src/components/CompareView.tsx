@@ -98,8 +98,25 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
         afterText = afterText.replace(/\s*(?:\[|〔|<)(?:별지|별표)[\s\S]*$/i, '');
       }
 
-      const beforeHtml = before?.contentHtml || before?.contentText || '';
-      const afterHtml = after?.contentHtml || after?.contentText || '';
+      // 연혁 태그 (<개정 ...>, <신설 ...> 등)를 완전히 제거하여 HTML 표가 깨지거나 diff 결과가 지저분해지는 것 방지
+      const stripHistoryTags = (text: string) => {
+         return text
+           .replace(/&lt;\s*개정\s*[^&]*&gt;/gi, '')
+           .replace(/&lt;\s*신설\s*[^&]*&gt;/gi, '')
+           .replace(/&lt;\s*삭제\s*[^&]*&gt;/gi, '')
+           .replace(/<\s*개정\s*[^>]*>/gi, '')
+           .replace(/<\s*신설\s*[^>]*>/gi, '')
+           .replace(/<\s*삭제\s*[^>]*>/gi, '')
+           .trim();
+      };
+      beforeText = stripHistoryTags(beforeText);
+      afterText = stripHistoryTags(afterText);
+
+      let beforeHtml = before?.contentHtml || before?.contentText || '';
+      let afterHtml = after?.contentHtml || after?.contentText || '';
+      beforeHtml = stripHistoryTags(beforeHtml);
+      afterHtml = stripHistoryTags(afterHtml);
+
       const beforeHasTable = beforeHtml.includes('<table');
       const afterHasTable = afterHtml.includes('<table');
       const hasTable = beforeHasTable || afterHasTable;
@@ -123,6 +140,8 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
         ...comp,
         parsedBeforeText: strippedBefore,
         parsedAfterText: strippedAfter,
+        parsedBeforeHtml: beforeHtml,
+        parsedAfterHtml: afterHtml,
         hasTable,
         isIdentical
       };
@@ -156,6 +175,8 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
             const after = comp.afterArticle;
             const beforeText = comp.parsedBeforeText;
             const afterText = comp.parsedAfterText;
+            const beforeHtml = comp.parsedBeforeHtml;
+            const afterHtml = comp.parsedAfterHtml;
             const hasTable = comp.hasTable;
 
             return (
@@ -166,7 +187,7 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                     <>
                       <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
                         {hasTable ? (
-                          <div dangerouslySetInnerHTML={{ __html: before.contentHtml || before.contentText || '' }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border" />
+                          <div dangerouslySetInnerHTML={{ __html: beforeHtml }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border" />
                         ) : (
                           renderDiff(beforeText, afterText, 'old')
                         )}
@@ -184,7 +205,7 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                     <>
                       <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
                         {hasTable ? (
-                          <div dangerouslySetInnerHTML={{ __html: after.contentHtml || after.contentText || '' }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border" />
+                          <div dangerouslySetInnerHTML={{ __html: afterHtml }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border" />
                         ) : (
                           renderDiff(beforeText, afterText, 'new')
                         )}

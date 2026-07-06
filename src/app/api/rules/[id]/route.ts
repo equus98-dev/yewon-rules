@@ -193,6 +193,17 @@ export async function GET(
         }
       }
       
+      // 중복 생성된 비교 내역(단순오타수정 반복 등)을 조문 번호 기준으로 최신 1개만 남기고 제거
+      const uniqueComparisonsMap = new Map();
+      for (const comp of comparisons) {
+        const artNum = comp.afterArticle?.articleNumber || comp.beforeArticle?.articleNumber;
+        if (artNum) {
+          uniqueComparisonsMap.set(artNum, comp);
+        }
+      }
+      comparisons.length = 0;
+      comparisons.push(...Array.from(uniqueComparisonsMap.values()));
+
       comparisons.sort((a, b) => {
         const numA = a.afterArticle?.articleNumber || a.beforeArticle?.articleNumber || 99999;
         const numB = b.afterArticle?.articleNumber || b.beforeArticle?.articleNumber || 99999;
