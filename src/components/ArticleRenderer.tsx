@@ -518,13 +518,10 @@ export default function ArticleRenderer({
             <span className="text-[20px] font-black text-[#000080] tracking-tight">{["부", "부 ", "칙", "칙 "].includes(title) ? "부칙" : title}</span>
           </div>
         )}
-        { (cleanHtml && !/<table/i.test(cleanHtml)) ? (
-             <div className={`mb-4 ql-editor ${wrapperClass} px-0 py-2 w-full`}>
-                 {formatGluedText(cleanHtml, true)}
-             </div>
-          ) : (
-             <div className={`mb-4 ql-editor ${wrapperClass} px-0 py-2 w-full`} dangerouslySetInnerHTML={{ __html: cleanHtml }} />
-          ) }
+        <div className={`mb-4 ql-editor ${wrapperClass} px-0 py-2 w-full`}>
+            {formatGluedText(cleanHtml, true)}
+        </div>
+        {renderDialogs()}
       </div>
     );
   }
@@ -964,10 +961,10 @@ export default function ArticleRenderer({
     
     if (hasTable) {
         // 테이블이 있지만 제N조로 시작하는 경우 제목을 먼저 추출
-        const isRef = /^\s*제\d+조(?:의\d+)?(?:(?:의(?!\d)|에|부터|까지|와|과|이나|나|를|을|은|는|이|가|,)|(?:\s|&nbsp;)*(?:제\d+[항호목]|등(?=[^가-힣]|에|의|을|를|은|는|이|가|와|과|나|$)|관련|단서|본문|각\s*호))/.test(text.trim()) || 
-                      /^\s*제\d+조(?:의\d+)?\s*[\[〔(（][^\]〕)）]+[\]〕)）](?:(?:의(?!\d)|에|부터|까지|와|과|이나|나|를|을|은|는|이|가|,)|(?:\s|&nbsp;)*(?:제\d+[항호목]|등(?=[^가-힣]|에|의|을|를|은|는|이|가|와|과|나|$)|관련|단서|본문|각\s*호))/.test(text.trim());
-        if (/^\s*제\d+(?:조|장|관|절)/.test(text) && !isRef) {
-           const match2 = text.match(/^\s*(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^()]*?(?:\([^()]*\)[^()]*?)*)[\]〕)）]([\s\S]*)/i) || text.match(/^\s*(제\d+조(?:의|\s+)?\d*)\s*([\s\S]*)/i);
+        const isRef = /^(?:<[^>]+>|\s|&nbsp;)*제\d+조(?:의\d+)?(?:(?:의(?!\d)|에|부터|까지|와|과|이나|나|를|을|은|는|이|가|,)|(?:\s|&nbsp;)*(?:제\d+[항호목]|등(?=[^가-힣]|에|의|을|를|은|는|이|가|와|과|나|$)|관련|단서|본문|각\s*호))/.test(text.trim()) || 
+                      /^(?:<[^>]+>|\s|&nbsp;)*제\d+조(?:의\d+)?\s*[\[〔(（][^\]〕)）]+[\]〕)）](?:(?:의(?!\d)|에|부터|까지|와|과|이나|나|를|을|은|는|이|가|,)|(?:\s|&nbsp;)*(?:제\d+[항호목]|등(?=[^가-힣]|에|의|을|를|은|는|이|가|와|과|나|$)|관련|단서|본문|각\s*호))/.test(text.trim());
+        if (/^(?:<[^>]+>|\s|&nbsp;)*제\d+(?:조|장|관|절)/.test(text) && !isRef) {
+           const match2 = text.match(/^(?:<[^>]+>|\s|&nbsp;)*(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^()]*?(?:\([^()]*\)[^()]*?)*)[\]〕)）]([\s\S]*)/i) || text.match(/^(?:<[^>]+>|\s|&nbsp;)*(제\d+조(?:의|\s+)?\d*)\s*([\s\S]*)/i);
            if (match2) {
                let articleNum = match2[1].replace(/\s/g, '');
                if (articleNum.match(/^제\d+조\d+$/)) {
@@ -1677,46 +1674,7 @@ export default function ArticleRenderer({
               )
           }
         </div>
-        {/* 편집 다이얼로그 */}
-        <Dialog open={isEditing} onClose={() => !isSaving && setIsEditing(false)} maxWidth="md" fullWidth>
-          <DialogTitle sx={{ p: 0 }}>
-            <div className="flex justify-between items-center bg-slate-50 border-b border-slate-200 px-4 py-3">
-              <span className="font-bold text-[#0c3161]">부칙 단순 수정</span>
-              <IconButton size="small" onClick={() => !isSaving && setIsEditing(false)} sx={{ p: 0.5 }}>
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </div>
-          </DialogTitle>
-          <DialogContent className="p-6 bg-slate-50">
-            <div className="space-y-3 bg-white p-4 border border-slate-200 rounded-lg shadow-inner max-h-[50vh] overflow-y-auto scrollbar">
-              {editItems.map((item, idx) => (
-                <div key={idx} className="flex gap-3 items-start">
-                  {item.num && <span className="font-bold shrink-0 mt-2.5 text-[#0c3161] whitespace-nowrap min-w-[1.5rem]">{item.num}</span>}
-                  <textarea
-                    className="w-full border border-slate-300 rounded p-2.5 text-[14px] text-slate-800 focus:outline-none focus:border-blue-500 min-h-[60px] resize-y"
-                    value={item.text}
-                    onChange={(e) => { const n = [...editItems]; n[idx].text = e.target.value; setEditItems(n); }}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-              <button type="button" className="px-4 py-2 border border-slate-300 text-slate-600 bg-white rounded font-bold text-sm" onClick={() => setIsEditing(false)} disabled={isSaving}>취소</button>
-              <button type="button" className="px-4 py-2 bg-[#0c3161] text-white rounded font-bold text-sm" onClick={async () => {
-                if (!articleId) return;
-                setIsSaving(true);
-                try {
-                  const newText = editItems.map(i => (i.num ? `${i.num} ${i.text}` : i.text)).join('\n');
-                  const res = await fetch(`/api/admin/articles/${articleId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contentText: newText, contentJson: editItems }) });
-                  if (!res.ok) throw new Error('저장 실패');
-                  alert('수정 완료');
-                  setIsEditing(false);
-                  window.dispatchEvent(new CustomEvent('rule-updated'));
-                } catch { alert('오류 발생'); } finally { setIsSaving(false); }
-              }} disabled={isSaving}>{isSaving ? '저장 중...' : '수정 완료'}</button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        {renderDialogs()}
       </div>
     );
   }
@@ -2179,7 +2137,14 @@ export default function ArticleRenderer({
         ));
       })()}
 
-      <Dialog open={modalHistory !== null} onClose={() => setModalHistory(null)} maxWidth="md" fullWidth>
+      {renderDialogs()}
+    </div>
+  );
+
+  function renderDialogs() {
+    return (
+      <>
+        <Dialog open={modalHistory !== null} onClose={() => setModalHistory(null)} maxWidth="md" fullWidth>
         <DialogTitle sx={{ p: 0 }}>
           <div className="flex justify-between items-center bg-slate-50 border-b border-slate-200 px-4 py-3">
             <span className="text-[16px] font-bold text-[#0c3161] flex items-center gap-2">
@@ -2418,8 +2383,9 @@ export default function ArticleRenderer({
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+      </>
+    );
+  }
 }
 
 // Trigger deploy
