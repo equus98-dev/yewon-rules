@@ -237,7 +237,7 @@ export default function ArticleRenderer({
     toolbarButtonSize: "small" as const,
     askBeforePasteHTML: false,
     askBeforePasteFromWord: false,
-    defaultActionOnPaste: "insert_as_html"
+    defaultActionOnPaste: "insert_as_html" as any
   }), []);
 
   const renderEditButton = (isItemRelative = false) => {
