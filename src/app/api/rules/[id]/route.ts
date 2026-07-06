@@ -262,12 +262,12 @@ export async function GET(
       } else if (art.articleNumber === 61 && art.contentText && art.contentText.includes("제62(논문지도교수 변경)")) {
         const parts = art.contentText.split("제62(논문지도교수 변경)");
         
-        let newContentJson1 = null;
+        let newContentJson1: string | null = null;
         if (art.contentJson) {
            try {
              const parsed = typeof art.contentJson === 'string' ? JSON.parse(art.contentJson) : art.contentJson;
              if (Array.isArray(parsed)) {
-                newContentJson1 = JSON.stringify(parsed.filter(item => !String(item.text || "").includes("제62(논문지도교수")));
+                newContentJson1 = JSON.stringify(parsed.filter((item: any) => !String(item.text || "").includes("제62(논문지도교수")));
              }
            } catch(e) {}
         }
