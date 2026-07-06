@@ -374,10 +374,15 @@ function EditorContent() {
         const oldLines = oldText.split('\n');
         const newLines = target.contentText.split('\n');
         let addedBadgeCount = 0;
+        let insideTable = false;
         const mappedLines = newLines.map(newLine => {
+          if (newLine.includes("<table")) insideTable = true;
+          const isTableLine = insideTable || /<t[rdh][\s>]/i.test(newLine) || /<\/t[rdh]>/i.test(newLine) || /<table/i.test(newLine);
+          if (newLine.includes("</table")) insideTable = false;
+
           if (!newLine.trim()) return newLine;
           if (oldLines.includes(newLine)) return newLine;
-          if (!newLine.includes(badgeStr.trim()) && !newLine.includes("<신설") && !newLine.includes("[개정") && !newLine.includes("[일부개정") && !newLine.includes("[전부개정")) {
+          if (!isTableLine && !newLine.includes(badgeStr.trim()) && !newLine.includes("<신설") && !newLine.includes("[개정") && !newLine.includes("[일부개정") && !newLine.includes("[전부개정")) {
             addedBadgeCount++;
             return newLine + ` ${badgeStr}`;
           }
@@ -795,10 +800,15 @@ function EditorContent() {
               const oldLines = oldText.split('\n');
               const newLines = updatedContentText.split('\n');
               let addedBadgeCount = 0;
+              let insideTable = false;
               const mappedLines = newLines.map(newLine => {
+                if (newLine.includes("<table")) insideTable = true;
+                const isTableLine = insideTable || /<t[rdh][\s>]/i.test(newLine) || /<\/t[rdh]>/i.test(newLine) || /<table/i.test(newLine);
+                if (newLine.includes("</table")) insideTable = false;
+
                 if (!newLine.trim()) return newLine;
                 if (oldLines.includes(newLine)) return newLine;
-                if (!newLine.includes(tag.trim()) && !newLine.includes("<신설") && !newLine.includes("[개정") && !newLine.includes("[일부개정") && !newLine.includes("[전부개정")) {
+                if (!isTableLine && !newLine.includes(tag.trim()) && !newLine.includes("<신설") && !newLine.includes("[개정") && !newLine.includes("[일부개정") && !newLine.includes("[전부개정")) {
                   addedBadgeCount++;
                   return newLine + tag;
                 }
