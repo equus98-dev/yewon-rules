@@ -93,23 +93,37 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
             let beforeText = before?.contentText || "";
             let afterText = after?.contentText || "";
 
-            // 만약 contentText가 비어있다면, contentJson의 paragraphs를 결합
+            // 만약 contentText가 비어있다면, contentJson을 기반으로 텍스트 결합
             if (!beforeText && before?.contentJson) {
                try {
                  const parsed = typeof before.contentJson === 'string' ? JSON.parse(before.contentJson) : before.contentJson;
                  if (parsed?.paragraphs) beforeText = parsed.paragraphs.join("\n");
+                 else if (Array.isArray(parsed)) beforeText = parsed.map((item: any) => (item.num ? item.num + " " : "") + (item.text || "")).join("\n");
                } catch (e) {}
             }
             if (!afterText && after?.contentJson) {
                try {
                  const parsed = typeof after.contentJson === 'string' ? JSON.parse(after.contentJson) : after.contentJson;
                  if (parsed?.paragraphs) afterText = parsed.paragraphs.join("\n");
+                 else if (Array.isArray(parsed)) afterText = parsed.map((item: any) => (item.num ? item.num + " " : "") + (item.text || "")).join("\n");
                } catch (e) {}
             }
 
             // 중복된 "제N조 제N조" 패턴 정리 (데이터베이스 오염 보정)
             beforeText = beforeText.replace(/^(제\d+조(?:의\d+)?)\s+\1/, '$1');
             afterText = afterText.replace(/^(제\d+조(?:의\d+)?)\s+\1/, '$1');
+
+            // [별지...] 또는 [별표...] 찌꺼기 제거 (부칙 등에 병합된 오류 보정)
+            if (before?.articleNumber >= 8000 || beforeText.includes("부 칙") || beforeText.includes("부칙")) {
+              beforeText = beforeText.replace(/\s*(?:\[|〔|<)(?:별지|별표).*$/is, '');
+            }
+            if (after?.articleNumber >= 8000 || afterText.includes("부 칙") || afterText.includes("부칙")) {
+              afterText = afterText.replace(/\s*(?:\[|〔|<)(?:별지|별표).*$/is, '');
+            }
+
+            // HTML 태그 완벽 제거 (diffWords 시 발생하는 HTML 문자열 노출 버그 수정)
+            beforeText = beforeText.replace(/<[^>]+>/g, '').trim();
+            afterText = afterText.replace(/<[^>]+>/g, '').trim();
 
             return (
               <div key={comp.id} className="grid grid-cols-2">

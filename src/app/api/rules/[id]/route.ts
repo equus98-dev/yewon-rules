@@ -137,6 +137,69 @@ export async function GET(
 
     const targetRevision = revisions.find((r) => r.id === targetRevisionId);
 
+    // 사용자 제보 버그: 제33조 개정 내용이 신구대비표에서 누락되는 현상 보정 (동적 디핑 시스템)
+    // ArticleComparison 테이블에 레코드가 누락되어도, 직전 연혁과 현재 연혁의 조문을 동적으로 비교하여 누락된 대비표를 강제로 생성
+    const currentIndex = revisions.findIndex((r) => r.id === targetRevisionId);
+    if (currentIndex >= 0 && currentIndex < revisions.length - 1) {
+      const prevRevisionId = revisions[currentIndex + 1].id;
+      const prevRes = await pool.query(
+        `SELECT id, part, chapter, section, "subSection", "articleNumber", title, "contentJson", "contentText", "sortOrder"
+         FROM "Article" WHERE "revisionId" = $1 ORDER BY "sortOrder" ASC`,
+        [prevRevisionId]
+      );
+      const prevArticles = prevRes.rows;
+      
+      const existingCompArticleNums = new Set(comparisons.map((c: any) => c.afterArticle?.articleNumber).filter(Boolean));
+      
+      for (const currArt of articlesRes.rows) {
+        if (!existingCompArticleNums.has(currArt.articleNumber)) {
+          const prevArt = prevArticles.find((a: any) => a.articleNumber === currArt.articleNumber);
+          if (prevArt && (prevArt.contentText !== currArt.contentText || prevArt.title !== currArt.title || prevArt.contentJson !== currArt.contentJson)) {
+            comparisons.push({
+              id: "dynamic-" + currArt.id,
+              note: "조항 개정 (동적 복원)",
+              beforeArticleId: prevArt.id,
+              afterArticleId: currArt.id,
+              beforeArticle: prevArt,
+              afterArticle: currArt,
+            });
+          } else if (!prevArt) {
+            comparisons.push({
+              id: "dynamic-" + currArt.id,
+              note: "조항 신설 (동적 복원)",
+              beforeArticleId: null,
+              afterArticleId: currArt.id,
+              beforeArticle: null,
+              afterArticle: currArt,
+            });
+          }
+        }
+      }
+      
+      const currentArticleNums = new Set(articlesRes.rows.map((a: any) => a.articleNumber));
+      for (const prevArt of prevArticles) {
+        if (!currentArticleNums.has(prevArt.articleNumber)) {
+          const compExists = comparisons.find((c: any) => c.beforeArticle?.articleNumber === prevArt.articleNumber);
+          if (!compExists) {
+            comparisons.push({
+              id: "dynamic-del-" + prevArt.id,
+              note: "조항 삭제 (동적 복원)",
+              beforeArticleId: prevArt.id,
+              afterArticleId: null,
+              beforeArticle: prevArt,
+              afterArticle: null,
+            });
+          }
+        }
+      }
+      
+      comparisons.sort((a, b) => {
+        const numA = a.afterArticle?.articleNumber || a.beforeArticle?.articleNumber || 99999;
+        const numB = b.afterArticle?.articleNumber || b.beforeArticle?.articleNumber || 99999;
+        return numA - numB;
+      });
+    }
+
     // 2-0-3 학업이수에 관한 규정 내 제25의2(특별학점인정) 오타 감지 및 독립 조문 완벽 분리
     let processedArticles: any[] = [];
     for (let art of articlesRes.rows) {
