@@ -2282,7 +2282,7 @@ export default function ArticleRenderer({
           <div className="bg-red-50 border border-red-200 text-red-700 text-[13px] p-3 rounded mb-4 font-bold leading-relaxed shadow-sm">
             ⚠️ 이 기능은 띄어쓰기나 단순 오타 수정에만 사용하십시오. 규정 내용 자체의 개정이 필요할 경우 반드시 [입안편집기]를 통해 개정안을 기안해야 합니다.
           </div>
-          <div className="space-y-3 bg-white p-4 border border-slate-200 rounded-lg shadow-inner max-h-[50vh] overflow-y-auto scrollbar">
+          <div className="space-y-3 bg-white p-4 border border-slate-200 rounded-lg shadow-inner">
             {editHtml !== null ? (
                <JoditEditor
                   value={editHtml}
@@ -2296,6 +2296,7 @@ export default function ArticleRenderer({
                     toolbarButtonSize: "small"
                   }}
                   onBlur={(newContent) => setEditHtml(newContent)}
+                  onChange={() => {}}
                 />
             ) : (
               editItems.map((item, idx) => (
