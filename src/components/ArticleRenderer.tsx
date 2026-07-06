@@ -2269,7 +2269,7 @@ export default function ArticleRenderer({
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isEditing} onClose={() => !isSaving && setIsEditing(false)} maxWidth="md" fullWidth>
+      <Dialog open={isEditing} onClose={() => !isSaving && setIsEditing(false)} maxWidth="md" fullWidth disableEnforceFocus disableRestoreFocus>
         <DialogTitle sx={{ p: 0 }}>
           <div className="flex justify-between items-center bg-slate-50 border-b border-slate-200 px-4 py-3">
             <span className="font-bold text-[#0c3161] flex items-center gap-2"><svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg> 단순 오타 수정 (인라인 편집)</span>
