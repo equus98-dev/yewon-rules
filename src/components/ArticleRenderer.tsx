@@ -2348,8 +2348,9 @@ export default function ArticleRenderer({
                         const match = text.match(/^([①-⑳\d]+[.)]?)\s*(.*)/);
                         if (match) {
                           num = match[1];
+                          text = match[2].trim();
                         }
-                        return { type: 'text', num, text: line.trim() };
+                        return { type: 'text', num, text };
                       });
 
                       bodyPayload = {
