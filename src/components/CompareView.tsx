@@ -121,18 +121,36 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
               afterText = afterText.replace(/\s*(?:\[|〔|<)(?:별지|별표)[\s\S]*$/i, '');
             }
 
-            // HTML 태그 완벽 제거 (diffWords 시 발생하는 HTML 문자열 노출 버그 수정)
-            beforeText = beforeText.replace(/<[^>]+>/g, '').trim();
-            afterText = afterText.replace(/<[^>]+>/g, '').trim();
+            // HTML 표(table) 포함 여부 확인
+            const beforeHasTable = (before?.contentHtml || before?.contentText || '').includes('<table');
+            const afterHasTable = (after?.contentHtml || after?.contentText || '').includes('<table');
+            const hasTable = beforeHasTable || afterHasTable;
+
+            // HTML 태그 완벽 제거 및 엔티티 디코딩 (diffWords 시 발생하는 HTML 문자열 노출 버그 수정)
+            const unescapeAndStrip = (text: string) => {
+              return text
+                .replace(/<[^>]+>/g, '')
+                .replace(/&nbsp;/g, ' ')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&amp;/g, '&')
+                .trim();
+            };
+            beforeText = unescapeAndStrip(beforeText);
+            afterText = unescapeAndStrip(afterText);
 
             return (
               <div key={comp.id} className="grid grid-cols-2">
                 {/* 왼쪽: 이전 연혁 */}
-                <div className="p-6 border-r border-slate-200 align-top">
+                <div className="p-6 border-r border-slate-200 align-top overflow-x-auto">
                   {before ? (
                     <>
                       <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
-                        {renderDiff(beforeText, afterText, 'old')}
+                        {hasTable ? (
+                          <div dangerouslySetInnerHTML={{ __html: before.contentHtml || before.contentText || '' }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border" />
+                        ) : (
+                          renderDiff(beforeText, afterText, 'old')
+                        )}
                       </div>
                     </>
                   ) : (
@@ -142,11 +160,15 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                   )}
                 </div>
                 {/* 오른쪽: 현재 연혁 */}
-                <div className="p-6 align-top">
+                <div className="p-6 align-top overflow-x-auto">
                   {after ? (
                     <>
                       <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
-                        {renderDiff(beforeText, afterText, 'new')}
+                        {hasTable ? (
+                          <div dangerouslySetInnerHTML={{ __html: after.contentHtml || after.contentText || '' }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border" />
+                        ) : (
+                          renderDiff(beforeText, afterText, 'new')
+                        )}
                       </div>
                     </>
                   ) : (

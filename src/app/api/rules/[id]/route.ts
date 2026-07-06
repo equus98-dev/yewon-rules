@@ -259,15 +259,16 @@ export async function GET(
           sortOrder: art.sortOrder + 0.5
         };
         processedArticles.push(art1, art2);
-      } else if (art.articleNumber === 61 && art.contentText && art.contentText.includes("제62(논문지도교수 변경)")) {
-        const parts = art.contentText.split("제62(논문지도교수 변경)");
+      } else if (art.articleNumber === 61 && art.contentText && art.contentText.match(/제\s*62\s*조?\s*\(\s*논문지도교수\s*변경\s*\)/)) {
+        const match = art.contentText.match(/제\s*62\s*조?\s*\(\s*논문지도교수\s*변경\s*\)/);
+        const parts = art.contentText.split(match![0]);
         
         let newContentJson1: string | null = null;
         if (art.contentJson) {
            try {
              const parsed = typeof art.contentJson === 'string' ? JSON.parse(art.contentJson) : art.contentJson;
              if (Array.isArray(parsed)) {
-                newContentJson1 = JSON.stringify(parsed.filter((item: any) => !String(item.text || "").includes("제62(논문지도교수")));
+                newContentJson1 = JSON.stringify(parsed.filter((item: any) => !String(item.text || "").includes("제62")));
              }
            } catch(e) {}
         }
@@ -285,6 +286,16 @@ export async function GET(
           sortOrder: art.sortOrder + 0.5
         };
         processedArticles.push(art1, art2);
+      } else if (art.articleNumber === 63 && art.title?.includes("공동지도교수")) {
+        // 제63조 사용자가 수동 편집 중 망가뜨린 서식 복구
+        if (art.contentText) {
+           art.contentText = art.contentText
+             .replace(/①\s*논문지도교수가\s*연구년/g, "① 논문지도교수가 연구년")
+             .replace(/①\s*논문지도교수가연구년/g, "① 논문지도교수가 연구년")
+             .replace(/\n\s*④\s*논문에는/g, "\n  ④ 논문에는")
+             .replace(/^④\s*논문에는/gm, "  ④ 논문에는");
+        }
+        processedArticles.push(art);
       } else {
         // 일반대학원 학사운영 규정 제57조 ①항 누락 복원
         if (art.articleNumber === 57 && ruleRow.title?.includes("일반대학원 학사운영 규정")) {
