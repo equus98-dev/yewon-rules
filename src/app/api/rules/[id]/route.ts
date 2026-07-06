@@ -89,7 +89,7 @@ export async function GET(
 
     const comparisons = comparisonsRes.rows.map((row) => {
       const isTypo = row.note && row.note.startsWith('[단순오타수정전본문]');
-      let synthesizedBeforeArticle = null;
+      let synthesizedBeforeArticle: any = null;
       if (isTypo && row.after_articleNumber) {
          synthesizedBeforeArticle = {
             part: row.after_part,
