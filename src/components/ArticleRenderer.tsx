@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { diffWords } from 'diff';
+import dynamic from "next/dynamic";
+
+const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
 interface ContentItem {
   type: "chapter" | "section" | "article" | "paragraph" | "item" | "subitem" | "text" | string;
@@ -2276,11 +2279,18 @@ export default function ArticleRenderer({
           </div>
           <div className="space-y-3 bg-white p-4 border border-slate-200 rounded-lg shadow-inner max-h-[50vh] overflow-y-auto scrollbar">
             {editHtml !== null ? (
-               <textarea
-                  className="w-full border border-slate-300 rounded p-2.5 text-[14px] text-slate-800 focus:outline-none focus:border-blue-500 min-h-[300px] resize-y shadow-sm transition-colors focus:bg-blue-50/20 leading-relaxed font-mono"
+               <JoditEditor
                   value={editHtml}
-                  onChange={(e) => setEditHtml(e.target.value)}
-                  placeholder="HTML 코드를 수정하세요"
+                  config={{
+                    readonly: false,
+                    placeholder: "내용을 입력하세요",
+                    height: 500,
+                    style: {
+                      fontFamily: 'Pretendard'
+                    },
+                    toolbarButtonSize: "small"
+                  }}
+                  onBlur={(newContent) => setEditHtml(newContent)}
                 />
             ) : (
               editItems.map((item, idx) => (
