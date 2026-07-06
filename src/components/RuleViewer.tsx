@@ -1675,8 +1675,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                 {/* Attachments Section */}
                 {/* Attachments Section */}
                 {attachments && attachments.length > 0 && (() => {
+                  const sortedAttachments = [...attachments].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
                   const groups = Object.values(
-                    attachments.reduce((acc: any, file: any) => {
+                    sortedAttachments.reduce((acc: any, file: any) => {
                       const baseName = file.title
                         .replace(/\.[^/.]+$/, "")
                         .replace(/\(최종\)$/i, "")
