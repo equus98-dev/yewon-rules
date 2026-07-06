@@ -64,7 +64,72 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
     return title;
   };
 
-  if (!comparisons || comparisons.length === 0) {
+  const processedComparisons = useMemo(() => {
+    if (!comparisons) return [];
+    return comparisons.map((comp: any) => {
+      const before = comp.beforeArticle;
+      const after = comp.afterArticle;
+      
+      let beforeText = before?.contentText || "";
+      let afterText = after?.contentText || "";
+
+      if (!beforeText && before?.contentJson) {
+         try {
+           const parsed = typeof before.contentJson === 'string' ? JSON.parse(before.contentJson) : before.contentJson;
+           if (parsed?.paragraphs) beforeText = parsed.paragraphs.join("\n");
+           else if (Array.isArray(parsed)) beforeText = parsed.map((item: any) => (item.num ? item.num + " " : "") + (item.text || "")).join("\n");
+         } catch (e) {}
+      }
+      if (!afterText && after?.contentJson) {
+         try {
+           const parsed = typeof after.contentJson === 'string' ? JSON.parse(after.contentJson) : after.contentJson;
+           if (parsed?.paragraphs) afterText = parsed.paragraphs.join("\n");
+           else if (Array.isArray(parsed)) afterText = parsed.map((item: any) => (item.num ? item.num + " " : "") + (item.text || "")).join("\n");
+         } catch (e) {}
+      }
+
+      beforeText = beforeText.replace(/^(제\d+조(?:의\d+)?)\s+\1/, '$1');
+      afterText = afterText.replace(/^(제\d+조(?:의\d+)?)\s+\1/, '$1');
+
+      if (before?.articleNumber >= 8000 || beforeText.includes("부 칙") || beforeText.includes("부칙")) {
+        beforeText = beforeText.replace(/\s*(?:\[|〔|<)(?:별지|별표)[\s\S]*$/i, '');
+      }
+      if (after?.articleNumber >= 8000 || afterText.includes("부 칙") || afterText.includes("부칙")) {
+        afterText = afterText.replace(/\s*(?:\[|〔|<)(?:별지|별표)[\s\S]*$/i, '');
+      }
+
+      const beforeHtml = before?.contentHtml || before?.contentText || '';
+      const afterHtml = after?.contentHtml || after?.contentText || '';
+      const beforeHasTable = beforeHtml.includes('<table');
+      const afterHasTable = afterHtml.includes('<table');
+      const hasTable = beforeHasTable || afterHasTable;
+
+      const unescapeAndStrip = (text: string) => {
+        return text.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').trim();
+      };
+      const strippedBefore = unescapeAndStrip(beforeText);
+      const strippedAfter = unescapeAndStrip(afterText);
+
+      let isIdentical = false;
+      if (before && after) {
+         if (hasTable) {
+            isIdentical = beforeHtml.trim() === afterHtml.trim();
+         } else {
+            isIdentical = strippedBefore === strippedAfter;
+         }
+      }
+
+      return {
+        ...comp,
+        parsedBeforeText: strippedBefore,
+        parsedAfterText: strippedAfter,
+        hasTable,
+        isIdentical
+      };
+    }).filter((comp: any) => !comp.isIdentical);
+  }, [comparisons]);
+
+  if (!processedComparisons || processedComparisons.length === 0) {
     return (
       <div className="p-10 text-center text-slate-500 flex flex-col items-center justify-center h-full">
         <h3 className="text-xl font-bold mb-2">신구대비표 데이터가 없습니다</h3>
@@ -86,58 +151,12 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
         </div>
 
         <div className="divide-y divide-slate-200">
-          {comparisons.map((comp: any) => {
+          {processedComparisons.map((comp: any) => {
             const before = comp.beforeArticle;
             const after = comp.afterArticle;
-            
-            let beforeText = before?.contentText || "";
-            let afterText = after?.contentText || "";
-
-            // 만약 contentText가 비어있다면, contentJson을 기반으로 텍스트 결합
-            if (!beforeText && before?.contentJson) {
-               try {
-                 const parsed = typeof before.contentJson === 'string' ? JSON.parse(before.contentJson) : before.contentJson;
-                 if (parsed?.paragraphs) beforeText = parsed.paragraphs.join("\n");
-                 else if (Array.isArray(parsed)) beforeText = parsed.map((item: any) => (item.num ? item.num + " " : "") + (item.text || "")).join("\n");
-               } catch (e) {}
-            }
-            if (!afterText && after?.contentJson) {
-               try {
-                 const parsed = typeof after.contentJson === 'string' ? JSON.parse(after.contentJson) : after.contentJson;
-                 if (parsed?.paragraphs) afterText = parsed.paragraphs.join("\n");
-                 else if (Array.isArray(parsed)) afterText = parsed.map((item: any) => (item.num ? item.num + " " : "") + (item.text || "")).join("\n");
-               } catch (e) {}
-            }
-
-            // 중복된 "제N조 제N조" 패턴 정리 (데이터베이스 오염 보정)
-            beforeText = beforeText.replace(/^(제\d+조(?:의\d+)?)\s+\1/, '$1');
-            afterText = afterText.replace(/^(제\d+조(?:의\d+)?)\s+\1/, '$1');
-
-            // [별지...] 또는 [별표...] 찌꺼기 제거 (부칙 등에 병합된 오류 보정)
-            if (before?.articleNumber >= 8000 || beforeText.includes("부 칙") || beforeText.includes("부칙")) {
-              beforeText = beforeText.replace(/\s*(?:\[|〔|<)(?:별지|별표)[\s\S]*$/i, '');
-            }
-            if (after?.articleNumber >= 8000 || afterText.includes("부 칙") || afterText.includes("부칙")) {
-              afterText = afterText.replace(/\s*(?:\[|〔|<)(?:별지|별표)[\s\S]*$/i, '');
-            }
-
-            // HTML 표(table) 포함 여부 확인
-            const beforeHasTable = (before?.contentHtml || before?.contentText || '').includes('<table');
-            const afterHasTable = (after?.contentHtml || after?.contentText || '').includes('<table');
-            const hasTable = beforeHasTable || afterHasTable;
-
-            // HTML 태그 완벽 제거 및 엔티티 디코딩 (diffWords 시 발생하는 HTML 문자열 노출 버그 수정)
-            const unescapeAndStrip = (text: string) => {
-              return text
-                .replace(/<[^>]+>/g, '')
-                .replace(/&nbsp;/g, ' ')
-                .replace(/&lt;/g, '<')
-                .replace(/&gt;/g, '>')
-                .replace(/&amp;/g, '&')
-                .trim();
-            };
-            beforeText = unescapeAndStrip(beforeText);
-            afterText = unescapeAndStrip(afterText);
+            const beforeText = comp.parsedBeforeText;
+            const afterText = comp.parsedAfterText;
+            const hasTable = comp.hasTable;
 
             return (
               <div key={comp.id} className="grid grid-cols-2">

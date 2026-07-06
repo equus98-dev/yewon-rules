@@ -1987,6 +1987,7 @@ export default function ArticleRenderer({
           if (isGlued) {
             return (
               <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 relative ${interactiveClass}`} style={{ paddingLeft: '52px' }}>
+                {showEditBtn && renderEditButton(true)}
                 <span className="font-normal mr-1">{safeNum}</span>
                 {formatGluedText(safeText, false)}
                 
