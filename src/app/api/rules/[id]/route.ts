@@ -196,7 +196,55 @@ export async function GET(
           sortOrder: art.sortOrder + 0.5
         };
         processedArticles.push(art1, art2);
+      } else if (art.articleNumber === 61 && art.contentText && art.contentText.includes("제62(논문지도교수 변경)")) {
+        const parts = art.contentText.split("제62(논문지도교수 변경)");
+        
+        let newContentJson1 = null;
+        if (art.contentJson) {
+           try {
+             const parsed = typeof art.contentJson === 'string' ? JSON.parse(art.contentJson) : art.contentJson;
+             if (Array.isArray(parsed)) {
+                newContentJson1 = JSON.stringify(parsed.filter(item => !String(item.text || "").includes("제62(논문지도교수")));
+             }
+           } catch(e) {}
+        }
+        
+        const art1 = { ...art, contentText: parts[0].trim(), contentJson: newContentJson1 || null };
+        const art2 = {
+          ...art,
+          id: art.id + "_sub_62",
+          articleNumber: 62,
+          title: "제62조(논문지도교수 변경)",
+          contentText: "제62조(논문지도교수 변경) " + parts[1].trim(),
+          contentJson: JSON.stringify([
+            { type: "article", num: "제62조", text: "제62조(논문지도교수 변경) " + parts[1].trim() }
+          ]),
+          sortOrder: art.sortOrder + 0.5
+        };
+        processedArticles.push(art1, art2);
       } else {
+        // 일반대학원 학사운영 규정 제57조 ①항 누락 복원
+        if (art.articleNumber === 57 && ruleRow.title?.includes("일반대학원 학사운영 규정")) {
+          if (art.contentText && art.contentText.match(/제57조\([^)]+\)\s*①/)) {
+            art.contentText = art.contentText.replace(/(제57조\([^)]+\))\s*①/, "$1\n①");
+            if (art.contentJson) {
+              try {
+                const parsed = typeof art.contentJson === 'string' ? JSON.parse(art.contentJson) : art.contentJson;
+                if (Array.isArray(parsed) && parsed.length > 0 && String(parsed[0].text || "").match(/제57조\([^)]+\)\s*①/)) {
+                  const firstItem = parsed[0];
+                  const m = String(firstItem.text).match(/^(제57조\([^)]+\))\s*①\s*(.*)/);
+                  if (m) {
+                     parsed.splice(0, 1, 
+                       { type: "article", num: "제57조", text: m[1] },
+                       { type: "paragraph", num: "①", text: m[2] }
+                     );
+                     art.contentJson = JSON.stringify(parsed);
+                  }
+                }
+              } catch(e) {}
+            }
+          }
+        }
         // 4-0-27 생명윤리위원회 운영 규정 제2조 내용 누락 및 잘림 복원
         if ((art.revisionId === "e1b535b7-e48a-491d-af47-f2e7451a2965" || ruleRow.title?.includes("생명윤리위원회")) && art.articleNumber === 2) {
           art = {
