@@ -101,12 +101,7 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
       // 연혁 태그 (<개정 ...>, <신설 ...> 등)를 완전히 제거하여 HTML 표가 깨지거나 diff 결과가 지저분해지는 것 방지
       const stripHistoryTags = (text: string) => {
          return text
-           .replace(/&lt;\s*개정\s*[^&]*&gt;/gi, '')
-           .replace(/&lt;\s*신설\s*[^&]*&gt;/gi, '')
-           .replace(/&lt;\s*삭제\s*[^&]*&gt;/gi, '')
-           .replace(/<\s*개정\s*[^>]*>/gi, '')
-           .replace(/<\s*신설\s*[^>]*>/gi, '')
-           .replace(/<\s*삭제\s*[^>]*>/gi, '')
+           .replace(/(?:&lt;|<)\s*(?:개정|신설|삭제|전문개정|본조신설)[\s\S]*?(?:&gt;|>)/gi, '')
            .trim();
       };
       beforeText = stripHistoryTags(beforeText);
@@ -187,7 +182,7 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                     <>
                       <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
                         {hasTable ? (
-                          <div dangerouslySetInnerHTML={{ __html: beforeHtml }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border" />
+                          <div dangerouslySetInnerHTML={{ __html: beforeHtml }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border prose-caption:text-slate-700 prose-caption:text-[14px] prose-caption:font-normal prose-caption:text-left prose-caption:mb-2 prose-caption:mt-0 prose-caption:w-full" />
                         ) : (
                           renderDiff(beforeText, afterText, 'old')
                         )}
@@ -205,7 +200,7 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                     <>
                       <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
                         {hasTable ? (
-                          <div dangerouslySetInnerHTML={{ __html: afterHtml }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border" />
+                          <div dangerouslySetInnerHTML={{ __html: afterHtml }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border prose-caption:text-slate-700 prose-caption:text-[14px] prose-caption:font-normal prose-caption:text-left prose-caption:mb-2 prose-caption:mt-0 prose-caption:w-full" />
                         ) : (
                           renderDiff(beforeText, afterText, 'new')
                         )}
