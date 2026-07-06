@@ -236,11 +236,16 @@ export default function ArticleRenderer({
           if (window.confirm("본 수정기능은 규정개정이 아닌 단순오타만 수정이 가능합니다.\n개정이 필요한 경우 입안편집기를 이용하시기 바랍니다.")) {
             if (contentHtml && contentHtml.trim().length > 0) {
               setEditHtml(contentHtml);
-              setEditItems([]);
             } else {
-              setEditHtml(null);
-              setEditItems(JSON.parse(JSON.stringify(items)));
+              const htmlStr = items.map((i: any) => {
+                const text = i.text || "";
+                if (!i.num) return `<p>${text}</p>`;
+                if (text.trim().startsWith(i.num)) return `<p>${text}</p>`;
+                return `<p>${i.num} ${text}</p>`;
+              }).join('');
+              setEditHtml(htmlStr);
             }
+            setEditItems([]);
             setIsEditing(true);
             if (articleId) {
               fetch(`/api/admin/articles/${articleId}`)
