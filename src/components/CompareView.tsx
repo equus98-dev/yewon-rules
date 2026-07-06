@@ -115,10 +115,10 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
 
             // [별지...] 또는 [별표...] 찌꺼기 제거 (부칙 등에 병합된 오류 보정)
             if (before?.articleNumber >= 8000 || beforeText.includes("부 칙") || beforeText.includes("부칙")) {
-              beforeText = beforeText.replace(/\s*(?:\[|〔|<)(?:별지|별표).*$/is, '');
+              beforeText = beforeText.replace(/\s*(?:\[|〔|<)(?:별지|별표)[\s\S]*$/i, '');
             }
             if (after?.articleNumber >= 8000 || afterText.includes("부 칙") || afterText.includes("부칙")) {
-              afterText = afterText.replace(/\s*(?:\[|〔|<)(?:별지|별표).*$/is, '');
+              afterText = afterText.replace(/\s*(?:\[|〔|<)(?:별지|별표)[\s\S]*$/i, '');
             }
 
             // HTML 태그 완벽 제거 (diffWords 시 발생하는 HTML 문자열 노출 버그 수정)
