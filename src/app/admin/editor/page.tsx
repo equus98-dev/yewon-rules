@@ -367,10 +367,29 @@ function EditorContent() {
       const newArticles = [...prev];
       const target = newArticles[revisionTargetIdx];
       
-      // 조문 본문에 뱃지 추가 (이미 없으면 추가)
-      if (target.contentText && !target.contentText.includes(badgeStr)) {
-        target.contentText = target.contentText + `\n${badgeStr}`;
-      } else if (!target.contentText) {
+      // 조문 본문에 뱃지 추가 (변경된 특정 항/호 뒤에 추가)
+      const orig = originalArticles.find((o) => o.articleNumber === target.articleNumber);
+      const oldText = orig ? orig.contentText || "" : "";
+      if (target.contentText) {
+        const oldLines = oldText.split('\n');
+        const newLines = target.contentText.split('\n');
+        let addedBadgeCount = 0;
+        const mappedLines = newLines.map(newLine => {
+          if (!newLine.trim()) return newLine;
+          if (oldLines.includes(newLine)) return newLine;
+          if (!newLine.includes(badgeStr.trim()) && !newLine.includes("<신설") && !newLine.includes("[개정") && !newLine.includes("[일부개정") && !newLine.includes("[전부개정")) {
+            addedBadgeCount++;
+            return newLine + ` ${badgeStr}`;
+          }
+          return newLine;
+        });
+        
+        let resultText = mappedLines.join('\n');
+        if (addedBadgeCount === 0 && !resultText.includes(badgeStr.trim())) {
+          resultText += `\n${badgeStr}`;
+        }
+        target.contentText = resultText;
+      } else {
         target.contentText = badgeStr;
       }
       target.isModified = true;
@@ -770,8 +789,26 @@ function EditorContent() {
                 lines[0] += tag;
               }
               updatedContentText = lines.join('\n');
-            } else if (!updatedContentText.includes(tag.trim()) && !updatedContentText.includes("[개정") && !updatedContentText.includes("[일부개정")) {
-              updatedContentText += tag;
+            } else {
+              const orig = originalArticles.find((o) => o.articleNumber === art.articleNumber);
+              const oldText = orig ? orig.contentText || "" : "";
+              const oldLines = oldText.split('\n');
+              const newLines = updatedContentText.split('\n');
+              let addedBadgeCount = 0;
+              const mappedLines = newLines.map(newLine => {
+                if (!newLine.trim()) return newLine;
+                if (oldLines.includes(newLine)) return newLine;
+                if (!newLine.includes(tag.trim()) && !newLine.includes("<신설") && !newLine.includes("[개정") && !newLine.includes("[일부개정") && !newLine.includes("[전부개정")) {
+                  addedBadgeCount++;
+                  return newLine + tag;
+                }
+                return newLine;
+              });
+              
+              updatedContentText = mappedLines.join('\n');
+              if (addedBadgeCount === 0 && !updatedContentText.includes(tag.trim()) && !updatedContentText.includes("[개정") && !updatedContentText.includes("[일부개정")) {
+                updatedContentText += tag;
+              }
             }
             finalContentJson = { paragraphs: [updatedContentText] };
             finalContentHtml = null;
