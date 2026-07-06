@@ -1844,8 +1844,8 @@ export default function ArticleRenderer({
 
             return (
               <div className={isFirstArticleHeader ? `mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full ${interactiveClass}` : `w-full my-1.5 relative ${interactiveClass}`} style={!isFirstArticleHeader ? { paddingLeft: '52px' } : undefined}>
-                {isFirstArticleHeader && showEditBtn && renderEditButton(true)}
-                {isFirstArticleHeader && onTogglePrintSelect && articleId && (
+                {showEditBtn && renderEditButton(true)}
+                {onTogglePrintSelect && articleId && (
                   <div className="flex items-center mr-1 mt-0.5">
                     <input 
                       type="checkbox" 
@@ -1855,7 +1855,7 @@ export default function ArticleRenderer({
                     />
                   </div>
                 )}
-                {isFirstArticleHeader && !hideBadge && !isAddendum && (
+                {!hideBadge && !isAddendum && (
                   <div className="flex items-center gap-1 mt-0.5 z-10">
                     <button 
                       onClick={(e) => { e.stopPropagation(); handleOpenHistory(historyDates); }}
@@ -1895,7 +1895,7 @@ export default function ArticleRenderer({
                           const dateMatch = addendumBody.match(/^\(?([\d.\s]+)\.?\)?\s*/);
                           return (
                             <>
-                              {isFirstArticleHeader && <span className="font-bold mr-1 text-slate-900">{titlePart}</span>}
+                              <span className="font-bold mr-1 text-slate-900">{titlePart}</span>
                               <span className="font-normal">{renderTextWithHistory(addendumBody)}</span>
                             </>
                           );
@@ -1963,8 +1963,8 @@ export default function ArticleRenderer({
 
                           return (
                             <>
-                              {isFirstArticleHeader && <span className="font-bold text-[#000080]">{articleNumOverride}</span>}
-                              {isFirstArticleHeader && articleTitleOverride && <span className="font-normal text-slate-800 ml-1 mr-1">{articleTitleOverride}</span>}
+                              <span className="font-bold text-[#000080]">{articleNumOverride}</span>
+                              {articleTitleOverride && <span className="font-normal text-slate-800 ml-1 mr-1">{articleTitleOverride}</span>}
                               {actualBody && <> {formatGluedText(actualBody, true)}</>}
                             </>
                           );

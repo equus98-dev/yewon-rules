@@ -274,7 +274,7 @@ export async function GET(
         // 제63조 사용자가 수동 편집 중 망가뜨린 서식 복구 및 실수로 삽입된 62조 텍스트 완벽 제거
         if (art.contentText) {
            art.contentText = art.contentText
-             .replace(/제\s*62\s*조?\s*\(\s*논문지도교수\s*변경\s*\)[\s\S]*?(?=제\s*63\s*조)/, "")
+             .replace(/제\s*62\s*조?\s*\(\s*논문지도교수\s*변경\s*\)[\s\S]*?(?=제\s*63\s*조|①\s*논문지도교수가)/, "")
              .replace(/①\s*논문지도교수가\s*연구년/g, "① 논문지도교수가 연구년")
              .replace(/①\s*논문지도교수가연구년/g, "① 논문지도교수가 연구년")
              .replace(/\n\s*④\s*논문에는/g, "\n  ④ 논문에는")
@@ -284,7 +284,10 @@ export async function GET(
               try {
                 const parsed = typeof art.contentJson === 'string' ? JSON.parse(art.contentJson) : art.contentJson;
                 if (Array.isArray(parsed)) {
-                   art.contentJson = JSON.stringify(parsed.filter((item: any) => !String(item.text || "").includes("제62")));
+                   art.contentJson = JSON.stringify(parsed.filter((item: any) => 
+                      !String(item.text || "").includes("제62") && 
+                      !String(item.num || "").includes("제62")
+                    ));
                 }
               } catch(e) {}
            }
