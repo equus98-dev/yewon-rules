@@ -2339,12 +2339,23 @@ export default function ArticleRenderer({
                       newText = newText.replace(/<br\s*\/?>/gi, '\n');
                       newText = newText.replace(/<\/div>\s*<div[^>]*>/gi, '\n');
                       newText = newText.replace(/<\/?div[^>]*>/gi, '\n');
+                      newText = newText.replace(/<[^>]+>/g, '');
                       newText = newText.replace(/\n\s*\n/g, '\n').trim();
+
+                      const newItems = newText.split('\n').filter(line => line.trim()).map(line => {
+                        let num = "";
+                        let text = line.trim();
+                        const match = text.match(/^([①-⑳\d]+[.)]?)\s*(.*)/);
+                        if (match) {
+                          num = match[1];
+                        }
+                        return { type: 'text', num, text: line.trim() };
+                      });
 
                       bodyPayload = {
                         contentText: newText,
                         contentHtml: null,
-                        contentJson: contentJson || {}
+                        contentJson: newItems
                       };
                     }
                   } else {
