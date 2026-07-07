@@ -499,7 +499,7 @@ export default function AdminFilesManagement() {
             <input
               type="file"
               onChange={handleFileSelect}
-              accept=".hwp,.pdf"
+              accept=".hwp,.pdf,.xls,.xlsx"
               className="hidden"
               id="file-upload-input"
               multiple={!targetAttachmentId}

@@ -1,1 +1,1 @@
-SELECT a.id, a.articleNumber, a.title, a.contentJson, a.contentText FROM Article a JOIN Revision r ON a.revisionId = r.id JOIN Rule ru ON r.ruleId = ru.id WHERE ru.ruleNumber = '2-0-2' AND a.articleNumber = 17;
+SELECT id, articleNumber, contentText, contentJson FROM Article WHERE articleNumber IN (61, 62, 63) AND revisionId = (SELECT id FROM Revision WHERE ruleId = (SELECT id FROM Rule WHERE title LIKE '%일반대학원 학사운영 규정%') ORDER BY version DESC LIMIT 1) ORDER BY articleNumber;

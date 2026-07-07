@@ -639,7 +639,7 @@ export default function RevisionClient({ id }: { id: string }) {
             type="file" 
             ref={fileInputRef}
             onChange={handleFileUpload}
-            accept=".hwp,.pdf"
+            accept=".hwp,.pdf,.xls,.xlsx"
             className="hidden" 
           />
           <button 

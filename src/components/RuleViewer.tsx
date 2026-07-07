@@ -1696,6 +1696,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                   const renderGroup = (group: any, idx: number, isMain: boolean = false) => {
                       let pdfFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "pdf" || f.title.toLowerCase().endsWith(".pdf"));
                       const hwpFile = group.files.find((f: any) => f.fileType?.toLowerCase() === "hwp" || f.title.toLowerCase().endsWith(".hwp"));
+                      const xlsFile = group.files.find((f: any) => f.fileType?.toLowerCase().startsWith("xls") || f.title.toLowerCase().endsWith(".xls") || f.title.toLowerCase().endsWith(".xlsx"));
                       
                       const getDownloadUrl = (file: any) => {
                         let fullTitle = file.title || "download";
@@ -1803,6 +1804,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                               {pdfFile && (
                                 <a href={getDownloadUrl(pdfFile)} download={true} target="_blank" className="bg-red-50 border border-red-200 text-red-700 px-2.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1 hover:bg-red-100 transition-colors shadow-sm" title="PDF 다운로드">
                                   <PictureAsPdfIcon sx={{ fontSize: 16 }} /> PDF
+                                </a>
+                              )}
+                              {xlsFile && (
+                                <a href={getDownloadUrl(xlsFile)} download={true} target="_blank" className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-2.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1 hover:bg-emerald-100 transition-colors shadow-sm" title="EXCEL 다운로드">
+                                  <FactCheckIcon sx={{ fontSize: 16 }} /> EXCEL
                                 </a>
                               )}
                               {pdfFile && (
