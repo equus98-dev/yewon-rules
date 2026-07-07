@@ -270,6 +270,31 @@ export async function GET(
           sortOrder: art.sortOrder + 0.5
         };
         processedArticles.push(art1, art2);
+      } else if (art.articleNumber === 61 && art.title?.includes("논문지도교수") && art.contentText && /제\s*62\s*조/i.test(art.contentText)) {
+        // 제61조에 제62조가 포함되어 버린 경우 강제 분리 (DB에 이미 병합된 경우를 동적으로 처리)
+        const match = art.contentText.match(/(.*?)(제\s*62\s*조.*)/s);
+        if (match) {
+          const art1Text = match[1].trim();
+          const art2Text = match[2].trim();
+          
+          const art1 = {
+            ...art,
+            contentText: art1Text,
+            contentJson: JSON.stringify([{ type: "article", num: "제61조(논문지도교수)", text: art1Text.replace(/제\s*61\s*조[^)]*\)\s*/, "").trim() }])
+          };
+          const art2 = {
+            ...art,
+            id: art.id + "_sub_62",
+            articleNumber: 62,
+            title: "논문지도교수 변경",
+            contentText: art2Text,
+            contentJson: JSON.stringify([{ type: "article", num: "제62조(논문지도교수 변경)", text: art2Text.replace(/제\s*62\s*조[^)]*\)\s*/, "").trim() }]),
+            sortOrder: art.sortOrder + 0.5
+          };
+          processedArticles.push(art1, art2);
+        } else {
+          processedArticles.push(art);
+        }
       } else if (art.articleNumber === 63 && art.title?.includes("공동지도교수")) {
         // 제63조 사용자가 수동 편집 중 망가뜨린 서식 복구 및 실수로 삽입된 62조 텍스트 완벽 제거
         if (art.contentText) {
@@ -293,6 +318,9 @@ export async function GET(
            }
         }
         processedArticles.push(art);
+      } else if (art.articleNumber === 62 && processedArticles.some(a => a.articleNumber === 62)) {
+        // 제61조에서 이미 62조가 동적으로 분리 생성된 경우 원본(아마도 비정상적인 데이터) 무시
+        continue;
 
       } else {
         // 일반대학원 학사운영 규정 제57조 ①항 누락 복원

@@ -111,11 +111,7 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
       let afterHtml = after?.contentHtml || after?.contentText || '';
       
       const cleanInlineStyles = (html: string) => {
-        let cleaned = html;
-        cleaned = cleaned.replace(/font-family:[^;"]+;?/gi, '');
-        cleaned = cleaned.replace(/font-size:[^;"]+;?/gi, '');
-        cleaned = cleaned.replace(/line-height:[^;"]+;?/gi, '');
-        return cleaned;
+        return html;
       };
 
       beforeHtml = cleanInlineStyles(beforeHtml);
