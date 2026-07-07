@@ -35,7 +35,6 @@ export async function GET() {
     );
     
     if (checkRes.rows.length === 0) {
-      const crypto = require('crypto');
       const articleId = crypto.randomUUID();
       await pool.query(
         `INSERT INTO "Article" (id, "revisionId", "articleNumber", title, "contentText", "contentHtml", "contentJson", "createdAt", "updatedAt") 
