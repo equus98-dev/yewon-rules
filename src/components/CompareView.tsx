@@ -109,6 +109,18 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
 
       let beforeHtml = before?.contentHtml || before?.contentText || '';
       let afterHtml = after?.contentHtml || after?.contentText || '';
+      
+      const cleanInlineStyles = (html: string) => {
+        let cleaned = html;
+        cleaned = cleaned.replace(/font-family:[^;"]+;?/gi, '');
+        cleaned = cleaned.replace(/font-size:[^;"]+;?/gi, '');
+        cleaned = cleaned.replace(/line-height:[^;"]+;?/gi, '');
+        return cleaned;
+      };
+
+      beforeHtml = cleanInlineStyles(beforeHtml);
+      afterHtml = cleanInlineStyles(afterHtml);
+      
       beforeHtml = stripHistoryTags(beforeHtml);
       afterHtml = stripHistoryTags(afterHtml);
 
@@ -180,9 +192,9 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                 <div className="p-6 border-r border-slate-200 align-top overflow-x-auto">
                   {before ? (
                     <>
-                      <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
+                      <div className="whitespace-pre-wrap text-[15.5px] leading-[1.7] text-slate-800 font-['Pretendard'] rule-viewer-content">
                         {hasTable ? (
-                          <div dangerouslySetInnerHTML={{ __html: beforeHtml }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border prose-caption:text-slate-700 prose-caption:text-[14px] prose-caption:font-normal prose-caption:text-left prose-caption:mb-2 prose-caption:mt-0 prose-caption:w-full" />
+                          <div dangerouslySetInnerHTML={{ __html: beforeHtml }} className="html-table-wrapper w-full break-keep" />
                         ) : (
                           renderDiff(beforeText, afterText, 'old')
                         )}
@@ -198,9 +210,9 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                 <div className="p-6 align-top overflow-x-auto">
                   {after ? (
                     <>
-                      <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
+                      <div className="whitespace-pre-wrap text-[15.5px] leading-[1.7] text-slate-800 font-['Pretendard'] rule-viewer-content">
                         {hasTable ? (
-                          <div dangerouslySetInnerHTML={{ __html: afterHtml }} className="prose prose-sm max-w-none prose-table:border-collapse prose-td:border prose-th:border prose-caption:text-slate-700 prose-caption:text-[14px] prose-caption:font-normal prose-caption:text-left prose-caption:mb-2 prose-caption:mt-0 prose-caption:w-full" />
+                          <div dangerouslySetInnerHTML={{ __html: afterHtml }} className="html-table-wrapper w-full break-keep" />
                         ) : (
                           renderDiff(beforeText, afterText, 'new')
                         )}
