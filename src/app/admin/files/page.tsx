@@ -98,9 +98,9 @@ export default function AdminFilesManagement() {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
     
-    const validFiles = files.filter(f => f.name.toLowerCase().endsWith(".hwp") || f.name.toLowerCase().endsWith(".pdf"));
+    const validFiles = files.filter(f => f.name.toLowerCase().endsWith(".hwp") || f.name.toLowerCase().endsWith(".pdf") || f.name.toLowerCase().endsWith(".xls") || f.name.toLowerCase().endsWith(".xlsx"));
     if (files.length !== validFiles.length) {
-      alert("HWP 또는 PDF 파일만 업로드할 수 있습니다.");
+      alert("HWP, PDF, EXCEL 파일만 업로드할 수 있습니다.");
     }
     
     if (targetAttachmentId && validFiles.length > 1) {
@@ -127,9 +127,9 @@ export default function AdminFilesManagement() {
     const files = Array.from(e.dataTransfer.files || []);
     if (files.length === 0) return;
     
-    const validFiles = files.filter(f => f.name.toLowerCase().endsWith(".hwp") || f.name.toLowerCase().endsWith(".pdf"));
+    const validFiles = files.filter(f => f.name.toLowerCase().endsWith(".hwp") || f.name.toLowerCase().endsWith(".pdf") || f.name.toLowerCase().endsWith(".xls") || f.name.toLowerCase().endsWith(".xlsx"));
     if (files.length !== validFiles.length) {
-      alert("HWP 또는 PDF 파일만 업로드할 수 있습니다.");
+      alert("HWP, PDF, EXCEL 파일만 업로드할 수 있습니다.");
     }
     
     if (targetAttachmentId && validFiles.length > 1) {

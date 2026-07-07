@@ -118,9 +118,9 @@ export default function RevisionClient({ id }: { id: string }) {
     if (files.length === 0 || !selectedRev) return;
 
     const file = files[0];
-    const valid = file.name.toLowerCase().endsWith(".hwp") || file.name.toLowerCase().endsWith(".pdf");
+    const valid = file.name.toLowerCase().endsWith(".hwp") || file.name.toLowerCase().endsWith(".pdf") || file.name.toLowerCase().endsWith(".xls") || file.name.toLowerCase().endsWith(".xlsx");
     if (!valid) {
-      alert("HWP 또는 PDF 파일만 업로드할 수 있습니다.");
+      alert("HWP, PDF, EXCEL 파일만 업로드할 수 있습니다.");
       e.target.value = "";
       return;
     }
