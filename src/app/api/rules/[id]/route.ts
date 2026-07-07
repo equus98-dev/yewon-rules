@@ -272,7 +272,7 @@ export async function GET(
         processedArticles.push(art1, art2);
       } else if (art.articleNumber === 61 && art.title?.includes("논문지도교수") && art.contentText && /제\s*62\s*조/i.test(art.contentText)) {
         // 제61조에 제62조가 포함되어 버린 경우 강제 분리 (DB에 이미 병합된 경우를 동적으로 처리)
-        const match = art.contentText.match(/(.*?)(제\s*62\s*조.*)/s);
+        const match = art.contentText.match(/([\s\S]*?)(제\s*62\s*조[\s\S]*)/);
         if (match) {
           const art1Text = match[1].trim();
           const art2Text = match[2].trim();
