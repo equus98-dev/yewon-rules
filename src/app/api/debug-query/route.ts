@@ -4,8 +4,18 @@ import { createPool } from "@/lib/db";
 export async function GET() {
   const pool = createPool();
   try {
-    const res = await pool.query(`SELECT id, "articleNumber", title, "contentText", "contentJson" FROM "Article" WHERE "revisionId" IN (SELECT id FROM "Revision" WHERE "ruleId" = '730c4edc-15a4-4df1-be7d-304bfa4dcfc9' ORDER BY version DESC LIMIT 1) AND "articleNumber" IN (61, 62, 63) ORDER BY "articleNumber"`);
-    return NextResponse.json(res.rows);
+    const revisionsRes = await pool.query(
+      `SELECT id, version, "versionName", "enactmentDate" FROM "Revision" WHERE "ruleId" = '526db4d2-bca1-49c2-a890-22541179286e' ORDER BY version DESC`
+    );
+    
+    const articlesRes = await pool.query(
+      `SELECT id, "revisionId", "articleNumber", title, "contentText" FROM "Article" WHERE "revisionId" IN (SELECT id FROM "Revision" WHERE "ruleId" = '526db4d2-bca1-49c2-a890-22541179286e') AND "articleNumber" > 8000 ORDER BY "revisionId", "articleNumber"`
+    );
+    
+    return NextResponse.json({
+      revisions: revisionsRes.rows,
+      articles: articlesRes.rows
+    });
   } catch (e: any) {
     return NextResponse.json({ error: e.message });
   } finally {
