@@ -1220,7 +1220,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           </button>
           
           <button 
-            onClick={() => window.open(`/compare?ruleId=${ruleId}`, "_blank", "width=1200,height=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes")}
+            onClick={() => window.open(`/compare?ruleId=${ruleId}`, "_blank", "width=1600,height=900,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes")}
             className="flex items-center gap-1 px-2.5 py-1 border border-slate-300 bg-white text-slate-700 text-[11px] font-bold rounded hover:bg-slate-50 transition-colors cursor-pointer"
           >
             <CompareArrowsIcon sx={{ fontSize: 14 }} className="text-purple-500" /> 신구대비표
