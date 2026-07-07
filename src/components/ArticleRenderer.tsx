@@ -989,7 +989,7 @@ export default function ArticleRenderer({
                const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(text.split(/<table/i)[0]);
                
                return (
-                  <div key={`glued-table`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full group/text">
+                  <div key={`glued-table`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-[calc(100%+52px)] -ml-[52px] group/text">
                      {renderEditButton(true)}
                      {onTogglePrintSelect && articleId && (
                        <div className="flex items-center mr-1 mt-0.5">
@@ -1843,7 +1843,7 @@ export default function ArticleRenderer({
             hasRenderedArticleHeader = true;
 
             return (
-              <div className={`mt-4 mb-0 flex items-start gap-2 pt-1 relative w-full ${interactiveClass}`} style={!isFirstArticleHeader ? { paddingLeft: '52px' } : undefined}>
+              <div className={`mt-4 mb-0 flex items-start gap-2 pt-1 relative ${!isFirstArticleHeader ? 'w-full' : 'w-[calc(100%+52px)] -ml-[52px]'} ${interactiveClass}`} style={!isFirstArticleHeader ? { paddingLeft: '52px' } : undefined}>
                 {showEditBtn && renderEditButton(true)}
                 {onTogglePrintSelect && articleId && (
                   <div className="flex items-center mr-1 mt-0.5">
@@ -1978,7 +1978,7 @@ export default function ArticleRenderer({
             );
           })();
 
-        } else if (item.type === "paragraph") {
+        } else if (item.type === "paragraph" || /^[①-⑳]/.test(plainItemText) || /^[①-⑳]/.test(numText)) {
           // 연혁 표기(예: 2008. 7. 16.)의 월/일이 호(1., 2.)로 오인되어 isGlued가 true가 되는 버그 완벽 방지!
           let decodedForGlued = String(item.text || "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&nbsp;/gi, ' ');
           decodedForGlued = decodedForGlued.replace(HISTORY_REGEX, "");
@@ -2056,9 +2056,9 @@ export default function ArticleRenderer({
           }
           const textToFormat = safeNum ? `${safeNum} ${safeText}` : safeText;
           return (
-            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${interactiveClass}`} style={{ paddingLeft: '52px' }}>
+            <div key={index} className={`text-slate-800 text-[16px] leading-[1.7] w-full my-1.5 ${interactiveClass} relative`} style={{ paddingLeft: '52px' }}>
+              {showEditBtn && renderEditButton(true)}
               {formatGluedText(textToFormat, false)}
-              
             </div>
           );
         }
