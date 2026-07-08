@@ -110,15 +110,23 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
       let beforeHtml = before?.contentHtml || before?.contentText || '';
       let afterHtml = after?.contentHtml || after?.contentText || '';
       
-      const cleanInlineStyles = (html: string) => {
-        return html;
-      };
-
-      beforeHtml = cleanInlineStyles(beforeHtml);
-      afterHtml = cleanInlineStyles(afterHtml);
-      
       beforeHtml = stripHistoryTags(beforeHtml);
       afterHtml = stripHistoryTags(afterHtml);
+
+      const cleanHtmlForTable = (html: string) => {
+        let cleaned = html;
+        // HWP generated HTML contains many empty paragraphs and <br> tags that stretch table cells.
+        // Remove <p> tags that contain only whitespace, &nbsp;, <br>, or empty spans
+        cleaned = cleaned.replace(/<p[^>]*>\s*(?:<span[^>]*>\s*&nbsp;\s*<\/span>|<br\s*\/?>|&nbsp;|\s)*<\/p>/gi, '');
+        // Remove <br> tags immediately before </td>
+        cleaned = cleaned.replace(/<br\s*\/?>\s*(?=<\/td>)/gi, '');
+        // Also remove any remaining empty paragraphs that might just be <p></p>
+        cleaned = cleaned.replace(/<p[^>]*>\s*<\/p>/gi, '');
+        return cleaned;
+      };
+
+      beforeHtml = cleanHtmlForTable(beforeHtml);
+      afterHtml = cleanHtmlForTable(afterHtml);
 
       const beforeHasTable = beforeHtml.includes('<table');
       const afterHasTable = afterHtml.includes('<table');

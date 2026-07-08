@@ -167,11 +167,23 @@
 .html-table-wrapper th,
 .html-table-wrapper td {
   border: 1px solid #e2e8f0 !important;
-  padding: 0.75rem 1rem !important;
+  padding: 0.5rem 0.5rem !important; /* Reduced padding for tighter look */
   color: #334155 !important;
   vertical-align: middle !important;
   word-break: keep-all !important;
   word-wrap: break-word !important;
+  height: auto !important; /* Override inline height from HWP */
+}
+
+.html-table-wrapper tr {
+  height: auto !important; /* Override inline height from HWP */
+}
+
+.html-table-wrapper td p,
+.html-table-wrapper th p {
+  margin: 0 !important; /* Remove excessive paragraph margins */
+  padding: 0 !important;
+  line-height: 1.4 !important;
 }
 
 /* 1. 상단 제목행 (th 태그) 음영 처리 */
