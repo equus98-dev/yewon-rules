@@ -169,8 +169,8 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
   }
 
   return (
-    <div className="bg-slate-50 p-6 w-full h-full">
-      <div className="w-full max-w-none mx-auto bg-white rounded-lg shadow-sm border border-slate-200">
+    <div className="bg-slate-50 p-6 w-full h-full overflow-x-auto">
+      <div className="w-full max-w-none mx-auto bg-white rounded-lg shadow-sm border border-slate-200 min-w-[1400px]">
         <div className="grid grid-cols-2 bg-[#eef3f8] border-b border-slate-300 sticky top-0 z-10">
           <div className="p-4 text-center font-bold text-slate-800 border-r border-slate-300">
             이전연혁 [{prevDate}]
@@ -196,7 +196,7 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                 <div className="p-6 border-r border-slate-200 align-top overflow-x-auto">
                   {before ? (
                     <>
-                      <div className="whitespace-pre-wrap text-[15.5px] leading-[1.7] text-slate-800 font-['Pretendard'] rule-viewer-content">
+                      <div className={`${hasTable ? 'whitespace-normal' : 'whitespace-pre-wrap'} text-[15.5px] leading-[1.7] text-slate-800 font-['Pretendard'] rule-viewer-content`}>
                         {hasTable ? (
                           <div dangerouslySetInnerHTML={{ __html: beforeHtml }} className="html-table-wrapper w-full break-keep" />
                         ) : (
@@ -214,7 +214,7 @@ export default function CompareView({ currentRevision, allRevisions }: CompareVi
                 <div className="p-6 align-top overflow-x-auto">
                   {after ? (
                     <>
-                      <div className="whitespace-pre-wrap text-[15.5px] leading-[1.7] text-slate-800 font-['Pretendard'] rule-viewer-content">
+                      <div className={`${hasTable ? 'whitespace-normal' : 'whitespace-pre-wrap'} text-[15.5px] leading-[1.7] text-slate-800 font-['Pretendard'] rule-viewer-content`}>
                         {hasTable ? (
                           <div dangerouslySetInnerHTML={{ __html: afterHtml }} className="html-table-wrapper w-full break-keep" />
                         ) : (
