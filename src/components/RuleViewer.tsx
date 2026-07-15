@@ -310,20 +310,16 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     const rev = { ...ruleData.currentRevision };
     if (rev.articles && Array.isArray(rev.articles)) {
        const getArticlePrefix = (art: any) => {
-         if (!art.articleNumber) {
-           const m3 = (art.contentText || "").match(/(제\d+조(?:의\s*\d+)?)/);
-           if (m3) return m3[1].replace(/\s/g, '');
-           const m4 = (art.title || "").match(/(제\d+조(?:의\s*\d+)?)/);
-           if (m4) return m4[1].replace(/\s/g, '');
-           return "";
-         }
-         const expected = `제${art.articleNumber}조`;
-         const regex = new RegExp(`(${expected}(?:의\\s*\\d+)?)`);
-         const m = (art.title || "").match(regex);
-         if (m) return m[1].replace(/\s/g, '');
+         const regex = /(제\d+조(?:의\s*\d+)?)/;
+         const m1 = (art.title || "").match(regex);
+         if (m1) return m1[1].replace(/\s/g, '');
          const m2 = (art.contentText || "").match(regex);
          if (m2) return m2[1].replace(/\s/g, '');
-         return expected;
+         
+         if (art.articleNumber) {
+           return `제${art.articleNumber}조`;
+         }
+         return "";
        };
 
        const filtered: any[] = [];
