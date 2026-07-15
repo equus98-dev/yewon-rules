@@ -1,7 +1,7 @@
 "use client";
 import { compareAttachmentNames } from '@/lib/utils';
 
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { CircularProgress, Typography } from "@mui/material";
 import ArticleRenderer from "./ArticleRenderer";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
