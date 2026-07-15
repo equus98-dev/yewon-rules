@@ -1445,6 +1445,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
 
                   return currentRevision.articles.map((a: any, idx: number) => {
                   const hasHtmlAttachments = currentRevision?.articles?.some((art: any) => art.articleNumber >= 9000) || false;
+                  // [버그 수정]: "연혁 숨기기"가 켜져있을 때 본문이 "삭제" 연혁 뿐인 조항(결번 껍데기)이 화면에 노출되는 버그(중복 노출 오인) 수정
+                  if (hideHistory && isDeletedOnly(a.contentText)) {
+                    return null;
+                  }
+                  
                   // 별지/별표/별첨 (9000번대) 조항은 더 이상 본문 하단에 HTML로 렌더링하지 않음 (첨부파일 컴포넌트로 대체)
                   const isLegacyAddendum = a.articleNumber >= 9000 && isAddendumArticle(a);
                   if (a.articleNumber >= 9000 && !isLegacyAddendum) return null;
