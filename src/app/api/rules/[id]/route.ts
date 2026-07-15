@@ -214,6 +214,19 @@ export async function GET(
     // 2-0-3 학업이수에 관한 규정 내 제25의2(특별학점인정) 오타 감지 및 독립 조문 완벽 분리
     let processedArticles: any[] = [];
     for (let art of articlesRes.rows) {
+      // [버그수정] "삭제 전용" 조항 필터링: contentText가 "제N조(제목) <삭제 날짜>" 형태로만 이루어진 경우 화면에서 제외
+      // 예: 제10조(입학홍보처) <삭제 2019.1.23.>, 제13조(종합지원실) <삭제 2017.5.10> 등
+      // 이런 조항이 정상 조항과 함께 렌더링되어 같은 조번호가 중복 표시되는 버그를 방지
+      if (art.articleNumber < 8000 && art.contentText) {
+        const trimmed = art.contentText.trim();
+        // 패턴: 조항 제목 헤더 + (공백 없이 또는 공백 후) <삭제 ...> 만 존재하는 경우
+        // 예: "제10조(입학홍보처) <삭제 2019.1.23.>" 또는 "제10조의1(제목) <삭제 ...>"
+        const deletedOnlyPattern = /^제\d+조(?:의\s*\d+)?\s*(?:\([^)]*\))?\s*[<\[〔＜（]삭제[^>\]〕＞）]*[>\]〕＞）]\s*$/;
+        if (deletedOnlyPattern.test(trimmed)) {
+          continue; // 삭제 전용 조항은 건너뜀
+        }
+      }
+
       // DB에 하드코딩된 연혁 span 껍데기가 묻어있는 경우 (과거 버그) 클라이언트로 가기 전에 모조리 벗겨냅니다.
       if (art.title) art.title = art.title.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
       if (art.contentText) art.contentText = art.contentText.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
