@@ -310,7 +310,13 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     const rev = { ...ruleData.currentRevision };
     if (rev.articles && Array.isArray(rev.articles)) {
        const getArticlePrefix = (art: any) => {
-         if (!art.articleNumber) return "";
+         if (!art.articleNumber) {
+           const m3 = (art.contentText || "").match(/(제\d+조(?:의\s*\d+)?)/);
+           if (m3) return m3[1].replace(/\s/g, '');
+           const m4 = (art.title || "").match(/(제\d+조(?:의\s*\d+)?)/);
+           if (m4) return m4[1].replace(/\s/g, '');
+           return "";
+         }
          const expected = `제${art.articleNumber}조`;
          const regex = new RegExp(`(${expected}(?:의\\s*\\d+)?)`);
          const m = (art.title || "").match(regex);
@@ -327,7 +333,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
        
        for (const art of rev.articles) {
           // 부칙, 별지, 서식 (8000번 이상)은 중복 제거 대상에서 제외
-          if (!art.articleNumber || art.articleNumber >= 8000) {
+          if (art.articleNumber && art.articleNumber >= 8000) {
              nonGrouped.push(art);
              continue;
           }
