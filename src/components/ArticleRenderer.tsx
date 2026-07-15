@@ -568,13 +568,13 @@ export default function ArticleRenderer({
     
     // Check if the first paragraph already contains the article number or title
     let alreadyHasTitle = false;
-    const cleanExpected = expectedTitleStart.replace(/\s+/g, '');
-    const cleanFull = fullTitle.replace(/\s+/g, '');
+    const cleanExpected = expectedTitleStart.replace(/[\s\u200B-\u200D\uFEFF]/g, '');
+    const cleanFull = fullTitle.replace(/[\s\u200B-\u200D\uFEFF]/g, '');
     for (let i = 0; i < Math.min(items.length, 3); i++) {
         if (items[i]) {
             const rawTextStr = String(items[i].text || "");
-            const textStr = rawTextStr.trim();
-            const cleanTextStr = rawTextStr.replace(/<[^>]+>/g, '').replace(/\s+/g, '');
+            const textStr = rawTextStr.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+            const cleanTextStr = rawTextStr.replace(/<[^>]+>/g, '').replace(/[\s\u200B-\u200D\uFEFF]/g, '');
             if (textStr.startsWith(expectedTitleStart) || cleanTextStr.startsWith(cleanExpected) || (articleNumber >= 8000 && cleanTextStr.startsWith(cleanFull))) {
                 alreadyHasTitle = true;
                 break;
