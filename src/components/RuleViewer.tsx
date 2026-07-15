@@ -414,6 +414,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     return "미정";
   }, [ruleData, currentRevision, addendumDates]);
 
+  const isDeletedOnly = useCallback((text: string | null | undefined) => {
+    if (!text) return false;
+    return /^제\d+조(?:의\s*\d+)?\s*(?:\([^)]*\))?\s*[<\[〔＜（]삭제[^>\]〕＞）]*[>\]〕＞）]\s*$/.test(text.trim());
+  }, []);
+
   const tocItems = useMemo(() => {
     if (!currentRevision || !currentRevision.articles) return [];
     let toc: any[] = [];
@@ -421,6 +426,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     let lastSection = "";
     
     currentRevision.articles.forEach((a: any) => {
+        // [버그 수정]: "연혁 숨기기" 상태일 때 내용이 삭제 연혁뿐인 조항 껍데기를 목록과 TOC에서 완전히 제외 (반복 노출 방지)
+        if (hideHistory && isDeletedOnly(a.contentText)) {
+            return;
+        }
+
         if (a.chapter && a.chapter !== lastChapter) {
             // 부칙 chapter는 가운데 장 헤더로 표시하지 않음 (ArticleRenderer에서 통합 처리)
             if (!/^부\s*칙/.test((a.chapter || '').replace(/\s+/g, ''))) {
@@ -790,7 +800,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     }
     
     return toc;
-  }, [currentRevision, ruleData?.attachments]);
+  }, [currentRevision, ruleData?.attachments, hideHistory, isDeletedOnly]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1611,6 +1621,11 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
                         }
 
                         if (isCompletelyHeadlessDuplicate) {
+                          return null;
+                        }
+
+                        // [버그 수정]: "연혁 숨기기" 상태일 때 본문에서도 삭제 전용 조항을 렌더링하지 않음
+                        if (hideHistory && isDeletedOnly(a.contentText)) {
                           return null;
                         }
                         
