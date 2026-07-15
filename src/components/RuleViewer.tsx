@@ -323,7 +323,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
        const nonGrouped: any[] = [];
        
        for (const art of rev.articles) {
-          if (art.articleNumber >= 8000 || !art.title) {
+          // 부칙, 별지, 서식 (8000번 이상)은 중복 제거 대상에서 제외
+          if (art.articleNumber >= 8000) {
              nonGrouped.push(art);
              continue;
           }
@@ -332,7 +333,8 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
              nonGrouped.push(art);
              continue;
           }
-          const key = `${art.articleNumber}-${prefix}`;
+          // articleNumber 대신 prefix(예: "제23조")를 유일키로 사용하여 완벽히 그룹화
+          const key = prefix;
           if (!groupMap.has(key)) {
              groupMap.set(key, []);
           }
