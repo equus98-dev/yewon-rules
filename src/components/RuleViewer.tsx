@@ -305,7 +305,57 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     document.querySelectorAll(".overflow-y-auto").forEach(el => el.scrollTo({ top: el.scrollHeight || 99999, behavior: "smooth" }));
   };
 
-  const currentRevision = ruleData?.currentRevision;
+  const currentRevision = useMemo(() => {
+    if (!ruleData?.currentRevision) return null;
+    const rev = { ...ruleData.currentRevision };
+    if (rev.articles && Array.isArray(rev.articles)) {
+       const getArticlePrefix = (title: string, text: string) => {
+         const m = (text || "").match(/^(제\d+조(?:의\s*\d+)?)/);
+         if (m) return m[1].replace(/\s/g, '');
+         const m2 = (title || "").match(/^(제\d+조(?:의\s*\d+)?)/);
+         if (m2) return m2[1].replace(/\s/g, '');
+         return "";
+       };
+
+       const filtered: any[] = [];
+       // [버그 수정]: DB에 같은 조항 번호를 가진 껍데기 레코드가 중복 저장되어 위아래로 반복 렌더링되는 현상 방지
+       const groupMap = new Map<string, any[]>();
+       const nonGrouped: any[] = [];
+       
+       for (const art of rev.articles) {
+          if (art.articleNumber >= 8000 || !art.title) {
+             nonGrouped.push(art);
+             continue;
+          }
+          const prefix = getArticlePrefix(art.title, art.contentText);
+          if (!prefix) {
+             nonGrouped.push(art);
+             continue;
+          }
+          const key = `${art.articleNumber}-${prefix}`;
+          if (!groupMap.has(key)) {
+             groupMap.set(key, []);
+          }
+          groupMap.get(key)!.push(art);
+       }
+       
+       for (const group of Array.from(groupMap.values())) {
+          if (group.length === 1) {
+             filtered.push(group[0]);
+          } else {
+             // 동일한 조항 번호/제목인데 여러 개가 있다면 내용(contentText)이 더 긴 것(연혁 등이 포함된 진짜 레코드) 하나만 남김
+             const sorted = group.sort((a, b) => (b.contentText || "").length - (a.contentText || "").length);
+             filtered.push(sorted[0]);
+          }
+       }
+       
+       const allArticles = [...filtered, ...nonGrouped];
+       // DB의 원래 순서(sortOrder)를 유지하도록 정렬
+       allArticles.sort((a, b) => a.sortOrder - b.sortOrder);
+       rev.articles = allArticles;
+    }
+    return rev;
+  }, [ruleData]);
 
   const addendumDates = useMemo(() => {
     if (!currentRevision || !currentRevision.articles || !Array.isArray(currentRevision.articles)) {
