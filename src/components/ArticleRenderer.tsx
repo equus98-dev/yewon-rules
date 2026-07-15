@@ -568,10 +568,14 @@ export default function ArticleRenderer({
     
     // Check if the first paragraph already contains the article number or title
     let alreadyHasTitle = false;
+    const cleanExpected = expectedTitleStart.replace(/\s+/g, '');
+    const cleanFull = fullTitle.replace(/\s+/g, '');
     for (let i = 0; i < Math.min(items.length, 3); i++) {
         if (items[i]) {
-            const textStr = String(items[i].text || "").trim();
-            if (textStr.startsWith(expectedTitleStart) || (articleNumber >= 8000 && textStr.replace(/\s+/g, '').startsWith(fullTitle.replace(/\s+/g, '')))) {
+            const rawTextStr = String(items[i].text || "");
+            const textStr = rawTextStr.trim();
+            const cleanTextStr = rawTextStr.replace(/<[^>]+>/g, '').replace(/\s+/g, '');
+            if (textStr.startsWith(expectedTitleStart) || cleanTextStr.startsWith(cleanExpected) || (articleNumber >= 8000 && cleanTextStr.startsWith(cleanFull))) {
                 alreadyHasTitle = true;
                 break;
             }
@@ -603,18 +607,27 @@ export default function ArticleRenderer({
   }
 
   // 제1조, 제3조 등이 일반 text나 paragraph로 잘못 분류되어 조문 제목 및 연/인 버튼 인식이 안 되는 문제 완벽 해결
+  let foundArticleNum = "";
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     if (item && (item.type === "text" || item.type === "paragraph")) {
-      const textStr = String(item.text || "").trim();
+      const textStr = String(item.text || "").replace(/<[^>]+>/g, '').trim();
       const numStr = String(item.num || "").trim();
       if (/^제\d+조/.test(textStr) || /^제\d+조/.test(numStr)) {
-        item.type = "article";
-        if (!item.num && /^제\d+조(?:의\d+)?/.test(textStr)) {
-          const m = textStr.match(/^제\d+조(?:의\d+)?/);
-          if (m) item.num = m[0];
+        const currentNum = numStr.match(/^제\d+조(?:의\d+)?/)?.[0] || textStr.match(/^제\d+조(?:의\d+)?/)?.[0] || "";
+        // 이미 같은 조항 번호를 가진 article이 앞서 인식되었다면, 중복 승격을 방지하여 [연][인] 배지가 두 번 나오는 현상을 차단한다.
+        if (currentNum && foundArticleNum === currentNum) {
+           continue; 
         }
+        item.type = "article";
+        if (!item.num && currentNum) {
+          item.num = currentNum;
+        }
+        if (currentNum) foundArticleNum = currentNum;
       }
+    } else if (item && item.type === "article") {
+      const currentNum = String(item.num || "").match(/^제\d+조(?:의\d+)?/)?.[0] || String(item.text || "").match(/^제\d+조(?:의\d+)?/)?.[0] || "";
+      if (currentNum) foundArticleNum = currentNum;
     }
   }
 
