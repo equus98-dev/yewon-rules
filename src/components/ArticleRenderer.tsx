@@ -572,7 +572,9 @@ export default function ArticleRenderer({
     const cleanFull = fullTitle.replace(/[\s\u200B-\u200D\uFEFF]/g, '');
     for (let i = 0; i < Math.min(items.length, 3); i++) {
         if (items[i]) {
-            const rawTextStr = String(items[i].text || "");
+            let rawTextStr = String(items[i].text || "");
+            // HTML 엔티티(&nbsp; 등)가 startsWith 검사를 방해하는 문제 해결
+            rawTextStr = rawTextStr.replace(/&nbsp;/gi, ' ');
             const textStr = rawTextStr.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
             const cleanTextStr = rawTextStr.replace(/<[^>]+>/g, '').replace(/[\s\u200B-\u200D\uFEFF]/g, '');
             if (textStr.startsWith(expectedTitleStart) || cleanTextStr.startsWith(cleanExpected) || (articleNumber >= 8000 && cleanTextStr.startsWith(cleanFull))) {
@@ -585,7 +587,7 @@ export default function ArticleRenderer({
     if (!alreadyHasTitle) {
       let targetIndex = -1;
       for (let i = 0; i < Math.min(items.length, 3); i++) {
-        const text = String(items[i]?.text || "").trim();
+        const text = String(items[i]?.text || "").replace(/&nbsp;/gi, ' ').replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
         if (text && !/^[\[〔]?(?:시행|제정|개정)/.test(text) && !text.includes("담당부서")) {
           targetIndex = i;
           break;
@@ -594,10 +596,14 @@ export default function ArticleRenderer({
       
       if (targetIndex !== -1 && items[targetIndex]) {
         let originalText = String(items[targetIndex].text || "").trim();
-        if (articleNumber >= 8000 && articleNumber < 9000) {
-           originalText = originalText.replace(/^(?:부\s*칙\s*)+/, '');
+        const cleanOriginal = originalText.replace(/&nbsp;/gi, '').replace(/<[^>]+>/g, '').replace(/[\s\u200B-\u200D\uFEFF]/g, '');
+        // 원문에 이미 "제N조"가 포함되어 있다면 절대 억지로 제목 삽입(\n 포함)을 하지 않음
+        if (!cleanOriginal.includes(cleanExpected)) {
+          if (articleNumber >= 8000 && articleNumber < 9000) {
+             originalText = originalText.replace(/^(?:부\s*칙\s*)+/, '');
+          }
+          items[targetIndex].text = `${fullTitle}\n${originalText}`;
         }
-        items[targetIndex].text = `${fullTitle}\n${originalText}`;
       } else {
         if (!alreadyHasTitle) {
           items[0] = { ...items[0], num: fullTitle };
