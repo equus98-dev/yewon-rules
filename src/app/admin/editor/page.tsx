@@ -49,6 +49,8 @@ function EditorContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const ruleIdParam = searchParams.get("ruleId");
+  const modeParam = searchParams.get("mode"); // "new" 일 때 신설규정 모드
+  const isNewMode = modeParam === "new";
 
   const [rules, setRules] = useState<any[]>([]);
   const [selectedRuleId, setSelectedRuleId] = useState("");
@@ -967,12 +969,35 @@ function EditorContent() {
               className="bg-[#0c3161] hover:bg-[#092244] text-white text-sm font-black px-5 py-2.5 rounded-xl shadow-lg shadow-[#0c3161]/10 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               <SaveIcon sx={{ fontSize: 18 }} />
-              {saving ? "실서버 배포 중..." : "최종 배포 저장"}
+              {saving
+                ? (isNewMode ? "제정 처리 중..." : "실서버 배포 중...")
+                : (isNewMode ? "제정 완료" : "최종 배포 저장")}
             </button>
           </div>
         </div>
 
-        {/* 개정 메타데이터 정보 입력 폼 */}
+        {/* 신설규정 모드 안내 배너 */}
+        {isNewMode && (
+          <div className="relative z-10 flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-2xl px-5 py-3.5 shadow-sm">
+            <span className="text-2xl shrink-0 mt-0.5">📝</span>
+            <div>
+              <p className="text-amber-900 font-black text-sm mb-0.5">신설규정 조문 입력 모드</p>
+              <p className="text-amber-800 text-xs font-bold leading-relaxed">
+                이 규정은 방금 제정된 신설규정입니다. 아래에서 조문 내용을 작성하고
+                <strong>[제정 완료]</strong> 버튼을 눌러 DB에 반영해 주세요.
+                조문 추가는 하단의 <strong>[+ 조항 추가]</strong> 버튼을 이용하세요.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => router.push("/admin/rules")}
+              className="ml-auto shrink-0 text-xs text-amber-700 hover:text-amber-900 font-black border border-amber-300 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap"
+            >
+              ← 규정 목록으로
+            </button>
+          </div>
+        )}
+
         <div className="relative z-10 grid grid-cols-1 md:grid-cols-6 gap-4 bg-slate-50 p-5 border border-slate-200 rounded-2xl text-sm shadow-sm">
           
           <div className="flex flex-col gap-1.5">

@@ -312,8 +312,8 @@ export default function AdminRulesManagement() {
 
       const data = (await res.json()) as any;
       if (res.ok) {
-        alert("규정 제정 등록이 성공적으로 완료되었습니다!");
-        window.location.reload();
+        alert("규정 제정 등록이 완료되었습니다!\n조문 편집 에디터로 이동합니다.");
+        router.push(`/admin/editor?ruleId=${data.ruleId}&mode=new`);
       } else {
         alert(data.error || "등록 실패");
       }
@@ -585,10 +585,20 @@ export default function AdminRulesManagement() {
       >
         <DialogTitle className="text-sm font-black border-b border-slate-100 text-slate-800 flex items-center gap-2">
           <AddIcon sx={{ fontSize: 18, color: "#0c3161" }} />
-          신규 규정 제정 등록 (입안 기초 마스터)
+          신규 규정 제정 등록 (신설)
         </DialogTitle>
         <form onSubmit={handleCreateRule}>
           <DialogContent className="space-y-4 pt-5 pb-6">
+
+            {/* 신설규정 안내 배너 */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-start gap-2.5">
+              <span className="text-blue-500 text-lg shrink-0 mt-0.5">📋</span>
+              <div className="text-xs text-blue-800 font-bold leading-relaxed">
+                <strong className="block mb-0.5 text-blue-900">신설규정 등록 안내</strong>
+                기본 정보(규정명·번호·분류·소관부서·제정일)를 입력하고 등록하면, 자동으로 <strong>조문 편집 에디터</strong>로 이동합니다.<br />
+                에디터에서 조문(條文) 내용을 직접 작성·저장하면 신설규정 입력이 완료됩니다.
+              </div>
+            </div>
 
             {/* 규정명 */}
             <div className="space-y-1">
@@ -697,9 +707,10 @@ export default function AdminRulesManagement() {
             <button
               type="submit"
               disabled={creating}
-              className="bg-[#0c3161] hover:bg-[#092244] text-white px-5 py-2 rounded-xl text-sm font-black cursor-pointer transition-all active:scale-95 shadow-md shadow-[#0c3161]/10 disabled:opacity-50"
+              className="bg-[#0c3161] hover:bg-[#092244] text-white px-5 py-2 rounded-xl text-sm font-black cursor-pointer transition-all active:scale-95 shadow-md shadow-[#0c3161]/10 disabled:opacity-50 flex items-center gap-1.5"
             >
-              {creating ? "제정 등록 중..." : "제정 등록 승인"}
+              <AddIcon sx={{ fontSize: 15 }} />
+              {creating ? "등록 중..." : "제정 등록 후 편집 시작"}
             </button>
           </DialogActions>
         </form>
