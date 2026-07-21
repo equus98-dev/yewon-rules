@@ -628,7 +628,7 @@ export default function AdminRulesManagement() {
       <Dialog
         open={openCreate}
         onClose={() => setOpenCreate(false)}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
         sx={{
           "& .MuiPaper-root": {
@@ -640,195 +640,201 @@ export default function AdminRulesManagement() {
           },
         }}
       >
-        <DialogTitle className="text-sm font-black border-b border-slate-100 text-slate-800 flex items-center gap-2">
-          <AddIcon sx={{ fontSize: 18, color: "#0c3161" }} />
+        <DialogTitle className="text-base font-black border-b border-slate-100 text-slate-800 flex items-center gap-2">
+          <AddIcon sx={{ fontSize: 20, color: "#0c3161" }} />
           신규 규정 제정 등록 (신설)
         </DialogTitle>
         <form onSubmit={handleCreateRule}>
-          <DialogContent className="space-y-4 pt-5 pb-6">
+          <DialogContent className="space-y-5 pt-5 pb-6">
 
             {/* 신설규정 안내 배너 */}
             <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-start gap-2.5">
-              <span className="text-blue-500 text-lg shrink-0 mt-0.5">📋</span>
-              <div className="text-xs text-blue-800 font-bold leading-relaxed">
+              <span className="text-blue-500 text-xl shrink-0 mt-0.5">📋</span>
+              <div className="text-sm text-blue-800 font-bold leading-relaxed">
                 <strong className="block mb-0.5 text-blue-900">신설규정 등록 안내</strong>
                 기본 정보(규정명·번호·분류·소관부서·제정일)를 입력하고 등록하면, 자동으로 <strong>조문 편집 에디터</strong>로 이동합니다.<br />
                 에디터에서 조문(條文) 내용을 직접 작성·저장하면 신설규정 입력이 완료됩니다.
               </div>
             </div>
 
-            {/* 규정명 */}
-            <div className="space-y-1">
-              <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">규정명 (필수)</label>
-              <input
-                type="text"
-                required
-                placeholder="예: 대학평의원회 운영 규정"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
-              />
-            </div>
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* 좌측: 기본 정보 입력 */}
+              <div className="flex-1 space-y-4">
+                {/* 규정명 */}
+                <div className="space-y-1.5">
+                  <label className="text-[15px] text-slate-500 font-bold uppercase tracking-wider pl-1">규정명 (필수)</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="예: 대학평의원회 운영 규정"
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
+                  />
+                </div>
 
-            {/* 규정번호 & 제정일자 */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">규정번호 (필수)</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="예: 제2-0-5호"
-                  value={newRuleNum}
-                  onChange={(e) => setNewRuleNum(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
-                />
+                {/* 규정번호 & 제정일자 */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[15px] text-slate-500 font-bold uppercase tracking-wider pl-1">규정번호 (필수)</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="예: 제2-0-5호"
+                      value={newRuleNum}
+                      onChange={(e) => setNewRuleNum(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
+                    />
+                  </div>
+
+                  {/* 제정 공포일 */}
+                  <div className="space-y-1.5">
+                    <label className="text-[15px] text-slate-500 font-bold uppercase tracking-wider pl-1">제정일자 (필수)</label>
+                    <input
+                      type="date"
+                      required
+                      value={newEnactmentDate}
+                      onChange={(e) => setNewEnactmentDate(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
+                    />
+                  </div>
+                </div>
+
+                {/* 분류 카테고리 & 소관 부서 */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5 flex flex-col">
+                    <label className="text-[15px] text-slate-500 font-bold uppercase tracking-wider mb-1 pl-1">분류 카테고리 (필수)</label>
+                    <select
+                      required
+                      value={newCatId}
+                      onChange={(e) => setNewCatId(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[15px] text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] cursor-pointer"
+                    >
+                      <option value="" disabled>카테고리 선택</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id} className="text-slate-850">{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5 flex flex-col">
+                    <label className="text-[15px] text-slate-500 font-bold uppercase tracking-wider mb-1 pl-1">소관 부서 (필수)</label>
+                    <select
+                      required
+                      value={newDeptId}
+                      onChange={(e) => setNewDeptId(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[15px] text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] cursor-pointer"
+                    >
+                      <DeptSelectOptions departments={departments} />
+                    </select>
+                  </div>
+                </div>
+
+                {/* 공포번호 */}
+                <div className="space-y-1.5">
+                  <label className="text-[15px] text-slate-500 font-bold uppercase tracking-wider pl-1 flex items-center gap-1.5">
+                    공포 기호/번호
+                    <span className="text-[11px] bg-emerald-100 text-emerald-700 font-black px-1.5 py-0.5 rounded border border-emerald-200">자동입력</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="조회 중..."
+                    value={newAnnounceNum}
+                    onChange={(e) => setNewAnnounceNum(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
+                  />
+                  <p className="text-xs text-slate-400 pl-1">DB에서 자동으로 다음 번호를 계산합니다. 직접 수정도 가능합니다.</p>
+                </div>
               </div>
 
-              {/* 제정 공포일 */}
-              <div className="space-y-1">
-                <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">제정일자 (필수)</label>
-                <input
-                  type="date"
-                  required
-                  value={newEnactmentDate}
-                  onChange={(e) => setNewEnactmentDate(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
-                />
-              </div>
-            </div>
-
-            {/* 분류 카테고리 & 소관 부서 */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1 flex flex-col">
-                <label className="text-sm text-slate-500 font-bold uppercase tracking-wider mb-1 pl-1">분류 카테고리 (필수)</label>
-                <select
-                  required
-                  value={newCatId}
-                  onChange={(e) => setNewCatId(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] cursor-pointer"
-                >
-                  <option value="" disabled>카테고리 선택</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id} className="text-slate-850">{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-1 flex flex-col">
-                <label className="text-sm text-slate-500 font-bold uppercase tracking-wider mb-1 pl-1">소관 부서 (필수)</label>
-                <select
-                  required
-                  value={newDeptId}
-                  onChange={(e) => setNewDeptId(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] cursor-pointer"
-                >
-                  <DeptSelectOptions departments={departments} />
-                </select>
-              </div>
-            </div>
-
-            {/* 공포번호 & 파일 업로드 */}
-            <div className="grid grid-cols-1 gap-4">
-              {/* 공포 기호/번호 - 자동입력 */}
-              <div className="space-y-1">
-                <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1 flex items-center gap-1.5">
-                  공포 기호/번호
-                  <span className="text-[10px] bg-emerald-100 text-emerald-700 font-black px-1.5 py-0.5 rounded border border-emerald-200">자동입력</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="조회 중..."
-                  value={newAnnounceNum}
-                  onChange={(e) => setNewAnnounceNum(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
-                />
-                <p className="text-[11px] text-slate-400 pl-1">DB에서 자동으로 다음 번호를 계산합니다. 직접 수정도 가능합니다.</p>
-              </div>
-
-              {/* 관련 서식 파일 업로드 - 복수 지원 */}
-              <div className="space-y-1.5">
-                <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1 flex items-center gap-1.5">
-                  관련 서식 파일 업로드
-                  <span className="text-[10px] bg-slate-100 text-slate-500 font-black px-1.5 py-0.5 rounded border border-slate-200">복수 선택 가능</span>
-                </label>
-
+              {/* 우측: 파일 업로드 및 안내 */}
+              <div className="flex-1 space-y-4 flex flex-col">
                 {/* 파일명 작성 규칙 안내 */}
-                <div className="bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-2.5 space-y-1.5">
-                  <p className="text-[11px] font-black text-amber-800 flex items-center gap-1">
+                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 space-y-2">
+                  <p className="text-[13px] font-black text-amber-800 flex items-center gap-1.5 pb-1 border-b border-amber-200/60">
                     📌 파일명 작성 규칙
                   </p>
-                  <div className="space-y-1 text-[11px] text-amber-700 font-bold leading-relaxed">
-                    <div className="flex items-start gap-1.5">
-                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">전문</span>
-                      <span><code className="bg-amber-100 px-1 rounded">[전문] 규정번호 규정이름</code> <span className="text-amber-500">예) [전문] 1-0-1 대학평의원회운영규정</span></span>
+                  <div className="space-y-1.5 text-xs text-amber-700 font-bold leading-relaxed pt-1">
+                    <div className="flex items-start gap-2">
+                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-black">전문</span>
+                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[전문] 규정번호 규정이름</code> <br/><span className="text-amber-500/90 text-[11px]">예) [전문] 1-0-1 대학평의원회운영규정</span></span>
                     </div>
-                    <div className="flex items-start gap-1.5">
-                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">별표</span>
-                      <span><code className="bg-amber-100 px-1 rounded">[별표N] 규정번호 별표이름</code> <span className="text-amber-500">예) [별표1] 1-0-1 학과별정원표</span></span>
+                    <div className="flex items-start gap-2 mt-1">
+                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-black">별표</span>
+                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[별표N] 규정번호 별표이름</code> <br/><span className="text-amber-500/90 text-[11px]">예) [별표1] 1-0-1 학과별정원표</span></span>
                     </div>
-                    <div className="flex items-start gap-1.5">
-                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">별지</span>
-                      <span><code className="bg-amber-100 px-1 rounded">[별지N] 규정번호 별지이름</code> <span className="text-amber-500">예) [별지1] 1-0-1 신청서</span></span>
+                    <div className="flex items-start gap-2 mt-1">
+                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-black">별지</span>
+                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[별지N] 규정번호 별지이름</code> <br/><span className="text-amber-500/90 text-[11px]">예) [별지1] 1-0-1 신청서</span></span>
                     </div>
-                    <div className="flex items-start gap-1.5">
-                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">별첨</span>
-                      <span><code className="bg-amber-100 px-1 rounded">[별첨N] 규정번호 별첨이름</code> <span className="text-amber-500">예) [별첨1] 1-0-1 참고자료</span></span>
+                    <div className="flex items-start gap-2 mt-1">
+                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-black">별첨</span>
+                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[별첨N] 규정번호 별첨이름</code> <br/><span className="text-amber-500/90 text-[11px]">예) [별첨1] 1-0-1 참고자료</span></span>
                     </div>
                   </div>
                 </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".hwp,.hwpx,.pdf,.jpg,.jpeg,.png,.gif,.xlsx,.xls"
-                  multiple
-                  className="hidden"
-                  onChange={handleFileSelect}
-                />
 
-                {/* 선택된 파일 목록 */}
-                {newUploadFiles.length > 0 && (
-                  <div className="space-y-1.5">
-                    {newUploadFiles.map((f, i) => (
-                      <div key={f.name + i} className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">
-                        <AttachFileIcon sx={{ fontSize: 18, color: "#059669" }} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-black text-emerald-800 truncate">{f.name}</p>
-                          <p className="text-xs text-emerald-600 font-bold">{(f.size / 1024).toFixed(1)} KB</p>
+                {/* 관련 서식 파일 업로드 - 복수 지원 */}
+                <div className="space-y-2 flex-1 flex flex-col">
+                  <label className="text-[15px] text-slate-500 font-bold uppercase tracking-wider pl-1 flex items-center gap-1.5">
+                    관련 서식 파일 첨부
+                    <span className="text-[11px] bg-slate-100 text-slate-500 font-black px-1.5 py-0.5 rounded border border-slate-200">복수 선택 가능</span>
+                  </label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".hwp,.hwpx,.pdf,.jpg,.jpeg,.png,.gif,.xlsx,.xls"
+                    multiple
+                    className="hidden"
+                    onChange={handleFileSelect}
+                  />
+
+                  {/* 선택된 파일 목록 */}
+                  {newUploadFiles.length > 0 && (
+                    <div className="space-y-1.5 max-h-[140px] overflow-y-auto scrollbar pr-1 mb-2">
+                      {newUploadFiles.map((f, i) => (
+                        <div key={f.name + i} className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">
+                          <AttachFileIcon sx={{ fontSize: 18, color: "#059669" }} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] font-black text-emerald-800 truncate">{f.name}</p>
+                            <p className="text-[11px] text-emerald-600 font-bold">{(f.size / 1024).toFixed(1)} KB</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setNewUploadFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                            className="shrink-0 text-emerald-400 hover:text-red-500 transition-colors cursor-pointer"
+                          >
+                            <CloseIcon sx={{ fontSize: 16 }} />
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setNewUploadFiles((prev) => prev.filter((_, idx) => idx !== i))}
-                          className="shrink-0 text-emerald-400 hover:text-red-500 transition-colors cursor-pointer"
-                        >
-                          <CloseIcon sx={{ fontSize: 16 }} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
 
-                {/* 드래그앤드롭 업로드 박스 */}
-                <div
-                  onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
-                  onDragLeave={() => setIsDragOver(false)}
-                  onDrop={handleFileDrop}
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl py-5 cursor-pointer transition-all ${
-                    isDragOver
-                      ? "border-[#0c3161] bg-blue-50"
-                      : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100"
-                  }`}
-                >
-                  <UploadFileIcon sx={{ fontSize: 28, color: isDragOver ? "#0c3161" : "#94a3b8" }} />
-                  <p className="text-sm font-black text-slate-500">
-                    {isDragOver ? "파일을 놓으세요" : newUploadFiles.length > 0 ? "+ 파일 추가" : "클릭하거나 파일을 드래그하세요"}
-                  </p>
-                  <p className="text-xs text-slate-400 font-bold">HWP · PDF · JPG · PNG · XLSX · 별표/별지 등 · 최대 50MB</p>
+                  {/* 드래그앤드롭 업로드 박스 */}
+                  <div
+                    onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+                    onDragLeave={() => setIsDragOver(false)}
+                    onDrop={handleFileDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`flex-1 flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl py-6 cursor-pointer transition-all min-h-[120px] ${
+                      isDragOver
+                        ? "border-[#0c3161] bg-blue-50"
+                        : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100"
+                    }`}
+                  >
+                    <UploadFileIcon sx={{ fontSize: 32, color: isDragOver ? "#0c3161" : "#94a3b8" }} />
+                    <p className="text-[15px] font-black text-slate-500">
+                      {isDragOver ? "파일을 놓으세요" : newUploadFiles.length > 0 ? "+ 파일 추가" : "클릭하거나 파일을 드래그하세요"}
+                    </p>
+                    <p className="text-xs text-slate-400 font-bold">HWP · PDF · JPG · PNG · XLSX · 별표/별지 등</p>
+                  </div>
                 </div>
               </div>
             </div>
 
           </DialogContent>
+
           <DialogActions className="border-t border-slate-100 px-6 py-4 flex gap-2 justify-end">
             <button
               type="button"
