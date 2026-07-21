@@ -757,19 +757,19 @@ export default function AdminRulesManagement() {
                   <div className="space-y-1.5 text-xs text-amber-700 font-bold leading-relaxed pt-1">
                     <div className="flex items-start gap-2">
                       <span className="shrink-0 bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-black">전문</span>
-                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[전문] 규정번호 규정이름</code> <br/><span className="text-amber-500/90 text-[11px]">예) [전문] 1-0-1 대학평의원회운영규정</span></span>
+                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[전문] 규정번호 규정이름</code> <br/><span className="text-slate-500 text-[11px]">예) [전문] 1-0-1 대학평의원회운영규정</span></span>
                     </div>
                     <div className="flex items-start gap-2 mt-1">
                       <span className="shrink-0 bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-black">별표</span>
-                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[별표N] 규정번호 별표이름</code> <br/><span className="text-amber-500/90 text-[11px]">예) [별표1] 1-0-1 학과별정원표</span></span>
+                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[별표N] 규정번호 별표이름</code> <br/><span className="text-slate-500 text-[11px]">예) [별표1] 1-0-1 학과별정원표</span></span>
                     </div>
                     <div className="flex items-start gap-2 mt-1">
                       <span className="shrink-0 bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-black">별지</span>
-                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[별지N] 규정번호 별지이름</code> <br/><span className="text-amber-500/90 text-[11px]">예) [별지1] 1-0-1 신청서</span></span>
+                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[별지N] 규정번호 별지이름</code> <br/><span className="text-slate-500 text-[11px]">예) [별지1] 1-0-1 신청서</span></span>
                     </div>
                     <div className="flex items-start gap-2 mt-1">
                       <span className="shrink-0 bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-black">별첨</span>
-                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[별첨N] 규정번호 별첨이름</code> <br/><span className="text-amber-500/90 text-[11px]">예) [별첨1] 1-0-1 참고자료</span></span>
+                      <span><code className="bg-amber-100 px-1 py-0.5 rounded">[별첨N] 규정번호 별첨이름</code> <br/><span className="text-slate-500 text-[11px]">예) [별첨1] 1-0-1 참고자료</span></span>
                     </div>
                   </div>
                 </div>
