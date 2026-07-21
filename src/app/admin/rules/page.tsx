@@ -751,6 +751,31 @@ export default function AdminRulesManagement() {
                   관련 서식 파일 업로드
                   <span className="text-[10px] bg-slate-100 text-slate-500 font-black px-1.5 py-0.5 rounded border border-slate-200">복수 선택 가능</span>
                 </label>
+
+                {/* 파일명 작성 규칙 안내 */}
+                <div className="bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-2.5 space-y-1.5">
+                  <p className="text-[11px] font-black text-amber-800 flex items-center gap-1">
+                    📌 파일명 작성 규칙
+                  </p>
+                  <div className="space-y-1 text-[11px] text-amber-700 font-bold leading-relaxed">
+                    <div className="flex items-start gap-1.5">
+                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">원문</span>
+                      <span><code className="bg-amber-100 px-1 rounded">규정번호_규정명.hwp</code> <span className="text-amber-500">예) 제2-0-5호_대학평의원회운영규정.hwp</span></span>
+                    </div>
+                    <div className="flex items-start gap-1.5">
+                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">별표</span>
+                      <span><code className="bg-amber-100 px-1 rounded">규정번호_별표제N호.hwp</code> <span className="text-amber-500">예) 제2-0-5호_별표제1호.hwp</span></span>
+                    </div>
+                    <div className="flex items-start gap-1.5">
+                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">별지</span>
+                      <span><code className="bg-amber-100 px-1 rounded">규정번호_별지제N호서식.hwp</code> <span className="text-amber-500">예) 제2-0-5호_별지제1호서식.hwp</span></span>
+                    </div>
+                    <div className="flex items-start gap-1.5">
+                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">PDF</span>
+                      <span><code className="bg-amber-100 px-1 rounded">규정번호_규정명.pdf</code> <span className="text-amber-500">예) 제2-0-5호_대학평의원회운영규정.pdf</span></span>
+                    </div>
+                  </div>
+                </div>
                 <input
                   ref={fileInputRef}
                   type="file"
