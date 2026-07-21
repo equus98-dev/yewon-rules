@@ -759,20 +759,20 @@ export default function AdminRulesManagement() {
                   </p>
                   <div className="space-y-1 text-[11px] text-amber-700 font-bold leading-relaxed">
                     <div className="flex items-start gap-1.5">
-                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">원문</span>
-                      <span><code className="bg-amber-100 px-1 rounded">규정번호_규정명.hwp</code> <span className="text-amber-500">예) 제2-0-5호_대학평의원회운영규정.hwp</span></span>
+                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">전문</span>
+                      <span><code className="bg-amber-100 px-1 rounded">[전문] 규정번호 규정이름</code> <span className="text-amber-500">예) [전문] 1-0-1 대학평의원회운영규정</span></span>
                     </div>
                     <div className="flex items-start gap-1.5">
                       <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">별표</span>
-                      <span><code className="bg-amber-100 px-1 rounded">규정번호_별표제N호.hwp</code> <span className="text-amber-500">예) 제2-0-5호_별표제1호.hwp</span></span>
+                      <span><code className="bg-amber-100 px-1 rounded">[별표N] 규정번호 별표이름</code> <span className="text-amber-500">예) [별표1] 1-0-1 학과별정원표</span></span>
                     </div>
                     <div className="flex items-start gap-1.5">
                       <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">별지</span>
-                      <span><code className="bg-amber-100 px-1 rounded">규정번호_별지제N호서식.hwp</code> <span className="text-amber-500">예) 제2-0-5호_별지제1호서식.hwp</span></span>
+                      <span><code className="bg-amber-100 px-1 rounded">[별지N] 규정번호 별지이름</code> <span className="text-amber-500">예) [별지1] 1-0-1 신청서</span></span>
                     </div>
                     <div className="flex items-start gap-1.5">
-                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">PDF</span>
-                      <span><code className="bg-amber-100 px-1 rounded">규정번호_규정명.pdf</code> <span className="text-amber-500">예) 제2-0-5호_대학평의원회운영규정.pdf</span></span>
+                      <span className="shrink-0 bg-amber-200 text-amber-900 px-1 rounded font-black">별첨</span>
+                      <span><code className="bg-amber-100 px-1 rounded">[별첨N] 규정번호 별첨이름</code> <span className="text-amber-500">예) [별첨1] 1-0-1 참고자료</span></span>
                     </div>
                   </div>
                 </div>
