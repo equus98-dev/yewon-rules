@@ -942,26 +942,7 @@ function EditorContent() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleFixAllRules}
-              disabled={saving}
-              className="bg-white border border-emerald-600 text-emerald-700 hover:bg-emerald-50 text-sm font-black px-4 py-2.5 rounded-xl shadow-sm active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-              title="시스템 내의 '모든 규정'들의 조문 간격 및 중복 제목 오류를 자동으로 일괄 수정합니다."
-            >
-              <SaveIcon sx={{ fontSize: 18 }} />
-              전체 규정 일괄 정상화(저장)
-            </button>
-            <button
-              type="button"
-              onClick={handleSimpleSaveAll}
-              disabled={saving || draftArticles.length === 0}
-              className="bg-white border border-[#0c3161] text-[#0c3161] hover:bg-slate-50 text-sm font-black px-4 py-2.5 rounded-xl shadow-sm active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-              title="이 규정의 모든 조항의 간격 및 중복 제목 오류를 자동으로 일괄 수정하여 실서버에 적용합니다."
-            >
-              <SaveIcon sx={{ fontSize: 18 }} />
-              전체 조문 일괄 정상화(저장)
-            </button>
+
             <button
               type="button"
               onClick={handlePublishRevision}

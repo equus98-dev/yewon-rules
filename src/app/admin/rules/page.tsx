@@ -360,31 +360,6 @@ export default function AdminRulesManagement() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* 전체 시스템 DB 조항 일괄 정상화 버튼 */}
-          <button
-            type="button"
-            onClick={async () => {
-              if (!confirm("시스템 내의 '모든 규정'을 스캔하여 간격 및 중복 제목 오류를 자동으로 찾아 DB를 정화합니다.\n\n이 작업은 되돌릴 수 없으며 시간이 조금 걸릴 수 있습니다.\n계속하시겠습니까?")) return;
-              
-              try {
-                const res = await fetch("/api/admin/fix-all-formats", { method: "POST" });
-                const data = (await res.json()) as any;
-                if (res.ok) {
-                  alert(`✅ 전체 규정 DB 스캔 및 정화 완료!\n총 ${data.count}개의 비정상 조항이 정상화되었습니다.`);
-                  window.location.reload();
-                } else {
-                  alert("오류 발생: " + data.error);
-                }
-              } catch (e) {
-                alert("네트워크/서버 오류가 발생했습니다.");
-              }
-            }}
-            className="bg-white border border-[#0c3161] hover:bg-slate-50 text-[#0c3161] text-sm font-black px-4.5 py-2.5 rounded-xl shadow-sm active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-            title="모든 규정의 오류를 일괄 수정합니다."
-          >
-            <AutoFixHighIcon sx={{ fontSize: 16 }} />
-            전체 규정 일괄 정화
-          </button>
 
           {/* 신규 등록 버튼 */}
           <button
