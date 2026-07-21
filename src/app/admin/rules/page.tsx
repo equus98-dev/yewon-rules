@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   CircularProgress,
   Dialog,
@@ -19,6 +19,8 @@ import BusinessIcon from "@mui/icons-material/Business";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import { useRouter as useNextRouter } from "next/navigation";
 
 // 선택 불가 그룹 부서명 (구분자 역할만 함)
@@ -70,8 +72,16 @@ export default function AdminRulesManagement() {
   const [newDeptId, setNewDeptId] = useState("");
   const [newEnactmentDate, setNewEnactmentDate] = useState("");
   const [newAnnounceNum, setNewAnnounceNum] = useState("");
-  const [newFileUrl, setNewFileUrl] = useState("");
   const [creating, setCreating] = useState(false);
+
+  // 파일 업로드 상태 (복수 선택 지원)
+  const [newUploadFiles, setNewUploadFiles] = useState<File[]>([]);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 허용 확장자
+  const ALLOWED_EXTS = ["hwp", "hwpx", "pdf", "jpg", "jpeg", "png", "gif", "xlsx", "xls"];
 
   // 인라인 담당부서 편집 상태
   const [editingDeptRuleId, setEditingDeptRuleId] = useState<string | null>(null);
@@ -144,6 +154,23 @@ export default function AdminRulesManagement() {
     }
     loadData();
   }, []);
+
+  // 모달 열릴 때 공포번호 자동 조회
+  useEffect(() => {
+    if (!openCreate) return;
+    async function fetchNextAnnounceNum() {
+      try {
+        const res = await fetch("/api/admin/next-announce-num");
+        if (res.ok) {
+          const data = (await res.json()) as any;
+          setNewAnnounceNum(data.nextAnnounceNum || "");
+        }
+      } catch (e) {
+        console.error("공포번호 자동 조회 실패:", e);
+      }
+    }
+    fetchNextAnnounceNum();
+  }, [openCreate]);
 
   // 규정 폐지 / 복구 토글 핸들러
   const handleToggleStatus = async (ruleId: string, currentStatus: string) => {
@@ -296,6 +323,7 @@ export default function AdminRulesManagement() {
 
     setCreating(true);
     try {
+      // 1) 규정 마스터 등록
       const res = await fetch("/api/admin/rules", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -306,23 +334,77 @@ export default function AdminRulesManagement() {
           departmentId: newDeptId,
           enactmentDate: newEnactmentDate,
           announcementNumber: newAnnounceNum,
-          fileUrl: newFileUrl,
         }),
       });
 
       const data = (await res.json()) as any;
-      if (res.ok) {
-        alert("규정 제정 등록이 완료되었습니다!\n조문 편집 에디터로 이동합니다.");
-        router.push(`/admin/editor?ruleId=${data.ruleId}&mode=new`);
-      } else {
+      if (!res.ok) {
         alert(data.error || "등록 실패");
+        return;
       }
+
+      const ruleId = data.ruleId;
+
+      // 2) 파일들 업로드 (순차 처리)
+      if (newUploadFiles.length > 0 && ruleId) {
+        setUploadingFile(true);
+        try {
+          for (const f of newUploadFiles) {
+            const formData = new FormData();
+            formData.append("file", f);
+            formData.append("ruleId", ruleId);
+            await fetch("/api/admin/files", { method: "POST", body: formData });
+          }
+        } catch (uploadErr) {
+          console.error("파일 업로드 실패:", uploadErr);
+        } finally {
+          setUploadingFile(false);
+        }
+      }
+
+      alert("규정 제정 등록이 완료되었습니다!\n조문 편집 에디터로 이동합니다.");
+      router.push(`/admin/editor?ruleId=${ruleId}&mode=new`);
     } catch (e) {
       console.error(e);
       alert("네트워크 오류 발생");
     } finally {
       setCreating(false);
     }
+  };
+
+  // 파일 드래그앤드롭 핸들러
+  const handleFileDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const dropped = Array.from(e.dataTransfer.files).filter((f) => {
+      const ext = f.name.split(".").pop()?.toLowerCase() || "";
+      return ALLOWED_EXTS.includes(ext);
+    });
+    if (dropped.length === 0) {
+      alert(`HWP, PDF, JPG, PNG, XLSX 등 허용 형식의 파일만 업로드 가능합니다.`);
+      return;
+    }
+    setNewUploadFiles((prev) => [
+      ...prev,
+      ...dropped.filter((f) => !prev.some((p) => p.name === f.name)),
+    ]);
+  }, [ALLOWED_EXTS]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files || []).filter((f) => {
+      const ext = f.name.split(".").pop()?.toLowerCase() || "";
+      return ALLOWED_EXTS.includes(ext);
+    });
+    if (selected.length === 0) {
+      alert(`HWP, PDF, JPG, PNG, XLSX 등 허용 형식의 파일만 업로드 가능합니다.`);
+      e.target.value = "";
+      return;
+    }
+    setNewUploadFiles((prev) => [
+      ...prev,
+      ...selected.filter((f) => !prev.some((p) => p.name === f.name)),
+    ]);
+    e.target.value = "";
   };
 
   const filteredRules = rules.filter(
@@ -645,28 +727,79 @@ export default function AdminRulesManagement() {
               </div>
             </div>
 
-            {/* 공포번호 & 다운로드 URL */}
+            {/* 공포번호 & 파일 업로드 */}
             <div className="grid grid-cols-1 gap-4">
+              {/* 공포 기호/번호 - 자동입력 */}
               <div className="space-y-1">
-                <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">공포 기호/번호</label>
+                <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1 flex items-center gap-1.5">
+                  공포 기호/번호
+                  <span className="text-[10px] bg-emerald-100 text-emerald-700 font-black px-1.5 py-0.5 rounded border border-emerald-200">자동입력</span>
+                </label>
                 <input
                   type="text"
-                  placeholder="예: 예원 제2026-1호"
+                  placeholder="조회 중..."
                   value={newAnnounceNum}
                   onChange={(e) => setNewAnnounceNum(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
                 />
+                <p className="text-[11px] text-slate-400 pl-1">DB에서 자동으로 다음 번호를 계산합니다. 직접 수정도 가능합니다.</p>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1">관련 서식 다운로드 링크 (한글/PDF URL)</label>
+              {/* 관련 서식 파일 업로드 - 복수 지원 */}
+              <div className="space-y-1.5">
+                <label className="text-sm text-slate-500 font-bold uppercase tracking-wider pl-1 flex items-center gap-1.5">
+                  관련 서식 파일 업로드
+                  <span className="text-[10px] bg-slate-100 text-slate-500 font-black px-1.5 py-0.5 rounded border border-slate-200">복수 선택 가능</span>
+                </label>
                 <input
-                  type="url"
-                  placeholder="예: https://yewon.ac.kr/main/filedown.php?no=46558"
-                  value={newFileUrl}
-                  onChange={(e) => setNewFileUrl(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".hwp,.hwpx,.pdf,.jpg,.jpeg,.png,.gif,.xlsx,.xls"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileSelect}
                 />
+
+                {/* 선택된 파일 목록 */}
+                {newUploadFiles.length > 0 && (
+                  <div className="space-y-1.5">
+                    {newUploadFiles.map((f, i) => (
+                      <div key={f.name + i} className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">
+                        <AttachFileIcon sx={{ fontSize: 18, color: "#059669" }} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-black text-emerald-800 truncate">{f.name}</p>
+                          <p className="text-xs text-emerald-600 font-bold">{(f.size / 1024).toFixed(1)} KB</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setNewUploadFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                          className="shrink-0 text-emerald-400 hover:text-red-500 transition-colors cursor-pointer"
+                        >
+                          <CloseIcon sx={{ fontSize: 16 }} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* 드래그앤드롭 업로드 박스 */}
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+                  onDragLeave={() => setIsDragOver(false)}
+                  onDrop={handleFileDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl py-5 cursor-pointer transition-all ${
+                    isDragOver
+                      ? "border-[#0c3161] bg-blue-50"
+                      : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100"
+                  }`}
+                >
+                  <UploadFileIcon sx={{ fontSize: 28, color: isDragOver ? "#0c3161" : "#94a3b8" }} />
+                  <p className="text-sm font-black text-slate-500">
+                    {isDragOver ? "파일을 놓으세요" : newUploadFiles.length > 0 ? "+ 파일 추가" : "클릭하거나 파일을 드래그하세요"}
+                  </p>
+                  <p className="text-xs text-slate-400 font-bold">HWP · PDF · JPG · PNG · XLSX · 별표/별지 등 · 최대 50MB</p>
+                </div>
               </div>
             </div>
 
@@ -685,7 +818,9 @@ export default function AdminRulesManagement() {
               className="bg-[#0c3161] hover:bg-[#092244] text-white px-5 py-2 rounded-xl text-sm font-black cursor-pointer transition-all active:scale-95 shadow-md shadow-[#0c3161]/10 disabled:opacity-50 flex items-center gap-1.5"
             >
               <AddIcon sx={{ fontSize: 15 }} />
-              {creating ? "등록 중..." : "제정 등록 후 편집 시작"}
+              {creating
+                ? (uploadingFile ? "파일 업로드 중..." : "등록 중...")
+                : "제정 등록 후 편집 시작"}
             </button>
           </DialogActions>
         </form>
