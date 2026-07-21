@@ -680,7 +680,7 @@ export default function AdminRulesManagement() {
                     <input
                       type="text"
                       required
-                      placeholder="예: 제2-0-5호"
+                      placeholder="예: 2-0-5"
                       value={newRuleNum}
                       onChange={(e) => setNewRuleNum(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 placeholder-slate-400 font-bold focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161]"
