@@ -102,6 +102,49 @@ function EditorContent() {
     }
   }, [revisionAnnounceDate, revisionEffectiveDate, revisionPopupOpen, isAddendumEdited]);
 
+  const [extractingArticles, setExtractingArticles] = useState(false);
+  const handleAutoExtractArticles = async (ruleId: string) => {
+    setExtractingArticles(true);
+    try {
+      const res = await fetch("/api/admin/extract-articles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ruleId }),
+      });
+      if (res.ok) {
+        const result = await res.json() as any;
+        if (result.articles && result.articles.length > 0) {
+          const parsedArticles = result.articles.map((a: any, idx: number) => {
+            const isAddendum = a.chapter === "부칙" || a.title === "부칙" || a.articleNumber === "부칙";
+            const extractedNum = parseInt(a.articleNumber, 10);
+            const finalNum = isAddendum ? 9999 : (isNaN(extractedNum) ? idx + 1 : extractedNum);
+
+            return {
+              chapter: a.chapter || (isAddendum ? "부칙" : ""),
+              section: a.section || "",
+              articleNumber: finalNum,
+              title: a.title || "제목없음",
+              contentText: a.contentText || "",
+              contentJson: { paragraphs: a.contentText ? a.contentText.split("\\n") : [] },
+              sortOrder: idx + 1,
+              isNew: true,
+            };
+          });
+          setDraftArticles(parsedArticles);
+          alert("첨부파일(PDF)에서 조문 데이터가 성공적으로 자동 추출되었습니다.\\n검수 후 제정완료 버튼을 눌러주세요.");
+        }
+      } else {
+        const errorData = await res.json() as any;
+        alert(`조문 자동 추출 실패: ${errorData.error}`);
+      }
+    } catch (e) {
+      console.error(e);
+      alert("자동 추출 중 오류가 발생했습니다.");
+    } finally {
+      setExtractingArticles(false);
+    }
+  };
+
   // 1. 규정 마스터 목록 로드
   useEffect(() => {
     async function loadRules() {
@@ -221,6 +264,10 @@ function EditorContent() {
               isNew: true,
             },
           ]);
+
+          if (isNewMode && data.attachments && data.attachments.length > 0) {
+            handleAutoExtractArticles(data.id);
+          }
         }
       } catch (e) {
         console.error(e);
@@ -922,8 +969,18 @@ function EditorContent() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-slate-50 overflow-hidden text-slate-800">
+    <div className="h-full flex flex-col bg-slate-50 overflow-hidden text-slate-800 relative">
       
+      {/* AI 자동 추출 로딩 오버레이 */}
+      {extractingArticles && (
+        <div className="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
+          <CircularProgress size={40} sx={{ color: "#0c3161" }} />
+          <div className="text-center">
+            <h3 className="text-[#0c3161] font-black text-lg mb-1">AI 조문 자동 추출 중...</h3>
+            <p className="text-slate-500 text-sm font-bold">첨부된 규정 파일을 분석하여 조문을 생성하고 있습니다. (최대 1~2분 소요)</p>
+          </div>
+        </div>
+      )}
       {/* ==================== 1. 상단 규정 선택 & 메타 폼 ==================== */}
       <div className="relative bg-[#008080]/10 border-b border-slate-200 p-6 space-y-4 shrink-0 z-10 shadow-sm overflow-hidden">
         {/* 학교 전경 이미지 배경 */}

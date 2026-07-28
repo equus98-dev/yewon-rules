@@ -1,0 +1,48 @@
+
+ ⛅️ wrangler 3.114.17 (update available 4.107.0)
+------------------------------------------------
+
+🌀 Executing on remote database yewon-rules-db (f448ab63-128a-4e09-a1e1-02095e73d92e):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+Note: if the execution fails to complete, your DB will return to its original state and you can safely retry.
+├ Checking if file needs uploading
+│
+├ 🌀 Uploading f448ab63-128a-4e09-a1e1-02095e73d92e.d97d61ab7b60bfef.sql
+│ 🌀 Uploading complete.
+│
+🌀 Starting import...
+🌀 Processed 1 queries.
+🚣 Executed 1 queries in 7.31ms (5673 rows read, 0 rows written)
+   Database is currently at bookmark 000006a0-00000004-000050a1-78d66baccac8eaf179a34a51ad29f280.
+[
+  {
+    "results": [
+      {
+        "Total queries executed": 1,
+        "Rows read": 5673,
+        "Rows written": 0,
+        "Database size (MB)": "22.08"
+      }
+    ],
+    "success": true,
+    "finalBookmark": "000006a0-00000004-000050a1-78d66baccac8eaf179a34a51ad29f280",
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "APAC",
+      "served_by_colo": "ICN",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 7.3116
+      },
+      "duration": 7.3116,
+      "changes": 1,
+      "last_row_id": 0,
+      "changed_db": true,
+      "size_after": 22077440,
+      "rows_read": 5673,
+      "rows_written": 0,
+      "num_tables": 9,
+      "total_attempts": 1
+    }
+  }
+]

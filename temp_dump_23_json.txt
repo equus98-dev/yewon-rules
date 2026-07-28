@@ -1,0 +1,7 @@
+Total 23rd Articles: 1
+[RevVersion:1] [ID:915df775-293d-44e4-bb55-55131db9daec Num:23] 문화예술교육원
+TEXT:
+제23조(문화예술교육원) <삭제 2019.1.23.>
+JSON:
+"[object Object]"
+-----------------------------------

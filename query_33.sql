@@ -1,0 +1,1 @@
+SELECT id, articleNumber, contentText, contentHtml, contentJson FROM Article WHERE articleNumber = 33 AND revisionId = (SELECT id FROM Revision WHERE ruleId = (SELECT id FROM Rule WHERE title LIKE '%일반대학원 학사운영 규정%') ORDER BY version DESC LIMIT 1);
