@@ -30,14 +30,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    await client.query("BEGIN");
-
     if (ruleTitle && ruleTitle.trim() !== "") {
       const newInitialSound = getInitialSound(ruleTitle.trim());
-      await client.query(
-        `UPDATE "Rule" SET title = $1, "initialSound" = $2, "updatedAt" = NOW() WHERE id = $3`,
-        [ruleTitle.trim(), newInitialSound, ruleId]
-      );
+      // UPDATE will be batched later
     }
 
     const prevRes = await client.query(
@@ -64,6 +59,16 @@ export async function POST(request: Request) {
         [validSourceRevision.id]
       );
       oldArticles = oldArtRes.rows;
+    }
+
+    await client.query("BEGIN");
+
+    if (ruleTitle && ruleTitle.trim() !== "") {
+      const newInitialSound = getInitialSound(ruleTitle.trim());
+      await client.query(
+        `UPDATE "Rule" SET title = $1, "initialSound" = $2, "updatedAt" = NOW() WHERE id = $3`,
+        [ruleTitle.trim(), newInitialSound, ruleId]
+      );
     }
 
     const newRevisionId = crypto.randomUUID();
