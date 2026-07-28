@@ -111,15 +111,19 @@ export default function AdminRulesManagement() {
         // 카테고리 트리에서 1뎁스/2뎁스 리스트 평탄화
         const catsData = (await catsRes.json()) as any;
         const flatCats: any[] = [];
-        function flattenCats(nodes: any[]) {
+        function flattenCats(nodes: any[], depth = 0) {
           nodes.forEach((n) => {
-            flatCats.push({ id: n.id.replace("cat-", ""), name: n.name });
+            flatCats.push({ 
+              id: n.id.replace("cat-", ""), 
+              name: depth === 0 ? n.name : `　└ ${n.name}`,
+              disabled: n.id.startsWith("virtual-")
+            });
             if (Array.isArray(n.children)) {
-              flattenCats(n.children.filter((c: any) => c.type === "folder"));
+              flattenCats(n.children.filter((c: any) => c.type === "folder"), depth + 1);
             }
           });
         }
-        flattenCats(catsData);
+        flattenCats(catsData, 0);
         setCategories(flatCats);
 
         // 부서 목록 가공 (dept- 접두어 제거, 그룹 부서 포함하여 저장)
@@ -712,7 +716,9 @@ export default function AdminRulesManagement() {
                     >
                       <option value="" disabled>카테고리 선택</option>
                       {categories.map((cat) => (
-                        <option key={cat.id} value={cat.id} className="text-slate-850">{cat.name}</option>
+                        <option key={cat.id} value={cat.id} disabled={cat.disabled} className={cat.disabled ? "text-slate-400 font-bold bg-slate-100" : "text-slate-850"}>
+                          {cat.name}
+                        </option>
                       ))}
                     </select>
                   </div>
