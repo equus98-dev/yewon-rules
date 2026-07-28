@@ -747,9 +747,12 @@ export default function ArticleRenderer({
 
   function renderTextWithHistory(text: string) {
     // DB에 &lt;table&gt; 과 같이 이스케이프되어 저장된 경우를 대비해 디코딩
-    let decodedText = text
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
+    // 단, <예술치료사> 와 같은 일반 텍스트가 사라지지 않도록 허용된 태그만 디코딩합니다.
+    const allowedTags = 'table|tr|td|th|tbody|thead|tfoot|br|p|div|span|strong|em|u|s|b|i|ul|ol|li|img';
+    const tagRegex = new RegExp(`&lt;(/?(?:${allowedTags})(?:\\s+[^&>]+)?)&gt;`, 'gi');
+    let decodedText = text.replace(tagRegex, '<$1>');
+
+    decodedText = decodedText
       .replace(/&amp;/g, "&")
       .replace(/&nbsp;/g, " ")
       .replace(/&quot;/g, '"')
@@ -766,10 +769,7 @@ export default function ArticleRenderer({
       return titlePart + " ";
     });
 
-    // 만약 테이블 태그가 없고 단순히 <p>나 </p> 등의 태그만 텍스트로 들어가 있다면 이를 정화해줍니다.
-    if (!/<table/i.test(decodedText)) {
-      decodedText = decodedText.replace(/<\/?[pP](?:\s[^>]*)?>/g, "");
-    }
+    // Jodit Editor가 생성한 <p> 태그와 스타일을 보존하기 위해 <p> 태그 삭제 로직을 제거합니다.
 
     if (hideHistory) {
       // 연혁 숨기기
@@ -821,7 +821,7 @@ export default function ArticleRenderer({
     });
 
     // 테이블 등 HTML 태그가 포함되어 있다면 dangerouslySetInnerHTML 사용
-    if (/<table|<tr|<td|<th|<br|<p/i.test(htmlText)) {
+    if (/<(?:table|tr|td|th|br|p|div|span|ul|ol|li)/i.test(htmlText)) {
       let hiddenNoCites: string[] = [];
       htmlText = htmlText.replace(/\[nocite\]([\s\S]*?)\[\/nocite\]/gi, (match, inner) => {
         hiddenNoCites.push(inner);

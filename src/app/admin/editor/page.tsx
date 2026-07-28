@@ -834,7 +834,7 @@ function EditorContent() {
           let finalContentJson = art.contentJson;
           let finalContentHtml = art.contentHtml;
 
-          if (art.isNew && !art.isModified) {
+          if (art.isNew && !art.isModified && !isNewMode) {
             const eDateObj = new Date(enactmentDate || new Date());
             const eDateStr = !isNaN(eDateObj.getTime()) ? `${eDateObj.getFullYear()}. ${eDateObj.getMonth() + 1}. ${eDateObj.getDate()}.` : formattedDate;
             const tag = ` <신설 ${eDateStr}>`;
