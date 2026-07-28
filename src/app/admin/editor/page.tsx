@@ -103,13 +103,22 @@ function EditorContent() {
   }, [revisionAnnounceDate, revisionEffectiveDate, revisionPopupOpen, isAddendumEdited]);
 
   const [extractingArticles, setExtractingArticles] = useState(false);
-  const handleAutoExtractArticles = async (ruleId: string) => {
+  const handleAutoExtractArticles = async (ruleIdToExtract?: string, forceAttachmentUrl?: string) => {
+    const targetId = ruleIdToExtract || selectedRuleId;
+    if (!targetId) return;
+
+    const attachmentUrl = forceAttachmentUrl || ruleDetail?.attachments?.[0]?.fileUrl;
+    if (!attachmentUrl) {
+      alert("등록된 첨부파일이 없어 자동 조문 추출을 진행할 수 없습니다.");
+      return;
+    }
+
     setExtractingArticles(true);
     try {
       const res = await fetch("/api/admin/extract-articles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ruleId }),
+        body: JSON.stringify({ ruleId: targetId, fileUrl: attachmentUrl }),
       });
       if (res.ok) {
         const result = await res.json() as any;
@@ -266,7 +275,7 @@ function EditorContent() {
           ]);
 
           if (isNewMode && data.attachments && data.attachments.length > 0) {
-            handleAutoExtractArticles(data.id);
+            handleAutoExtractArticles(data.id, data.attachments[0].fileUrl);
           }
         }
       } catch (e) {
