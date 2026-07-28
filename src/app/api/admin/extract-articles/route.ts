@@ -68,7 +68,7 @@ export async function POST(request: Request) {
     const base64Data = Buffer.from(arrayBuffer).toString("base64");
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const fallbackModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash-latest", "gemini-pro-latest"];
 
     const prompt = `
 당신은 대학 규정집 전문 분석 AI입니다. 첨부된 규정 문서(PDF)를 읽고, 문서에 포함된 모든 조문(Article) 정보를 추출하여 아래의 JSON 배열 형식으로만 응답하세요. (마크다운 백틱 등 부가적인 설명 없이 오직 순수한 JSON 배열만 반환해야 합니다.)
@@ -90,28 +90,47 @@ export async function POST(request: Request) {
 - 응답은 반드시 유효한 JSON 배열이어야 합니다.
 `;
 
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          data: base64Data,
-          mimeType: "application/pdf",
-        },
-      },
-    ]);
+    let textResponse = "";
+    let success = false;
+    let lastError: any = null;
 
-    let responseText = result.response.text();
-    responseText = responseText.replace(/```json/gi, "").replace(/```/g, "").trim();
-    
-    let articles = [];
-    try {
-      articles = JSON.parse(responseText);
-    } catch (e) {
-      console.error("JSON 파싱 실패:", responseText);
-      return NextResponse.json({ error: "AI가 반환한 데이터를 파싱할 수 없습니다." }, { status: 500 });
+    for (const modelName of fallbackModels) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: "v1beta" });
+        const result = await model.generateContent([
+          prompt,
+          {
+            inlineData: {
+              data: base64Data,
+              mimeType: "application/pdf",
+            },
+          },
+        ]);
+        textResponse = (await result.response).text();
+        success = true;
+        break;
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[Extract API] ${modelName} 모델 호출 실패, 다음 모델 시도 중... 오류:`, err.message);
+      }
     }
 
-    return NextResponse.json({ articles });
+    if (!success) {
+      if (lastError?.message?.includes("429") || lastError?.message?.includes("quota") || lastError?.message?.includes("Quota")) {
+        return NextResponse.json({ error: "현재 AI 자동 추출 일일 사용량이 초과되었습니다." }, { status: 429 });
+      }
+      return NextResponse.json({ error: `AI 모델 호출 실패: ${lastError?.message}` }, { status: 500 });
+    }
+
+    let parsedJson: any = null;
+    try {
+      let cleanText = textResponse.replace(/^```json/i, "").replace(/^```/, "").replace(/```$/i, "").trim();
+      parsedJson = JSON.parse(cleanText);
+    } catch (e: any) {
+      return NextResponse.json({ error: "AI가 반환한 데이터를 JSON으로 파싱하는 데 실패했습니다.", raw: textResponse }, { status: 500 });
+    }
+
+    return NextResponse.json({ articles: parsedJson });
   } catch (error: any) {
     console.error("[Admin Extract Articles Error]:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
