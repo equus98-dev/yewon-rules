@@ -155,14 +155,17 @@ export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "Missing rule ID" }, { status: 400 });
+    const checkRes = await client.query(`SELECT id FROM "Rule" WHERE id = $1`, [id]);
+    if (checkRes.rows.length === 0) return NextResponse.json({ error: "Rule not found" }, { status: 404 });
+
     await client.query("BEGIN");
     await client.query(`DELETE FROM "Article" WHERE "revisionId" IN (SELECT id FROM "Revision" WHERE "ruleId" = $1)`, [id]);
     await client.query(`DELETE FROM "ArticleComparison" WHERE "revisionId" IN (SELECT id FROM "Revision" WHERE "ruleId" = $1)`, [id]);
     await client.query(`DELETE FROM "Attachment" WHERE "ruleId" = $1`, [id]);
     await client.query(`DELETE FROM "Revision" WHERE "ruleId" = $1`, [id]);
-    const ruleRes = await client.query(`DELETE FROM "Rule" WHERE id = $1 RETURNING *`, [id]);
+    await client.query(`DELETE FROM "Rule" WHERE id = $1`, [id]);
     await client.query("COMMIT");
-    if (ruleRes.rows.length === 0) return NextResponse.json({ error: "Rule not found" }, { status: 404 });
+    
     return NextResponse.json({ success: true, message: "규정이 성공적으로 삭제되었습니다." });
   } catch (error: any) {
     if (client) {

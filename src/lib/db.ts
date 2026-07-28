@@ -26,19 +26,41 @@ class D1PoolWrapper {
     return newSql;
   }
 
+  private inTransaction: boolean = false;
+  private batchStatements: any[] = [];
+
   async query(sql: string, params: any[] = []) {
     const trimmed = sql.trim().toUpperCase();
-    if (trimmed === "BEGIN" || trimmed === "COMMIT" || trimmed === "ROLLBACK") {
-      // Ignore transaction statements as D1 interactive transactions are not supported.
-      // This means queries will run sequentially without atomic guarantees,
-      // which is acceptable for this single-admin CMS application.
+    if (trimmed === "BEGIN") {
+      this.inTransaction = true;
+      this.batchStatements = [];
+      return { rows: [], rowCount: 0 };
+    }
+    if (trimmed === "COMMIT") {
+      this.inTransaction = false;
+      if (this.batchStatements.length > 0) {
+        const results = await this.db.batch(this.batchStatements);
+        this.batchStatements = [];
+        return { rows: [], rowCount: results.length, batchResults: results };
+      }
+      return { rows: [], rowCount: 0 };
+    }
+    if (trimmed === "ROLLBACK") {
+      this.inTransaction = false;
+      this.batchStatements = [];
       return { rows: [], rowCount: 0 };
     }
 
     const safeParams = params.map(p => (p instanceof Date ? p.toISOString() : p));
     const stmt = this.db.prepare(this.convertSql(sql)).bind(...safeParams);
-    const { results } = await stmt.all();
-    return { rows: results || [], rowCount: results?.length || 0 };
+    
+    if (this.inTransaction) {
+      this.batchStatements.push(stmt);
+      return { rows: [], rowCount: 0, _isBatched: true, stmtIndex: this.batchStatements.length - 1 };
+    } else {
+      const { results } = await stmt.all();
+      return { rows: results || [], rowCount: results?.length || 0 };
+    }
   }
 
   async connect() {
