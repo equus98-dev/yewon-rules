@@ -5,19 +5,40 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createPool } from "@/lib/db";
 
+function getInitialSound(text: string): string {
+  if (!text) return "ㄱ";
+  const cleanText = text.replace(/[^가-힣a-zA-Z0-9]/g, "");
+  if (cleanText.length === 0) return "ㄱ";
+  const char = cleanText.charAt(0);
+  const code = char.charCodeAt(0) - 0xac00;
+  if (code >= 0 && code < 11172) {
+    const chosungList = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+    return chosungList[Math.floor(code / 588)];
+  }
+  return char.toUpperCase();
+}
+
 export async function POST(request: Request) {
   const pool = createPool();
   let client;
   try {
     client = await pool.connect();
     const body = (await request.json()) as any;
-    const { ruleId, versionName, revisionType, enactmentDate, effectiveDate, announcementNumber, description, articles } = body;
+    const { ruleId, ruleTitle, versionName, revisionType, enactmentDate, effectiveDate, announcementNumber, description, articles } = body;
 
     if (!ruleId || !versionName || !revisionType || !enactmentDate || !effectiveDate) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     await client.query("BEGIN");
+
+    if (ruleTitle && ruleTitle.trim() !== "") {
+      const newInitialSound = getInitialSound(ruleTitle.trim());
+      await client.query(
+        `UPDATE "Rule" SET title = $1, "initialSound" = $2, "updatedAt" = NOW() WHERE id = $3`,
+        [ruleTitle.trim(), newInitialSound, ruleId]
+      );
+    }
 
     const prevRes = await client.query(
       `SELECT id, version FROM "Revision" WHERE "ruleId" = $1 ORDER BY version DESC LIMIT 1`,

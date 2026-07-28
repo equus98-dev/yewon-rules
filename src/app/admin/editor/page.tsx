@@ -60,6 +60,7 @@ function EditorContent() {
 
   // 현재 선택된 규정 상세 정보
   const [ruleDetail, setRuleDetail] = useState<any>(null);
+  const [editedRuleTitle, setEditedRuleTitle] = useState("");
   const [originalArticles, setOriginalArticles] = useState<any[]>([]);
   
   // 개정안 초안 작성 폼 정보
@@ -145,6 +146,7 @@ function EditorContent() {
         }
         const data = (await res.json()) as any;
         setRuleDetail(data);
+        setEditedRuleTitle(data.title || "");
 
         const rev = data.currentRevision;
         if (rev && Array.isArray(rev.articles)) {
@@ -749,8 +751,10 @@ function EditorContent() {
     }
 
     const hasModifications = draftArticles.some(art => art.isModified || art.isGroupModified || art.isNew || art.isDeleted);
-    if (!hasModifications) {
-      alert("수정된 조항이 없습니다. 변경 사항을 작성한 후 배포해 주십시오.");
+    const isTitleModified = ruleDetail && editedRuleTitle.trim() !== "" && editedRuleTitle.trim() !== ruleDetail.title;
+    
+    if (!hasModifications && !isTitleModified) {
+      alert("수정된 조항이나 변경된 규정명이 없습니다. 변경 사항을 작성한 후 배포해 주십시오.");
       return;
     }
 
@@ -875,6 +879,7 @@ function EditorContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ruleId: selectedRuleId,
+          ruleTitle: editedRuleTitle.trim(),
           versionName,
           revisionType,
           enactmentDate,
@@ -979,9 +984,9 @@ function EditorContent() {
           </div>
         )}
 
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-6 gap-4 bg-slate-50 p-5 border border-slate-200 rounded-2xl text-sm shadow-sm">
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-7 gap-4 bg-slate-50 p-5 border border-slate-200 rounded-2xl text-sm shadow-sm">
           
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 md:col-span-2">
             <label className="text-sm text-slate-550 font-bold tracking-wider pl-1">대상 규정 선택</label>
             <select
               value={selectedRuleId}
@@ -996,7 +1001,18 @@ function EditorContent() {
             </select>
           </div>
 
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 md:col-span-1">
+            <label className="text-sm text-slate-550 font-bold tracking-wider pl-1">개정 규정명</label>
+            <input
+              type="text"
+              value={editedRuleTitle}
+              onChange={(e) => setEditedRuleTitle(e.target.value)}
+              placeholder="예: 예원예술대학교 학칙"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-800 font-extrabold focus:outline-none focus:ring-1 focus:ring-[#0c3161] text-base"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5 md:col-span-1">
             <label className="text-sm text-slate-550 font-bold tracking-wider pl-1">개정 버전 기호</label>
             <input
               type="text"
