@@ -140,7 +140,7 @@ function EditorContent() {
             };
           });
           setDraftArticles(parsedArticles);
-          alert("첨부파일(PDF)에서 조문 데이터가 성공적으로 자동 추출되었습니다.\\n검수 후 제정완료 버튼을 눌러주세요.");
+          alert("첨부파일(PDF)에서 조문 데이터가 성공적으로 자동 추출되었습니다.\n검수 후 제정완료 버튼을 눌러주세요.");
         }
       } else {
         const errorData = await res.json() as any;
