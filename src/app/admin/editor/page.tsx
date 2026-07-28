@@ -1030,23 +1030,33 @@ function EditorContent() {
 
         {/* 신설규정 모드 안내 배너 */}
         {isNewMode && (
-          <div className="relative z-10 flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-2xl px-5 py-3.5 shadow-sm">
-            <span className="text-2xl shrink-0 mt-0.5">📝</span>
-            <div>
-              <p className="text-amber-900 font-black text-sm mb-0.5">신설규정 조문 입력 모드</p>
-              <p className="text-amber-800 text-xs font-bold leading-relaxed">
-                이 규정은 방금 제정된 신설규정입니다. 아래에서 조문 내용을 작성하고
-                <strong>[제정 완료]</strong> 버튼을 눌러 DB에 반영해 주세요.
-                조문 추가는 하단의 <strong>[+ 조항 추가]</strong> 버튼을 이용하세요.
-              </p>
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-amber-50 border border-amber-300 rounded-2xl px-5 py-3.5 shadow-sm">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl shrink-0 mt-0.5">📝</span>
+              <div>
+                <p className="text-amber-900 font-black text-sm mb-0.5">신설규정 조문 입력 모드</p>
+                <p className="text-amber-800 text-xs font-bold leading-relaxed">
+                  이 규정은 방금 제정된 신설규정입니다. 아래에서 조문 내용을 작성하고
+                  <strong>[제정 완료]</strong> 버튼을 눌러 DB에 반영해 주세요.
+                </p>
+              </div>
             </div>
-            <button
-              type="button"
-              onClick={() => router.push("/admin/rules")}
-              className="ml-auto shrink-0 text-xs text-amber-700 hover:text-amber-900 font-black border border-amber-300 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap"
-            >
-              ← 규정 목록으로
-            </button>
+            <div className="flex items-center gap-2 ml-auto">
+              <button
+                type="button"
+                onClick={() => handleAutoExtractArticles()}
+                className="shrink-0 text-xs text-white font-black bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-4 py-2 rounded-lg transition-all cursor-pointer whitespace-nowrap shadow-md active:scale-95"
+              >
+                ✨ PDF 기반 조문 자동 생성
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/admin/rules")}
+                className="shrink-0 text-xs text-amber-700 hover:text-amber-900 font-black border border-amber-300 bg-amber-100 hover:bg-amber-200 px-3 py-2 rounded-lg transition-all cursor-pointer whitespace-nowrap"
+              >
+                ← 목록으로
+              </button>
+            </div>
           </div>
         )}
 
