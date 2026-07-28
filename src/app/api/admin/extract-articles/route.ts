@@ -33,15 +33,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "현재 PDF 파일만 AI 자동 추출을 지원합니다. PDF로 변환하여 다시 첨부해 주세요." }, { status: 400 });
     }
 
-    // 파일 다운로드
-    const fileRes = await fetch(fileUrl);
-    if (!fileRes.ok) {
-      return NextResponse.json({ error: "첨부파일 다운로드에 실패했습니다." }, { status: 500 });
-    }
-
-    const arrayBuffer = await fileRes.arrayBuffer();
-    const base64Data = Buffer.from(arrayBuffer).toString("base64");
-
     // 환경 변수에서 Gemini API Key 가져오기
     const ctx = getRequestContext();
     const env = ctx?.env as any;
@@ -50,6 +41,31 @@ export async function POST(request: Request) {
     if (!apiKey) {
       return NextResponse.json({ error: "서버에 GEMINI_API_KEY가 설정되어 있지 않습니다." }, { status: 500 });
     }
+
+    // 파일 다운로드 (R2 스토리지에서 직접 가져오기)
+    let arrayBuffer: ArrayBuffer;
+    if (fileUrl.startsWith('/api/files/')) {
+      const fileName = fileUrl.split('/').pop();
+      if (!fileName) return NextResponse.json({ error: "잘못된 첨부파일 URL입니다." }, { status: 400 });
+      
+      if (!env || !env.STORAGE) {
+        return NextResponse.json({ error: "Cloudflare R2 스토리지를 찾을 수 없습니다." }, { status: 500 });
+      }
+      const fileObj = await env.STORAGE.get(fileName);
+      if (!fileObj) {
+        return NextResponse.json({ error: "첨부파일을 스토리지에서 찾을 수 없습니다." }, { status: 404 });
+      }
+      arrayBuffer = await fileObj.arrayBuffer();
+    } else {
+      // 외부 절대 URL인 경우에만 fetch 사용
+      const fileRes = await fetch(fileUrl);
+      if (!fileRes.ok) {
+        return NextResponse.json({ error: "첨부파일 다운로드에 실패했습니다." }, { status: 500 });
+      }
+      arrayBuffer = await fileRes.arrayBuffer();
+    }
+
+    const base64Data = Buffer.from(arrayBuffer).toString("base64");
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
