@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { CircularProgress, Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
@@ -56,6 +56,7 @@ function EditorContent() {
   const [selectedRuleId, setSelectedRuleId] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const isPublishingRef = useRef(false);
   const [activeTab, setActiveTab] = useState<"edit" | "preview" | "compare">("edit");
 
   // 현재 선택된 규정 상세 정보
@@ -818,6 +819,8 @@ function EditorContent() {
       return;
     }
 
+    if (isPublishingRef.current) return;
+    isPublishingRef.current = true;
     setSaving(true);
     try {
       const eDateObj = new Date(enactmentDate);
@@ -964,6 +967,7 @@ function EditorContent() {
       console.error(e);
       alert(`네트워크/서버 오류: ${e.message}`);
     } finally {
+      isPublishingRef.current = false;
       setSaving(false);
     }
   };
