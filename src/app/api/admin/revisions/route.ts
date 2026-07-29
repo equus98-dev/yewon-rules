@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   try {
     client = await pool.connect();
     const body = (await request.json()) as any;
-    const { ruleId, ruleTitle, versionName, revisionType, enactmentDate, effectiveDate, announcementNumber, description, articles } = body;
+    const { ruleId, ruleTitle, versionName, revisionType, enactmentDate, effectiveDate, announcementNumber, description, articles, isInitialEnactment } = body;
 
     if (!ruleId || !versionName || !revisionType || !enactmentDate || !effectiveDate) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -71,12 +71,37 @@ export async function POST(request: Request) {
       );
     }
 
-    const newRevisionId = crypto.randomUUID();
-    await client.query(
-      `INSERT INTO "Revision" (id, "ruleId", version, "versionName", "revisionType", "enactmentDate", "effectiveDate", "announcementNumber", description, "createdAt", "updatedAt")
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())`,
-      [newRevisionId, ruleId, nextVersion, versionName, revisionType, new Date(enactmentDate), new Date(effectiveDate), announcementNumber || "공포", description || `${versionName} 공포 반영`]
-    );
+    let newRevisionId = null;
+    let finalVersion = nextVersion;
+
+    if (isInitialEnactment) {
+      const firstRevRes = await client.query(
+        `SELECT id, version FROM "Revision" WHERE "ruleId" = $1 AND version = 1 LIMIT 1`,
+        [ruleId]
+      );
+      if (firstRevRes.rows.length > 0) {
+        newRevisionId = firstRevRes.rows[0].id;
+        finalVersion = firstRevRes.rows[0].version;
+        
+        await client.query(
+          `UPDATE "Revision" SET "versionName" = $1, "revisionType" = $2, "enactmentDate" = $3, "effectiveDate" = $4, "announcementNumber" = $5, description = $6, "updatedAt" = NOW() WHERE id = $7`,
+          [versionName, revisionType, new Date(enactmentDate), new Date(effectiveDate), announcementNumber || "공포", description || `${versionName} 공포 반영`, newRevisionId]
+        );
+        // delete any old articles attached to the first revision before inserting the new ones
+        await client.query(`DELETE FROM "Article" WHERE "revisionId" = $1`, [newRevisionId]);
+        await client.query(`DELETE FROM "ArticleComparison" WHERE "revisionId" = $1`, [newRevisionId]);
+      }
+    }
+
+    if (!newRevisionId) {
+      newRevisionId = crypto.randomUUID();
+      finalVersion = nextVersion;
+      await client.query(
+        `INSERT INTO "Revision" (id, "ruleId", version, "versionName", "revisionType", "enactmentDate", "effectiveDate", "announcementNumber", description, "createdAt", "updatedAt")
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())`,
+        [newRevisionId, ruleId, finalVersion, versionName, revisionType, new Date(enactmentDate), new Date(effectiveDate), announcementNumber || "공포", description || `${versionName} 공포 반영`]
+      );
+    }
 
     const createdNewArticles: any[] = [];
     if (Array.isArray(articles) && articles.length > 0) {
@@ -120,7 +145,7 @@ export async function POST(request: Request) {
     }
 
     await client.query("COMMIT");
-    return NextResponse.json({ success: true, revisionId: newRevisionId, version: nextVersion });
+    return NextResponse.json({ success: true, revisionId: newRevisionId, version: finalVersion });
   } catch (error: any) {
     if (client) {
       try { await client.query("ROLLBACK"); } catch (e) { console.error("Rollback error:", e); }

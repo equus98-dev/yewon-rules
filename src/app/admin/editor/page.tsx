@@ -951,6 +951,7 @@ function EditorContent() {
           announcementNumber: announceNum,
           description,
           articles: articlesToSave,
+          isInitialEnactment: isNewMode,
         }),
       });
 
