@@ -252,7 +252,10 @@ export default function ArticleRenderer({
               setEditHtml(contentHtml);
             } else {
               const htmlStr = items.map((i: any) => {
-                const text = i.text || "";
+                let text = i.text || "";
+                // JoditEditor에 넣기 전, 평문 텍스트 내의 <, > 등의 기호를 HTML 엔티티로 변환하여 태그로 인식되지 않게 함
+                text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
                 if (!i.num) return `<p>${text}</p>`;
                 if (text.trim().startsWith(i.num)) return `<p>${text}</p>`;
                 return `<p>${i.num} ${text}</p>`;
@@ -2361,6 +2364,15 @@ export default function ArticleRenderer({
                       newText = newText.replace(/<\/?div[^>]*>/gi, '\n');
                       newText = newText.replace(/<[^>]+>/g, '');
                       newText = newText.replace(/\n\s*\n/g, '\n').trim();
+                      
+                      // JoditEditor 등 리치 에디터가 변환한 HTML 엔티티를 원래의 문자로 복구
+                      newText = newText
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>')
+                        .replace(/&nbsp;/g, ' ')
+                        .replace(/&quot;/g, '"')
+                        .replace(/&#39;/g, "'")
+                        .replace(/&amp;/g, '&');
 
                       const newItems = newText.split('\n').filter(line => line.trim()).map(line => {
                         let num = "";
