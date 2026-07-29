@@ -828,16 +828,16 @@ export default function AdminRulesManagement() {
                   {newMainFiles.length > 0 && (
                     <div className="space-y-1.5 max-h-[100px] overflow-y-auto scrollbar pr-1 mb-2">
                       {newMainFiles.map((f, i) => (
-                        <div key={f.name + i} className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5">
-                          <AttachFileIcon sx={{ fontSize: 18, color: "#1d4ed8" }} />
+                        <div key={f.name + i} className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">
+                          <AttachFileIcon sx={{ fontSize: 18, color: "#dc2626" }} />
                           <div className="flex-1 min-w-0">
-                            <p className="text-[13px] font-black text-blue-800 truncate">{f.name}</p>
-                            <p className="text-[11px] text-blue-600 font-bold">{(f.size / 1024).toFixed(1)} KB</p>
+                            <p className="text-[13px] font-black text-red-800 truncate">{f.name}</p>
+                            <p className="text-[11px] text-red-600 font-bold">{(f.size / 1024).toFixed(1)} KB</p>
                           </div>
                           <button
                             type="button"
                             onClick={() => setNewMainFiles((prev) => prev.filter((_, idx) => idx !== i))}
-                            className="shrink-0 text-blue-400 hover:text-red-500 transition-colors cursor-pointer"
+                            className="shrink-0 text-red-400 hover:text-red-600 transition-colors cursor-pointer"
                           >
                             <CloseIcon sx={{ fontSize: 16 }} />
                           </button>
@@ -851,14 +851,14 @@ export default function AdminRulesManagement() {
                     onDrop={handleMainFileDrop}
                     onClick={() => mainFileInputRef.current?.click()}
                     className={`flex-1 flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl py-4 cursor-pointer transition-all min-h-[80px] ${
-                      isMainDragOver ? "border-[#0c3161] bg-blue-50" : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100"
+                      isMainDragOver ? "border-red-400 bg-red-100" : "border-red-200 bg-red-50/50 hover:border-red-300 hover:bg-red-50"
                     }`}
                   >
-                    <UploadFileIcon sx={{ fontSize: 24, color: isMainDragOver ? "#0c3161" : "#94a3b8" }} />
-                    <p className="text-[13px] font-black text-slate-500">
+                    <UploadFileIcon sx={{ fontSize: 24, color: isMainDragOver ? "#dc2626" : "#fca5a5" }} />
+                    <p className="text-[13px] font-black text-red-800">
                       {isMainDragOver ? "파일을 놓으세요" : newMainFiles.length > 0 ? "+ 전문 파일 추가" : "클릭하거나 전문 파일을 드래그하세요"}
                     </p>
-                    <p className="text-[11px] text-slate-400 font-bold">HWP · PDF</p>
+                    <p className="text-[11px] text-red-400 font-bold">HWP · PDF</p>
                   </div>
                 </div>
 
