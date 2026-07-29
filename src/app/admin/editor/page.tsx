@@ -258,13 +258,21 @@ function EditorContent() {
           setDraftArticles(copied);
           
           // 개정 폼 디폴트값 자동 세팅
-          const nextVerNum = (data.revisions?.[0]?.version || 1) + 1;
-          setVersionName(`제${nextVerNum}차 일부개정`);
-          setAnnounceNum(`공포 제${nextVerNum}호`);
-          
-          const today = new Date().toISOString().split("T")[0];
-          setEnactmentDate(today);
-          setEffectiveDate(today);
+          if (isNewMode && rev) {
+            setVersionName(rev.versionName || "");
+            setAnnounceNum(rev.announcementNumber || "");
+            setEnactmentDate(rev.enactmentDate ? new Date(rev.enactmentDate).toISOString().split("T")[0] : "");
+            setEffectiveDate(rev.effectiveDate ? new Date(rev.effectiveDate).toISOString().split("T")[0] : "");
+            if (rev.revisionType) setRevisionType(rev.revisionType);
+          } else {
+            const nextVerNum = (data.revisions?.[0]?.version || 1) + 1;
+            setVersionName(`제${nextVerNum}차 일부개정`);
+            setAnnounceNum(`공포 제${nextVerNum}호`);
+            
+            const today = new Date().toISOString().split("T")[0];
+            setEnactmentDate(today);
+            setEffectiveDate(today);
+          }
         } else {
           setOriginalArticles([]);
           setDraftArticles([
