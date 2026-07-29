@@ -224,6 +224,7 @@
   word-wrap: break-word !important;
   background-color: transparent !important;
   font-weight: normal !important; /* Prevent header bolding */
+  text-align: left !important;
 }
 
 /* 2. 왼쪽 구분열 (첫 번째 열) 음영 처리 (제거: rowspan시 문제 발생) */
