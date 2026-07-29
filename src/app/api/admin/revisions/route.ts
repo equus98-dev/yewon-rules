@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     let newRevisionId: string | null = null;
     let finalVersion = nextVersion;
 
-    if (isInitialEnactment) {
+    if (isInitialEnactment || (revisionType === "ENACTMENT" && previousRevision?.version === 1 && previousRevision?.revisionType === "ENACTMENT")) {
       const firstRevRes = await client.query(
         `SELECT id, version FROM "Revision" WHERE "ruleId" = $1 AND version = 1 LIMIT 1`,
         [ruleId]
