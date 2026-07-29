@@ -53,6 +53,7 @@ export async function POST(request: Request) {
     const ruleId = formData.get("ruleId") as string;
     const attachmentId = formData.get("attachmentId") as string;
     const revisionId = formData.get("revisionId") as string;
+    const customTitle = formData.get("title") as string;
 
     if (!file || !ruleId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -75,19 +76,21 @@ export async function POST(request: Request) {
     // Public API URL 생성 (파일 다운로드용 라우트)
     const publicUrl = `/api/files/${uniqueFileName}`;
 
+    const finalTitle = customTitle && customTitle.trim() !== "" ? customTitle : file.name;
+
     // 데이터베이스 업데이트 또는 추가
     if (attachmentId) {
       await pool.query(
         `UPDATE "Attachment" 
          SET "fileUrl" = $1, "fileSize" = $2, "fileType" = $3, title = $4, "revisionId" = $5
          WHERE id = $6`,
-        [publicUrl, file.size, ext?.toUpperCase() || 'HWP', file.name, revisionId || null, attachmentId]
+        [publicUrl, file.size, ext?.toUpperCase() || 'HWP', finalTitle, revisionId || null, attachmentId]
       );
     } else {
       await pool.query(
         `INSERT INTO "Attachment" (id, "ruleId", title, "fileUrl", "fileSize", "fileType", "createdAt", "updatedAt", "revisionId")
          VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW(), $7)`,
-        [crypto.randomUUID(), ruleId, file.name, publicUrl, file.size, ext?.toUpperCase() || 'HWP', revisionId || null]
+        [crypto.randomUUID(), ruleId, finalTitle, publicUrl, file.size, ext?.toUpperCase() || 'HWP', revisionId || null]
       );
     }
 

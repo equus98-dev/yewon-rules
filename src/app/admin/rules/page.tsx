@@ -361,6 +361,14 @@ export default function AdminRulesManagement() {
             const formData = new FormData();
             formData.append("file", f);
             formData.append("ruleId", ruleId);
+            
+            // newMainFiles에 속한 파일이면 파일명 앞에 [전문] 을 붙여서 업로드 (서식관리에서 인식하도록)
+            if (newMainFiles.includes(f)) {
+              formData.append("title", `[전문] ${f.name}`);
+            } else {
+              formData.append("title", f.name);
+            }
+
             await fetch("/api/admin/files", { method: "POST", body: formData });
           }
         } catch (uploadErr) {
