@@ -118,7 +118,11 @@ export async function POST(request: Request) {
 
     if (!success) {
       if (lastError?.message?.includes("429") || lastError?.message?.includes("quota") || lastError?.message?.includes("Quota")) {
-        return NextResponse.json({ error: "현재 AI 자동 추출 일일 사용량이 초과되었습니다." }, { status: 429 });
+        // 구분: Rate Limit (분당 한도) vs Quota (일일 한도)
+        if (lastError?.message?.includes("Too Many Requests") || lastError?.message?.toLowerCase().includes("rate limit")) {
+          return NextResponse.json({ error: "일시적으로 AI 처리 요청이 몰렸거나, 문서가 너무 커서 1분당 처리 한도를 초과했습니다. 약 1분 후 다시 시도해주세요." }, { status: 429 });
+        }
+        return NextResponse.json({ error: "현재 AI 자동 추출 일일 사용량(Quota)이 초과되었거나 API 한도에 도달했습니다. 잠시 후 다시 시도해주세요." }, { status: 429 });
       }
       return NextResponse.json({ error: `AI 모델 호출 실패: ${lastError?.message}` }, { status: 500 });
     }
