@@ -105,8 +105,8 @@ export async function POST(request: Request) {
       try { await client.query("ROLLBACK"); } catch (e) { console.error("Rollback error:", e); }
     }
     console.error("[Admin Rules POST Error]:", error);
-    if (error.message?.includes("duplicate key value violates unique constraint")) {
-      return NextResponse.json({ error: "이미 존재하는 규정 번호입니다." }, { status: 409 });
+    if (error.message?.includes("duplicate key value violates unique constraint") || error.message?.includes("UNIQUE constraint failed") || error.message?.includes("SQLITE_CONSTRAINT_UNIQUE")) {
+      return NextResponse.json({ error: "이미 존재하는 규정 번호입니다. 다른 번호를 사용해 주세요." }, { status: 409 });
     }
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   } finally {
