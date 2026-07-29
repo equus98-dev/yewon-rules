@@ -175,7 +175,7 @@ export default function ArticleRenderer({
               .rule-title { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
               .chapter-title { font-size: 18px; font-weight: bold; color: #000080; margin-bottom: 15px; }
               .article-content { font-size: 16px; margin-top: 10px; }
-              .btn-print { display: none; }
+              .print-actions { display: none; }
               /* 프린트 시 표 스타일 */
               .html-table-wrapper table { border-collapse: collapse !important; width: 100% !important; margin: 15px 0 !important; font-size: 11pt !important; background-color: white !important; }
               .html-table-wrapper th, .html-table-wrapper td { border: 1px solid #aaa !important; padding: 8px 12px !important; color: #000 !important; vertical-align: middle !important; word-break: break-word !important; }
@@ -186,7 +186,9 @@ export default function ArticleRenderer({
             .rule-title { font-size: 26px; font-weight: bold; text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; color: #0c3161; }
             .chapter-title { font-size: 18px; font-weight: bold; color: #000080; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
             .article-content { font-size: 16px; margin-top: 10px; }
-            .btn-print { display: block; width: 120px; margin: 0 auto 30px auto; padding: 10px; text-align: center; background: #0c3161; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+            .print-actions { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+            .btn-print { width: 120px; padding: 10px; text-align: center; background: #0c3161; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+            .btn-close { width: 120px; padding: 10px; text-align: center; background: #64748b; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
             /* 웹 팝업 창 표(Table) 프리미엄 스타일 */
             .html-table-wrapper { width: 100%; overflow-x: auto; padding: 10px 0; }
@@ -203,7 +205,10 @@ export default function ArticleRenderer({
           </style>
         </head>
         <body>
-          <button class="btn-print" onclick="window.print()">인쇄하기</button>
+          <div class="print-actions">
+            <button class="btn-print" onclick="window.print()">인쇄하기</button>
+            <button class="btn-close" onclick="window.close()">닫기</button>
+          </div>
           <div class="rule-title">${ruleName}</div>
           ${chapterName ? `<div class="chapter-title">${chapterName}</div>` : ""}
           <div class="article-content ${wrapperClass}">${bodyHtml}</div>

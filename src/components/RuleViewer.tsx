@@ -198,7 +198,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
               .rule-title { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
               .chapter-title { font-size: 18px; font-weight: bold; color: #000080; margin-bottom: 15px; }
               .article-content { font-size: 16px; margin-top: 10px; }
-              .btn-print { display: none; }
+              .print-actions { display: none; }
               .html-table-wrapper table { border-collapse: collapse !important; width: 100% !important; margin: 15px 0 !important; font-size: 11pt !important; background-color: white !important; }
               .html-table-wrapper th, .html-table-wrapper td { border: 1px solid #aaa !important; padding: 8px 12px !important; color: #000 !important; vertical-align: middle !important; word-break: break-word !important; }
               .html-table-wrapper th { background-color: #eee !important; font-weight: bold !important; text-align: center !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -208,7 +208,9 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
             .rule-title { font-size: 26px; font-weight: bold; text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; color: #0c3161; }
             .chapter-title { font-size: 18px; font-weight: bold; color: #000080; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
             .article-content { font-size: 16px; margin-top: 10px; }
-            .btn-print { display: block; width: 120px; margin: 0 auto 30px auto; padding: 10px; text-align: center; background: #0c3161; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+            .print-actions { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+            .btn-print { width: 120px; padding: 10px; text-align: center; background: #0c3161; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+            .btn-close { width: 120px; padding: 10px; text-align: center; background: #64748b; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; hover: opacity-90; }
             .html-table-wrapper { width: 100%; overflow-x: auto; padding: 10px 0; }
             .html-table-wrapper table { border-collapse: collapse !important; width: 100% !important; margin: 20px 0 !important; font-size: 14px !important; background-color: white !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
             .html-table-wrapper th, .html-table-wrapper td { border: 1px solid #e2e8f0 !important; padding: 12px 16px !important; color: #334155 !important; vertical-align: middle !important; word-break: break-word !important; }
@@ -221,7 +223,10 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
           </style>
         </head>
         <body>
-          <button class="btn-print" onclick="window.print()">인쇄하기</button>
+          <div class="print-actions">
+            <button class="btn-print" onclick="window.print()">인쇄하기</button>
+            <button class="btn-close" onclick="window.close()">닫기</button>
+          </div>
           <div class="rule-title">${ruleName}</div>
           ${combinedHtml}
           <script>
