@@ -108,17 +108,17 @@ export async function POST(request: Request) {
       for (const art of articles) {
         const artId = crypto.randomUUID();
         await client.query(
-          `INSERT INTO "Article" (id, "revisionId", part, chapter, section, "subSection", "articleNumber", title, "contentJson", "contentText", "sortOrder", "createdAt", "updatedAt")
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())`,
-          [artId, newRevisionId, art.part || null, art.chapter || null, art.section || null, art.subSection || null, parseInt(art.articleNumber) || 1, art.title || "제목없음", JSON.stringify(art.contentJson || {}), art.contentText || "", art.sortOrder || 1]
+          `INSERT INTO "Article" (id, "revisionId", part, chapter, section, "subSection", "articleNumber", title, "contentJson", "contentText", "contentHtml", "sortOrder", "createdAt", "updatedAt")
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW())`,
+          [artId, newRevisionId, art.part || null, art.chapter || null, art.section || null, art.subSection || null, parseInt(art.articleNumber) || 1, art.title || "제목없음", JSON.stringify(art.contentJson || {}), art.contentText || "", art.contentHtml || null, art.sortOrder || 1]
         );
-        createdNewArticles.push({ id: artId, articleNumber: parseInt(art.articleNumber) || 1, contentText: art.contentText || "", part: art.part || null, chapter: art.chapter || null, section: art.section || null, subSection: art.subSection || null });
+        createdNewArticles.push({ id: artId, articleNumber: parseInt(art.articleNumber) || 1, contentText: art.contentText || "", contentHtml: art.contentHtml || null, part: art.part || null, chapter: art.chapter || null, section: art.section || null, subSection: art.subSection || null });
       }
     } else if (validSourceRevision) {
       // 사용자 제안 반영: 입안/연혁 추가 시 명시적 조문 목록이 주어지지 않은 경우, 직전 유효 연혁의 모든 조문(Article)을 고스란히 복제(Deep Copy)하여 새 연혁에 적재
       await client.query(
-        `INSERT INTO "Article" (id, "revisionId", part, chapter, section, "subSection", "articleNumber", title, "contentJson", "contentText", "sortOrder", "createdAt", "updatedAt")
-         SELECT gen_random_uuid(), $1, part, chapter, section, "subSection", "articleNumber", title, "contentJson", "contentText", "sortOrder", NOW(), NOW()
+        `INSERT INTO "Article" (id, "revisionId", part, chapter, section, "subSection", "articleNumber", title, "contentJson", "contentText", "contentHtml", "sortOrder", "createdAt", "updatedAt")
+         SELECT gen_random_uuid(), $1, part, chapter, section, "subSection", "articleNumber", title, "contentJson", "contentText", "contentHtml", "sortOrder", NOW(), NOW()
          FROM "Article" 
          WHERE "revisionId" = $2`,
         [newRevisionId, validSourceRevision.id]

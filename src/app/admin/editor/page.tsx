@@ -133,13 +133,17 @@ function EditorContent() {
             const extractedNum = parseInt(a.articleNumber, 10);
             const finalNum = isAddendum ? 9999 : (isNaN(extractedNum) ? idx + 1 : extractedNum);
 
+            const contentText = a.contentText || "";
+            const hasHtml = contentText.includes("<table") || contentText.includes("<td");
+
             return {
               chapter: a.chapter || (isAddendum ? "부칙" : ""),
               section: a.section || "",
               articleNumber: finalNum,
               title: a.title || "제목없음",
-              contentText: a.contentText || "",
-              contentJson: { paragraphs: a.contentText ? a.contentText.split("\\n") : [] },
+              contentText: contentText,
+              contentHtml: hasHtml ? contentText : null,
+              contentJson: { paragraphs: contentText ? contentText.split("\\n") : [] },
               sortOrder: idx + 1,
               isNew: true,
             };
