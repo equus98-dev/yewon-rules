@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       );
     }
 
-    let newRevisionId = null;
+    let newRevisionId: string | null = null;
     let finalVersion = nextVersion;
 
     if (isInitialEnactment) {
