@@ -99,7 +99,7 @@ export async function POST(request: Request) {
       );
     }
     await client.query("COMMIT");
-    return NextResponse.json({ success: true, ruleId });
+    return NextResponse.json({ success: true, ruleId, revisionId });
   } catch (error: any) {
     if (client) {
       try { await client.query("ROLLBACK"); } catch (e) { console.error("Rollback error:", e); }
