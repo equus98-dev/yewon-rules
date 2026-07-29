@@ -202,6 +202,30 @@
   text-align: center !important;
 }
 
+/* AI가 1칸짜리 박스로 추출한 규정 본문 박스 (custom-rule-table) 스타일 지정 */
+.custom-rule-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+  background-color: #ffffff !important;
+  border-radius: 6px !important;
+  border-style: hidden !important; /* Hide outer border to use box-shadow instead, or use solid */
+  box-shadow: 0 0 0 1px #cbd5e1 !important; /* slate-300 for border */
+}
+
+.custom-rule-table td {
+  padding: 1.25rem !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #334155 !important;
+  font-family: 'Pretendard', sans-serif !important;
+  line-height: 1.6 !important;
+  word-break: keep-all !important;
+  word-wrap: break-word !important;
+  background-color: transparent !important;
+  font-weight: normal !important; /* Prevent header bolding */
+}
+
 /* 2. 왼쪽 구분열 (첫 번째 열) 음영 처리 (제거: rowspan시 문제 발생) */
 
 /* 조직도 전용 스타일 (인라인 스타일 우선, 그리드선 숨김) */
