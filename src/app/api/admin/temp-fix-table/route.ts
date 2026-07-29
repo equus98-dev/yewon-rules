@@ -40,7 +40,7 @@ export async function GET(request: Request) {
     let newJson = typeof article.contentJson === 'string' ? JSON.parse(article.contentJson) : article.contentJson;
     newJson.contentText = newContentText;
     
-    await client.query(`UPDATE "Article" SET "contentText" = $1, "contentJson" = $2 WHERE id = $3`, [newContentText, newJson, article.id]);
+    await client.query(`UPDATE "Article" SET "contentText" = $1, "contentJson" = $2 WHERE id = $3`, [newContentText, JSON.stringify(newJson), article.id]);
     
     return NextResponse.json({ success: true, old: article.contentText, new: newContentText });
   } catch (error: any) {
