@@ -151,6 +151,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
     const ruleName = ruleData?.title || "규정명 미상";
 
     let combinedHtml = "";
+    let lastChapter = "";
     targetArticles.forEach((a: any) => {
       let rawText = "";
       if (a.contentHtml && a.contentHtml.trim().length > 0) {
@@ -172,13 +173,19 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
       const isOrgChart = (a.title && (a.title.includes("조직도") || a.title.includes("기구표"))) || bodyHtml.includes("조직도");
       const wrapperClass = isOrgChart ? "org-chart-wrapper" : "html-table-wrapper";
       
-      const chapterName = a.chapter ? `<div class="chapter-title">${a.chapter}</div>` : "";
+      let chapterHtml = "";
+      if (a.chapter && a.chapter !== lastChapter) {
+        chapterHtml = `<div class="chapter-title">${a.chapter}</div>`;
+        lastChapter = a.chapter;
+      }
+      
       combinedHtml += `
-        ${chapterName}
+        ${chapterHtml}
         <div class="article-content ${wrapperClass}">${bodyHtml}</div>
         <hr style="border: 0; border-bottom: 1px dashed #ccc; margin: 30px 0;" />
       `;
     });
+
 
     printWindow.document.write(`
       <!DOCTYPE html>
