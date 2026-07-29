@@ -198,7 +198,7 @@ function RuleViewerInner({ ruleId, isAdmin }: RuleViewerProps) {
               .rule-title { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
               .chapter-title { font-size: 18px; font-weight: bold; color: #000080; margin-bottom: 15px; }
               .article-content { font-size: 16px; margin-top: 10px; }
-              .print-actions { display: none; }
+              .print-actions { display: none !important; }
               .html-table-wrapper table { border-collapse: collapse !important; width: 100% !important; margin: 15px 0 !important; font-size: 11pt !important; background-color: white !important; }
               .html-table-wrapper th, .html-table-wrapper td { border: 1px solid #aaa !important; padding: 8px 12px !important; color: #000 !important; vertical-align: middle !important; word-break: break-word !important; }
               .html-table-wrapper th { background-color: #eee !important; font-weight: bold !important; text-align: center !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
