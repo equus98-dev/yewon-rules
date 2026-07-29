@@ -74,13 +74,16 @@ export default function AdminRulesManagement() {
   const [newAnnounceNum, setNewAnnounceNum] = useState("");
   const [creating, setCreating] = useState(false);
 
-  // 파일 업로드 상태 (복수 선택 지원)
   const [newUploadFiles, setNewUploadFiles] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [uploadingFile, setUploadingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 허용 확장자
+  // 규정 전문 파일 전용 상태
+  const [newMainFiles, setNewMainFiles] = useState<File[]>([]);
+  const [isMainDragOver, setIsMainDragOver] = useState(false);
+  const mainFileInputRef = useRef<HTMLInputElement>(null);
+
+  const [uploadingFile, setUploadingFile] = useState(false);
   const ALLOWED_EXTS = ["hwp", "hwpx", "pdf", "jpg", "jpeg", "png", "gif", "xlsx", "xls"];
 
   // 인라인 담당부서 편집 상태
@@ -350,10 +353,11 @@ export default function AdminRulesManagement() {
       const ruleId = data.ruleId;
 
       // 2) 파일들 업로드 (순차 처리)
-      if (newUploadFiles.length > 0 && ruleId) {
+      const allFiles = [...newMainFiles, ...newUploadFiles];
+      if (allFiles.length > 0 && ruleId) {
         setUploadingFile(true);
         try {
-          for (const f of newUploadFiles) {
+          for (const f of allFiles) {
             const formData = new FormData();
             formData.append("file", f);
             formData.append("ruleId", ruleId);
@@ -405,6 +409,33 @@ export default function AdminRulesManagement() {
       return;
     }
     setNewUploadFiles((prev) => [
+      ...prev,
+      ...selected.filter((f) => !prev.some((p) => p.name === f.name)),
+    ]);
+    e.target.value = "";
+  };
+
+  const handleMainFileDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsMainDragOver(false);
+    const dropped = Array.from(e.dataTransfer.files).filter((f) => {
+      const ext = f.name.split(".").pop()?.toLowerCase() || "";
+      return ALLOWED_EXTS.includes(ext);
+    });
+    if (dropped.length === 0) return;
+    setNewMainFiles((prev) => [
+      ...prev,
+      ...dropped.filter((f) => !prev.some((p) => p.name === f.name)),
+    ]);
+  }, [ALLOWED_EXTS]);
+
+  const handleMainFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files || []).filter((f) => {
+      const ext = f.name.split(".").pop()?.toLowerCase() || "";
+      return ALLOWED_EXTS.includes(ext);
+    });
+    if (selected.length === 0) return;
+    setNewMainFiles((prev) => [
       ...prev,
       ...selected.filter((f) => !prev.some((p) => p.name === f.name)),
     ]);
@@ -780,10 +811,61 @@ export default function AdminRulesManagement() {
                   </div>
                 </div>
 
-                {/* 관련 서식 파일 업로드 - 복수 지원 */}
+                {/* 규정 전문 파일 업로드 */}
                 <div className="space-y-2 flex-1 flex flex-col">
                   <label className="text-[15px] text-slate-500 font-bold uppercase tracking-wider pl-1 flex items-center gap-1.5">
-                    관련 서식 파일 첨부
+                    규정 전문 파일 첨부
+                    <span className="text-[11px] bg-slate-100 text-slate-500 font-black px-1.5 py-0.5 rounded border border-slate-200">복수 선택 가능</span>
+                  </label>
+                  <input
+                    ref={mainFileInputRef}
+                    type="file"
+                    accept=".hwp,.hwpx,.pdf"
+                    multiple
+                    className="hidden"
+                    onChange={handleMainFileSelect}
+                  />
+                  {newMainFiles.length > 0 && (
+                    <div className="space-y-1.5 max-h-[100px] overflow-y-auto scrollbar pr-1 mb-2">
+                      {newMainFiles.map((f, i) => (
+                        <div key={f.name + i} className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5">
+                          <AttachFileIcon sx={{ fontSize: 18, color: "#1d4ed8" }} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] font-black text-blue-800 truncate">{f.name}</p>
+                            <p className="text-[11px] text-blue-600 font-bold">{(f.size / 1024).toFixed(1)} KB</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setNewMainFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                            className="shrink-0 text-blue-400 hover:text-red-500 transition-colors cursor-pointer"
+                          >
+                            <CloseIcon sx={{ fontSize: 16 }} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div
+                    onDragOver={(e) => { e.preventDefault(); setIsMainDragOver(true); }}
+                    onDragLeave={() => setIsMainDragOver(false)}
+                    onDrop={handleMainFileDrop}
+                    onClick={() => mainFileInputRef.current?.click()}
+                    className={`flex-1 flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl py-4 cursor-pointer transition-all min-h-[80px] ${
+                      isMainDragOver ? "border-[#0c3161] bg-blue-50" : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100"
+                    }`}
+                  >
+                    <UploadFileIcon sx={{ fontSize: 24, color: isMainDragOver ? "#0c3161" : "#94a3b8" }} />
+                    <p className="text-[13px] font-black text-slate-500">
+                      {isMainDragOver ? "파일을 놓으세요" : newMainFiles.length > 0 ? "+ 전문 파일 추가" : "클릭하거나 전문 파일을 드래그하세요"}
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-bold">HWP · PDF</p>
+                  </div>
+                </div>
+
+                {/* 부속 서식 파일 업로드 */}
+                <div className="space-y-2 flex-1 flex flex-col">
+                  <label className="text-[15px] text-slate-500 font-bold uppercase tracking-wider pl-1 flex items-center gap-1.5 mt-2">
+                    별표/별지/별첨 파일 첨부
                     <span className="text-[11px] bg-slate-100 text-slate-500 font-black px-1.5 py-0.5 rounded border border-slate-200">복수 선택 가능</span>
                   </label>
                   <input
@@ -797,7 +879,7 @@ export default function AdminRulesManagement() {
 
                   {/* 선택된 파일 목록 */}
                   {newUploadFiles.length > 0 && (
-                    <div className="space-y-1.5 max-h-[140px] overflow-y-auto scrollbar pr-1 mb-2">
+                    <div className="space-y-1.5 max-h-[100px] overflow-y-auto scrollbar pr-1 mb-2">
                       {newUploadFiles.map((f, i) => (
                         <div key={f.name + i} className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">
                           <AttachFileIcon sx={{ fontSize: 18, color: "#059669" }} />
@@ -823,17 +905,17 @@ export default function AdminRulesManagement() {
                     onDragLeave={() => setIsDragOver(false)}
                     onDrop={handleFileDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`flex-1 flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl py-6 cursor-pointer transition-all min-h-[120px] ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl py-4 cursor-pointer transition-all min-h-[80px] ${
                       isDragOver
-                        ? "border-[#0c3161] bg-blue-50"
+                        ? "border-emerald-600 bg-emerald-50"
                         : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100"
                     }`}
                   >
-                    <UploadFileIcon sx={{ fontSize: 32, color: isDragOver ? "#0c3161" : "#94a3b8" }} />
-                    <p className="text-[15px] font-black text-slate-500">
-                      {isDragOver ? "파일을 놓으세요" : newUploadFiles.length > 0 ? "+ 파일 추가" : "클릭하거나 파일을 드래그하세요"}
+                    <UploadFileIcon sx={{ fontSize: 24, color: isDragOver ? "#059669" : "#94a3b8" }} />
+                    <p className="text-[13px] font-black text-slate-500">
+                      {isDragOver ? "파일을 놓으세요" : newUploadFiles.length > 0 ? "+ 부속 파일 추가" : "클릭하거나 부속 파일을 드래그하세요"}
                     </p>
-                    <p className="text-xs text-slate-400 font-bold">HWP · PDF · JPG · PNG · XLSX · 별표/별지 등</p>
+                    <p className="text-[11px] text-slate-400 font-bold">HWP · PDF · JPG · PNG · XLSX 등</p>
                   </div>
                 </div>
               </div>

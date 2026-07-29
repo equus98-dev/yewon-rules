@@ -66,7 +66,7 @@ function EditorContent() {
   
   // 개정안 초안 작성 폼 정보
   const [versionName, setVersionName] = useState("");
-  const [revisionType, setRevisionType] = useState("AMENDMENT"); // AMENDMENT, TOTAL_AMENDMENT
+  const [revisionType, setRevisionType] = useState(isNewMode ? "ENACTMENT" : "AMENDMENT"); // AMENDMENT, TOTAL_AMENDMENT, ENACTMENT
   const [enactmentDate, setEnactmentDate] = useState("");
   const [effectiveDate, setEffectiveDate] = useState("");
   const [announceNum, setAnnounceNum] = useState("");
@@ -108,7 +108,11 @@ function EditorContent() {
     const targetId = ruleIdToExtract || selectedRuleId;
     if (!targetId) return;
 
-    const attachmentUrl = forceAttachmentUrl || ruleDetail?.attachments?.[0]?.fileUrl;
+    let attachmentUrl = forceAttachmentUrl;
+    if (!attachmentUrl && ruleDetail?.attachments && ruleDetail.attachments.length > 0) {
+      const targetAttachment = ruleDetail.attachments.find((f: any) => f.title.toLowerCase().endsWith('.pdf')) || ruleDetail.attachments[0];
+      attachmentUrl = targetAttachment?.fileUrl;
+    }
     if (!attachmentUrl) {
       alert("등록된 첨부파일이 없어 자동 조문 추출을 진행할 수 없습니다.");
       return;
@@ -276,7 +280,8 @@ function EditorContent() {
           ]);
 
           if (isNewMode && data.attachments && data.attachments.length > 0) {
-            handleAutoExtractArticles(data.id, data.attachments[0].fileUrl);
+            const targetPdf = data.attachments.find((f: any) => f.title.toLowerCase().endsWith('.pdf')) || data.attachments[0];
+            handleAutoExtractArticles(data.id, targetPdf.fileUrl);
           }
         }
       } catch (e) {

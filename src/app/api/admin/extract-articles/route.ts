@@ -10,23 +10,28 @@ export async function POST(request: Request) {
   let pool;
   try {
     const body = await request.json() as any;
-    const { ruleId } = body;
+    const { ruleId, fileUrl: bodyFileUrl } = body;
     if (!ruleId) {
       return NextResponse.json({ error: "ruleId is required" }, { status: 400 });
     }
 
     pool = createPool();
-    const attachmentsRes = await pool.query(
-      `SELECT "fileUrl", "title" FROM "Attachment" WHERE "ruleId" = $1 ORDER BY "createdAt" ASC LIMIT 1`,
-      [ruleId]
-    );
+    let fileUrl = bodyFileUrl;
+    let title = fileUrl ? fileUrl.split('/').pop() || "" : "";
 
-    if (attachmentsRes.rows.length === 0) {
-      return NextResponse.json({ error: "첨부된 규정 파일이 없습니다." }, { status: 404 });
+    if (!fileUrl) {
+      const attachmentsRes = await pool.query(
+        `SELECT "fileUrl", "title" FROM "Attachment" WHERE "ruleId" = $1 ORDER BY CASE WHEN "title" LIKE '%.pdf' THEN 0 ELSE 1 END, "createdAt" ASC LIMIT 1`,
+        [ruleId]
+      );
+
+      if (attachmentsRes.rows.length === 0) {
+        return NextResponse.json({ error: "첨부된 규정 파일이 없습니다." }, { status: 404 });
+      }
+      fileUrl = attachmentsRes.rows[0].fileUrl;
+      title = attachmentsRes.rows[0].title;
     }
 
-    const fileUrl = attachmentsRes.rows[0].fileUrl;
-    const title = attachmentsRes.rows[0].title;
     const isPdf = title.toLowerCase().endsWith(".pdf") || fileUrl.toLowerCase().includes(".pdf");
 
     if (!isPdf) {
