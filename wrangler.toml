@@ -5,8 +5,8 @@ pages_build_output_dir = ".vercel/output/static"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "yewon-rules-db"
-database_id = "f448ab63-128a-4e09-a1e1-02095e73d92e"
+database_name = "yewon-db"
+database_id = "a39616f2-ba75-47e1-af30-7ab78f667abd"
 
 [[r2_buckets]]
 binding = "STORAGE"

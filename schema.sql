@@ -109,7 +109,7 @@ CREATE INDEX IF NOT EXISTS "idx_Rule_departmentId" ON "Rule"("departmentId");
 CREATE INDEX IF NOT EXISTS "idx_Attachment_ruleId" ON "Attachment"("ruleId");
 CREATE INDEX IF NOT EXISTS "idx_ArticleComparison_revisionId" ON "ArticleComparison"("revisionId");
  
-CREATE TABLE " "Opinion ( 
+CREATE TABLE "Opinion" ( 
   id TEXT NOT NULL PRIMARY KEY, 
   title TEXT NOT NULL, 
   content TEXT NOT NULL, 
