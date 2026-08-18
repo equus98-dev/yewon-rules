@@ -62,6 +62,7 @@ export async function GET(request: Request) {
           c.name AS "categoryName", d.name AS "departmentName",
           (SELECT "versionName" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "latestVersionName",
           (SELECT "enactmentDate" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "enactmentDate",
+          (SELECT "createdAt" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "createdAt",
           (SELECT "announcementNumber" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "announcementNumber",
           (SELECT "revisionType" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "revisionType",
           (SELECT a."fileUrl" FROM "Attachment" a WHERE a."ruleId" = r.id AND (a."fileType" ILIKE '%hwp%' OR a.title ILIKE '%.hwp') AND a.title NOT ILIKE '%서식%' AND a.title NOT ILIKE '%별표%' AND a.title NOT ILIKE '%별지%' LIMIT 1) AS "hwpUrl",
@@ -110,6 +111,7 @@ export async function GET(request: Request) {
           c.name AS "categoryName", d.name AS "departmentName",
           (SELECT "versionName" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "latestVersionName",
           (SELECT "enactmentDate" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "enactmentDate",
+          (SELECT "createdAt" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "createdAt",
           (SELECT "announcementNumber" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "announcementNumber"
          FROM "Rule" r
          LEFT JOIN "Category" c ON r."categoryId" = c.id
@@ -128,7 +130,7 @@ export async function GET(request: Request) {
           a.id AS "articleId", a."articleNumber", a.title AS "articleTitle", a."contentText",
           r.id, r.title, r."ruleNumber", r.status,
           c.name AS "categoryName", d.name AS "departmentName",
-          rev."versionName" AS "latestVersionName", rev."enactmentDate"
+          rev."versionName" AS "latestVersionName", rev."enactmentDate", rev."createdAt"
          FROM "Article" a
          JOIN "Revision" rev ON a."revisionId" = rev.id
          JOIN "Rule" r ON rev."ruleId" = r.id
@@ -156,6 +158,7 @@ export async function GET(request: Request) {
           snippet,
           enactmentDate: art.enactmentDate,
           latestVersionName: art.latestVersionName,
+          createdAt: art.createdAt,
         };
       });
     }
@@ -168,7 +171,8 @@ export async function GET(request: Request) {
           r.id AS "ruleId", r.title AS "ruleTitle", r."ruleNumber",
           c.name AS "categoryName", d.name AS "departmentName",
           (SELECT "versionName" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "latestVersionName",
-          (SELECT "enactmentDate" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "enactmentDate"
+          (SELECT "enactmentDate" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "enactmentDate",
+          (SELECT "createdAt" FROM "Revision" WHERE "ruleId" = r.id ORDER BY version DESC LIMIT 1) AS "createdAt"
          FROM "Attachment" a
          JOIN "Rule" r ON a."ruleId" = r.id
          LEFT JOIN "Category" c ON r."categoryId" = c.id

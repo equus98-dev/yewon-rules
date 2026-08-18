@@ -121,10 +121,16 @@ export default function SidebarTree({ activeRuleId, onSelectRule, onSelectCatego
         }
         const data = (await res.json()) as any;
         if (Array.isArray(data)) {
-          // 공포일자(enactmentDate) 내림차순 정렬
-          const sorted = data.sort(
-            (a: any, b: any) => new Date(b.enactmentDate).getTime() - new Date(a.enactmentDate).getTime()
-          );
+          // 공포일자(enactmentDate) 내림차순 정렬 (공포일자가 같으면 등록일시 기준 최근순)
+          const sorted = data.sort((a: any, b: any) => {
+            const dateA = new Date(a.enactmentDate).getTime();
+            const dateB = new Date(b.enactmentDate).getTime();
+            if (dateB !== dateA) return dateB - dateA;
+
+            const createA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const createB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return createB - createA;
+          });
           setRecentRules(sorted);
         }
       } catch (err: any) {

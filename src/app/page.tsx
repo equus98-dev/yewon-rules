@@ -220,10 +220,16 @@ export default function Home() {
         const res = await fetch("/api/rules/search?query=");
         const data = (await res.json()) as any;
         if (Array.isArray(data)) {
-          // enactmentDate 기준 최근순으로 5개만 노출
-          const sorted = data.sort(
-            (a: any, b: any) => new Date(b.enactmentDate).getTime() - new Date(a.enactmentDate).getTime()
-          );
+          // enactmentDate 기준 최근순으로 5개만 노출 (공포일자가 같으면 등록일시 기준 최근순)
+          const sorted = data.sort((a: any, b: any) => {
+            const dateA = new Date(a.enactmentDate).getTime();
+            const dateB = new Date(b.enactmentDate).getTime();
+            if (dateB !== dateA) return dateB - dateA;
+
+            const createA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const createB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return createB - createA;
+          });
           setRecentRules(sorted.slice(0, 5));
         }
       } catch (error) {

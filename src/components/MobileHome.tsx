@@ -59,9 +59,15 @@ export default function MobileHome() {
         const noticesData = await noticesRes.json() as any;
 
         if (Array.isArray(rulesData)) {
-          const sorted = rulesData.sort(
-            (a: any, b: any) => new Date(b.enactmentDate).getTime() - new Date(a.enactmentDate).getTime()
-          );
+          const sorted = rulesData.sort((a: any, b: any) => {
+            const dateA = new Date(a.enactmentDate).getTime();
+            const dateB = new Date(b.enactmentDate).getTime();
+            if (dateB !== dateA) return dateB - dateA;
+
+            const createA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const createB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return createB - createA;
+          });
           setRecentRules(sorted.slice(0, 5));
         }
         if (Array.isArray(noticesData)) {
