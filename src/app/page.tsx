@@ -84,6 +84,8 @@ export default function Home() {
 
   // 대시보드용 최신 제개정 목록
   const [recentRules, setRecentRules] = useState<any[]>([]);
+  const [allRecentRules, setAllRecentRules] = useState<any[]>([]);
+  const [recentCurrentPage, setRecentCurrentPage] = useState(1);
   const [loadingRecent, setLoadingRecent] = useState(false);
 
   // 실시간 공지사항 연동을 위한 상태 정의
@@ -231,6 +233,7 @@ export default function Home() {
             return createB - createA;
           });
           setRecentRules(sorted.slice(0, 5));
+          setAllRecentRules(sorted);
         }
       } catch (error) {
         console.error("Failed to load recent rules:", error);
@@ -721,6 +724,9 @@ export default function Home() {
               }}
               onTabChange={(tab) => {
                 setActiveVerticalTab(tab);
+                if (tab === "최신 제·개정") {
+                  setRecentCurrentPage(1);
+                }
                 if (tab === "조직도" || tab === "공지사항") {
                   setActiveRuleId(null);
                   setActiveCategoryId(null);
@@ -906,12 +912,20 @@ export default function Home() {
 
               <div className="flex-1 p-8">
                 <div className="w-full">
+                  {/* 건수 및 페이지 표시 */}
+                  {!loadingRecent && allRecentRules.length > 0 && (
+                    <div className="flex items-center text-[15px] font-extrabold text-slate-700 select-none mb-3">
+                      <span className="mr-3">전체: <span className="text-blue-700">{allRecentRules.length}</span>건</span>
+                      <span>페이지: {recentCurrentPage}/{Math.max(1, Math.ceil(allRecentRules.length / 10))}</span>
+                    </div>
+                  )}
+
                   <div className="bg-white border-t-2 border-slate-700 shadow-sm overflow-hidden flex flex-col">
                     {loadingRecent ? (
                       <div className="flex justify-center items-center py-40">
                         <CircularProgress size={30} sx={{ color: "#0c3161" }} />
                       </div>
-                    ) : recentRules.length === 0 ? (
+                    ) : allRecentRules.length === 0 ? (
                       <div className="text-center py-40 text-slate-500 text-[15px] font-bold">
                         등록된 최신 제·개정 규정이 없습니다.
                       </div>
@@ -927,43 +941,102 @@ export default function Home() {
                           </tr>
                         </thead>
                         <tbody>
-                          {recentRules.map((rule, idx) => {
-                            const isAbolished = rule.status === "ABOLISHED";
-                            return (
-                              <tr key={rule.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors group">
-                                <td className="py-4 px-4 text-center text-slate-500 font-extrabold text-[16px]">
-                                  {recentRules.length - idx}
-                                </td>
-                                <td className="py-4 px-4 text-center">
-                                  <span className={`px-2.5 py-1 rounded text-[12.5px] font-extrabold ${isAbolished ? "bg-red-400 text-white" : "bg-[#81c784] text-white"}`}>
-                                    {rule.latestVersionName}
-                                  </span>
-                                </td>
-                                <td className="py-4 px-4">
-                                  <button
-                                    type="button"
-                                    onClick={() => { setActiveRuleId(rule.id); setActiveVerticalTab("규정"); }}
-                                    className={`font-bold cursor-pointer text-[15.5px] transition-colors text-left ${isAbolished ? "text-slate-400 line-through group-hover:text-slate-500" : "text-slate-800 group-hover:text-blue-800"}`}
-                                  >
-                                    {rule.title}
-                                  </button>
-                                </td>
-                                <td className="py-4 px-4 text-center text-slate-600 font-medium text-[15px]">
-                                  {rule.category?.name || "분류없음"}
-                                </td>
-                                <td className="py-4 px-4 text-center text-slate-600 font-mono text-[14.5px]">
-                                  {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString().replace(/\. /g, '.').replace(/\.$/, '') : "-"}
-                                </td>
-                              </tr>
-                            );
-                          })}
+                          {(() => {
+                            const pageSize = 10;
+                            const startIndex = (recentCurrentPage - 1) * pageSize;
+                            const currentRules = allRecentRules.slice(startIndex, startIndex + pageSize);
+                            return currentRules.map((rule, idx) => {
+                              const isAbolished = rule.status === "ABOLISHED";
+                              const displayNum = allRecentRules.length - startIndex - idx;
+                              return (
+                                <tr key={rule.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors group">
+                                  <td className="py-4 px-4 text-center text-slate-500 font-extrabold text-[16px]">
+                                    {displayNum}
+                                  </td>
+                                  <td className="py-4 px-4 text-center">
+                                    <span className={`px-2.5 py-1 rounded text-[12.5px] font-extrabold ${isAbolished ? "bg-red-400 text-white" : "bg-[#81c784] text-white"}`}>
+                                      {rule.latestVersionName}
+                                    </span>
+                                  </td>
+                                  <td className="py-4 px-4">
+                                    <button
+                                      type="button"
+                                      onClick={() => { setActiveRuleId(rule.id); setActiveVerticalTab("규정"); }}
+                                      className={`font-bold cursor-pointer text-[15.5px] transition-colors text-left ${isAbolished ? "text-slate-400 line-through group-hover:text-slate-500" : "text-slate-800 group-hover:text-blue-800"}`}
+                                    >
+                                      {rule.title}
+                                    </button>
+                                  </td>
+                                  <td className="py-4 px-4 text-center text-slate-600 font-medium text-[15px]">
+                                    {rule.category?.name || "분류없음"}
+                                  </td>
+                                  <td className="py-4 px-4 text-center text-slate-600 font-mono text-[14.5px]">
+                                    {rule.enactmentDate ? new Date(rule.enactmentDate).toLocaleDateString().replace(/\. /g, '.').replace(/\.$/, '') : "-"}
+                                  </td>
+                                </tr>
+                              );
+                            });
+                          })()}
                         </tbody>
                       </table>
                     )}
-                    {!loadingRecent && recentRules.length > 0 && (
+                    {!loadingRecent && allRecentRules.length > 0 && (
                       <div className="flex items-center justify-center py-6 border-t border-slate-200 bg-white">
                         <div className="flex gap-1.5">
-                          <button className="px-4 py-1.5 bg-[#0c3161] text-white text-[15px] font-black shadow-sm">1</button>
+                          {(() => {
+                            const pageSize = 10;
+                            const totalRecentPages = Math.ceil(allRecentRules.length / pageSize);
+                            
+                            const pageNumbers: number[] = [];
+                            const startPage = Math.max(1, recentCurrentPage - 2);
+                            const endPage = Math.min(totalRecentPages, startPage + 4);
+                            const displayStartPage = Math.max(1, Math.min(startPage, totalRecentPages - 4));
+                            for (let i = displayStartPage; i <= Math.min(totalRecentPages, displayStartPage + 4); i++) {
+                              pageNumbers.push(i);
+                            }
+
+                            return (
+                              <>
+                                <button
+                                  onClick={() => setRecentCurrentPage(1)}
+                                  className="px-3 py-1.5 border border-slate-200 bg-slate-50 text-slate-500 font-bold text-[14px] cursor-pointer hover:bg-slate-100 transition-colors"
+                                >
+                                  «
+                                </button>
+                                <button
+                                  onClick={() => setRecentCurrentPage(prev => Math.max(1, prev - 1))}
+                                  className="px-3 py-1.5 border border-slate-200 bg-slate-50 text-slate-500 font-bold text-[14px] cursor-pointer hover:bg-slate-100 transition-colors"
+                                >
+                                  &lt;
+                                </button>
+                                {pageNumbers.map(page => (
+                                  <button
+                                    key={page}
+                                    onClick={() => setRecentCurrentPage(page)}
+                                    className={`px-4 py-1.5 text-[15px] font-black shadow-sm cursor-pointer ${
+                                      recentCurrentPage === page
+                                        ? "bg-[#0c3161] text-white"
+                                        : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    {page}
+                                  </button>
+                                ))}
+                                <button
+                                  onClick={() => setRecentCurrentPage(prev => Math.min(totalRecentPages, prev + 1))}
+                                  className="px-3 py-1.5 border border-slate-200 bg-slate-50 text-slate-500 font-bold text-[14px] cursor-pointer hover:bg-slate-100 transition-colors"
+                                >
+                                  &gt;
+                                </button>
+                                <button
+                                  onClick={() => setRecentCurrentPage(totalRecentPages)}
+                                  className="px-3 py-1.5 border border-slate-200 bg-slate-50 text-slate-500 font-bold text-[14px] cursor-pointer hover:bg-slate-100 transition-colors"
+                                >
+                                  »
+                                </button>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     )}
@@ -1740,7 +1813,7 @@ export default function Home() {
                       </h3>
                       <IconButton 
                         size="small" 
-                        onClick={() => { setActiveVerticalTab("최신 제·개정"); setActiveRuleId(null); setActiveCategoryId(null); setIsSearching(false); setActiveNoticeId(null); }} 
+                        onClick={() => { setActiveVerticalTab("최신 제·개정"); setActiveRuleId(null); setActiveCategoryId(null); setIsSearching(false); setActiveNoticeId(null); setRecentCurrentPage(1); }} 
                         sx={{ 
                           bgcolor: "rgba(59, 155, 156, 0.15)",
                           backgroundImage: "radial-gradient(rgba(59, 155, 156, 0.3) 1.5px, transparent 1.5px)",

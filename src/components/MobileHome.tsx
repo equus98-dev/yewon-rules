@@ -29,6 +29,7 @@ export default function MobileHome() {
   // 카테고리 선택 상태
   const [selectedCategoryTitle, setSelectedCategoryTitle] = useState<string>("");
   const [categoryRules, setCategoryRules] = useState<any[]>([]);
+  const [categoryCurrentPage, setCategoryCurrentPage] = useState<number>(1);
   const [loadingCategory, setLoadingCategory] = useState<boolean>(false);
 
   // 검색 상태
@@ -119,6 +120,7 @@ export default function MobileHome() {
     setActiveNoticeId(null);
     setSelectedCategoryTitle(title);
     setActiveTab("category");
+    setCategoryCurrentPage(1);
     setLoadingCategory(true);
     try {
       let url = `/api/rules/search?query=`;
@@ -148,7 +150,7 @@ export default function MobileHome() {
 
       if (type === "recent") {
         const sorted = rulesList.sort((a: any, b: any) => new Date(b.enactmentDate).getTime() - new Date(a.enactmentDate).getTime());
-        setCategoryRules(sorted.slice(0, 20));
+        setCategoryRules(sorted);
       } else {
         setCategoryRules(rulesList);
       }
@@ -448,33 +450,103 @@ export default function MobileHome() {
               <div className="w-8"></div>
             </div>
             <div className="p-4 w-full max-w-lg mx-auto flex flex-col gap-2.5">
-              <div className="text-xs font-bold text-slate-500 mb-1 px-1">
-                전체 <span className="text-blue-700 font-extrabold">{categoryRules.length}</span>건의 규정이 조회되었습니다.
-              </div>
+              {!loadingCategory && categoryRules.length > 0 && (
+                <div className="text-xs font-bold text-slate-500 mb-1 px-1 flex justify-between">
+                  <span>전체 <span className="text-blue-700 font-extrabold">{categoryRules.length}</span>건</span>
+                  <span>페이지: {categoryCurrentPage}/{Math.max(1, Math.ceil(categoryRules.length / 10))}</span>
+                </div>
+              )}
               {loadingCategory ? (
                 <div className="py-20 flex justify-center"><CircularProgress size={30} /></div>
               ) : categoryRules.length === 0 ? (
                 <div className="py-20 text-center text-slate-400 font-bold text-sm">해당 카테고리에 등록된 규정이 없습니다.</div>
               ) : (
-                categoryRules.map((rule) => (
-                  <div 
-                    key={rule.id}
-                    onClick={() => setActiveRuleId(rule.id)}
-                    className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-blue-500 transition-all cursor-pointer active:scale-98 flex flex-col gap-1.5"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded text-[11px] font-extrabold">
-                        {rule.ruleNumber || "규정"}
-                      </span>
-                      <span className="text-[12px] font-bold text-slate-400">
-                        {rule.enactmentDate ? rule.enactmentDate.split("T")[0] : ""}
-                      </span>
-                    </div>
-                    <h4 className="text-[15px] font-extrabold text-slate-800 tracking-tight line-clamp-1">
-                      {rule.title}
-                    </h4>
-                  </div>
-                ))
+                (() => {
+                  const mobilePageSize = 10;
+                  const startIndex = (categoryCurrentPage - 1) * mobilePageSize;
+                  const currentRules = categoryRules.slice(startIndex, startIndex + mobilePageSize);
+                  return (
+                    <>
+                      {currentRules.map((rule) => (
+                        <div 
+                          key={rule.id}
+                          onClick={() => setActiveRuleId(rule.id)}
+                          className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-blue-500 transition-all cursor-pointer active:scale-98 flex flex-col gap-1.5"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="px-2.5 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded text-[11px] font-extrabold">
+                              {rule.ruleNumber || "규정"}
+                            </span>
+                            <span className="text-[12px] font-bold text-slate-400">
+                              {rule.enactmentDate ? rule.enactmentDate.split("T")[0] : ""}
+                            </span>
+                          </div>
+                          <h4 className="text-[15px] font-extrabold text-slate-800 tracking-tight line-clamp-1">
+                            {rule.title}
+                          </h4>
+                        </div>
+                      ))}
+
+                      {/* 페이징 하단 바 */}
+                      <div className="flex items-center justify-center py-4 bg-transparent mt-2">
+                        <div className="flex gap-1">
+                          {(() => {
+                            const totalPages = Math.ceil(categoryRules.length / mobilePageSize);
+                            const pageNumbers: number[] = [];
+                            const startPage = Math.max(1, categoryCurrentPage - 2);
+                            const endPage = Math.min(totalPages, startPage + 4);
+                            const displayStartPage = Math.max(1, Math.min(startPage, totalPages - 4));
+                            for (let i = displayStartPage; i <= Math.min(totalPages, displayStartPage + 4); i++) {
+                              pageNumbers.push(i);
+                            }
+
+                            return (
+                              <>
+                                <button
+                                  onClick={() => setCategoryCurrentPage(1)}
+                                  className="px-2.5 py-1 border border-slate-200 bg-white text-slate-500 rounded font-bold text-xs cursor-pointer active:scale-95"
+                                >
+                                  «
+                                </button>
+                                <button
+                                  onClick={() => setCategoryCurrentPage(prev => Math.max(1, prev - 1))}
+                                  className="px-2.5 py-1 border border-slate-200 bg-white text-slate-500 rounded font-bold text-xs cursor-pointer active:scale-95"
+                                >
+                                  &lt;
+                                </button>
+                                {pageNumbers.map(page => (
+                                  <button
+                                    key={page}
+                                    onClick={() => setCategoryCurrentPage(page)}
+                                    className={`px-3 py-1 rounded text-xs font-black shadow-sm cursor-pointer ${
+                                      categoryCurrentPage === page
+                                        ? "bg-[#0c3161] text-white"
+                                        : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    {page}
+                                  </button>
+                                ))}
+                                <button
+                                  onClick={() => setCategoryCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                  className="px-2.5 py-1 border border-slate-200 bg-white text-slate-500 rounded font-bold text-xs cursor-pointer active:scale-95"
+                                >
+                                  &gt;
+                                </button>
+                                <button
+                                  onClick={() => setCategoryCurrentPage(totalPages)}
+                                  className="px-2.5 py-1 border border-slate-200 bg-white text-slate-500 rounded font-bold text-xs cursor-pointer active:scale-95"
+                                >
+                                  »
+                                </button>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()
               )}
             </div>
           </div>
