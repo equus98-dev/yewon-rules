@@ -79,6 +79,11 @@ function EditorContent() {
   // 신규 조항 추가 위치 지정용 체크 인덱스
   const [checkedArticleIndex, setCheckedArticleIndex] = useState<number | null>(null);
 
+  // 가지조 (의1 vs 의2) 선택 팝업 관련 상태
+  const [subNumSelectorOpen, setSubNumSelectorOpen] = useState(false);
+  const [selectorTargetNum, setSelectorTargetNum] = useState<number | null>(null);
+  const [selectorCheckedIndex, setSelectorCheckedIndex] = useState<number | null>(null);
+
   // 활성화된(포커스된) 조항 번호 상태 (왼쪽 뷰어 동기화용)
   const [activeArticleNum, setActiveArticleNum] = useState<number | null>(null);
 
@@ -553,17 +558,16 @@ function EditorContent() {
   };
 
 
-  // 신규 조항 추가 (신설)
-  const handleAddArticle = () => {
+  // 일반 조항 신설 (제N조)
+  const createNormalArticle = () => {
     setDraftArticles((prev) => {
-      // 일반 조문(8000 미만) 중 최대 조 번호를 찾음
       const normalArticles = prev.filter((p) => p.articleNumber < 8000);
       const maxNum = normalArticles.length > 0 ? Math.max(...normalArticles.map((p) => p.articleNumber)) : 0;
       const nextNum = maxNum + 1;
       
       const newArticle = {
         part: "",
-        chapter: "제1장 총칙",
+        chapter: prev[prev.length - 1]?.chapter || "제1장 총칙",
         section: "",
         subSection: "",
         articleNumber: nextNum,
@@ -575,37 +579,71 @@ function EditorContent() {
         isDeleted: false,
         isModified: false,
       };
-
-      if (checkedArticleIndex !== null && checkedArticleIndex >= 0 && checkedArticleIndex < prev.length) {
-        const targetArticle = prev[checkedArticleIndex];
-        const targetNum = targetArticle.articleNumber;
-        
-        // 동일한 조 번호를 가진 기존 조문들 중에서 '의N' 형태의 최대 N값을 찾음
-        const relatedArticles = prev.filter(p => p.articleNumber === targetNum);
-        let maxSub = 1; // 1부터 시작하므로 다음은 '의2'가 됨
-        relatedArticles.forEach(a => {
-           const subMatch = a.title.match(/^의(\d+)/);
-           if (subMatch) {
-              const subNum = parseInt(subMatch[1], 10);
-              if (subNum > maxSub) maxSub = subNum;
-           }
-        });
-        const nextSub = maxSub + 1;
-        
-        newArticle.chapter = targetArticle.chapter || "제1장 총칙";
-        newArticle.articleNumber = targetNum;
-        newArticle.title = `의${nextSub}(제목)`;
-        newArticle.contentText = `제${targetNum}조의${nextSub} (제목) `;
-        
-        const newArray = [...prev];
-        newArray.splice(checkedArticleIndex + 1, 0, newArticle);
-        setCheckedArticleIndex(null); // 추가 후 체크 해제
-        return newArray;
-      }
-
-      newArticle.chapter = prev[prev.length - 1]?.chapter || "제1장 총칙";
       return [...prev, newArticle];
     });
+  };
+
+  // '의 N' 가지조항 신설
+  const createSubArticle = (targetIdx: number, targetNum: number, subNum: number) => {
+    setDraftArticles((prev) => {
+      const targetArticle = prev[targetIdx];
+      const newArticle = {
+        part: targetArticle.part || "",
+        chapter: targetArticle.chapter || "제1장 총칙",
+        section: targetArticle.section || "",
+        subSection: targetArticle.subSection || "",
+        articleNumber: targetNum,
+        title: `의${subNum}(제목)`,
+        contentText: `제${targetNum}조의${subNum} (제목) `,
+        contentJson: { paragraphs: [""] },
+        sortOrder: targetArticle.sortOrder + 0.01 * subNum,
+        isNew: true,
+        isDeleted: false,
+        isModified: false,
+      };
+
+      const newArray = [...prev];
+      newArray.splice(targetIdx + 1, 0, newArticle);
+      setCheckedArticleIndex(null); // 추가 후 체크 해제
+      return newArray;
+    });
+  };
+
+  // 신규 조항 추가 (신설)
+  const handleAddArticle = () => {
+    if (checkedArticleIndex !== null && checkedArticleIndex >= 0 && checkedArticleIndex < draftArticles.length) {
+      const targetArticle = draftArticles[checkedArticleIndex];
+      const targetNum = targetArticle.articleNumber;
+      
+      // 동일한 조 번호를 가진 기존 조문들 중 '의N' 최대값 탐색
+      const relatedArticles = draftArticles.filter(p => p.articleNumber === targetNum);
+      let hasSub1 = false;
+      let maxSub = 1;
+      
+      relatedArticles.forEach(a => {
+         const subMatch = a.title.match(/^의(\d+)/);
+         if (subMatch) {
+            const subNum = parseInt(subMatch[1], 10);
+            if (subNum === 1) hasSub1 = true;
+            if (subNum > maxSub) maxSub = subNum;
+         }
+      });
+
+      // 만약 '의1' 조항이 없는 경우에만 팝업을 띄워 선택하게 합니다.
+      if (!hasSub1) {
+        setSelectorTargetNum(targetNum);
+        setSelectorCheckedIndex(checkedArticleIndex);
+        setSubNumSelectorOpen(true);
+        return;
+      } else {
+        // 이미 '의1'이 있는 경우: 바로 '의(maxSub + 1)' 로 생성
+        const nextSub = maxSub + 1;
+        createSubArticle(checkedArticleIndex, targetNum, nextSub);
+        return;
+      }
+    }
+
+    createNormalArticle();
   };
 
   // 그룹 헤더 개정 취소
@@ -1955,6 +1993,49 @@ function EditorContent() {
             >
               <SaveIcon sx={{ fontSize: 16 }} />
               저장 및 개정처리
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 가지조(의1 vs 의2) 선택 팝업 */}
+      <Dialog 
+        open={subNumSelectorOpen} 
+        onClose={() => setSubNumSelectorOpen(false)} 
+        maxWidth="xs" 
+        fullWidth
+      >
+        <DialogTitle sx={{ p: 2.5, pb: 1, fontWeight: 'black', fontSize: '15px', borderBottom: '1px solid #e2e8f0' }}>
+          신설 조항 번호 선택
+        </DialogTitle>
+        <DialogContent className="bg-white p-6" sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <p className="text-[13px] font-bold text-slate-600 mb-2 leading-relaxed">
+            제{selectorTargetNum}조와 연관된 신설 조항의 번호를 선택해 주세요.
+          </p>
+          <div className="flex flex-col gap-2 w-full">
+            <button
+              onClick={() => {
+                if (selectorCheckedIndex !== null && selectorTargetNum !== null) {
+                  createSubArticle(selectorCheckedIndex, selectorTargetNum, 1);
+                }
+                setSubNumSelectorOpen(false);
+              }}
+              className="w-full py-3.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-extrabold text-xs border border-blue-200 rounded-xl transition-all cursor-pointer text-left px-4 flex justify-between items-center"
+            >
+              <span>제{selectorTargetNum}조의1 (제{selectorTargetNum}조와 연관)</span>
+              <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-black">추천</span>
+            </button>
+            <button
+              onClick={() => {
+                if (selectorCheckedIndex !== null && selectorTargetNum !== null) {
+                  createSubArticle(selectorCheckedIndex, selectorTargetNum, 2);
+                }
+                setSubNumSelectorOpen(false);
+              }}
+              className="w-full py-3.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-extrabold text-xs border border-slate-200 rounded-xl transition-all cursor-pointer text-left px-4 flex justify-between items-center"
+            >
+              <span>제{selectorTargetNum}조의2 로 신설</span>
+              <span className="text-[10px] bg-slate-100 text-slate-800 px-2 py-0.5 rounded font-black">기본값</span>
             </button>
           </div>
         </DialogContent>
