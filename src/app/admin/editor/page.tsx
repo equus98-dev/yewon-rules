@@ -587,6 +587,7 @@ function EditorContent() {
   const createSubArticle = (targetIdx: number, targetNum: number, subNum: number) => {
     setDraftArticles((prev) => {
       const targetArticle = prev[targetIdx];
+      const baseOrder = Math.floor(targetArticle.sortOrder || targetNum);
       const newArticle = {
         part: targetArticle.part || "",
         chapter: targetArticle.chapter || "제1장 총칙",
@@ -596,7 +597,7 @@ function EditorContent() {
         title: `의${subNum}(제목)`,
         contentText: `제${targetNum}조의${subNum} (제목) `,
         contentJson: { paragraphs: [""] },
-        sortOrder: targetArticle.sortOrder + 0.01 * subNum,
+        sortOrder: baseOrder + 0.001 * subNum,
         isNew: true,
         isDeleted: false,
         isModified: false,
@@ -617,26 +618,27 @@ function EditorContent() {
       
       // 동일한 조 번호를 가진 기존 조문들 중 '의N' 최대값 탐색
       const relatedArticles = draftArticles.filter(p => p.articleNumber === targetNum);
-      let hasSub1 = false;
-      let maxSub = 1;
+      let hasAnySub = false;
+      let maxSub = 0;
       
       relatedArticles.forEach(a => {
-         const subMatch = a.title.match(/^의(\d+)/);
-         if (subMatch) {
-            const subNum = parseInt(subMatch[1], 10);
-            if (subNum === 1) hasSub1 = true;
+         const titleMatch = a.title?.match(/(?:^|\s|조)의\s*(\d+)/) || a.title?.match(/^의(\d+)/);
+         const contentMatch = a.contentText?.match(/제\s*\d+\s*조의\s*(\d+)/);
+         const subNum = titleMatch ? parseInt(titleMatch[1], 10) : (contentMatch ? parseInt(contentMatch[1], 10) : 0);
+         if (subNum > 0) {
+            hasAnySub = true;
             if (subNum > maxSub) maxSub = subNum;
          }
       });
 
-      // 만약 '의1' 조항이 없는 경우에만 팝업을 띄워 선택하게 합니다.
-      if (!hasSub1) {
+      // 해당 조에 가지조('의N')가 전혀 없는 경우에만 팝업을 띄워 의1 vs 의2 선택
+      if (!hasAnySub) {
         setSelectorTargetNum(targetNum);
         setSelectorCheckedIndex(checkedArticleIndex);
         setSubNumSelectorOpen(true);
         return;
       } else {
-        // 이미 '의1'이 있는 경우: 바로 '의(maxSub + 1)' 로 생성
+        // 이미 가지조가 존재하는 경우: 기존 최대 가지번호 다음 번호(maxSub + 1)로 자동 생성
         const nextSub = maxSub + 1;
         createSubArticle(checkedArticleIndex, targetNum, nextSub);
         return;
