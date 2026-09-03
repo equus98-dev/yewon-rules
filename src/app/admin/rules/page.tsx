@@ -33,10 +33,12 @@ function DeptSelectOptions({ departments }: { departments: any[] }) {
 
   // 그룹별 분류
   const 총장직속하위 = selectable.filter((d) => ["비서실", "감사실", "인권센터"].includes(d.name));
+  const 교무지원처하위 = selectable.filter((d) => ["대학원"].includes(d.name));
+  const 기획조정처하위 = selectable.filter((d) => ["정보도서관"].includes(d.name));
   const 부설기관하위 = selectable.filter((d) => ["평생교육원"].includes(d.name));
-  const 부속기관하위 = selectable.filter((d) => ["학생생활관", "정보도서관"].includes(d.name));
+  const 부속기관하위 = selectable.filter((d) => ["학생생활관"].includes(d.name));
   const 독립부서 = selectable.filter((d) =>
-    ![...총장직속하위, ...부설기관하위, ...부속기관하위].some((x) => x.id === d.id)
+    ![...총장직속하위, ...교무지원처하위, ...기획조정처하위, ...부설기관하위, ...부속기관하위].some((x) => x.id === d.id)
   );
 
   return (
@@ -46,6 +48,12 @@ function DeptSelectOptions({ departments }: { departments: any[] }) {
         {총장직속하위.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
       </optgroup>
       {독립부서.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+      <optgroup label="◆ 교무지원처 산하">
+        {교무지원처하위.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+      </optgroup>
+      <optgroup label="◆ 기획조정처 산하">
+        {기획조정처하위.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+      </optgroup>
       <optgroup label="◆ 부설기관">
         {부설기관하위.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
       </optgroup>

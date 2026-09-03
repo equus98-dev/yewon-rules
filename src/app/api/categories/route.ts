@@ -110,6 +110,13 @@ export async function GET(request: Request) {
     }
 
     if (type === "dept") {
+      try {
+        await pool.query(`UPDATE "Department" SET name = '교무지원처' WHERE name = '교학지원처' OR code = 'ACADEMIC'`);
+        await pool.query(`UPDATE "Department" SET name = '입학지원처' WHERE name = '입학홍보처' OR code = 'ADMISSIONS'`);
+      } catch (err) {
+        // Ignore in environments where write permissions or table locks occur
+      }
+
       const rDepts = await pool.query('SELECT id, name, code, "sortOrder" FROM "Department" ORDER BY "sortOrder" ASC');
       const rRules = await pool.query('SELECT id, title, "ruleNumber", status, "departmentId" FROM "Rule" ORDER BY title ASC');
 
@@ -118,14 +125,17 @@ export async function GET(request: Request) {
         SECRETARY: "PRESIDENT",
         AUDIT: "PRESIDENT",
         HUMANRIGHTS: "PRESIDENT",
+        GRADUATE: "ACADEMIC",
+        LIBRARY: "PLANNING",
         LIFELONG: "ATTACHED_ORG",
         DORMITORY: "ATTACHED_INST",
-        LIBRARY: "ATTACHED_INST",
       };
 
       // code -> dept 맵
       const codeMap = new Map<string, any>();
       rDepts.rows.forEach((dept) => {
+        if (dept.name === "교학지원처" || dept.code === "ACADEMIC") dept.name = "교무지원처";
+        if (dept.name === "입학홍보처" || dept.code === "ADMISSIONS") dept.name = "입학지원처";
         if (dept.code) codeMap.set(dept.code, dept);
       });
 

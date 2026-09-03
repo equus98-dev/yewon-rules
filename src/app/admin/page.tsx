@@ -147,7 +147,7 @@ export default function AdminDashboard() {
 
             <div className="mt-8 pt-4 border-t border-slate-100 select-none">
               <span className="text-sm text-slate-450 font-bold">
-                * 기획조정처, 교학지원처 등 4개 중심 소관 부서에 지능형 매핑이 완료되었습니다.
+                * 기획조정처, 교무지원처 등 4개 중심 소관 부서에 지능형 매핑이 완료되었습니다.
               </span>
             </div>
           </div>
