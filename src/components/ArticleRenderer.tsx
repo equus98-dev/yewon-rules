@@ -625,7 +625,7 @@ export default function ArticleRenderer({
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     if (item && (item.type === "text" || item.type === "paragraph")) {
-      const textStr = String(item.text || "").replace(/<[^>]+>/g, '').trim();
+      const textStr = String(item.text || "").replace(/<(?:\/?[a-zA-Z][^>]*|!--[\s\S]*?--)>/g, '').trim();
       const numStr = String(item.num || "").trim();
       if (/^제\d+조/.test(textStr) || /^제\d+조/.test(numStr)) {
         const currentNum = numStr.match(/^제\d+조(?:의\d+)?/)?.[0] || textStr.match(/^제\d+조(?:의\d+)?/)?.[0] || "";
@@ -1344,6 +1344,17 @@ export default function ArticleRenderer({
                  } else {
                      body = m[2].trim();
                  }
+
+                 // 현재 조문과 동일한 번호가 본문에서 중복 감지된 경우, 별도 조문 헤더를 만들지 않고 인라인으로 렌더링
+                 if (isArticleBody && articleNum && (articleNum === baseArticlePath || articleNum === `제${articleNumber}조`)) {
+                     const inlineText = body || trimmed;
+                     return (
+                        <span key={`glued-${idx}`} className="font-normal text-slate-800 break-keep inline">
+                           {renderTextWithHistory(inlineText)}{" "}
+                        </span>
+                     );
+                 }
+
                  const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(trimmed);
                  return (
                     <div key={`glued-${idx}`} id={`toc-${articleNum}`} className="mt-4 mb-0 flex items-start gap-2 pt-1 relative w-[calc(100%+52px)] -ml-[52px] group/text">
@@ -1855,7 +1866,7 @@ export default function ArticleRenderer({
             let parsedTitle = "";
             
             const safeText = String(articleItem.text || "").trim();
-            const plainText = safeText.replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim();
+            const plainText = safeText.replace(/<(?:\/?[a-zA-Z][^>]*|!--[\s\S]*?--)>/g, '').replace(/&nbsp;/gi, ' ').trim();
             const isAddendum = /^부\s*칙/.test(plainText) || plainText.replace(/\s+/g, "").startsWith("부칙") || (title && ["부칙", "부", "부 ", "칙", "칙 "].includes(title));
             const { historyDates, badgeType, badgeColor, badgeTitle } = getBadgeInfo(plainText, contentText);
             
@@ -1954,6 +1965,7 @@ export default function ArticleRenderer({
                           actualBody = actualBody.replace(/^(?:\s|&nbsp;|<br\s*\/?>|<\/?p[^>]*>)+/gi, '').trim();
 
                           if (/^제\d+조/.test(plainText)) {
+                            const htmlTagOrSpace = '(?:\\s|&nbsp;|<(?:\\/?[a-zA-Z][^>]*|!--[\\s\\S]*?--)>)*';
                             const match = plainText.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)[\[〔(（]([^()]*?(?:\([^()]*\)[^()]*?)*)[\]〕)）]([\s\S]*)/);
                             if (match) {
                                articleNumOverride = match[1].replace(/\s/g, '');
@@ -1961,11 +1973,17 @@ export default function ArticleRenderer({
                                    articleNumOverride = articleNumOverride.replace(/조(\d+)$/, '조의$1');
                                }
                                articleTitleOverride = `(${match[2]})`;
-                               const titlePart = plainText.substring(0, plainText.indexOf(match[3]));
+                               let titlePart = "";
+                               if (match[3] && match[3].trim().length > 0) {
+                                 const bodyStartIdx = plainText.indexOf(match[3]);
+                                 titlePart = bodyStartIdx !== -1 ? plainText.substring(0, bodyStartIdx) : plainText;
+                               } else {
+                                 titlePart = plainText;
+                               }
                                const regexPattern = titlePart.split('').map(c => 
-                                 c.trim() === '' ? '(?:\\s|&nbsp;|<[^>]+>)*' : c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\s|&nbsp;|<[^>]+>)*'
+                                 c.trim() === '' ? htmlTagOrSpace : c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + htmlTagOrSpace
                                ).join('');
-                               const remover = new RegExp('^(?:\\s|&nbsp;|<[^>]+>)*' + regexPattern, 'i');
+                               const remover = new RegExp('^' + htmlTagOrSpace + regexPattern, 'i');
                                actualBody = actualBody.replace(remover, '').trim();
                             } else {
                                const match2 = plainText.match(/^(제\d+조(?:의|\s+)?\d*)(?:(?:\s|&nbsp;)*)([\s\S]*)/);
@@ -1974,11 +1992,17 @@ export default function ArticleRenderer({
                                    if (articleNumOverride.match(/^제\d+조\d+$/)) {
                                        articleNumOverride = articleNumOverride.replace(/조(\d+)$/, '조의$1');
                                    }
-                                   const titlePart = plainText.substring(0, plainText.indexOf(match2[2]));
+                                   let titlePart = "";
+                                   if (match2[2] && match2[2].trim().length > 0) {
+                                     const bodyStartIdx = plainText.indexOf(match2[2]);
+                                     titlePart = bodyStartIdx !== -1 ? plainText.substring(0, bodyStartIdx) : plainText;
+                                   } else {
+                                     titlePart = plainText;
+                                   }
                                    const regexPattern = titlePart.split('').map(c => 
-                                     c.trim() === '' ? '(?:\\s|&nbsp;|<[^>]+>)*' : c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\s|&nbsp;|<[^>]+>)*'
+                                     c.trim() === '' ? htmlTagOrSpace : c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + htmlTagOrSpace
                                    ).join('');
-                                   const remover = new RegExp('^(?:\\s|&nbsp;|<[^>]+>)*' + regexPattern, 'i');
+                                   const remover = new RegExp('^' + htmlTagOrSpace + regexPattern, 'i');
                                    actualBody = actualBody.replace(remover, '').trim();
                                }
                             }
