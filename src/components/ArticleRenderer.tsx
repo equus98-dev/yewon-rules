@@ -115,10 +115,18 @@ export default function ArticleRenderer({
   onTogglePrintSelect,
 }: ArticleRendererProps) {
   // DB에서 넘어온 값에 하드코딩된 span 껍데기(과거 버그)가 묻어있을 수 있으므로 정리합니다.
+  // DB에서 넘어온 값에 하드코딩된 span 껍데기(과거 버그)가 묻어있을 수 있으므로 정리합니다.
   if (title) title = title.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
   if (contentText) contentText = contentText.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
   if (contentHtml) contentHtml = contentHtml.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
   if (typeof contentJson === 'string') contentJson = contentJson.replace(/<span class=["']?text-sky-700[^>]*>([\s\S]*?)<\/span>/gi, '$1');
+
+  // 2026 조직개편 부서명 변경 (교학지원처 -> 교무지원처, 입학홍보처 -> 입학지원처)
+  const replaceOrgDept = (str: string) => str.replace(/교학지원처/g, '교무지원처').replace(/입학홍보처/g, '입학지원처');
+  if (title) title = replaceOrgDept(title);
+  if (contentText) contentText = replaceOrgDept(contentText);
+  if (contentHtml) contentHtml = replaceOrgDept(contentHtml);
+  if (typeof contentJson === 'string') contentJson = replaceOrgDept(contentJson);
   const isAddendumArticle =
     title === "부칙" ||
     title === "부" ||
