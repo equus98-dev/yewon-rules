@@ -815,9 +815,16 @@ export default function Home() {
                             <span>작성일: <span className="text-slate-700">{notice.date}</span></span>
                           </div>
                         </div>
-                        <div className="p-8 text-[15px] text-slate-800 leading-relaxed font-medium whitespace-pre-wrap flex-1">
-                          {notice.content}
-                        </div>
+                        {/<[a-z][\s\S]*>/i.test(notice.content) ? (
+                          <div 
+                            className="p-8 text-[15px] text-slate-800 leading-relaxed font-medium flex-1 prose max-w-none [&_table]:border-collapse [&_table]:w-full [&_table]:my-4 [&_table]:border [&_table]:border-slate-300 [&_th]:border [&_th]:border-slate-300 [&_th]:bg-slate-100 [&_th]:p-2.5 [&_th]:text-center [&_th]:font-bold [&_td]:border [&_td]:border-slate-300 [&_td]:p-2.5 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-blue-600 [&_a]:underline"
+                            dangerouslySetInnerHTML={{ __html: notice.content }}
+                          />
+                        ) : (
+                          <div className="p-8 text-[15px] text-slate-800 leading-relaxed font-medium whitespace-pre-wrap flex-1">
+                            {notice.content}
+                          </div>
+                        )}
                         <div className="px-8 py-5 border-t border-slate-200 bg-slate-50 flex justify-end">
                           <button
                             onClick={() => setActiveNoticeId(null)}
@@ -1919,9 +1926,16 @@ export default function Home() {
             </div>
 
             {/* 모달 본문 */}
-            <div className="p-6 overflow-y-auto flex-1 text-slate-700 text-xs leading-relaxed whitespace-pre-wrap font-medium">
-              {selectedNotice.content}
-            </div>
+            {/<[a-z][\s\S]*>/i.test(selectedNotice.content) ? (
+              <div 
+                className="p-6 overflow-y-auto flex-1 text-slate-700 text-[13px] leading-relaxed font-medium prose max-w-none [&_table]:border-collapse [&_table]:w-full [&_table]:my-3 [&_table]:border [&_table]:border-slate-300 [&_th]:border [&_th]:border-slate-300 [&_th]:bg-slate-100 [&_th]:p-2 [&_th]:text-center [&_th]:font-bold [&_td]:border [&_td]:border-slate-300 [&_td]:p-2 [&_p]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-blue-600 [&_a]:underline"
+                dangerouslySetInnerHTML={{ __html: selectedNotice.content }}
+              />
+            ) : (
+              <div className="p-6 overflow-y-auto flex-1 text-slate-700 text-xs leading-relaxed whitespace-pre-wrap font-medium">
+                {selectedNotice.content}
+              </div>
+            )}
 
             {/* 모달 푸터 버튼 */}
             <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">

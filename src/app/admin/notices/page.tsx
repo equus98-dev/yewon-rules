@@ -1,12 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { CircularProgress, IconButton } from "@mui/material";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RefreshIcon from "@mui/icons-material/Refresh";
+
+const JoditEditor = dynamic(() => import("jodit-react"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-64 flex flex-col items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-400 text-sm font-semibold gap-2">
+      <CircularProgress size={24} sx={{ color: "#0c3161" }} />
+      <span>에디터 불러오는 중...</span>
+    </div>
+  ),
+});
 
 export default function AdminNotices() {
   const [notices, setNotices] = useState<any[]>([]);
@@ -23,8 +34,67 @@ export default function AdminNotices() {
   const [dept, setDept] = useState("기획조정팀");
   const [date, setDate] = useState("");
 
-  const deptOptions = ["기획조정팀"];
-  const prefixOptions = ["전체공지", "교직원 안내", ""];
+  const editorRef = useRef<any>(null);
+
+  const deptOptions = [
+    "기획조정팀",
+    "교무처",
+    "학생지원처",
+    "총무처",
+    "사무처",
+    "입학홍보처",
+    "산학협력단",
+    "전산정보원",
+  ];
+  const prefixOptions = ["전체공지", "교직원 안내", "학생 안내", "규정 개정", "의견수렴", "긴급"];
+
+  const editorConfig = useMemo(
+    () => ({
+      readonly: false,
+      placeholder: "공지사항 상세 내용을 입력하세요 (글자 서식, 표, 링크, 이미지 삽입 가능)...",
+      height: 400,
+      minHeight: 300,
+      askBeforePasteHTML: false,
+      askBeforePasteFromWord: false,
+      defaultActionOnPaste: "insert_as_html" as const,
+      language: "ko",
+      style: {
+        fontFamily: "'Pretendard', sans-serif",
+        fontSize: "15px",
+        lineHeight: "1.7",
+      },
+      buttons: [
+        "bold",
+        "italic",
+        "underline",
+        "strikethrough",
+        "|",
+        "font",
+        "fontsize",
+        "brush",
+        "paragraph",
+        "|",
+        "ul",
+        "ol",
+        "|",
+        "table",
+        "link",
+        "image",
+        "|",
+        "align",
+        "undo",
+        "redo",
+        "hr",
+        "eraser",
+        "source",
+        "fullsize",
+      ],
+      uploader: {
+        insertImageAsBase64URI: true,
+      },
+    }),
+    []
+  );
 
   // 1. 공지사항 로드
   const loadNotices = async () => {
@@ -72,28 +142,27 @@ export default function AdminNotices() {
     let noticeTitle = notice.title;
     let noticePrefix = "";
     const match = noticeTitle.match(/^\[(.*?)\]\s*(.*)$/);
-    if (match && prefixOptions.includes(match[1])) {
-      noticePrefix = match[1];
-      noticeTitle = match[2];
-    } else if (match && !prefixOptions.includes(match[1])) {
-      // If it has a bracket but not in our standard options, just leave it in title or add it to options
+    if (match) {
       noticePrefix = match[1];
       noticeTitle = match[2];
     }
     
     setPrefix(noticePrefix);
     setTitle(noticeTitle);
-    setContent(notice.content);
-    setDept(notice.dept);
-    setDate(notice.date);
+    setContent(notice.content || "");
+    setDept(notice.dept || "기획조정팀");
+    setDate(notice.date || "");
     setModalOpen(true);
   };
 
   // 4. 공지 저장 (생성 또는 수정)
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim() || !dept || !date) {
-      alert("모든 필수 입력 필드를 채워 주십시오.");
+    const finalContent = (editorRef.current?.value !== undefined ? editorRef.current.value : content).trim();
+    const textOnly = finalContent.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, "").trim();
+
+    if (!title.trim() || !textOnly || !dept || !date) {
+      alert("모든 필수 입력 필드(제목, 본문 내용, 작성 부서, 노출일자)를 채워 주십시오.");
       return;
     }
 
@@ -103,8 +172,8 @@ export default function AdminNotices() {
       const method = isEdit ? "PUT" : "POST";
       const finalTitle = prefix ? `[${prefix}] ${title}` : title;
       const payload = isEdit 
-        ? { id: editingNotice.id, title: finalTitle, content, dept, date } 
-        : { title: finalTitle, content, dept, date };
+        ? { id: editingNotice.id, title: finalTitle, content: finalContent, dept, date } 
+        : { title: finalTitle, content: finalContent, dept, date };
 
       const res = await fetch(url, {
         method,
@@ -222,7 +291,7 @@ export default function AdminNotices() {
                             {notice.title}
                           </h4>
                           <p className="text-[14px] text-slate-450 font-bold max-w-xl truncate">
-                            {notice.content}
+                            {notice.content ? notice.content.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim() : ""}
                           </p>
                         </div>
                       </td>
@@ -257,23 +326,23 @@ export default function AdminNotices() {
 
       </div>
 
-      {/* 6. 공지 등록/수정 모달 폼 다이얼로그 (프리미엄 라이트 테마) */}
+      {/* 6. 공지 등록/수정 모달 폼 다이얼로그 (와이드 웹에디터 테마) */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 select-none">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <form 
             onSubmit={handleSave}
-            className="bg-white border border-slate-200 w-full max-w-lg rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh] hover:scale-[1.002] transition-all"
+            className="bg-white border border-slate-200 w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh] transition-all"
           >
             {/* 모달 헤더 */}
-            <div className="bg-gradient-to-r from-[#0c3161] to-[#092244] p-5.5 text-white flex items-center justify-between border-b border-slate-200 shadow-sm">
+            <div className="bg-gradient-to-r from-[#0c3161] to-[#092244] p-5 text-white flex items-center justify-between border-b border-slate-200 shadow-sm select-none">
               <h3 className="text-lg font-black tracking-tight flex items-center gap-2">
-                <CampaignIcon sx={{ color: "#ffffff", fontSize: 22 }} />
-                {editingNotice ? "공지사항 정보 개정" : "신규 긴급 공지 인입"}
+                <CampaignIcon sx={{ color: "#ffffff", fontSize: 24 }} />
+                {editingNotice ? "공지사항 정보 개정" : "신규 공지사항 작성"}
               </h3>
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="text-slate-200 hover:text-white text-lg font-bold transition-colors cursor-pointer"
+                className="text-slate-200 hover:text-white text-xl font-bold transition-colors cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10"
               >
                 ✕
               </button>
@@ -291,13 +360,12 @@ export default function AdminNotices() {
                   <select
                     value={prefix}
                     onChange={(e) => setPrefix(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4.5 py-3.5 text-[13.5px] text-slate-850 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-extrabold cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13.5px] text-slate-850 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-extrabold cursor-pointer"
                   >
                     <option value="" className="text-slate-400">선택 안함</option>
-                    <option value="전체공지">전체공지</option>
-                    <option value="교직원 안내">교직원 안내</option>
-                    <option value="의견수렴">의견수렴</option>
-                    <option value="개정알림">개정알림</option>
+                    {prefixOptions.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="col-span-3 space-y-2">
@@ -310,7 +378,7 @@ export default function AdminNotices() {
                     placeholder="예: 학칙 개정에 따른 조문 최종 확정 공고"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4.5 py-3.5 text-[13.5px] text-slate-850 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-bold"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13.5px] text-slate-850 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-bold"
                   />
                 </div>
               </div>
@@ -324,9 +392,9 @@ export default function AdminNotices() {
                   <select
                     value={dept}
                     onChange={(e) => setDept(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4.5 py-3.5 text-[13.5px] text-slate-850 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-extrabold cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13.5px] text-slate-850 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-extrabold cursor-pointer"
                   >
-                    {deptOptions.map((opt) => (
+                    {Array.from(new Set([...deptOptions, dept])).map((opt) => (
                       <option key={opt} value={opt} className="bg-white text-slate-800">{opt}</option>
                     ))}
                   </select>
@@ -342,40 +410,46 @@ export default function AdminNotices() {
                     placeholder="2026.05.31"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4.5 py-3.5 text-[13.5px] text-slate-850 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-bold"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13.5px] text-slate-850 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-bold"
                   />
                 </div>
               </div>
 
-              {/* 본문 에어리어 */}
+              {/* 본문 에디터 */}
               <div className="space-y-2">
-                <label className="text-slate-600 flex items-center gap-1 pl-1">
-                  <span className="text-[#0c3161]">•</span> 공지사항 상세 내용
-                </label>
-                <textarea
-                  required
-                  rows={6}
-                  placeholder="사용자 화면의 모달과 사이드바에 실시간 노출될 전체 본문 내용을 격식 있고 구체적으로 기술하십시오..."
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4.5 py-3.5 text-[13.5px] text-slate-850 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0c3161] focus:border-[#0c3161] font-medium resize-none leading-relaxed"
-                />
+                <div className="flex items-center justify-between">
+                  <label className="text-slate-600 flex items-center gap-1 pl-1">
+                    <span className="text-[#0c3161]">•</span> 공지사항 상세 내용 (웹 에디터)
+                  </label>
+                  <span className="text-[12px] text-slate-400 font-medium">
+                    글자 서식(굵게, 색상), 글머리 기호, 표, 이미지, 링크 등을 자유롭게 작성할 수 있습니다.
+                  </span>
+                </div>
+                <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-inner">
+                  <JoditEditor
+                    ref={editorRef}
+                    value={content}
+                    config={editorConfig}
+                    onBlur={(newContent) => setContent(newContent)}
+                    onChange={() => {}}
+                  />
+                </div>
               </div>
 
             </div>
 
             {/* 모달 푸터 버튼 바 */}
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3">
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 select-none">
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="border border-slate-200 text-slate-650 hover:bg-slate-100 hover:text-slate-900 text-[13.5px] font-black px-6 py-3 rounded-xl transition-all cursor-pointer select-none active:scale-95"
+                className="border border-slate-200 text-slate-650 hover:bg-slate-100 hover:text-slate-900 text-[13.5px] font-black px-6 py-2.5 rounded-xl transition-all cursor-pointer select-none active:scale-95"
               >
                 취소
               </button>
               <button
                 type="submit"
-                className="bg-[#0c3161] hover:bg-[#092244] text-[13.5px] font-white text-white font-black px-6 py-3 rounded-xl shadow-lg shadow-[#0c3161]/10 transition-all cursor-pointer select-none active:scale-95"
+                className="bg-[#0c3161] hover:bg-[#092244] text-[13.5px] text-white font-black px-6 py-2.5 rounded-xl shadow-lg shadow-[#0c3161]/10 transition-all cursor-pointer select-none active:scale-95"
               >
                 {editingNotice ? "변경사항 저장" : "새 공지 발행"}
               </button>
