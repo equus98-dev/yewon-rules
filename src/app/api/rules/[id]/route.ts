@@ -323,6 +323,115 @@ export async function GET(
         // 제61조에서 이미 62조가 동적으로 분리 생성된 경우 원본(아마도 비정상적인 데이터) 무시
         continue;
 
+      } else if (
+        (ruleRow.ruleNumber === "3-3-20" || ruleRow.title?.includes("원격수업") || targetRevisionId === "afb193fb-86c9-40a1-b1d6-91c22f400d29") &&
+        art.articleNumber === 2 &&
+        art.contentText &&
+        art.contentText.includes("제3조(학점인정)")
+      ) {
+        // 3-3-20 원격수업 운영에 관한 규정: 제2조 내 제3조, 제4조 분리
+        const rawText = art.contentText;
+        const idx3 = rawText.indexOf("제3조(학점인정)");
+        const idx4 = rawText.indexOf("제4조(원격수업의 개설 및 운영)");
+
+        const text2 = rawText.slice(0, idx3).trim();
+        const text3 = (idx4 !== -1 ? rawText.slice(idx3, idx4) : rawText.slice(idx3)).trim();
+        const text4 = idx4 !== -1 ? rawText.slice(idx4).trim() : "";
+
+        // 제2조
+        processedArticles.push({
+          ...art,
+          id: art.id,
+          articleNumber: 2,
+          title: "용어의 정의",
+          contentText: text2,
+          contentJson: JSON.stringify([
+            { type: "article", num: "제2조", text: "제2조(용어의 정의)" },
+            { type: "paragraph", num: "", text: text2.replace(/^제2조\([^)]+\)\s*/, "").trim() }
+          ]),
+          contentHtml: null,
+          sortOrder: 2
+        });
+
+        // 제3조
+        processedArticles.push({
+          ...art,
+          id: art.id + "_art3",
+          articleNumber: 3,
+          title: "학점인정",
+          contentText: text3,
+          contentJson: JSON.stringify([
+            { type: "article", num: "제3조", text: "제3조(학점인정)" },
+            { type: "paragraph", num: "", text: text3.replace(/^제3조\([^)]+\)\s*/, "").trim() }
+          ]),
+          contentHtml: null,
+          sortOrder: 3
+        });
+
+        // 제4조
+        if (text4) {
+          processedArticles.push({
+            ...art,
+            id: art.id + "_art4",
+            articleNumber: 4,
+            title: "원격수업의 개설 및 운영",
+            contentText: text4,
+            contentJson: JSON.stringify([
+              { type: "article", num: "제4조", text: "제4조(원격수업의 개설 및 운영)" },
+              { type: "paragraph", num: "", text: text4.replace(/^제4조\([^)]+\)\s*/, "").trim() }
+            ]),
+            contentHtml: null,
+            sortOrder: 4
+          });
+        }
+      } else if (
+        (ruleRow.ruleNumber === "3-3-20" || ruleRow.title?.includes("원격수업") || targetRevisionId === "afb193fb-86c9-40a1-b1d6-91c22f400d29") &&
+        art.articleNumber === 5 &&
+        art.contentText &&
+        art.contentText.includes("제6조(출석관리)")
+      ) {
+        // 3-3-20 원격수업 운영에 관한 규정: 제5조 내 제6조~제15조 및 부칙 분리
+        const rawText = art.contentText;
+        const marks = [
+          { num: 5, title: "시수인정", tag: "제5조(시수인정)" },
+          { num: 6, title: "출석관리", tag: "제6조(출석관리)" },
+          { num: 7, title: "평가관리", tag: "제7조(평가관리)" },
+          { num: 8, title: "원격수업관리위원회 구성", tag: "제8조(원격수업관리위원회 구성)" },
+          { num: 9, title: "<삭제>", tag: "제9조 <삭제" },
+          { num: 10, title: "콘텐츠 개발 및 지원", tag: "제10조(콘텐츠 개발 및 지원)" },
+          { num: 11, title: "원격수업의 관리 및 운영", tag: "제11조(원격수업의 관리 및 운영)" },
+          { num: 12, title: "다른 규정과의 관계", tag: "제12조(다른 규정과의 관계)" },
+          { num: 13, title: "지식재산권", tag: "제13조(지식재산권)" },
+          { num: 13, title: "의2(정보보호에 관한 사항)", tag: "제13조의2(정보보호에 관한 사항)" },
+          { num: 14, title: "담당 부서", tag: "제14조(담당 부서)" },
+          { num: 15, title: "적용제외", tag: "제15조(적용제외)" },
+          { num: 8001, title: "부칙", tag: "부 칙(제정 2019. 1. 28)" }
+        ];
+
+        for (let i = 0; i < marks.length; i++) {
+          const cur = marks[i];
+          const startIdx = rawText.indexOf(cur.tag);
+          if (startIdx === -1) continue;
+          let endIdx = rawText.length;
+          if (i < marks.length - 1) {
+            const nextIdx = rawText.indexOf(marks[i + 1].tag, startIdx);
+            if (nextIdx !== -1) endIdx = nextIdx;
+          }
+          const snippet = rawText.slice(startIdx, endIdx).trim();
+          processedArticles.push({
+            ...art,
+            id: i === 0 ? art.id : art.id + "_art_" + cur.num + (cur.title.includes("의2") ? "_sub2" : ""),
+            articleNumber: cur.num,
+            title: cur.title,
+            contentText: snippet,
+            contentJson: JSON.stringify([
+              { type: "article", num: cur.title.includes("의2") ? "제13조의2" : `제${cur.num}조`, text: cur.tag },
+              { type: "paragraph", num: "", text: snippet.replace(new RegExp(`^${cur.tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*`), "").trim() }
+            ]),
+            contentHtml: null,
+            sortOrder: cur.num === 13 && cur.title.includes("의2") ? 13.5 : cur.num
+          });
+        }
       } else {
         // 일반대학원 학사운영 규정 제57조 ①항 누락 복원
         if (art.articleNumber === 57 && ruleRow.title?.includes("일반대학원 학사운영 규정")) {
@@ -356,6 +465,20 @@ export async function GET(
             ])
           };
         }
+
+        // 3-3-20 원격수업 운영에 관한 규정 제1조 및 부칙 정리
+        if (ruleRow.ruleNumber === "3-3-20" || ruleRow.title?.includes("원격수업") || targetRevisionId === "afb193fb-86c9-40a1-b1d6-91c22f400d29") {
+          if (art.articleNumber === 1) {
+            art.sortOrder = 1;
+          } else if (art.articleNumber >= 8000 && art.contentText && art.contentText.includes("부 칙(제정 2021. 3. 30)")) {
+            art.contentText = art.contentText
+              .replace(/부\s*칙\(제정\s*2021\.\s*3\.\s*30\)/g, "부 칙(개정 2021. 3. 30)\n")
+              .replace(/부\s*칙\(제정\s*2023\.02\.13\.\)/g, "\n\n부 칙(개정 2023. 2. 13)\n")
+              .trim();
+            art.sortOrder = 8002;
+          }
+        }
+
         processedArticles.push(art);
       }
     }
